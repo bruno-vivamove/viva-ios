@@ -1,14 +1,7 @@
-//
-//  AuthButton.swift
-//  Viva
-//
-//  Created by Bruno Souto on 1/9/25.
-//
-
 import SwiftUI
 
 class AuthenticationManager: ObservableObject {
-    @Published private(set) var isSignedIn = false  // Make setter private
+    @Published private(set) var isSignedIn = false
     
     func signIn() {
         withAnimation(.easeInOut(duration: 0.5)) {
@@ -24,84 +17,206 @@ class AuthenticationManager: ObservableObject {
 }
 
 struct SignInView: View {
-    private let mainTextFontSize: CGFloat = 70
-    private let logoWidth: CGFloat = 180
-    private let horizontalPadding: CGFloat = 20
-    private let buttonSpacing: CGFloat = 15
-
     @StateObject private var authManager = AuthenticationManager()
+    private let logoWidth: CGFloat = 180
     
     var body: some View {
         ZStack {
-            Color.black
+            VivaDesign.Colors.background
                 .ignoresSafeArea()
-
+            
             if authManager.isSignedIn {
                 MainView()
                     .environmentObject(authManager)
                     .transition(.move(edge: .trailing))
             } else {
-                VStack(spacing: 20) {
+                VStack(spacing: VivaDesign.Spacing.medium) {
                     // Logo
-                    HStack {
-                        Spacer()
-                        Image("viva_logo")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: logoWidth)
-                            .padding(.trailing, horizontalPadding)
-                    }
-
+                    LogoHeader(width: logoWidth)
+                    
                     Spacer()
-
+                    
                     // Main Text
-                    HStack {
-                        Spacer()
-                        VStack(alignment: .trailing, spacing: 0) {
-                            Text("LONG")
-                                .font(.system(size: mainTextFontSize, weight: .bold))
-                                .foregroundColor(.vivaGreen)
-
-                            Text("LIVE")
-                                .font(.system(size: mainTextFontSize, weight: .bold))
-                                .foregroundColor(.vivaGreen)
-
-                            Text("THE FIT")
-                                .font(.system(size: mainTextFontSize, weight: .bold))
-                                .foregroundColor(.white)
-                        }
-                        .multilineTextAlignment(.trailing)
-                        .padding(.trailing, horizontalPadding)
-                    }
-
+                    MarketingText()
+                    
                     Spacer()
-
-                    // Buttons
-                    VStack(spacing: buttonSpacing) {
-                        AuthButton(title: "Sign Up", foregroundColor: .black, backgroundColor: Color.vivaGreen, borderColor: Color.vivaGreen){
-                            // Action
-
-                        }
-                        
-                        AuthButton(title: "Sign In", foregroundColor: .white, backgroundColor: .black, borderColor: .white){
-                            self.authManager.signIn()
-                        }
-
-                        AuthButton(title: "Sign In", foregroundColor: .white, backgroundColor: .black, borderColor: .white, image: Image("google_logo")){
-                            // Action
-
-                        }
-
-                        AuthButton(title: "Sign in with Apple", foregroundColor: .black, backgroundColor: .white, borderColor: .white, image: Image(systemName: "applelogo")
-                        ){
-                            // Action
-
-                        }
-                    }
-                    .padding(.horizontal, 30)
+                    
+                    // Auth Buttons
+                    AuthButtonStack(authManager: authManager)
                 }
-                .padding(.vertical, 30)
+                .padding(.vertical, VivaDesign.Spacing.large)
             }
+        }
+    }
+}
+
+struct LogoHeader: View {
+    let width: CGFloat
+    
+    var body: some View {
+        HStack {
+            Spacer()
+            Image("viva_logo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: width)
+                .padding(.trailing, VivaDesign.Spacing.medium)
+        }
+    }
+}
+
+struct MarketingText: View {
+    var body: some View {
+        HStack {
+            Spacer()
+            VStack(alignment: .trailing, spacing: 0) {
+                Text("LONG")
+                    .font(VivaDesign.Typography.displayText())
+                    .foregroundColor(VivaDesign.Colors.vivaGreen)
+                
+                Text("LIVE")
+                    .font(VivaDesign.Typography.displayText())
+                    .foregroundColor(VivaDesign.Colors.vivaGreen)
+                
+                Text("THE FIT")
+                    .font(VivaDesign.Typography.displayText())
+                    .foregroundColor(VivaDesign.Colors.primaryText)
+            }
+            .multilineTextAlignment(.trailing)
+            .padding(.trailing, VivaDesign.Spacing.medium)
+        }
+    }
+}
+
+struct AuthButtonStack: View {
+    @ObservedObject var authManager: AuthenticationManager
+    
+    var body: some View {
+        VStack(spacing: VivaDesign.Spacing.small) {
+            // Sign Up Button
+            AuthButtonView(
+                title: "Sign Up",
+                style: .primary,
+                action: {
+                    // Add sign up action
+                }
+            )
+            
+            // Basic Sign In Button
+            AuthButtonView(
+                title: "Sign In",
+                style: .secondary,
+                action: {
+                    authManager.signIn()
+                }
+            )
+            
+            // Google Sign In Button
+            AuthButtonView(
+                title: "Sign In with Google",
+                style: .secondary,
+                image: Image("google_logo"),
+                action: {
+                    // Add Google sign in action
+                }
+            )
+            
+            // Apple Sign In Button
+            AuthButtonView(
+                title: "Sign in with Apple",
+                style: .white,
+                image: Image(systemName: "applelogo"),
+                action: {
+                    // Add Apple sign in action
+                }
+            )
+        }
+        .padding(.horizontal, VivaDesign.Spacing.large)
+    }
+}
+
+// MARK: - Auth Button Components
+enum AuthButtonStyle {
+    case primary
+    case secondary
+    case white
+    
+    var foregroundColor: Color {
+        switch self {
+        case .primary:
+            return .black
+        case .secondary:
+            return .white
+        case .white:
+            return .black
+        }
+    }
+    
+    var backgroundColor: Color {
+        switch self {
+        case .primary:
+            return VivaDesign.Colors.vivaGreen
+        case .secondary:
+            return .clear
+        case .white:
+            return .white
+        }
+    }
+    
+    var borderColor: Color {
+        switch self {
+        case .primary:
+            return VivaDesign.Colors.vivaGreen
+        case .secondary:
+            return .white
+        case .white:
+            return .white
+        }
+    }
+}
+
+struct AuthButtonView: View {
+    let title: String
+    let style: AuthButtonStyle
+    let image: Image?
+    let action: () -> Void
+    
+    init(
+        title: String,
+        style: AuthButtonStyle,
+        image: Image? = nil,
+        action: @escaping () -> Void
+    ) {
+        self.title = title
+        self.style = style
+        self.image = image
+        self.action = action
+    }
+    
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                if let image = image {
+                    image
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .foregroundColor(style.foregroundColor)
+                }
+                
+                Text(title)
+                    .font(VivaDesign.Typography.body.bold())
+                    .foregroundColor(style.foregroundColor)
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: VivaDesign.Sizing.buttonCornerRadius)
+                    .fill(style.backgroundColor)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: VivaDesign.Sizing.buttonCornerRadius)
+                    .stroke(style.borderColor, lineWidth: VivaDesign.Sizing.buttonBorderWidth)
+            )
         }
     }
 }

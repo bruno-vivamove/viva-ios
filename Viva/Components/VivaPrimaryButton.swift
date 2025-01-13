@@ -9,18 +9,29 @@ import SwiftUI
 
 struct VivaPrimaryButton: View {
     let title: String
+    let width: CGFloat?
     let action: () -> Void
-    
+
+    init(title: String, width: CGFloat? = nil, action: @escaping () -> Void) {
+        self.title = title
+        self.width = width
+        self.action = action
+    }
+
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(VivaDesign.Typography.body.bold())
-                .foregroundColor(.black)
-                .frame(maxWidth: .infinity)
-                .padding()
+                .foregroundColor(VivaDesign.Colors.vivaGreen)
+                .font(VivaDesign.Typography.caption)
+                .frame(width: width)
+                .padding(VivaDesign.Spacing.minimal)
                 .background(
-                    RoundedRectangle(cornerRadius: VivaDesign.Sizing.buttonCornerRadius)
-                        .fill(VivaDesign.Colors.vivaGreen)
+                    RoundedRectangle(
+                        cornerRadius: VivaDesign.Sizing.cornerRadius
+                    )
+                    .stroke(
+                        VivaDesign.Colors.vivaGreen,
+                        lineWidth: VivaDesign.Sizing.borderWidth)
                 )
         }
     }

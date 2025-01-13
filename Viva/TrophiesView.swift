@@ -7,13 +7,17 @@
 
 import SwiftUI
 
+struct MatchupHistory {
+    let opponent: User
+    let record: String
+}
+
 struct TrophiesView: View {
-    // Sample data that matches the screenshot
     private let totalMatchups = 46
     private let wins = 25
     private let losses = 21
     private let timeRange = "All-Time ▼"
-
+    
     private let matchupHistory = [
         MatchupHistory(
             opponent: User(
@@ -42,109 +46,207 @@ struct TrophiesView: View {
             ),
             record: "9-6"
         ),
+        MatchupHistory(
+            opponent: User(
+                id: "5",
+                name: "Chris Dolan",
+                score: 1287,
+                imageURL: "profile_chris"
+            ),
+            record: "11-9"
+        ),
+        MatchupHistory(
+            opponent: User(
+                id: "6",
+                name: "Bruno Souto",
+                score: 1168,
+                imageURL: "profile_bruno"
+            ),
+            record: "5-6"
+        ),
+        MatchupHistory(
+            opponent: User(
+                id: "7",
+                name: "Judah Levine",
+                score: 1113,
+                imageURL: "profile_judah"
+            ),
+            record: "9-6"
+        ),
+        MatchupHistory(
+            opponent: User(
+                id: "8",
+                name: "Chris Dolan",
+                score: 1287,
+                imageURL: "profile_chris"
+            ),
+            record: "11-9"
+        ),
+        MatchupHistory(
+            opponent: User(
+                id: "9",
+                name: "Bruno Souto",
+                score: 1168,
+                imageURL: "profile_bruno"
+            ),
+            record: "5-6"
+        ),
+        MatchupHistory(
+            opponent: User(
+                id: "10",
+                name: "Judah Levine",
+                score: 1113,
+                imageURL: "profile_judah"
+            ),
+            record: "9-6"
+        ),
     ]
-
+    
     var body: some View {
-        VStack(spacing: 10) {
-            // Header stats
-            VStack(spacing: 40) {
-                HStack {
-                    Spacer()
-                    Text("\(totalMatchups)")
-                        .foregroundColor(.vivaGreen)
-                        .font(.subheadline)
-                        .fontWeight(.bold) +
-                    Text(" Total Matchups")
-                        .foregroundColor(.white)
-                        .font(.subheadline)
-                        .fontWeight(.bold)
-
-                    Spacer()
-
-                    Text(timeRange)
-                        .foregroundColor(.white)
-                        .font(.subheadline)
-                        .fontWeight(.bold)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 4)
-                    Spacer()
-                }
-
-                HStack(spacing: 24) {
-                    // Wins
-                    HStack(spacing: 8) {
-                        Image(systemName: "trophy.fill")
-                            .foregroundColor(.yellow)
-                        Text("\(wins)")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                        Text("wins")
-                            .font(.title3)
-                            .foregroundColor(.vivaGreen)
-                    }
-
-                    // Losses
-                    HStack(spacing: 8) {
-                        Image(systemName: "minus.circle.fill")
-                            .foregroundColor(.red)
-                        Text("\(losses)")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                        Text("losses")
-                            .font(.title3)
-                            .foregroundColor(.gray)
-                    }
-                }
-            }
-            .padding(.horizontal)
-
-            Rectangle()
-                .fill(Color.white.opacity(0.6))
-                .frame(height: 1.5)
+        VStack(spacing: VivaDesign.Spacing.small) {
+            // Header Stats
+            TrophiesHeader(
+                totalMatchups: totalMatchups,
+                timeRange: timeRange,
+                wins: wins,
+                losses: losses
+            )
+            
+            VivaDivider()
                 .padding(.horizontal)
-
-            // Matchup history
-            VStack(spacing: 0) {
-                ForEach(
-                    Array(matchupHistory.enumerated()),
-                    id: \.element.opponent.id
-                ) { index, history in
-                    MatchupHistoryCard(history: history)
-                        .padding(.vertical, 10)
-
-                    if index < matchupHistory.count - 1 {
-                        Rectangle()
-                            .fill(Color.white.opacity(0.6))
-                            .frame(height: 1.5)
-                            .padding(.horizontal)
+            
+            // Matchup History
+            ScrollView {
+                VStack(spacing: 0) {
+                    ForEach(Array(matchupHistory.enumerated()), id: \.element.opponent.id) { index, history in
+                        HistoryCard(history: history)
+                            .padding(.vertical, VivaDesign.Spacing.small)
+                        
+                        if index < matchupHistory.count - 1 {
+                            VivaDivider()
+                                .padding(.horizontal)
+                        }
                     }
                 }
             }
-            Spacer()
-
+            
             // Create New Matchup Button
-            Button(action: {
+            VivaPrimaryButton(title: "Create New Matchup") {
                 // Add action here
-            }) {
-                Text("Create New Matchup")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.vivaGreen, lineWidth: 1)
-                    )
             }
-            .padding(.horizontal)
-
-            Spacer()
         }
-        .padding(.top)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black)
+        .background(VivaDesign.Colors.background)
+    }
+}
+
+struct TrophiesHeader: View {
+    let totalMatchups: Int
+    let timeRange: String
+    let wins: Int
+    let losses: Int
+    
+    var body: some View {
+        VStack(spacing: VivaDesign.Spacing.large) {
+            // Total Matchups and Time Range
+            HStack {
+                Spacer()
+                Text("\(totalMatchups)")
+                    .foregroundColor(VivaDesign.Colors.vivaGreen)
+                    .font(VivaDesign.Typography.caption.bold()) +
+                Text(" Total Matchups")
+                    .foregroundColor(VivaDesign.Colors.primaryText)
+                    .font(VivaDesign.Typography.caption.bold())
+                
+                Spacer()
+                
+                Text(timeRange)
+                    .foregroundColor(VivaDesign.Colors.primaryText)
+                    .font(VivaDesign.Typography.caption.bold())
+                    .padding(.horizontal, VivaDesign.Spacing.small)
+                    .padding(.vertical, VivaDesign.Spacing.minimal)
+                Spacer()
+            }
+            
+            // Win/Loss Stats
+            HStack(spacing: VivaDesign.Spacing.medium) {
+                // Wins
+                StatDisplay(
+                    icon: "trophy.fill",
+                    iconColor: .yellow,
+                    value: wins,
+                    label: "wins",
+                    labelColor: VivaDesign.Colors.vivaGreen
+                )
+                
+                // Losses
+                StatDisplay(
+                    icon: "minus.circle.fill",
+                    iconColor: .red,
+                    value: losses,
+                    label: "losses",
+                    labelColor: VivaDesign.Colors.secondaryText
+                )
+            }
+        }
+        .padding(.horizontal)
+    }
+}
+
+struct StatDisplay: View {
+    let icon: String
+    let iconColor: Color
+    let value: Int
+    let label: String
+    let labelColor: Color
+    
+    var body: some View {
+        HStack(spacing: VivaDesign.Spacing.minimal) {
+            Image(systemName: icon)
+                .foregroundColor(iconColor)
+            Text("\(value)")
+                .font(.title)
+                .fontWeight(.bold)
+                .foregroundColor(VivaDesign.Colors.primaryText)
+            Text(label)
+                .font(VivaDesign.Typography.title3)
+                .foregroundColor(labelColor)
+        }
+    }
+}
+
+struct HistoryCard: View {
+    let history: MatchupHistory
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            // Record
+            Text(history.record)
+                .font(.title)
+                .fontWeight(.bold)
+                .foregroundColor(VivaDesign.Colors.primaryText)
+                .frame(maxWidth: .infinity, alignment: .center)
+            
+            // VS
+            Text("vs")
+                .font(VivaDesign.Typography.body)
+                .foregroundColor(VivaDesign.Colors.primaryText)
+                .frame(maxWidth: .infinity, alignment: .center)
+            
+            // Opponent Info
+            VStack(alignment: .center, spacing: VivaDesign.Spacing.minimal) {
+                Text(history.opponent.name)
+                    .font(VivaDesign.Typography.body)
+                    .foregroundColor(VivaDesign.Colors.vivaGreen)
+                    .lineLimit(1)
+                
+                VivaProfileImage(
+                    imageURL: history.opponent.imageURL,
+                    size: .medium
+                )
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+        }
     }
 }
 

@@ -9,18 +9,31 @@ import SwiftUI
 
 struct VivaSecondaryButton: View {
     let title: String
+    let width: CGFloat?
     let action: () -> Void
-    
+
+    init(title: String, width: CGFloat? = nil, action: @escaping () -> Void) {
+        self.title = title
+        self.width = width
+        self.action = action
+    }
+
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(VivaDesign.Typography.body.bold())
                 .foregroundColor(VivaDesign.Colors.primaryText)
-                .frame(maxWidth: .infinity)
-                .padding()
+                .font(VivaDesign.Typography.caption)
+                .frame(width: width)
+                .padding(VivaDesign.Spacing.minimal)
                 .background(
-                    RoundedRectangle(cornerRadius: VivaDesign.Sizing.buttonCornerRadius)
-                        .stroke(VivaDesign.Colors.vivaGreen, lineWidth: VivaDesign.Sizing.buttonBorderWidth)
+                    RoundedRectangle(
+                        cornerRadius: VivaDesign.Sizing
+                            .cornerRadius
+                    )
+                    .stroke(
+                        VivaDesign.Colors.primaryText,
+                        lineWidth: VivaDesign.Sizing.borderWidth
+                    )
                 )
         }
     }

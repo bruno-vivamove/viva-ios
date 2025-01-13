@@ -1,77 +1,96 @@
+//
+//  HomeView.swift
+//  Viva
+//
+//  Created by Bruno Souto on 1/9/25.
+//
+
 import SwiftUI
 
 struct RewardsView: View {
-    private let points = 3017 // This could be passed in or managed by a view model
+    private let points = 3017
     private let logoWidth: CGFloat = 120
-    private let horizontalPadding: CGFloat = 20
 
     var body: some View {
         VStack(spacing: 0) {
-            // Points Display
-            VStack(spacing: 4) {
-                Text("\(points)")
-                    .font(.system(size: 60, weight: .bold))
-                    .foregroundColor(.white)
-                
-                Text("Reward Points")
-                    .font(.system(size: 24))
-                    .foregroundColor(.vivaGreen)
-            }
-            .padding(.vertical, 24)  // Less vertical padding
-            .padding(.horizontal, 50)  // More horizontal padding
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.white.opacity(0.6), lineWidth: 1)
-            )
-            .padding(.top, 40)
-            
+            RewardsPointsCard(points: points)
+                .padding(.top, VivaDesign.Spacing.large)
+
             Spacer()
-            
-            // Logo and Title
-            VStack(spacing: 4) {
+
+            VStack(spacing: 0) {
+                MarketplaceHeader(logoWidth: logoWidth)
                 HStack {
                     Spacer()
-                    Image("viva_logo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: logoWidth)
+                    Text("COMING SOON")
+                        .font(VivaDesign.Typography.displayText())
+                        .fontWeight(.bold)
+                        .foregroundColor(VivaDesign.Colors.primaryText)
+                        .multilineTextAlignment(.trailing)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.01)
                 }
-
-                Text("Marketplace")
-                    .foregroundColor(.vivaGreen)
-                    .font(.system(size: 22))
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-
-            // Coming Soon Text
-            VStack {
-                Text("COMING SOON")
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.trailing)
-                    .lineLimit(2)
-                    .font(.system(size: 1000).leading(.tight))  // Large initial size that will be scaled down
-                    .minimumScaleFactor(0.01)
-            }  // Allow significant scaling
-            
-            // Description Text
-            HStack {
-                Spacer()
-                Text("Redeem Viva Reward Points for discounts and credit towards a curated selection of healthy brands.")
-                    .font(.system(size: 16))
-                    .foregroundColor(.white)
+                HStack {
+                    Spacer()
+                    Text(
+                        "Redeem Viva Reward Points for discounts and credit towards a curated selection of healthy brands."
+                    )
+                    .font(VivaDesign.Typography.body)
+                    .foregroundColor(VivaDesign.Colors.primaryText)
                     .multilineTextAlignment(.trailing)
                     .frame(maxWidth: UIScreen.main.bounds.width * 0.5)
+                }
             }
-            
+
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(.horizontal, horizontalPadding)
-        .background(Color.black)
+        .padding(.horizontal, VivaDesign.Spacing.medium)
+        .background(VivaDesign.Colors.background)
     }
 }
 
 #Preview {
     RewardsView()
+}
+
+struct RewardsPointsCard: View {
+    let points: Int
+
+    var body: some View {
+        VivaCard {
+            VStack(spacing: VivaDesign.Spacing.minimal) {
+                Text("\(points)")
+                    .font(VivaDesign.Typography.displayText(60))
+                    .foregroundColor(VivaDesign.Colors.primaryText)
+
+                Text("Reward Points")
+                    .font(VivaDesign.Typography.title3)
+                    .foregroundColor(VivaDesign.Colors.vivaGreen)
+            }
+            .padding(.vertical, VivaDesign.Spacing.medium)
+            .padding(.horizontal, VivaDesign.Spacing.large)
+        }
+    }
+}
+
+struct MarketplaceHeader: View {
+    let logoWidth: CGFloat
+
+    var body: some View {
+        VStack(spacing: VivaDesign.Spacing.minimal) {
+            HStack {
+                Spacer()
+                Image("viva_logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: logoWidth)
+            }
+
+            Text("Marketplace")
+                .foregroundColor(VivaDesign.Colors.vivaGreen)
+                .font(VivaDesign.Typography.title3)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+    }
 }

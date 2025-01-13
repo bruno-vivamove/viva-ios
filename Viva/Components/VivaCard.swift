@@ -10,11 +10,11 @@ import SwiftUI
 // Base Card View
 struct VivaCard<Content: View>: View {
     let content: Content
-    
+
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
-    
+
     var body: some View {
         content
             .padding(VivaDesign.Spacing.small)
@@ -22,8 +22,12 @@ struct VivaCard<Content: View>: View {
                 RoundedRectangle(cornerRadius: VivaDesign.Sizing.cornerRadius)
                     .fill(VivaDesign.Colors.background)
                     .overlay(
-                        RoundedRectangle(cornerRadius: VivaDesign.Sizing.cornerRadius)
-                            .stroke(VivaDesign.Colors.divider, lineWidth: VivaDesign.Sizing.borderWidth)
+                        RoundedRectangle(
+                            cornerRadius: VivaDesign.Sizing.cornerRadius
+                        )
+                        .stroke(
+                            VivaDesign.Colors.divider,
+                            lineWidth: VivaDesign.Sizing.borderWidth)
                     )
             )
     }

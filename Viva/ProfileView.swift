@@ -1,24 +1,15 @@
-//
-//  ProfileView.swift
-//  Viva
-//
-//  Created by Bruno Souto on 1/9/25.
-//
-
 import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var authManager: AuthenticationManager
     
-    // Sample user data
     private let user = User(
         id: "1",
         name: "Saya Jones",
         score: 3017,
-        imageURL: "google_logo"
+        imageURL: "profile_stock"
     )
     
-    // Menu items data
     private let menuItems = [
         MenuItem(icon: "applewatch", title: "Linked Devices"),
         MenuItem(icon: "doc.text", title: "Rules & FAQ"),
@@ -30,76 +21,18 @@ struct ProfileView: View {
     ]
     
     var body: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: VivaDesign.Spacing.large) {
             // Profile Header
-            HStack(spacing: 30) {
-                Spacer()
-                VStack {
-                    Image("profile_stock")
-                        .resizable()
-                        .frame(width: 80, height: 80)
-                        .clipShape(Circle())
-                    
-                    Text(user.name)
-                        .font(.title2)
-                        .foregroundColor(.white)
-                    
-                    Button(action: {
-                        // Add edit action
-                    }) {
-                        Text("Edit")
-                            .font(.subheadline)
-                            .foregroundColor(.vivaGreen)
-                    }
-                }
-                
-                VStack {
-                    Text("\(user.score)")
-                        .font(.system(size: 42))
-                        .foregroundColor(.white)
-                        .fontWeight(.bold)
-                    
-                    Text("Reward Points")
-                        .font(.subheadline)
-                        .foregroundColor(.vivaGreen)
-                }
-                Spacer()
-
-            }
-            .padding(.top)
+            ProfileHeader(user: user)
             
             // Menu Items
-            VStack(spacing: 8) {
+            VStack(spacing: VivaDesign.Spacing.minimal) {
                 ForEach(menuItems, id: \.title) { item in
-                    Button(action: {
-                        // Add navigation action
-                    }) {
-                        HStack {
-                            Image(systemName: item.icon)
-                                .foregroundColor(.white)
-                                .frame(width: 24)
-                            
-                            Text(item.title)
-                                .foregroundColor(.white)
-                                .font(.body)
-                            
-                            Spacer()
-                            
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(.gray)
-                        }
-                        .padding(.vertical, 12) // Reduced vertical padding
-                        .padding(.horizontal, 12) // Adjusted horizontal padding
-                        .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.white.opacity(0.6), lineWidth: 1)
-                        )
-                    }
+                    MenuItemButton(item: item)
                 }
             }
             .padding(.horizontal)
-            
-            // Log Out Button
+                        
             Button(action: {
                 authManager.signOut()
             }) {
@@ -108,21 +41,100 @@ struct ProfileView: View {
                     .foregroundColor(.vivaGreen)
                     .padding(.vertical)
             }
-            
+            .padding(.horizontal)
             Spacer()
-    }
-        .background(Color.black)
+        }
+        .padding(.vertical, VivaDesign.Spacing.medium)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(VivaDesign.Colors.background)
     }
 }
 
-// Supporting struct for menu items
-struct MenuItem {
+struct ProfileHeader: View {
+    let user: User
+    
+    var body: some View {
+        HStack(spacing: VivaDesign.Spacing.large) {
+            Spacer()
+            
+            // Profile Image and Name
+            VStack(spacing: VivaDesign.Spacing.minimal) {
+                VivaProfileImage(
+                    imageURL: user.imageURL,
+                    size: .large
+                )
+                
+                Text(user.name)
+                    .font(.title2)
+                    .foregroundColor(VivaDesign.Colors.primaryText)
+                
+                Button(action: {
+                    // Add edit action
+                }) {
+                    Text("Edit")
+                        .font(VivaDesign.Typography.caption)
+                        .foregroundColor(VivaDesign.Colors.vivaGreen)
+                }
+            }
+            
+            // Points Display
+            VStack(spacing: VivaDesign.Spacing.minimal) {
+                Text("\(user.score)")
+                    .font(VivaDesign.Typography.displayText(42))
+                    .foregroundColor(VivaDesign.Colors.primaryText)
+                    .fontWeight(.bold)
+                
+                Text("Reward Points")
+                    .font(VivaDesign.Typography.caption)
+                    .foregroundColor(VivaDesign.Colors.vivaGreen)
+            }
+            
+            Spacer()
+        }
+        .padding(.top)
+    }
+}
+
+struct MenuItemButton: View {
+    let item: MenuItem
+    
+    var body: some View {
+        Button(action: {
+            // Add navigation action
+        }) {
+            HStack {
+                Image(systemName: item.icon)
+                    .foregroundColor(VivaDesign.Colors.primaryText)
+                    .frame(width: 24)
+                
+                Text(item.title)
+                    .foregroundColor(VivaDesign.Colors.primaryText)
+                    .font(VivaDesign.Typography.body)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .foregroundColor(VivaDesign.Colors.secondaryText)
+            }
+            .padding(.vertical, VivaDesign.Spacing.small)
+            .padding(.horizontal, VivaDesign.Spacing.small)
+            .background(
+                RoundedRectangle(cornerRadius: VivaDesign.Sizing.cornerRadius)
+                    .stroke(VivaDesign.Colors.divider, lineWidth: VivaDesign.Sizing.borderWidth)
+            )
+        }
+    }
+}
+
+struct MenuItem: Identifiable {
+    let id = UUID()
     let icon: String
     let title: String
 }
 
-struct ProfileView_Previews: PreviewProvider {
-    static var previews: some View {
-        ProfileView()
-    }
+
+#Preview {
+    ProfileView()
+        .environmentObject(AuthenticationManager())
 }
+
