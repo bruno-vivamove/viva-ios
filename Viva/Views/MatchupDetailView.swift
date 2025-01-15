@@ -174,13 +174,7 @@ struct UserScoreView: View {
     }
     
     private var userInfo: some View {
-        VStack(alignment: imageOnLeft ? .leading : .trailing) {
-            Text(user.name)
-                .foregroundColor(.vivaGreen)
-            Text("\(user.score)")
-                .font(.title)
-                .foregroundColor(.white)
-        }
+        LabeledValueStack(label: user.name, value: "\(user.score)", alignment: imageOnLeft ? .leading : .trailing)
     }
 }
 
