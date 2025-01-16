@@ -1,13 +1,14 @@
 import SwiftUI
+import User
 
 struct ProfileView: View {
     @EnvironmentObject var authManager: AuthenticationManager
     
     private let user = User(
         id: "1",
-        name: "Saya Jones",
-        score: 3017,
-        imageURL: "profile_stock"
+        displayName: "Saya Jones",
+        rewardPoints: 3017,
+        imageId: "profile_stock"
     )
     
     private let menuItems = [
@@ -60,11 +61,11 @@ struct ProfileHeader: View {
             // Profile Image and Name
             VStack(spacing: VivaDesign.Spacing.minimal) {
                 VivaProfileImage(
-                    imageURL: user.imageURL,
+                    imageURL: user.imageId,
                     size: .large
                 )
                 
-                Text(user.name)
+                Text(user.displayName)
                     .font(.title2)
                     .foregroundColor(VivaDesign.Colors.primaryText)
                 
@@ -79,7 +80,7 @@ struct ProfileHeader: View {
             
             // Points Display
             VStack(spacing: VivaDesign.Spacing.minimal) {
-                Text("\(user.score)")
+                Text("\(user.rewardPoints)")
                     .font(VivaDesign.Typography.displayText(42))
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .fontWeight(.bold)

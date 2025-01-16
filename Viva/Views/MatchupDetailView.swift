@@ -1,15 +1,6 @@
-//
-//  MatchupDetail.swift
-//  Viva
-//
-//  Created by Bruno Souto on 1/12/25.
-//
-
 import Charts
 import SwiftUI
-
-import SwiftUI
-import Charts
+import User
 
 // MARK: - Models
 struct WorkoutEntry: Identifiable {
@@ -29,16 +20,16 @@ struct DailyActivity: Identifiable {
 struct MatchupDetailView: View {
     private let leftUser = User(
         id: "1",
-        name: "Saya Jones",
-        score: 1275,
-        imageURL: "profile_stock"
+        displayName: "Saya Jones",
+        rewardPoints: 1275,
+        imageId: "profile_stock"
     )
 
     private let rightUser = User(
         id: "4",
-        name: "Judah Levine",
-        score: 1113,
-        imageURL: "profile_judah"
+        displayName: "Judah Levine",
+        rewardPoints: 1113,
+        imageId: "profile_judah"
     )
 
     private let workouts = [
@@ -167,14 +158,14 @@ struct UserScoreView: View {
     }
     
     private var userImage: some View {
-        Image(user.imageURL)
+        Image(user.imageId)
             .resizable()
             .frame(width: 60, height: 60)
             .clipShape(Circle())
     }
     
     private var userInfo: some View {
-        LabeledValueStack(label: user.name, value: "\(user.score)", alignment: imageOnLeft ? .leading : .trailing)
+        LabeledValueStack(label: user.displayName, value: "\(user.rewardPoints)", alignment: imageOnLeft ? .leading : .trailing)
     }
 }
 
@@ -318,13 +309,13 @@ struct RecordDisplay: View {
     
     var body: some View {
         HStack(spacing: VivaDesign.Spacing.minimal) {
-            VivaProfileImage(imageURL: leftUser.imageURL, size: .mini)
+            VivaProfileImage(imageURL: leftUser.imageId, size: .mini)
             Text("\(wins)")
                 .font(.title)
             Spacer().frame(width: 10)
             Text("\(losses)")
                 .font(.title)
-            VivaProfileImage(imageURL: rightUser.imageURL, size: .mini)
+            VivaProfileImage(imageURL: rightUser.imageId, size: .mini)
         }
         .foregroundColor(VivaDesign.Colors.primaryText)
     }

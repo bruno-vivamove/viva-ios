@@ -1,12 +1,5 @@
 import SwiftUI
-
-// Add these models at the top level
-struct User {
-    let id: String
-    let name: String
-    let score: Int
-    let imageURL: String
-}
+import User
 
 struct MainView: View {
     private let activeTabColor: Color = .white
