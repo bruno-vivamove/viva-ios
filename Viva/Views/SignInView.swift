@@ -90,6 +90,7 @@ struct MarketingText: View {
 
 struct AuthButtonStack: View {
     @ObservedObject var authManager: AuthenticationManager
+    @State private var showSignInForm = false
     
     var body: some View {
         VStack(spacing: VivaDesign.Spacing.small) {
@@ -107,7 +108,7 @@ struct AuthButtonStack: View {
                 title: "Sign In",
                 style: .secondary,
                 action: {
-                    authManager.signIn()
+                    showSignInForm = true
                 }
             )
             
@@ -132,6 +133,9 @@ struct AuthButtonStack: View {
             )
         }
         .padding(.horizontal, VivaDesign.Spacing.large)
+        .sheet(isPresented: $showSignInForm) {
+            SignInFormView(authManager: authManager)
+        }
     }
 }
 

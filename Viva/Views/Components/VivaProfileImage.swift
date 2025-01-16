@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct VivaProfileImage: View {
-    let imageURL: String
+    let imageId: String
     let size: VivaDesign.Sizing.ProfileImage
     
     var body: some View {
-        Image(imageURL)
+        Image(imageId)
             .resizable()
             .frame(width: size.rawValue, height: size.rawValue)
             .clipShape(Circle())

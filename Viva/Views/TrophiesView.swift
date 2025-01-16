@@ -1,10 +1,3 @@
-//
-//  TrophiesView.swift
-//  Viva
-//
-//  Created by Bruno Souto on 1/12/25.
-//
-
 import SwiftUI
 
 struct MatchupHistory {
@@ -22,81 +15,72 @@ struct TrophiesView: View {
         MatchupHistory(
             opponent: User(
                 id: "2",
-                name: "Chris Dolan",
-                score: 1287,
-                imageURL: "profile_chris"
+                displayName: "Chris Dolan",
+                imageId: "profile_chris"
             ),
             record: "11-9"
         ),
         MatchupHistory(
             opponent: User(
                 id: "3",
-                name: "Bruno Souto",
-                score: 1168,
-                imageURL: "profile_bruno"
+                displayName: "Bruno Souto",
+                imageId: "profile_bruno"
             ),
             record: "5-6"
         ),
         MatchupHistory(
             opponent: User(
                 id: "4",
-                name: "Judah Levine",
-                score: 1113,
-                imageURL: "profile_judah"
+                displayName: "Judah Levine",
+                imageId: "profile_judah"
             ),
             record: "9-6"
         ),
         MatchupHistory(
             opponent: User(
                 id: "5",
-                name: "Chris Dolan",
-                score: 1287,
-                imageURL: "profile_chris"
+                displayName: "Chris Dolan",
+                imageId: "profile_chris"
             ),
             record: "11-9"
         ),
         MatchupHistory(
             opponent: User(
                 id: "6",
-                name: "Bruno Souto",
-                score: 1168,
-                imageURL: "profile_bruno"
+                displayName: "Bruno Souto",
+                imageId: "profile_bruno"
             ),
             record: "5-6"
         ),
         MatchupHistory(
             opponent: User(
                 id: "7",
-                name: "Judah Levine",
-                score: 1113,
-                imageURL: "profile_judah"
+                displayName: "Judah Levine",
+                imageId: "profile_judah"
             ),
             record: "9-6"
         ),
         MatchupHistory(
             opponent: User(
                 id: "8",
-                name: "Chris Dolan",
-                score: 1287,
-                imageURL: "profile_chris"
+                displayName: "Chris Dolan",
+                imageId: "profile_chris"
             ),
             record: "11-9"
         ),
         MatchupHistory(
             opponent: User(
                 id: "9",
-                name: "Bruno Souto",
-                score: 1168,
-                imageURL: "profile_bruno"
+                displayName: "Bruno Souto",
+                imageId: "profile_bruno"
             ),
             record: "5-6"
         ),
         MatchupHistory(
             opponent: User(
                 id: "10",
-                name: "Judah Levine",
-                score: 1113,
-                imageURL: "profile_judah"
+                displayName: "Judah Levine",
+                imageId: "profile_judah"
             ),
             record: "9-6"
         ),
@@ -235,13 +219,13 @@ struct HistoryCard: View {
             
             // Opponent Info
             VStack(alignment: .center, spacing: VivaDesign.Spacing.minimal) {
-                Text(history.opponent.name)
+                Text(history.opponent.displayName)
                     .font(VivaDesign.Typography.body)
                     .foregroundColor(VivaDesign.Colors.vivaGreen)
                     .lineLimit(1)
                 
                 VivaProfileImage(
-                    imageURL: history.opponent.imageURL,
+                    imageId: history.opponent.imageId,
                     size: .medium
                 )
             }

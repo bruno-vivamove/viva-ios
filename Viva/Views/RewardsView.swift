@@ -1,10 +1,3 @@
-//
-//  HomeView.swift
-//  Viva
-//
-//  Created by Bruno Souto on 1/9/25.
-//
-
 import SwiftUI
 
 struct RewardsView: View {
