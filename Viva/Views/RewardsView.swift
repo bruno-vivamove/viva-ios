@@ -1,11 +1,5 @@
-//
-//  HomeView.swift
-//  Viva
-//
-//  Created by Bruno Souto on 1/9/25.
-//
-
 import SwiftUI
+import User
 
 struct RewardsView: View {
     private let points = 3017

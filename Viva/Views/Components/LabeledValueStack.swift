@@ -1,11 +1,5 @@
-//
-//  LabeledValueStack.swift
-//  Viva
-//
-//  Created by Bruno Souto on 1/13/25.
-//
-
 import SwiftUI
+import User
 
 struct LabeledValueStack: View {
     let label: String
