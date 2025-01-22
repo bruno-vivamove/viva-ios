@@ -139,7 +139,6 @@ struct AuthButtonStack: View {
     }
 }
 
-// MARK: - Auth Button Components
 enum AuthButtonStyle {
     case primary
     case secondary
