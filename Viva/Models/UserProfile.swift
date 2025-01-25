@@ -1,7 +1,7 @@
-struct UserProfile {
+struct UserProfile: Encodable, Decodable {
     let id: String
-    let displayName: String
     let emailAddress: String
-    let imageId: String
+    let displayName: String
+    let imageUrl: String
     let rewardPoints: Int;
 }

@@ -1,4 +1,4 @@
-struct ClientError: Error {
+struct NetworkClientError: Error {
     let code: String
     let message: String?
     

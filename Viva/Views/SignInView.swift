@@ -1,58 +1,56 @@
+import Foundation
+import Security
 import SwiftUI
 
-class AuthenticationManager: ObservableObject {
-    @Published private(set) var isSignedIn = false
-    
-    func signIn() {
-        withAnimation(.easeInOut(duration: 0.5)) {
-            isSignedIn = true
-        }
-    }
-    
-    func signOut() {
-        withAnimation(.easeInOut(duration: 0.5)) {
-            isSignedIn = false
-        }
-    }
-}
-
 struct SignInView: View {
-    @StateObject private var authManager = AuthenticationManager()
     private let logoWidth: CGFloat = 180
-    
+
+    @ObservedObject private var userSession: UserSession
+    private let authenticationManager: AuthenticationManager
+
+    init(userSession: UserSession, authenticationManager: AuthenticationManager)
+    {
+        self.userSession = userSession
+        self.authenticationManager = authenticationManager
+    }
+
     var body: some View {
         ZStack {
             VivaDesign.Colors.background
                 .ignoresSafeArea()
-            
-            if authManager.isSignedIn {
-                MainView()
-                    .environmentObject(authManager)
-                    .transition(.move(edge: .trailing))
+
+            if userSession.isLoggedIn {
+                MainView(
+                    userSession: userSession,
+                    authenticationManager: authenticationManager
+                )
+                .transition(.move(edge: .trailing))
             } else {
                 VStack(spacing: VivaDesign.Spacing.medium) {
                     // Logo
                     LogoHeader(width: logoWidth)
-                    
+
                     Spacer()
-                    
+
                     // Main Text
                     MarketingText()
-                    
+
                     Spacer()
-                    
+
                     // Auth Buttons
-                    AuthButtonStack(authManager: authManager)
+                    AuthButtonStack(
+                        userSession: userSession,
+                        authenticationManager: authenticationManager)
                 }
                 .padding(.vertical, VivaDesign.Spacing.large)
             }
-        }
+        }.animation(.easeInOut, value: userSession.isLoggedIn)
     }
 }
 
 struct LogoHeader: View {
     let width: CGFloat
-    
+
     var body: some View {
         HStack {
             Spacer()
@@ -73,11 +71,11 @@ struct MarketingText: View {
                 Text("LONG")
                     .font(VivaDesign.Typography.displayText())
                     .foregroundColor(VivaDesign.Colors.vivaGreen)
-                
+
                 Text("LIVE")
                     .font(VivaDesign.Typography.displayText())
                     .foregroundColor(VivaDesign.Colors.vivaGreen)
-                
+
                 Text("THE FIT")
                     .font(VivaDesign.Typography.displayText())
                     .foregroundColor(VivaDesign.Colors.primaryText)
@@ -89,9 +87,16 @@ struct MarketingText: View {
 }
 
 struct AuthButtonStack: View {
-    @ObservedObject var authManager: AuthenticationManager
     @State private var showSignInForm = false
-    
+    @ObservedObject private var userSession: UserSession
+    private let authenticationManager: AuthenticationManager
+
+    init(userSession: UserSession, authenticationManager: AuthenticationManager)
+    {
+        self.userSession = userSession
+        self.authenticationManager = authenticationManager
+    }
+
     var body: some View {
         VStack(spacing: VivaDesign.Spacing.small) {
             // Sign Up Button
@@ -102,7 +107,7 @@ struct AuthButtonStack: View {
                     // Add sign up action
                 }
             )
-            
+
             // Basic Sign In Button
             AuthButtonView(
                 title: "Sign In",
@@ -111,7 +116,7 @@ struct AuthButtonStack: View {
                     showSignInForm = true
                 }
             )
-            
+
             // Google Sign In Button
             AuthButtonView(
                 title: "Sign In with Google",
@@ -121,7 +126,7 @@ struct AuthButtonStack: View {
                     // Add Google sign in action
                 }
             )
-            
+
             // Apple Sign In Button
             AuthButtonView(
                 title: "Sign in with Apple",
@@ -134,7 +139,8 @@ struct AuthButtonStack: View {
         }
         .padding(.horizontal, VivaDesign.Spacing.large)
         .sheet(isPresented: $showSignInForm) {
-            SignInFormView(authManager: authManager)
+            SignInFormView(
+                authManager: authenticationManager, userSession: userSession)
         }
     }
 }
@@ -143,7 +149,7 @@ enum AuthButtonStyle {
     case primary
     case secondary
     case white
-    
+
     var foregroundColor: Color {
         switch self {
         case .primary:
@@ -154,7 +160,7 @@ enum AuthButtonStyle {
             return .black
         }
     }
-    
+
     var backgroundColor: Color {
         switch self {
         case .primary:
@@ -165,7 +171,7 @@ enum AuthButtonStyle {
             return .white
         }
     }
-    
+
     var borderColor: Color {
         switch self {
         case .primary:
@@ -183,7 +189,7 @@ struct AuthButtonView: View {
     let style: AuthButtonStyle
     let image: Image?
     let action: () -> Void
-    
+
     init(
         title: String,
         style: AuthButtonStyle,
@@ -195,7 +201,7 @@ struct AuthButtonView: View {
         self.image = image
         self.action = action
     }
-    
+
     var body: some View {
         Button(action: action) {
             HStack {
@@ -205,7 +211,7 @@ struct AuthButtonView: View {
                         .frame(width: 20, height: 20)
                         .foregroundColor(style.foregroundColor)
                 }
-                
+
                 Text(title)
                     .font(VivaDesign.Typography.body.bold())
                     .foregroundColor(style.foregroundColor)
@@ -213,17 +219,39 @@ struct AuthButtonView: View {
             .frame(maxWidth: .infinity)
             .padding()
             .background(
-                RoundedRectangle(cornerRadius: VivaDesign.Sizing.buttonCornerRadius)
-                    .fill(style.backgroundColor)
+                RoundedRectangle(
+                    cornerRadius: VivaDesign.Sizing.buttonCornerRadius
+                )
+                .fill(style.backgroundColor)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: VivaDesign.Sizing.buttonCornerRadius)
-                    .stroke(style.borderColor, lineWidth: VivaDesign.Sizing.buttonBorderWidth)
+                RoundedRectangle(
+                    cornerRadius: VivaDesign.Sizing.buttonCornerRadius
+                )
+                .stroke(
+                    style.borderColor,
+                    lineWidth: VivaDesign.Sizing.buttonBorderWidth)
             )
         }
     }
 }
 
 #Preview {
-    SignInView()
+    let userSession = UserSession()
+    SignInView(
+        userSession: userSession,
+        authenticationManager: AuthenticationManager(
+            userSession: userSession,
+            authService: AuthService(
+                networkClient: NetworkClient(
+                    settings: AuthNetworkClientSettings())),
+            sessionService: SessionService(
+                networkClient: NetworkClient(
+                    settings: AppWithNoSessionNetworkClientSettings())),
+            userProfileService: UserProfileService(
+                networkClient: NetworkClient(
+                    settings: AppNetworkClientSettings(userSession: userSession)
+                ),
+                userSession: userSession)
+        ))
 }

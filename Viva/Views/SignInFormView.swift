@@ -1,21 +1,19 @@
 import SwiftUI
 
 class SignInViewModel: ObservableObject {
+    @ObservedObject var userSession: UserSession
+
     @Published var email = ""
     @Published var password = ""
     @Published var showPassword = false
     @Published var isLoading = false
     @Published var errorMessage: String?
 
-    private let authService: AuthService
-    private let authManager: AuthenticationManager
+    let authManager: AuthenticationManager
 
-    init(
-        authService: AuthService = AuthService(),
-        authManager: AuthenticationManager
-    ) {
-        self.authService = authService
+    init(authManager: AuthenticationManager, userSession: UserSession) {
         self.authManager = authManager
+        self.userSession = userSession
     }
 
     @MainActor
@@ -24,18 +22,18 @@ class SignInViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            let authResponse = try await authService.signIn(
+            try await authManager.signIn(
                 email: email, password: password)
-            authManager.signIn()
             return true
-        } catch let clientError as ClientError {
+        } catch let clientError as NetworkClientError {
             if let message = clientError.message {
+                // TODO map the error code to user readable messages
                 errorMessage = message
             } else {
-                errorMessage = "Error logging in. Please try again.."
+                errorMessage = "Error logging in. Please try again."
             }
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = "Error logging in. Please try again."
         }
 
         isLoading = false
@@ -44,12 +42,14 @@ class SignInViewModel: ObservableObject {
 }
 
 struct SignInFormView: View {
+    @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: SignInViewModel
 
-    init(authManager: AuthenticationManager) {
+    init(authManager: AuthenticationManager, userSession: UserSession) {
         _viewModel = StateObject(
-            wrappedValue: SignInViewModel(authManager: authManager)
+            wrappedValue: SignInViewModel(
+                authManager: authManager, userSession: userSession)
         )
     }
 
@@ -228,5 +228,22 @@ extension View {
 }
 
 #Preview {
-    SignInFormView(authManager: AuthenticationManager())
+    let userSession = UserSession()
+
+    SignInFormView(
+        authManager: AuthenticationManager(
+            userSession: userSession,
+            authService: AuthService(
+                networkClient: NetworkClient(
+                    settings: AuthNetworkClientSettings())),
+            sessionService: SessionService(
+                networkClient: NetworkClient(
+                    settings: AppWithNoSessionNetworkClientSettings())),
+            userProfileService: UserProfileService(
+                networkClient: NetworkClient(
+                    settings: AppNetworkClientSettings(userSession: userSession)
+                ),
+                userSession: userSession)
+        ),
+        userSession: userSession)
 }

@@ -1,16 +1,17 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @EnvironmentObject var authManager: AuthenticationManager
-    
+    @ObservedObject private var userSession: UserSession
+    private let authManager: AuthenticationManager
+
     private let user = UserProfile(
         id: "1",
-        displayName: "Saya Jones",
         emailAddress: "saya@gmail.com",
-        imageId: "profile_stock",
+        displayName: "Saya Jones",
+        imageUrl: "profile_stock",
         rewardPoints: 3017
     )
-    
+
     private let menuItems = [
         MenuItem(icon: "applewatch", title: "Linked Devices"),
         MenuItem(icon: "doc.text", title: "Rules & FAQ"),
@@ -18,14 +19,19 @@ struct ProfileView: View {
         MenuItem(icon: "gearshape.fill", title: "Settings"),
         MenuItem(icon: "person.2.fill", title: "Referrals"),
         MenuItem(icon: "star.fill", title: "Subscription"),
-        MenuItem(icon: "questionmark.circle", title: "Help")
+        MenuItem(icon: "questionmark.circle", title: "Help"),
     ]
-    
+
+    init(userSession: UserSession, authManager: AuthenticationManager) {
+        self.userSession = userSession
+        self.authManager = authManager
+    }
+
     var body: some View {
         VStack(spacing: VivaDesign.Spacing.large) {
             // Profile Header
             ProfileHeader(user: user)
-            
+
             // Menu Items
             VStack(spacing: VivaDesign.Spacing.minimal) {
                 ForEach(menuItems, id: \.title) { item in
@@ -33,9 +39,11 @@ struct ProfileView: View {
                 }
             }
             .padding(.horizontal)
-                        
+
             Button(action: {
-                authManager.signOut()
+                Task {
+                    await authManager.signOut()
+                }
             }) {
                 Text("LOG OUT")
                     .font(.headline)
@@ -53,22 +61,22 @@ struct ProfileView: View {
 
 struct ProfileHeader: View {
     let user: UserProfile
-    
+
     var body: some View {
         HStack(spacing: VivaDesign.Spacing.large) {
             Spacer()
-            
+
             // Profile Image and Name
             VStack(spacing: VivaDesign.Spacing.minimal) {
                 VivaProfileImage(
-                    imageId: user.imageId,
+                    imageId: user.imageUrl,
                     size: .large
                 )
-                
+
                 Text(user.displayName)
                     .font(.title2)
                     .foregroundColor(VivaDesign.Colors.primaryText)
-                
+
                 Button(action: {
                     // Add edit action
                 }) {
@@ -77,19 +85,19 @@ struct ProfileHeader: View {
                         .foregroundColor(VivaDesign.Colors.vivaGreen)
                 }
             }
-            
+
             // Points Display
             VStack(spacing: VivaDesign.Spacing.minimal) {
                 Text("\(user.rewardPoints)")
                     .font(VivaDesign.Typography.displayText(42))
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .fontWeight(.bold)
-                
+
                 Text("Reward Points")
                     .font(VivaDesign.Typography.caption)
                     .foregroundColor(VivaDesign.Colors.vivaGreen)
             }
-            
+
             Spacer()
         }
         .padding(.top)
@@ -98,7 +106,7 @@ struct ProfileHeader: View {
 
 struct MenuItemButton: View {
     let item: MenuItem
-    
+
     var body: some View {
         Button(action: {
             // Add navigation action
@@ -107,13 +115,13 @@ struct MenuItemButton: View {
                 Image(systemName: item.icon)
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .frame(width: 24)
-                
+
                 Text(item.title)
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .font(VivaDesign.Typography.body)
-                
+
                 Spacer()
-                
+
                 Image(systemName: "chevron.right")
                     .foregroundColor(VivaDesign.Colors.secondaryText)
             }
@@ -121,7 +129,9 @@ struct MenuItemButton: View {
             .padding(.horizontal, VivaDesign.Spacing.small)
             .background(
                 RoundedRectangle(cornerRadius: VivaDesign.Sizing.cornerRadius)
-                    .stroke(VivaDesign.Colors.divider, lineWidth: VivaDesign.Sizing.borderWidth)
+                    .stroke(
+                        VivaDesign.Colors.divider,
+                        lineWidth: VivaDesign.Sizing.borderWidth)
             )
         }
     }
@@ -133,9 +143,22 @@ struct MenuItem: Identifiable {
     let title: String
 }
 
-
 #Preview {
-    ProfileView()
-        .environmentObject(AuthenticationManager())
+    let userSession = UserSession()
+    ProfileView(
+        userSession: userSession,
+        authManager: AuthenticationManager(
+            userSession: userSession,
+            authService: AuthService(
+                networkClient: NetworkClient(
+                    settings: AuthNetworkClientSettings())),
+            sessionService: SessionService(
+                networkClient: NetworkClient(
+                    settings: AppWithNoSessionNetworkClientSettings())),
+            userProfileService: UserProfileService(
+                networkClient: NetworkClient(
+                    settings: AppNetworkClientSettings(userSession: userSession)
+                ),
+                userSession: userSession)
+        ))
 }
-
