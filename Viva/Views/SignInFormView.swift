@@ -25,14 +25,21 @@ class SignInViewModel: ObservableObject {
             try await authManager.signIn(
                 email: email, password: password)
             return true
-        } catch let clientError as NetworkClientError {
-            if let message = clientError.message {
-                // TODO map the error code to user readable messages
-                errorMessage = message
-            } else {
+        } catch let errorResponse as AuthErrorResponse {
+            // TODO map the error code to user readable messages
+            print("Auth Error: " + errorResponse.error.message)
+            switch errorResponse.error.message {
+            case "MISSING_EMAIL", "INVALID_EMAIL", "INVALID_LOGIN_CREDENTIALS":
+                errorMessage = "Invalid email or password."
+            default:
                 errorMessage = "Error logging in. Please try again."
             }
+        } catch let clientError as NetworkClientError {
+            // TODO map the error code to user readable messages
+            print("Network Client Error: " + clientError.message)
+            errorMessage = "Error logging in. Please try again."
         } catch {
+            print("Unknown Error: " + error.localizedDescription)
             errorMessage = "Error logging in. Please try again."
         }
 
@@ -228,22 +235,10 @@ extension View {
 }
 
 #Preview {
-    let userSession = UserSession()
+    let userSession = VivaAppObjects.dummyUserSession()
+    let vivaAppObjects = VivaAppObjects(userSession: userSession)
 
     SignInFormView(
-        authManager: AuthenticationManager(
-            userSession: userSession,
-            authService: AuthService(
-                networkClient: NetworkClient(
-                    settings: AuthNetworkClientSettings())),
-            sessionService: SessionService(
-                networkClient: NetworkClient(
-                    settings: AppWithNoSessionNetworkClientSettings())),
-            userProfileService: UserProfileService(
-                networkClient: NetworkClient(
-                    settings: AppNetworkClientSettings(userSession: userSession)
-                ),
-                userSession: userSession)
-        ),
+        authManager: vivaAppObjects.authenticationManager,
         userSession: userSession)
 }

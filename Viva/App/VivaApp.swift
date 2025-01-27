@@ -12,25 +12,13 @@ struct VivaApp: App {
     @StateObject var appState = AppState()
 
     var body: some Scene {
-        let authenticationManager =  AuthenticationManager(
-            userSession: appState.userSession,
-            authService: AuthService(
-                networkClient: NetworkClient(
-                    settings: AuthNetworkClientSettings())),
-            sessionService: SessionService(
-                networkClient: NetworkClient(
-                    settings: AppWithNoSessionNetworkClientSettings())),
-            userProfileService: UserProfileService(
-                networkClient: NetworkClient(
-                    settings: AppNetworkClientSettings(userSession: appState.userSession)
-                ),
-                userSession: appState.userSession)
-        )
+        let vivaAppObjects = VivaAppObjects(userSession: appState.userSession)
 
         WindowGroup {
             SignInView(
                 userSession: appState.userSession,
-                authenticationManager: authenticationManager
+                authenticationManager: vivaAppObjects.authenticationManager,
+                userProfileService: vivaAppObjects.userProfileService
             )
             .environmentObject(appState)
             .environmentObject(appState.userSession)

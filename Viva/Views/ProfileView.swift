@@ -1,16 +1,9 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @ObservedObject private var userSession: UserSession
+    private let userSession: UserSession
     private let authManager: AuthenticationManager
-
-    private let user = UserProfile(
-        id: "1",
-        emailAddress: "saya@gmail.com",
-        displayName: "Saya Jones",
-        imageUrl: "profile_stock",
-        rewardPoints: 3017
-    )
+    private let userProfileService: UserProfileService
 
     private let menuItems = [
         MenuItem(icon: "applewatch", title: "Linked Devices"),
@@ -22,15 +15,22 @@ struct ProfileView: View {
         MenuItem(icon: "questionmark.circle", title: "Help"),
     ]
 
-    init(userSession: UserSession, authManager: AuthenticationManager) {
+    init(
+        userSession: UserSession,
+        authManager: AuthenticationManager,
+        userProfileService: UserProfileService
+    ) {
         self.userSession = userSession
         self.authManager = authManager
+        self.userProfileService = userProfileService
     }
 
     var body: some View {
         VStack(spacing: VivaDesign.Spacing.large) {
             // Profile Header
-            ProfileHeader(user: user)
+            ProfileHeader(
+                userSession: userSession,
+                userProfileService: userProfileService)
 
             // Menu Items
             VStack(spacing: VivaDesign.Spacing.minimal) {
@@ -47,7 +47,7 @@ struct ProfileView: View {
             }) {
                 Text("LOG OUT")
                     .font(.headline)
-                    .foregroundColor(.vivaGreen)
+                    .foregroundColor(VivaDesign.Colors.vivaGreen)
                     .padding(.vertical)
             }
             .padding(.horizontal)
@@ -60,7 +60,18 @@ struct ProfileView: View {
 }
 
 struct ProfileHeader: View {
-    let user: UserProfile
+    @ObservedObject var userSession: UserSession
+    @State private var showEditProfile = false
+
+    private let userProfileService: UserProfileService
+
+    init(
+        userSession: UserSession,
+        userProfileService: UserProfileService
+    ) {
+        self.userSession = userSession
+        self.userProfileService = userProfileService
+    }
 
     var body: some View {
         HStack(spacing: VivaDesign.Spacing.large) {
@@ -69,16 +80,17 @@ struct ProfileHeader: View {
             // Profile Image and Name
             VStack(spacing: VivaDesign.Spacing.minimal) {
                 VivaProfileImage(
-                    imageId: user.imageUrl,
+                    imageId: userSession.getUserProfile().imageUrl
+                        ?? "profile_default",
                     size: .large
                 )
 
-                Text(user.displayName)
+                Text(userSession.getUserProfile().displayName)
                     .font(.title2)
                     .foregroundColor(VivaDesign.Colors.primaryText)
 
                 Button(action: {
-                    // Add edit action
+                    showEditProfile = true
                 }) {
                     Text("Edit")
                         .font(VivaDesign.Typography.caption)
@@ -88,7 +100,7 @@ struct ProfileHeader: View {
 
             // Points Display
             VStack(spacing: VivaDesign.Spacing.minimal) {
-                Text("\(user.rewardPoints)")
+                Text("\(userSession.getUserProfile().rewardPoints ?? 0)")
                     .font(VivaDesign.Typography.displayText(42))
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .fontWeight(.bold)
@@ -101,6 +113,11 @@ struct ProfileHeader: View {
             Spacer()
         }
         .padding(.top)
+        .sheet(isPresented: $showEditProfile) {
+            EditProfileView(
+                userSession: userSession, userProfileService: userProfileService
+            )
+        }
     }
 }
 
@@ -144,21 +161,12 @@ struct MenuItem: Identifiable {
 }
 
 #Preview {
-    let userSession = UserSession()
+    let userSession = VivaAppObjects.dummyUserSession()
+    let vivaAppObjects = VivaAppObjects(userSession: userSession)
+
     ProfileView(
         userSession: userSession,
-        authManager: AuthenticationManager(
-            userSession: userSession,
-            authService: AuthService(
-                networkClient: NetworkClient(
-                    settings: AuthNetworkClientSettings())),
-            sessionService: SessionService(
-                networkClient: NetworkClient(
-                    settings: AppWithNoSessionNetworkClientSettings())),
-            userProfileService: UserProfileService(
-                networkClient: NetworkClient(
-                    settings: AppNetworkClientSettings(userSession: userSession)
-                ),
-                userSession: userSession)
-        ))
+        authManager: vivaAppObjects.authenticationManager,
+        userProfileService: vivaAppObjects.userProfileService
+    )
 }

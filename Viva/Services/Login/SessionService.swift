@@ -7,7 +7,7 @@ final class SessionService {
         self.networkClient = networkClient
     }
 
-    func createSession(idToken: String) async throws -> SessionResponse {
+    func createSession(_ idToken: String) async throws -> SessionResponse {
         let sessionRequest = try networkClient.buildPostRequest(
             path: "/viva/session",
             body: ["idToken": idToken])

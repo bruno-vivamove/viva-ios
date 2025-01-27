@@ -11,21 +11,23 @@ final class AuthNetworkClientSettings: NetworkClientSettings {
 }
 
 final class AppWithNoSessionNetworkClientSettings: NetworkClientSettings {
-    let baseUrl = "https://viva-svc-7e66d6saga-ue.a.run.app"
+//    let baseUrl = "https://viva-svc-7e66d6saga-ue.a.run.app"
+    let baseUrl = "http://localhost:8080"
     let headers = [
         "referer": "https://dev.vivamove.io",
     ]
 }
 
 final class AppNetworkClientSettings: NetworkClientSettings {
-    let baseUrl = "https://viva-svc-7e66d6saga-ue.a.run.app"
+//    let baseUrl = "https://viva-svc-7e66d6saga-ue.a.run.app"
+    let baseUrl = "http://localhost:8080"
     let userSession: UserSession
     
     var headers: [String: String]{
         get {
             return [
                 "referer": "https://dev.vivamove.io",
-                "Authorization": "Bearer \(userSession.sessionToken!)"
+                "Authorization": "Bearer \(userSession.getAccessToken()!)"
             ]
         }
     }

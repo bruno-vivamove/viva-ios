@@ -141,10 +141,6 @@ struct HomeView: View {
     }
 }
 
-#Preview {
-    HomeView()
-}
-
 struct HomeHeader: View {
     var body: some View {
         HStack(spacing: VivaDesign.Spacing.medium) {
@@ -163,4 +159,8 @@ struct HomeHeader: View {
             }
         }
     }
+}
+
+#Preview {
+    HomeView()
 }

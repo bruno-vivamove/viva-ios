@@ -7,11 +7,13 @@ struct SignInView: View {
 
     @ObservedObject private var userSession: UserSession
     private let authenticationManager: AuthenticationManager
+    private let userProfileService: UserProfileService
 
-    init(userSession: UserSession, authenticationManager: AuthenticationManager)
+    init(userSession: UserSession, authenticationManager: AuthenticationManager, userProfileService: UserProfileService)
     {
         self.userSession = userSession
         self.authenticationManager = authenticationManager
+        self.userProfileService = userProfileService
     }
 
     var body: some View {
@@ -22,7 +24,8 @@ struct SignInView: View {
             if userSession.isLoggedIn {
                 MainView(
                     userSession: userSession,
-                    authenticationManager: authenticationManager
+                    authenticationManager: authenticationManager,
+                    userProfileService: userProfileService
                 )
                 .transition(.move(edge: .trailing))
             } else {
@@ -44,7 +47,7 @@ struct SignInView: View {
                 }
                 .padding(.vertical, VivaDesign.Spacing.large)
             }
-        }.animation(.easeInOut, value: userSession.isLoggedIn)
+        }
     }
 }
 
@@ -113,6 +116,9 @@ struct AuthButtonStack: View {
                 title: "Sign In",
                 style: .secondary,
                 action: {
+//                    Task {
+//                        await userSession.setTestLoggedIn()
+//                    }
                     showSignInForm = true
                 }
             )
@@ -237,21 +243,12 @@ struct AuthButtonView: View {
 }
 
 #Preview {
-    let userSession = UserSession()
+    let userSession = VivaAppObjects.dummyUserSession()
+    let vivaAppObjects = VivaAppObjects(userSession: userSession)
+
     SignInView(
         userSession: userSession,
-        authenticationManager: AuthenticationManager(
-            userSession: userSession,
-            authService: AuthService(
-                networkClient: NetworkClient(
-                    settings: AuthNetworkClientSettings())),
-            sessionService: SessionService(
-                networkClient: NetworkClient(
-                    settings: AppWithNoSessionNetworkClientSettings())),
-            userProfileService: UserProfileService(
-                networkClient: NetworkClient(
-                    settings: AppNetworkClientSettings(userSession: userSession)
-                ),
-                userSession: userSession)
-        ))
+        authenticationManager: vivaAppObjects.authenticationManager,
+        userProfileService: vivaAppObjects.userProfileService
+    )
 }

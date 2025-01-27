@@ -15,4 +15,14 @@ final class UserProfileService {
         return try await networkClient.fetchData(
             request: sessionRequest, type: UserProfile.self)
     }
+
+    func saveCurrentUserProfile(userProfile: UserProfile) async throws
+        -> UserProfile
+    {
+        let sessionRequest = try networkClient.buildPutRequest(
+            path: "/viva/me", body: userProfile)
+
+        return try await networkClient.fetchData(
+            request: sessionRequest, type: UserProfile.self)
+    }
 }

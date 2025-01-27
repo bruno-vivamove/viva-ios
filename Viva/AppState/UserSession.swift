@@ -9,28 +9,42 @@ final class UserSession: ObservableObject {
     @Published private(set) var isLoggedIn = false
     @Published private(set) var userProfile: UserProfile? = nil
 
-    var sessionToken: String? {
-        get {
-            return retrieveToken()
-        }
+    func getAccessToken() -> String? {
+        return retrieveToken()
     }
     
-    func setLoggedIn(sessionToken: String, userProfile: UserProfile) async {
+    func setAccessToken(_ sessionToken: String) {
         saveToken(sessionToken)
-        
+    }
+    
+    func getUserProfile() -> UserProfile {
+        return userProfile!
+    }
+
+    func setUserProfile(_ userProfile: UserProfile) {
+        return self.userProfile = userProfile
+    }
+
+    func setTestLoggedIn() async {
         await MainActor.run {
             self.isLoggedIn = true
-            self.userProfile = userProfile
         }
     }
     
-    func setLoggedOut() async {
-        await MainActor.run {
-            self.isLoggedIn = false;
-            self.userProfile = nil
+    func setLoggedIn(_ userProfile: UserProfile) {
+        self.userProfile = userProfile
+        withAnimation(.easeInOut(duration: 0.5)) {
+            self.isLoggedIn = true
         }
-
-        deleteToken()
+    }
+    
+    func setLoggedOut()  {
+        withAnimation(.easeInOut(duration: 0.5)) {
+            self.isLoggedIn = false;
+        } completion: {
+            self.userProfile = nil
+            self.deleteToken()
+        }
     }
 
     private func saveToken(_ token: String) {

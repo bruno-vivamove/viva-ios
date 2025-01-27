@@ -19,24 +19,26 @@ final class AuthenticationManager {
     }
 
     func signIn(email: String, password: String) async throws {
-        let authResponse = try await authService.signIn(
-            email: email, password: password)
-        let sessionResponse = try await sessionService.createSession(
-            idToken: authResponse.idToken)
-        let userProfile = UserProfile(
-            id: "dummy_id",
-            emailAddress: "dummy_email",
-            displayName: "dummy_display_name",
-            imageUrl: "dummy_url",
-            rewardPoints: 1000)
+        let authResponse = try await authService.signIn(email, password)
+        let sessionResponse = try await sessionService.createSession(authResponse.idToken)
+        userSession.setAccessToken(sessionResponse.accessToken)
+//        let userProfile = UserProfile(
+//            id: "dummy_id",
+//            emailAddress: "dummy_email",
+//            displayName: "dummy_display_name",
+//            imageUrl: "dummy_url",
+//            rewardPoints: 1000)
 
-//        let userProfile = try await userProfileService.getCurrentUserProfile()
+        let userProfile = try await userProfileService.getCurrentUserProfile()
 
-        await userSession.setLoggedIn(
-            sessionToken: sessionResponse.accessToken, userProfile: userProfile)
+        await MainActor.run(){
+            userSession.setLoggedIn(userProfile)
+        }
     }
 
     func signOut() async {
-        await userSession.setLoggedOut()
+        await MainActor.run(){
+            userSession.setLoggedOut()
+        }
     }
 }
