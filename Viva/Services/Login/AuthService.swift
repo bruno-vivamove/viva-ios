@@ -8,17 +8,19 @@ final class AuthService {
     }
 
     func signIn(_ email: String, _ password: String) async throws -> AuthResponse {
-        let authRequest = try networkClient.buildPostRequest(
-            path: "",
-            body: [
-                "email": email,
-                "password": password,
-                "returnSecureToken": true,
-            ])
+        struct SignInRequest: Encodable {
+            let email: String
+            let password: String
+            let returnSecureToken: Bool
+        }
         
-        return try await networkClient.fetchData(
-            request: authRequest,
-            type: AuthResponse.self,
-            errorType: AuthErrorResponse.self)
+        return try await networkClient.post(
+            path: "",
+            body: SignInRequest(
+                email: email,
+                password: password,
+                returnSecureToken: true
+            )
+        )
     }
 }

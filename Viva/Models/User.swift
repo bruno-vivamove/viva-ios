@@ -1,5 +1,5 @@
-struct User: Encodable, Decodable {
+struct User: Encodable, Decodable, Identifiable {
     let id: String
     let displayName: String
-    let imageId: String
+    let imageUrl: String?
 }

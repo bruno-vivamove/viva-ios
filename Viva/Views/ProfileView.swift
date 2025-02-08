@@ -79,11 +79,19 @@ struct ProfileHeader: View {
 
             // Profile Image and Name
             VStack(spacing: VivaDesign.Spacing.minimal) {
-                VivaProfileImage(
-                    imageId: userSession.getUserProfile().imageUrl
-                        ?? "profile_default",
-                    size: .large
-                )
+                Button(action: {
+                    Task {
+                        let userProfile = try await userProfileService.getCurrentUserProfile()
+                        await MainActor.run() {
+                            userSession.setUserProfile(userProfile)
+                        }
+                    }
+                }) {
+                    VivaProfileImage(
+                        imageUrl: userSession.getUserProfile().imageUrl,
+                        size: .large
+                    ).id(userSession.getUserProfile().imageUrl)
+                }
 
                 Text(userSession.getUserProfile().displayName)
                     .font(.title2)

@@ -7,14 +7,17 @@ struct MainView: View {
     private var userSession: UserSession
     private let authenticationManager: AuthenticationManager
     private let userProfileService: UserProfileService
+    private let friendService: FriendService
     
     init(userSession: UserSession,
          authenticationManager: AuthenticationManager,
-         userProfileService: UserProfileService)
+         userProfileService: UserProfileService,
+         friendService: FriendService)
     {
         self.userSession = userSession
         self.authenticationManager = authenticationManager
         self.userProfileService = userProfileService
+        self.friendService = friendService
     }
 
     var body: some View {
@@ -28,13 +31,13 @@ struct MainView: View {
                     Text("Home")
                 }
 
-            // Rewards Tab
-            RewardsView()
+            // Friends Tab
+            FriendsView(friendService: friendService)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
                 .tabItem {
-                    Image(systemName: "dollarsign.circle.fill")
-                    Text("Rewards")
+                    Image(systemName: "person.2.fill")
+                    Text("Friends")
                 }
 
             // Profile Tab
@@ -82,6 +85,7 @@ struct MainView: View {
     MainView(
         userSession: userSession,
         authenticationManager: vivaAppObjects.authenticationManager,
-        userProfileService: vivaAppObjects.userProfileService
+        userProfileService: vivaAppObjects.userProfileService,
+        friendService: vivaAppObjects.friendService
     )
 }

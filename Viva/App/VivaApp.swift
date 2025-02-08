@@ -18,7 +18,8 @@ struct VivaApp: App {
             SignInView(
                 userSession: appState.userSession,
                 authenticationManager: vivaAppObjects.authenticationManager,
-                userProfileService: vivaAppObjects.userProfileService
+                userProfileService: vivaAppObjects.userProfileService,
+                friendService: vivaAppObjects.friendService
             )
             .environmentObject(appState)
             .environmentObject(appState.userSession)

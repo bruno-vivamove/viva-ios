@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C075296D2D485B8D00A5EA2E /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = C075296C2D485B8D00A5EA2E /* Alamofire */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		C03975B72D2F83D000BCE78F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C075296D2D485B8D00A5EA2E /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = Viva;
 			packageProductDependencies = (
+				C075296C2D485B8D00A5EA2E /* Alamofire */,
 			);
 			productName = Viva;
 			productReference = C03975A62D2F83CE00BCE78F /* Viva.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = C039759D2D2F83CE00BCE78F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C075296B2D485B8D00A5EA2E /* XCRemoteSwiftPackageReference "Alamofire" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C03975A72D2F83CE00BCE78F /* Products */;
 			projectDirPath = "";
@@ -554,6 +563,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C075296B2D485B8D00A5EA2E /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C075296C2D485B8D00A5EA2E /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C075296B2D485B8D00A5EA2E /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C039759E2D2F83CE00BCE78F /* Project object */;
 }

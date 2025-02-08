@@ -8,11 +8,13 @@ final class SessionService {
     }
 
     func createSession(_ idToken: String) async throws -> SessionResponse {
-        let sessionRequest = try networkClient.buildPostRequest(
-            path: "/viva/session",
-            body: ["idToken": idToken])
+        struct CreateSessionRequest: Encodable {
+            let idToken: String
+        }
         
-        return try await networkClient.fetchData(
-            request: sessionRequest, type: SessionResponse.self)
+        return try await networkClient.post(
+            path: "/viva/session",
+            body: CreateSessionRequest(idToken: idToken)
+        )
     }
 }

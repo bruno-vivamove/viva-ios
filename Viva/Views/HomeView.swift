@@ -9,13 +9,13 @@ struct HomeView: View {
             leftUsers: [MatchupUser(
                 user: User(
                     id: "1", displayName: "Saya Jones",
-                    imageId: "profile_stock"),
+                    imageUrl: nil),
                 score: 1275
             )],
             rightUsers: [MatchupUser(
                 user: User(
                     id: "2", displayName: "Chris Dolan",
-                    imageId: "profile_chris"),
+                    imageUrl: nil),
                 score: 1287
             )],
             endDate: ISO8601DateFormatter().date(from: "2025-01-16T11:00:00Z")!
@@ -25,13 +25,13 @@ struct HomeView: View {
             leftUsers: [MatchupUser(
                 user: User(
                     id: "2", displayName: "Saya Jones",
-                    imageId: "profile_stock"),
+                    imageUrl: nil),
                 score: 1225
             )],
             rightUsers: [MatchupUser(
                 user: User(
                     id: "3", displayName: "Bruno Souto",
-                    imageId: "profile_bruno"),
+                    imageUrl: nil),
                 score: 1168
             )],
             endDate: ISO8601DateFormatter().date(from: "2025-01-17T11:00:00Z")!
@@ -41,13 +41,13 @@ struct HomeView: View {
             leftUsers: [MatchupUser(
                 user: User(
                     id: "3", displayName: "Saya Jones",
-                    imageId: "profile_stock"),
+                    imageUrl: nil),
                 score: 1175
             )],
             rightUsers: [MatchupUser(
                 user: User(
                     id: "4", displayName: "Judah Levine",
-                    imageId: "profile_judah"),
+                    imageUrl: nil),
                 score: 1113
             )],
             endDate: ISO8601DateFormatter().date(from: "2025-01-18T11:00:00Z")!
@@ -60,14 +60,14 @@ struct HomeView: View {
             id: "1",
             user: User(
                 id: "5", displayName: "Chris Dolan",
-                imageId: "profile_chris"),
+                imageUrl: nil),
             type: .sent
         ),
         MatchupInvite(
             id: "2",
             user: User(
                 id: "6", displayName: "Adson Afonso",
-                imageId: "profile_bruno"
+                imageUrl: nil
             ),
             type: .sent
         ),
@@ -75,7 +75,7 @@ struct HomeView: View {
             id: "3",
             user: User(
                 id: "7", displayName: "Judah Levine",
-                imageId: "profile_judah"
+                imageUrl: nil
             ),
             type: .sent
         ),
@@ -83,7 +83,7 @@ struct HomeView: View {
             id: "4",
             user: User(
                 id: "8", displayName: "Chris Dolan",
-                imageId: "profile_chris"
+                imageUrl: nil
             ),
             type: .received
         ),

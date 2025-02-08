@@ -16,7 +16,7 @@ struct TrophiesView: View {
             opponent: User(
                 id: "2",
                 displayName: "Chris Dolan",
-                imageId: "profile_chris"
+                imageUrl: nil
             ),
             record: "11-9"
         ),
@@ -24,7 +24,7 @@ struct TrophiesView: View {
             opponent: User(
                 id: "3",
                 displayName: "Bruno Souto",
-                imageId: "profile_bruno"
+                imageUrl: nil
             ),
             record: "5-6"
         ),
@@ -32,7 +32,7 @@ struct TrophiesView: View {
             opponent: User(
                 id: "4",
                 displayName: "Judah Levine",
-                imageId: "profile_judah"
+                imageUrl: nil
             ),
             record: "9-6"
         ),
@@ -40,7 +40,7 @@ struct TrophiesView: View {
             opponent: User(
                 id: "5",
                 displayName: "Chris Dolan",
-                imageId: "profile_chris"
+                imageUrl: nil
             ),
             record: "11-9"
         ),
@@ -48,7 +48,7 @@ struct TrophiesView: View {
             opponent: User(
                 id: "6",
                 displayName: "Bruno Souto",
-                imageId: "profile_bruno"
+                imageUrl: nil
             ),
             record: "5-6"
         ),
@@ -56,7 +56,7 @@ struct TrophiesView: View {
             opponent: User(
                 id: "7",
                 displayName: "Judah Levine",
-                imageId: "profile_judah"
+                imageUrl: nil
             ),
             record: "9-6"
         ),
@@ -64,7 +64,7 @@ struct TrophiesView: View {
             opponent: User(
                 id: "8",
                 displayName: "Chris Dolan",
-                imageId: "profile_chris"
+                imageUrl: nil
             ),
             record: "11-9"
         ),
@@ -72,7 +72,7 @@ struct TrophiesView: View {
             opponent: User(
                 id: "9",
                 displayName: "Bruno Souto",
-                imageId: "profile_bruno"
+                imageUrl: nil
             ),
             record: "5-6"
         ),
@@ -80,7 +80,7 @@ struct TrophiesView: View {
             opponent: User(
                 id: "10",
                 displayName: "Judah Levine",
-                imageId: "profile_judah"
+                imageUrl: nil
             ),
             record: "9-6"
         ),
@@ -225,7 +225,7 @@ struct HistoryCard: View {
                     .lineLimit(1)
                 
                 VivaProfileImage(
-                    imageId: history.opponent.imageId,
+                    imageUrl: history.opponent.imageUrl,
                     size: .medium
                 )
             }

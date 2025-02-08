@@ -24,18 +24,11 @@ class EditProfileViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            let curUserProfile = userSession.getUserProfile()
-
-            // TODO only have to populate some properties, not all
-            let newUserProfile = UserProfile(
-                id: curUserProfile.id,
+            let updateRequest = UserProfileUpdateRequest(
                 emailAddress: self.email,
-                displayName: self.displayName,
-                imageUrl: curUserProfile.imageUrl,
-                rewardPoints: curUserProfile.rewardPoints)
+                displayName: self.displayName)
             let savedUserProfile =
-                try await userProfileService.saveCurrentUserProfile(
-                    userProfile: newUserProfile)
+                try await userProfileService.saveCurrentUserProfile(updateRequest, selectedImage)
 
             self.userSession.setUserProfile(savedUserProfile)
             // Update successful
@@ -147,7 +140,7 @@ struct EditProfileView: View {
                         .clipShape(Circle())
                 } else {
                     VivaProfileImage(
-                        imageId: viewModel.userSession.userProfile?.imageUrl
+                        imageUrl: viewModel.userSession.userProfile?.imageUrl
                             ?? "profile_default", size: .large)
                 }
 

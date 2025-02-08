@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 final class UserProfileService {
     private let networkClient: NetworkClient
@@ -10,19 +11,40 @@ final class UserProfileService {
     }
 
     func getCurrentUserProfile() async throws -> UserProfile {
-        let sessionRequest = try networkClient.buildGetRequest(path: "/viva/me")
-
-        return try await networkClient.fetchData(
-            request: sessionRequest, type: UserProfile.self)
+        return try await networkClient.get(path: "/viva/me")
     }
 
-    func saveCurrentUserProfile(userProfile: UserProfile) async throws
-        -> UserProfile
-    {
-        let sessionRequest = try networkClient.buildPutRequest(
-            path: "/viva/me", body: userProfile)
+    func saveCurrentUserProfile(
+        _ updateRequest: UserProfileUpdateRequest, _ selectedImage: UIImage?
+    ) async throws -> UserProfile {
+        var multipartData: [NetworkClient.MultipartData] = []
 
-        return try await networkClient.fetchData(
-            request: sessionRequest, type: UserProfile.self)
+        // Convert profile update request to JSON data
+        let jsonEncoder = JSONEncoder()
+        let profileData = try jsonEncoder.encode(updateRequest)
+        multipartData.append(
+            NetworkClient.MultipartData(
+                data: profileData,
+                name: "userProfileUpdateRequest",
+                mimeType: "application/json"
+            ))
+
+        // Add image data if provided
+        if let image = selectedImage,
+            let imageData = image.jpegData(compressionQuality: 0.8)
+        {
+            multipartData.append(
+                NetworkClient.MultipartData(
+                    data: imageData,
+                    name: "profileImageFile",
+                    mimeType: "image/jpeg"
+                ))
+        }
+
+        return try await networkClient.upload(
+            path: "/viva/me",
+            headers: nil,
+            data: multipartData
+        )
     }
 }

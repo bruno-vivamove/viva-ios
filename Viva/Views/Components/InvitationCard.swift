@@ -34,7 +34,7 @@ struct InvitationCard: View {
                         .font(VivaDesign.Typography.caption)
 
                     VivaProfileImage(
-                        imageId: invitation.user.imageId,
+                        imageUrl: invitation.user.imageUrl,
                         size: .small
                     )
                 }

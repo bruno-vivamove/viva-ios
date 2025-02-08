@@ -1,10 +1,11 @@
 struct VivaAppObjects {
     public let userSession: UserSession
     public let appNetworkClientSettings: AppNetworkClientSettings
+    public let authenticationManager: AuthenticationManager
     public let authService: AuthService
     public let sessionService: SessionService
     public let userProfileService: UserProfileService
-    public let authenticationManager: AuthenticationManager
+    public let friendService: FriendService
 
     init(userSession: UserSession) {
         self.userSession = userSession
@@ -25,6 +26,9 @@ struct VivaAppObjects {
             userSession: userSession
         )
 
+        friendService = FriendService(
+            networkClient: NetworkClient(settings: appNetworkClientSettings))
+
         authenticationManager = AuthenticationManager(
             userSession: userSession,
             authService: authService,
@@ -43,6 +47,6 @@ struct VivaAppObjects {
                 displayName: "dummy_display_name",
                 imageUrl: "profile_bruno",
                 rewardPoints: 9876))
-        return userSession;
+        return userSession
     }
 }

@@ -9,7 +9,7 @@ struct MatchupCard: View {
                 // Left User
                 HStack(spacing: VivaDesign.Spacing.small) {
                     VivaProfileImage(
-                        imageId: matchup.leftUsers[0].user.imageId,
+                        imageUrl: matchup.leftUsers[0].user.imageUrl,
                         size: .small
                     )
 
@@ -38,7 +38,7 @@ struct MatchupCard: View {
                     )
 
                     VivaProfileImage(
-                        imageId: matchup.rightUsers[0].user.imageId,
+                        imageUrl: matchup.rightUsers[0].user.imageUrl,
                         size: .small
                     )
                 }

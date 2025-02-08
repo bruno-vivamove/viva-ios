@@ -23,7 +23,7 @@ struct MatchupDetailView: View {
                 user: User(
                     id: "1",
                     displayName: "Saya Jones",
-                    imageId: "profile_stock"
+                    imageUrl: nil
                 ), score: 1275)
         ],
         rightUsers: [
@@ -31,7 +31,7 @@ struct MatchupDetailView: View {
                 user: User(
                     id: "4",
                     displayName: "Judah Levine",
-                    imageId: "profile_judah"
+                    imageUrl: nil
                 ), score: 1113)
         ], endDate: ISO8601DateFormatter().date(from: "2025-01-16T11:00:00Z")!)
 
@@ -160,7 +160,7 @@ struct UserScoreView: View {
     }
 
     private var userImage: some View {
-        Image(matchupUser.user.imageId)
+        Image(systemName: "person.circle.fill")
             .resizable()
             .frame(width: 60, height: 60)
             .clipShape(Circle())
@@ -331,13 +331,13 @@ struct RecordDisplay: View {
 
     var body: some View {
         HStack(spacing: VivaDesign.Spacing.minimal) {
-            VivaProfileImage(imageId: leftUser.imageId, size: .mini)
+            VivaProfileImage(imageUrl: leftUser.imageUrl, size: .mini)
             Text("\(wins)")
                 .font(.title)
             Spacer().frame(width: 10)
             Text("\(losses)")
                 .font(.title)
-            VivaProfileImage(imageId: rightUser.imageId, size: .mini)
+            VivaProfileImage(imageUrl: rightUser.imageUrl, size: .mini)
         }
         .foregroundColor(VivaDesign.Colors.primaryText)
     }
