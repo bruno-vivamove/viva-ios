@@ -16,7 +16,8 @@ struct TrophiesView: View {
             opponent: User(
                 id: "2",
                 displayName: "Chris Dolan",
-                imageUrl: nil
+                imageUrl: nil,
+                friendStatus: .friend
             ),
             record: "11-9"
         ),
@@ -24,7 +25,8 @@ struct TrophiesView: View {
             opponent: User(
                 id: "3",
                 displayName: "Bruno Souto",
-                imageUrl: nil
+                imageUrl: nil,
+                friendStatus: .friend
             ),
             record: "5-6"
         ),
@@ -32,7 +34,8 @@ struct TrophiesView: View {
             opponent: User(
                 id: "4",
                 displayName: "Judah Levine",
-                imageUrl: nil
+                imageUrl: nil,
+                friendStatus: .friend
             ),
             record: "9-6"
         ),
@@ -40,7 +43,8 @@ struct TrophiesView: View {
             opponent: User(
                 id: "5",
                 displayName: "Chris Dolan",
-                imageUrl: nil
+                imageUrl: nil,
+                friendStatus: .friend
             ),
             record: "11-9"
         ),
@@ -48,7 +52,8 @@ struct TrophiesView: View {
             opponent: User(
                 id: "6",
                 displayName: "Bruno Souto",
-                imageUrl: nil
+                imageUrl: nil,
+                friendStatus: .friend
             ),
             record: "5-6"
         ),
@@ -56,7 +61,8 @@ struct TrophiesView: View {
             opponent: User(
                 id: "7",
                 displayName: "Judah Levine",
-                imageUrl: nil
+                imageUrl: nil,
+                friendStatus: .friend
             ),
             record: "9-6"
         ),
@@ -64,7 +70,8 @@ struct TrophiesView: View {
             opponent: User(
                 id: "8",
                 displayName: "Chris Dolan",
-                imageUrl: nil
+                imageUrl: nil,
+                friendStatus: .friend
             ),
             record: "11-9"
         ),
@@ -72,7 +79,8 @@ struct TrophiesView: View {
             opponent: User(
                 id: "9",
                 displayName: "Bruno Souto",
-                imageUrl: nil
+                imageUrl: nil,
+                friendStatus: .friend
             ),
             record: "5-6"
         ),
@@ -80,7 +88,8 @@ struct TrophiesView: View {
             opponent: User(
                 id: "10",
                 displayName: "Judah Levine",
-                imageUrl: nil
+                imageUrl: nil,
+                friendStatus: .friend
             ),
             record: "9-6"
         ),

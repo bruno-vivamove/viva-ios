@@ -19,6 +19,8 @@ struct VivaProfileImage: View {
                 case .failure(let error):
                     defaultImage
                         .onAppear {
+                            // TODO remove debug code
+                            
                             // More detailed error logging
                             print("🖼️ Image load failed:")
                             print("URL: \(urlString)")

@@ -23,7 +23,8 @@ struct MatchupDetailView: View {
                 user: User(
                     id: "1",
                     displayName: "Saya Jones",
-                    imageUrl: nil
+                    imageUrl: nil,
+                    friendStatus: .friend
                 ), score: 1275)
         ],
         rightUsers: [
@@ -31,7 +32,8 @@ struct MatchupDetailView: View {
                 user: User(
                     id: "4",
                     displayName: "Judah Levine",
-                    imageUrl: nil
+                    imageUrl: nil,
+                    friendStatus: .friend
                 ), score: 1113)
         ], endDate: ISO8601DateFormatter().date(from: "2025-01-16T11:00:00Z")!)
 

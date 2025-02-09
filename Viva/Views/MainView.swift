@@ -32,7 +32,7 @@ struct MainView: View {
                 }
 
             // Friends Tab
-            FriendsView(friendService: friendService)
+            FriendsView(friendService: friendService, userSession: userSession)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
                 .tabItem {

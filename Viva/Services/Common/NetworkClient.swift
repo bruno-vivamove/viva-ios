@@ -14,10 +14,11 @@ final class NetworkClient {
     init(settings: NetworkClientSettings) {
         self.settings = settings
         self.session = Session.default
+        debugPrint(
+            "🔧 NetworkClient initialized with baseURL: \(settings.baseUrl)")
     }
 
     // MARK: - Request Building
-
     private func buildHeaders(
         _ defaultHeaders: [String: String],
         _ additionalHeaders: [String: String]? = nil
@@ -27,41 +28,47 @@ final class NetworkClient {
             .merging(settings.headers) { _, new in new }
             .merging(additionalHeaders ?? [:]) { _, new in new }
 
+        debugPrint("🔨 Built headers: \(headers)")
         return HTTPHeaders(headers)
     }
 
     private func buildURL(path: String) throws -> URL {
         guard let url = URL(string: settings.baseUrl + path) else {
+            debugPrint(
+                "❌ Failed to build URL with base: \(settings.baseUrl) and path: \(path)"
+            )
             throw NetworkClientError(
                 code: "INVALID_URL",
                 message: "Invalid URL"
             )
         }
+        debugPrint("🔨 Built URL: \(url.absoluteString)")
         return url
     }
 
-    // MARK: - Public Request Methods
+    // MARK: - Public Request Methods with Response
 
     public func get<T: Decodable>(
         path: String,
         headers: [String: String]? = nil
     ) async throws -> T {
+        debugPrint("📤 GET Request initiated for path: \(path)")
         let url = try buildURL(path: path)
-        return try await performRequestWithoutBody(
+        return try await performRequestWithResponse(
             url: url,
             method: .get,
             headers: buildHeaders(defaultGetHeaders, headers)
         )
     }
 
-    @discardableResult
     public func post<T: Decodable, E: Encodable>(
         path: String,
         body: E,
         headers: [String: String]? = nil
     ) async throws -> T {
+        debugPrint("📤 POST Request initiated for path: \(path)")
         let url = try buildURL(path: path)
-        return try await performRequestWithBody(
+        return try await performRequestWithResponse(
             url: url,
             method: .post,
             body: body,
@@ -69,27 +76,72 @@ final class NetworkClient {
         )
     }
 
-    @discardableResult
     public func post<T: Decodable>(
         path: String,
         headers: [String: String]? = nil
     ) async throws -> T {
+        debugPrint("📤 POST Request initiated for path: \(path)")
         let url = try buildURL(path: path)
-        return try await performRequestWithoutBody(
+        return try await performRequestWithResponse(
             url: url,
             method: .post,
             headers: buildHeaders(defaultPostHeaders, headers)
         )
     }
 
-    @discardableResult
-    public func put<T: Decodable, E: Encodable>(
+    // MARK: - Public Request Methods without Response
+
+    public func post(
+        path: String,
+        headers: [String: String]? = nil
+    ) async throws {
+        debugPrint("📤 POST Request (no response) initiated for path: \(path)")
+        let url = try buildURL(path: path)
+        try await performRequestWithoutResponse(
+            url: url,
+            method: .post,
+            headers: buildHeaders(defaultPostHeaders, headers)
+        )
+    }
+
+    public func post<E: Encodable>(
         path: String,
         body: E,
         headers: [String: String]? = nil
-    ) async throws -> T {
+    ) async throws {
+        debugPrint(
+            "📤 POST Request (no response) with body initiated for path: \(path)"
+        )
         let url = try buildURL(path: path)
-        return try await performRequestWithBody(
+        try await performRequestWithoutResponse(
+            url: url,
+            method: .post,
+            body: body,
+            headers: buildHeaders(defaultPostHeaders, headers)
+        )
+    }
+
+    public func put(
+        path: String,
+        headers: [String: String]? = nil
+    ) async throws {
+        debugPrint("📤 PUT Request initiated for path: \(path)")
+        let url = try buildURL(path: path)
+        try await performRequestWithoutResponse(
+            url: url,
+            method: .put,
+            headers: buildHeaders(defaultPostHeaders, headers)
+        )
+    }
+
+    public func put<E: Encodable>(
+        path: String,
+        body: E,
+        headers: [String: String]? = nil
+    ) async throws {
+        debugPrint("📤 PUT Request with body initiated for path: \(path)")
+        let url = try buildURL(path: path)
+        try await performRequestWithoutResponse(
             url: url,
             method: .put,
             body: body,
@@ -97,27 +149,27 @@ final class NetworkClient {
         )
     }
 
-    @discardableResult
-    public func put<T: Decodable>(
+    public func patch(
         path: String,
         headers: [String: String]? = nil
-    ) async throws -> T {
+    ) async throws {
+        debugPrint("📤 PATCH Request initiated for path: \(path)")
         let url = try buildURL(path: path)
-        return try await performRequestWithoutBody(
+        try await performRequestWithoutResponse(
             url: url,
-            method: .put,
+            method: .patch,
             headers: buildHeaders(defaultPostHeaders, headers)
         )
     }
 
-    @discardableResult
-    public func patch<T: Decodable, E: Encodable>(
+    public func patch<E: Encodable>(
         path: String,
         body: E,
         headers: [String: String]? = nil
-    ) async throws -> T {
+    ) async throws {
+        debugPrint("📤 PATCH Request with body initiated for path: \(path)")
         let url = try buildURL(path: path)
-        return try await performRequestWithBody(
+        try await performRequestWithoutResponse(
             url: url,
             method: .patch,
             body: body,
@@ -125,18 +177,20 @@ final class NetworkClient {
         )
     }
 
-    @discardableResult
-    public func patch<T: Decodable>(
+    public func delete(
         path: String,
         headers: [String: String]? = nil
-    ) async throws -> T {
+    ) async throws {
+        debugPrint("📤 DELETE Request initiated for path: \(path)")
         let url = try buildURL(path: path)
-        return try await performRequestWithoutBody(
+        try await performRequestWithoutResponse(
             url: url,
-            method: .patch,
-            headers: buildHeaders(defaultPostHeaders, headers)
+            method: .delete,
+            headers: buildHeaders(defaultGetHeaders, headers)
         )
     }
+
+    // MARK: - Upload Methods
 
     struct MultipartData {
         let data: Data
@@ -152,26 +206,30 @@ final class NetworkClient {
             self.name = name
             self.fileName = fileName
             self.mimeType = mimeType
+            debugPrint(
+                "📦 MultipartData initialized - name: \(name), fileName: \(String(describing: fileName)), mimeType: \(String(describing: mimeType)), size: \(data.count) bytes"
+            )
         }
     }
 
-    @discardableResult
-    func upload<T: Decodable>(
+    public func upload<T: Decodable>(
         path: String,
         headers: [String: String]? = nil,
         data: [MultipartData]
     ) async throws -> T {
+        debugPrint("📤 Upload Request initiated for path: \(path)")
         let url = try buildURL(path: path)
         let requestHeaders = buildHeaders(defaultUploadHeaders, headers)
 
-        // Debug logging
         debugPrint("🌐 Upload Request: \(url.absoluteString)")
         debugPrint("📋 Headers: \(requestHeaders)")
+        debugPrint("📦 Uploading \(data.count) files")
 
         return try await withCheckedThrowingContinuation { continuation in
             session.upload(
                 multipartFormData: { multipartFormData in
                     data.forEach { dataItem in
+                        debugPrint("📎 Appending file: \(dataItem.name)")
                         multipartFormData.append(
                             dataItem.data,
                             withName: dataItem.name,
@@ -179,66 +237,133 @@ final class NetworkClient {
                             mimeType: dataItem.mimeType
                         )
                     }
+                    debugPrint(
+                        "📦 Total upload size: \(multipartFormData.contentLength) bytes"
+                    )
                 },
                 to: url,
                 method: .patch,
                 headers: requestHeaders
             )
             .uploadProgress { progress in
-                debugPrint("📤 Upload progress: \(progress.fractionCompleted)")
+                debugPrint(
+                    "📤 Upload progress: \(progress.fractionCompleted * 100)% (\(progress.completedUnitCount)/\(progress.totalUnitCount) bytes)"
+                )
             }
             .validate()
             .responseDecodable(of: T.self) { response in
-                self.handleResponse(response, continuation: continuation)
+                switch response.result {
+                case .success(let value):
+                    debugPrint("✅ Upload completed successfully")
+                    continuation.resume(returning: value)
+                case .failure(let error):
+                    self.handleError(
+                        error, response: response, continuation: continuation)
+                }
             }
         }
     }
 
-    @discardableResult
-    public func delete<T: Decodable>(
+    public func upload(
         path: String,
-        headers: [String: String]? = nil
-    ) async throws -> T {
+        headers: [String: String]? = nil,
+        data: [MultipartData]
+    ) async throws {
+        debugPrint("📤 Upload Request (no response) initiated for path: \(path)")
         let url = try buildURL(path: path)
-        return try await performRequestWithoutBody(
-            url: url,
-            method: .delete,
-            headers: buildHeaders(defaultGetHeaders, headers)
-        )
+        let requestHeaders = buildHeaders(defaultUploadHeaders, headers)
+
+        debugPrint("🌐 Upload Request: \(url.absoluteString)")
+        debugPrint("📋 Headers: \(requestHeaders)")
+        debugPrint("📦 Uploading \(data.count) files")
+
+        try await withCheckedThrowingContinuation { continuation in
+            session.upload(
+                multipartFormData: { multipartFormData in
+                    data.forEach { dataItem in
+                        debugPrint("📎 Appending file: \(dataItem.name)")
+                        multipartFormData.append(
+                            dataItem.data,
+                            withName: dataItem.name,
+                            fileName: dataItem.fileName,
+                            mimeType: dataItem.mimeType
+                        )
+                    }
+                    debugPrint(
+                        "📦 Total upload size: \(multipartFormData.contentLength) bytes"
+                    )
+                },
+                to: url,
+                method: .patch,
+                headers: requestHeaders
+            )
+            .uploadProgress { progress in
+                debugPrint(
+                    "📤 Upload progress: \(progress.fractionCompleted * 100)% (\(progress.completedUnitCount)/\(progress.totalUnitCount) bytes)"
+                )
+            }
+            .validate()
+            .response { response in
+                switch response.result {
+                case .success:
+                    debugPrint("✅ Upload completed successfully")
+                    continuation.resume()
+                case .failure(let error):
+                    self.handleErrorWithoutResponse(
+                        error, response: response, continuation: continuation)
+                }
+            }
+        }
     }
 
     // MARK: - Private Request Methods
 
-    private func performRequestWithoutBody<T: Decodable>(
+    private func performRequestWithResponse<T: Decodable>(
         url: URL,
         method: HTTPMethod,
         headers: HTTPHeaders
     ) async throws -> T {
-        // Debug logging
         debugPrint("🌐 \(method.rawValue) Request: \(url.absoluteString)")
         debugPrint("📋 Headers: \(headers)")
 
-        let decoder = JSONDecoder()
         return try await withCheckedThrowingContinuation { continuation in
-            session.request(
-                url,
-                method: method,
-                headers: headers
-            )
-            .validate()
-            .responseDecodable(of: T.self, decoder: decoder) { response in
-                self.handleResponse(response, continuation: continuation)
-            }
+            session.request(url, method: method, headers: headers)
+                .validate()
+                .responseDecodable(of: T.self) { response in
+                    debugPrint("🌐 Attempting to decode to type: \(T.self)")
+                    debugPrint(
+                        "📥 Response Status: \(String(describing: response.response?.statusCode))"
+                    )
+                    debugPrint(
+                        "📥 Response Headers: \(String(describing: response.response?.headers))"
+                    )
+
+                    if let data = response.data {
+                        debugPrint("📥 Response size: \(data.count) bytes")
+                        if let rawString = String(data: data, encoding: .utf8) {
+                            debugPrint("📥 Raw Response string: \(rawString)")
+                        }
+                    }
+
+                    switch response.result {
+                    case .success(let value):
+                        debugPrint("✅ Request completed successfully")
+                        continuation.resume(returning: value)
+                    case .failure(let error):
+                        self.handleError(
+                            error, response: response,
+                            continuation: continuation)
+                    }
+                }
         }
     }
 
-    private func performRequestWithBody<T: Decodable, E: Encodable>(
+    private func performRequestWithResponse<T: Decodable, E: Encodable>(
         url: URL,
         method: HTTPMethod,
         body: E,
         headers: HTTPHeaders
     ) async throws -> T {
-        // Debug logging
         debugPrint("🌐 \(method.rawValue) Request: \(url.absoluteString)")
         debugPrint("📋 Headers: \(headers)")
         debugPrint("📦 Body: \(body)")
@@ -252,46 +377,184 @@ final class NetworkClient {
                 headers: headers
             )
             .validate()
-            .responseDecodable(of: T.self, emptyResponseCodes: [200, 204]) { response in
-                self.handleResponse(response, continuation: continuation)
+            .responseDecodable(of: T.self) { response in
+                debugPrint("🌐 Attempting to decode to type: \(T.self)")
+                debugPrint(
+                    "📥 Response Status: \(String(describing: response.response?.statusCode))"
+                )
+                debugPrint(
+                    "📥 Response Headers: \(String(describing: response.response?.headers))"
+                )
+
+                if let data = response.data {
+                    debugPrint("📥 Response size: \(data.count) bytes")
+                    if let rawString = String(data: data, encoding: .utf8) {
+                        debugPrint("📥 Raw Response string: \(rawString)")
+                    }
+                }
+
+                switch response.result {
+                case .success(let value):
+                    debugPrint("✅ Request completed successfully")
+                    continuation.resume(returning: value)
+                case .failure(let error):
+                    self.handleError(
+                        error, response: response,
+                        continuation: continuation)
+                }
             }
         }
     }
 
-    // MARK: - Response Handling
+    private func performRequestWithoutResponse(
+        url: URL,
+        method: HTTPMethod,
+        headers: HTTPHeaders
+    ) async throws {
+        debugPrint("🌐 \(method.rawValue) Request: \(url.absoluteString)")
+        debugPrint("📋 Headers: \(headers)")
 
-    private func handleResponse<T>(
-        _ response: DataResponse<T, AFError>,
-        continuation: CheckedContinuation<T, Error>
-    ) {
-        // Debug logging for response
-        debugPrint("🌐 Attempting to decode to type: \(T.self)")
-        debugPrint("📥 Response Status: \(String(describing: response.response?.statusCode))")
-        debugPrint("📥 Response Headers: \(String(describing: response.response?.headers))")
+        try await withCheckedThrowingContinuation { continuation in
+            session.request(url, method: method, headers: headers)
+                .validate()
+                .response { response in
+                    debugPrint(
+                        "📥 Response Status: \(String(describing: response.response?.statusCode))"
+                    )
+                    debugPrint(
+                        "📥 Response Headers: \(String(describing: response.response?.headers))"
+                    )
 
-        if let data = response.data {
-            if let rawString = String(data: data, encoding: .utf8) {
-                debugPrint("📥 Raw Response string: \(rawString)")
+                    if let data = response.data {
+                        debugPrint("📥 Response size: \(data.count) bytes")
+                        if let rawString = String(data: data, encoding: .utf8) {
+                            debugPrint("📥 Raw Response string: \(rawString)")
+                        }
+                    }
+
+                    switch response.result {
+                    case .success:
+                        debugPrint("✅ Request completed successfully")
+                        continuation.resume()
+                    case .failure(let error):
+                        self.handleErrorWithoutResponse(
+                            error, response: response,
+                            continuation: continuation)
+                    }
+                }
+        }
+    }
+
+    private func performRequestWithoutResponse<E: Encodable>(
+        url: URL,
+        method: HTTPMethod,
+        body: E,
+        headers: HTTPHeaders
+    ) async throws {
+        debugPrint("🌐 \(method.rawValue) Request: \(url.absoluteString)")
+        debugPrint("📋 Headers: \(headers)")
+        debugPrint("📦 Body: \(body)")
+
+        try await withCheckedThrowingContinuation { continuation in
+            session.request(
+                url,
+                method: method,
+                parameters: body,
+                encoder: JSONParameterEncoder.default,
+                headers: headers
+            )
+            .validate()
+            .response { response in
+                debugPrint(
+                    "📥 Response Status: \(String(describing: response.response?.statusCode))"
+                )
+                debugPrint(
+                    "📥 Response Headers: \(String(describing: response.response?.headers))"
+                )
+
+                if let data = response.data {
+                    debugPrint("📥 Response size: \(data.count) bytes")
+                    if let rawString = String(data: data, encoding: .utf8) {
+                        debugPrint("📥 Raw Response string: \(rawString)")
+                    }
+                }
+
+                switch response.result {
+                case .success:
+                    debugPrint("✅ Request completed successfully")
+                    continuation.resume()
+                case .failure(let error):
+                    self.handleErrorWithoutResponse(
+                        error, response: response,
+                        continuation: continuation)
+                }
             }
         }
+    }
 
-        switch response.result {
-        case .success(let value):
-            continuation.resume(returning: value)
+    private func handleError<T>(
+        _ error: AFError,
+        response: DataResponse<T, AFError>,
+        continuation: CheckedContinuation<T, Error>
+    ) {
+        debugPrint("❌ Error occurred during request")
+        debugPrint("❌ Error description: \(error.localizedDescription)")
 
-        case .failure(let error):
+        if let underlyingError = error.underlyingError {
+            debugPrint("❌ Underlying error: \(underlyingError)")
+        }
+
+        if let data = response.data,
+            let errorResponse = try? JSONDecoder().decode(
+                ErrorResponse.self, from: data)
+        {
+            debugPrint("❌ Decoded Error Response: \(errorResponse)")
+            continuation.resume(throwing: errorResponse)
+        } else {
+            let networkError = NetworkClientError(
+                code: "REQUEST_ERROR",
+                message: error.localizedDescription
+            )
+            debugPrint("❌ Network Error: \(networkError)")
             if let data = response.data,
-                let errorResponse = try? JSONDecoder().decode(
-                    ErrorResponse.self, from: data)
+                let rawString = String(data: data, encoding: .utf8)
             {
-                continuation.resume(throwing: errorResponse)
-            } else {
-                continuation.resume(
-                    throwing: NetworkClientError(
-                        code: "REQUEST_ERROR",
-                        message: error.localizedDescription
-                    ))
+                debugPrint("❌ Raw error response: \(rawString)")
             }
+            continuation.resume(throwing: networkError)
+        }
+    }
+
+    private func handleErrorWithoutResponse(
+        _ error: AFError,
+        response: AFDataResponse<Data?>,
+        continuation: CheckedContinuation<Void, Error>
+    ) {
+        debugPrint("❌ Error occurred during request")
+        debugPrint("❌ Error description: \(error.localizedDescription)")
+
+        if let underlyingError = error.underlyingError {
+            debugPrint("❌ Underlying error: \(underlyingError)")
+        }
+
+        if let data = response.data,
+            let errorResponse = try? JSONDecoder().decode(
+                ErrorResponse.self, from: data)
+        {
+            debugPrint("❌ Decoded Error Response: \(errorResponse)")
+            continuation.resume(throwing: errorResponse)
+        } else {
+            let networkError = NetworkClientError(
+                code: "REQUEST_ERROR",
+                message: error.localizedDescription
+            )
+            debugPrint("❌ Network Error: \(networkError)")
+            if let data = response.data,
+                let rawString = String(data: data, encoding: .utf8)
+            {
+                debugPrint("❌ Raw error response: \(rawString)")
+            }
+            continuation.resume(throwing: networkError)
         }
     }
 }

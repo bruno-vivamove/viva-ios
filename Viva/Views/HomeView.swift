@@ -1,89 +1,126 @@
-import SwiftUI
 import Foundation
-
+import SwiftUI
 
 struct HomeView: View {
     private let liveMatchups = [
         Matchup(
             id: "1",
-            leftUsers: [MatchupUser(
-                user: User(
-                    id: "1", displayName: "Saya Jones",
-                    imageUrl: nil),
-                score: 1275
-            )],
-            rightUsers: [MatchupUser(
-                user: User(
-                    id: "2", displayName: "Chris Dolan",
-                    imageUrl: nil),
-                score: 1287
-            )],
+            leftUsers: [
+                MatchupUser(
+                    user: User(
+                        id: "1",
+                        displayName: "Saya Jones",
+                        imageUrl: nil,
+                        friendStatus: .friend
+                    ),
+                    score: 1275
+                )
+            ],
+            rightUsers: [
+                MatchupUser(
+                    user: User(
+                        id: "2",
+                        displayName: "Chris Dolan",
+                        imageUrl: nil,
+                        friendStatus: .friend
+                    ),
+                    score: 1287
+                )
+            ],
             endDate: ISO8601DateFormatter().date(from: "2025-01-16T11:00:00Z")!
         ),
         Matchup(
             id: "2",
-            leftUsers: [MatchupUser(
-                user: User(
-                    id: "2", displayName: "Saya Jones",
-                    imageUrl: nil),
-                score: 1225
-            )],
-            rightUsers: [MatchupUser(
-                user: User(
-                    id: "3", displayName: "Bruno Souto",
-                    imageUrl: nil),
-                score: 1168
-            )],
+            leftUsers: [
+                MatchupUser(
+                    user: User(
+                        id: "2",
+                        displayName: "Saya Jones",
+                        imageUrl: nil,
+                        friendStatus: .friend
+                    ),
+                    score: 1225
+                )
+            ],
+            rightUsers: [
+                MatchupUser(
+                    user: User(
+                        id: "3",
+                        displayName: "Bruno Souto",
+                        imageUrl: nil,
+                        friendStatus: .friend
+                    ),
+                    score: 1168
+                )
+            ],
             endDate: ISO8601DateFormatter().date(from: "2025-01-17T11:00:00Z")!
         ),
         Matchup(
             id: "3",
-            leftUsers: [MatchupUser(
-                user: User(
-                    id: "3", displayName: "Saya Jones",
-                    imageUrl: nil),
-                score: 1175
-            )],
-            rightUsers: [MatchupUser(
-                user: User(
-                    id: "4", displayName: "Judah Levine",
-                    imageUrl: nil),
-                score: 1113
-            )],
+            leftUsers: [
+                MatchupUser(
+                    user: User(
+                        id: "3",
+                        displayName: "Saya Jones",
+                        imageUrl: nil,
+                        friendStatus: .friend
+                    ),
+                    score: 1175
+                )
+            ],
+            rightUsers: [
+                MatchupUser(
+                    user: User(
+                        id: "4",
+                        displayName: "Judah Levine",
+                        imageUrl: nil,
+                        friendStatus: .friend
+                    ),
+                    score: 1113
+                )
+            ],
             endDate: ISO8601DateFormatter().date(from: "2025-01-18T11:00:00Z")!
         ),
     ]
-
 
     private let pendingInvitations = [
         MatchupInvite(
             id: "1",
             user: User(
-                id: "5", displayName: "Chris Dolan",
-                imageUrl: nil),
+                id: "5",
+                displayName: "Chris Dolan",
+                imageUrl: nil,
+                friendStatus: .friend
+            ),
             type: .sent
         ),
         MatchupInvite(
             id: "2",
             user: User(
-                id: "6", displayName: "Adson Afonso",
-                imageUrl: nil
+                id: "6",
+                displayName: "Adson Afonso",
+                imageUrl: nil,
+                friendStatus: .friend
             ),
             type: .sent
         ),
         MatchupInvite(
             id: "3",
             user: User(
-                id: "7", displayName: "Judah Levine",
-                imageUrl: nil
+                id: "7",
+                displayName: "Judah Levine",
+                imageUrl: nil,
+                friendStatus: .friend
             ),
             type: .sent
         ),
         MatchupInvite(
             id: "4",
             user: User(
-                id: "8", displayName: "Chris Dolan",
-                imageUrl: nil
+                id: "8",
+                displayName: "Chris Dolan",
+                imageUrl: nil,
+                friendStatus: .friend
             ),
             type: .received
         ),

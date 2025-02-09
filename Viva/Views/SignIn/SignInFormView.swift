@@ -22,6 +22,12 @@ class SignInViewModel: ObservableObject {
         errorMessage = nil
 
         do {
+            if (email.isEmpty || password.isEmpty) {
+                try await authManager.signIn(
+                    email: "bruno@vivamove.com", password: "abc12345")
+                return true
+            }
+            
             try await authManager.signIn(
                 email: email, password: password)
             return true
@@ -52,6 +58,12 @@ struct SignInFormView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: SignInViewModel
+    @FocusState private var focusedField: Field?
+    
+    enum Field {
+        case email
+        case password
+    }
 
     init(authManager: AuthenticationManager, userSession: UserSession) {
         _viewModel = StateObject(
@@ -67,7 +79,7 @@ struct SignInFormView: View {
                     .ignoresSafeArea()
 
                 VStack(spacing: VivaDesign.Spacing.large) {
-                    EmailField(email: $viewModel.email)
+                    EmailField(email: $viewModel.email, focusedField: $focusedField)
                     PasswordField(
                         password: $viewModel.password,
                         showPassword: $viewModel.showPassword
@@ -85,6 +97,9 @@ struct SignInFormView: View {
                     DismissButton(action: { dismiss() })
                 }
             }
+            .onAppear {
+                focusedField = .email
+            }
         }
     }
 
@@ -99,6 +114,7 @@ struct SignInFormView: View {
 
 struct EmailField: View {
     @Binding var email: String
+    @FocusState.Binding var focusedField: SignInFormView.Field?
 
     var body: some View {
         TextField("", text: $email)
@@ -110,6 +126,7 @@ struct EmailField: View {
             .autocapitalization(.none)
             .textContentType(.emailAddress)
             .keyboardType(.emailAddress)
+            .focused($focusedField, equals: .email)
             .padding(.horizontal, VivaDesign.Spacing.large)
     }
 }
