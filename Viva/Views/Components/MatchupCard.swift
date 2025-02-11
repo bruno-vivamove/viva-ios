@@ -8,14 +8,16 @@ struct MatchupCard: View {
             HStack {
                 // Left User
                 HStack(spacing: VivaDesign.Spacing.small) {
+                    let user = matchup.leftUsers.count > 0 ? matchup.leftUsers[0] : nil
+                    
                     VivaProfileImage(
-                        imageUrl: matchup.leftUsers[0].user.imageUrl,
+                        imageUrl: user?.imageUrl,
                         size: .small
                     )
 
                     LabeledValueStack(
-                        label: matchup.leftUsers[0].user.displayName,
-                        value: "\(matchup.leftUsers[0].score)",
+                        label: user?.displayName ?? "Open Position",
+                        value: "\(1000)",
                         alignment: .leading
                     )
                 }
@@ -31,14 +33,16 @@ struct MatchupCard: View {
 
                 // Right User
                 HStack(spacing: VivaDesign.Spacing.small) {
+                    let user = matchup.rightUsers.count > 0 ? matchup.rightUsers[0] : nil
+
                     LabeledValueStack(
-                        label: matchup.rightUsers[0].user.displayName,
-                        value: "\(matchup.rightUsers[0].score)",
+                        label: user?.displayName ?? "Open Position",
+                        value: "\(1000)",
                         alignment: .trailing
                     )
 
                     VivaProfileImage(
-                        imageUrl: matchup.rightUsers[0].user.imageUrl,
+                        imageUrl: user?.imageUrl,
                         size: .small
                     )
                 }

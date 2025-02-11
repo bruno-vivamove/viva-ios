@@ -21,6 +21,10 @@ final class UserSession: ObservableObject {
         return userProfile!
     }
 
+    func getUserId() -> String {
+        return userProfile!.id
+    }
+
     func setUserProfile(_ userProfile: UserProfile) {
         return self.userProfile = userProfile
     }

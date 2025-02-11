@@ -6,13 +6,18 @@ struct VivaAppObjects {
     public let sessionService: SessionService
     public let userProfileService: UserProfileService
     public let friendService: FriendService
+    public let matchupService: MatchupService
+    public let appNetworkClient: NetworkClient
 
     init(userSession: UserSession) {
         self.userSession = userSession
+        
 
         appNetworkClientSettings = AppNetworkClientSettings(
             userSession: userSession)
 
+        appNetworkClient = NetworkClient(settings: appNetworkClientSettings)
+        
         authService = AuthService(
             networkClient: NetworkClient(
                 settings: AuthNetworkClientSettings()))
@@ -22,13 +27,15 @@ struct VivaAppObjects {
                 settings: AppWithNoSessionNetworkClientSettings()))
 
         userProfileService = UserProfileService(
-            networkClient: NetworkClient(settings: appNetworkClientSettings),
+            networkClient: appNetworkClient,
             userSession: userSession
         )
 
         friendService = FriendService(
-            networkClient: NetworkClient(settings: appNetworkClientSettings))
+            networkClient: appNetworkClient)
 
+        matchupService = MatchupService(networkClient: appNetworkClient)
+        
         authenticationManager = AuthenticationManager(
             userSession: userSession,
             authService: authService,

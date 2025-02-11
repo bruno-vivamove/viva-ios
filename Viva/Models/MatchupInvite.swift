@@ -1,10 +1,13 @@
-struct MatchupInvite {
-    let id: String
-    let user: User
-    let type: InvitationType
+import Foundation
+
+struct MatchupInvite: Codable {
+    let inviteCode: String
+    let matchupId: String
+    let user: User?  // Optional since it can be null for open invites
+    let side: MatchupUser.Side
+    let createTime: Date
 }
 
-enum InvitationType {
-    case sent
-    case received
+struct MatchupInvitesResponse: Codable {
+    let invites: [MatchupInvite]
 }

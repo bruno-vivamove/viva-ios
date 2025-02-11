@@ -1,8 +1,12 @@
 import SwiftUI
 
 struct InvitationCard: View {
-    let invitation: MatchupInvite
     private let buttonWidth: CGFloat = 120
+
+    let invite: MatchupInvite
+    let userSession: UserSession
+    var onAccept: () -> Void
+    var onDelete: () -> Void
 
     var body: some View {
         VivaCard {
@@ -10,17 +14,18 @@ struct InvitationCard: View {
                 // Action Buttons Container
                 VStack(spacing: VivaDesign.Spacing.minimal) {
                     VivaPrimaryButton(
-                        title: invitation.type == .sent ? "Accept" : "Remind",
+                        title: invite.user?.id == userSession.getUserId() ? "Accept" : "Remind",
                         width: buttonWidth
                     ) {
-                        // Add action here
-
+                        onAccept()
                     }
 
-                    if invitation.type == .sent {
-                        VivaSecondaryButton(title: "Delete", width: buttonWidth)
-                        {
-                            // Add action here
+                    if invite.user?.id != userSession.getUserId() {
+                        VivaSecondaryButton(
+                            title: "Delete",
+                            width: buttonWidth
+                        ) {
+                            onDelete()
                         }
                     }
                 }
@@ -29,16 +34,31 @@ struct InvitationCard: View {
 
                 // User Info
                 HStack(spacing: VivaDesign.Spacing.small) {
-                    Text(invitation.user.displayName)
+                    Text(invite.user?.displayName ?? "Open Invite")
                         .foregroundColor(VivaDesign.Colors.vivaGreen)
                         .font(VivaDesign.Typography.caption)
 
                     VivaProfileImage(
-                        imageUrl: invitation.user.imageUrl,
+                        imageUrl: invite.user?.imageUrl,
                         size: .small
                     )
                 }
             }
         }
     }
+}
+
+#Preview {
+    InvitationCard(
+        invite: MatchupInvite(
+            inviteCode: "123",
+            matchupId: "match1",
+            user: User(id: "usr1", displayName: "Bill Johnson", imageUrl: nil, friendStatus: .friend),
+            side: .left,
+            createTime: Date()
+        ),
+        userSession: VivaAppObjects.dummyUserSession(),
+        onAccept: {},
+        onDelete: {}
+    )
 }

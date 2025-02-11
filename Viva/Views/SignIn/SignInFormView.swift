@@ -22,12 +22,6 @@ class SignInViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            if (email.isEmpty || password.isEmpty) {
-                try await authManager.signIn(
-                    email: "bruno@vivamove.com", password: "abc12345")
-                return true
-            }
-            
             try await authManager.signIn(
                 email: email, password: password)
             return true
@@ -75,19 +69,47 @@ struct SignInFormView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+                // Background
                 VivaDesign.Colors.background
                     .ignoresSafeArea()
-
+                
+                // Top decorative elements
+                TopDesignElement()
+                
                 VStack(spacing: VivaDesign.Spacing.large) {
-                    EmailField(email: $viewModel.email, focusedField: $focusedField)
-                    PasswordField(
-                        password: $viewModel.password,
-                        showPassword: $viewModel.showPassword
-                    )
-                    SignInButton(
-                        isLoading: viewModel.isLoading,
-                        action: signIn
-                    )
+                    // Welcome Text
+                    WelcomeSection()
+                        .padding(.top, 140) // Adjust based on design element
+                        .padding(.horizontal, VivaDesign.Spacing.large)
+                    
+                    // Form Fields
+                    VStack(spacing: VivaDesign.Spacing.large) {
+                        EmailField(email: $viewModel.email, focusedField: $focusedField)
+                        PasswordField(
+                            password: $viewModel.password,
+                            showPassword: $viewModel.showPassword
+                        )
+                        
+                        // Sign In Button
+                        SignInButton(
+                            isLoading: viewModel.isLoading,
+                            action: signIn
+                        )
+                        
+                        // Forgot Password
+                        HStack {
+                            Spacer()
+                            Button("Forgot Password?") {
+                                // Add forgot password action
+                            }
+                            .foregroundColor(VivaDesign.Colors.vivaGreen)
+                            .font(VivaDesign.Typography.caption)
+                        }
+                    }
+                    .padding(.horizontal, VivaDesign.Spacing.large)
+                    
+                    Spacer()
+                                        
                     ErrorMessageView(message: viewModel.errorMessage)
                 }
             }
@@ -112,6 +134,46 @@ struct SignInFormView: View {
     }
 }
 
+// New Components
+struct TopDesignElement: View {
+    var body: some View {
+        VStack {
+            ZStack {
+                // Green glow circles
+                Circle()
+                    .fill(VivaDesign.Colors.vivaGreen)
+                    .frame(width: 200, height: 200)
+                    .opacity(0.2)
+                    .blur(radius: 60)
+                    .offset(x: 100, y: -80)
+                
+                Circle()
+                    .fill(VivaDesign.Colors.vivaGreen)
+                    .frame(width: 150, height: 150)
+                    .opacity(0.1)
+                    .blur(radius: 50)
+                    .offset(x: -80, y: 20)
+            }
+            Spacer()
+        }
+    }
+}
+
+struct WelcomeSection: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: VivaDesign.Spacing.small) {
+            Text("Welcome Back")
+                .font(.system(size: 34, weight: .bold))
+                .foregroundColor(VivaDesign.Colors.primaryText)
+            
+            Text("Sign in to continue your fitness journey")
+                .font(VivaDesign.Typography.body)
+                .foregroundColor(VivaDesign.Colors.secondaryText)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
 struct EmailField: View {
     @Binding var email: String
     @FocusState.Binding var focusedField: SignInFormView.Field?
@@ -127,7 +189,6 @@ struct EmailField: View {
             .textContentType(.emailAddress)
             .keyboardType(.emailAddress)
             .focused($focusedField, equals: .email)
-            .padding(.horizontal, VivaDesign.Spacing.large)
     }
 }
 
@@ -154,7 +215,6 @@ struct PasswordField: View {
             PasswordVisibilityToggle(showPassword: $showPassword)
         }
         .textFieldStyle(VivaTextFieldStyle())
-        .padding(.horizontal, VivaDesign.Spacing.large)
     }
 }
 
@@ -189,7 +249,6 @@ struct SignInButton: View {
                     .tint(VivaDesign.Colors.vivaGreen)
             }
         }
-        .padding(.horizontal, VivaDesign.Spacing.large)
     }
 }
 

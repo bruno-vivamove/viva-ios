@@ -9,13 +9,15 @@ struct SignInView: View {
     private let authenticationManager: AuthenticationManager
     private let userProfileService: UserProfileService
     private let friendService: FriendService
+    private let matchupService: MatchupService
 
-    init(userSession: UserSession, authenticationManager: AuthenticationManager, userProfileService: UserProfileService, friendService: FriendService)
+    init(userSession: UserSession, authenticationManager: AuthenticationManager, userProfileService: UserProfileService, friendService: FriendService, matchupService: MatchupService)
     {
         self.userSession = userSession
         self.authenticationManager = authenticationManager
         self.userProfileService = userProfileService
         self.friendService = friendService
+        self.matchupService = matchupService
     }
 
     var body: some View {
@@ -28,7 +30,8 @@ struct SignInView: View {
                     userSession: userSession,
                     authenticationManager: authenticationManager,
                     userProfileService: userProfileService,
-                    friendService: friendService
+                    friendService: friendService,
+                    matchupService: matchupService
                 )
                 .transition(.move(edge: .trailing))
             } else {
@@ -253,6 +256,7 @@ struct AuthButtonView: View {
         userSession: userSession,
         authenticationManager: vivaAppObjects.authenticationManager,
         userProfileService: vivaAppObjects.userProfileService,
-        friendService: vivaAppObjects.friendService
+        friendService: vivaAppObjects.friendService,
+        matchupService: vivaAppObjects.matchupService
     )
 }

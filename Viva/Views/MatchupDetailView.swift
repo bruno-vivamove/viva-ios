@@ -17,25 +17,14 @@ struct DailyActivity: Identifiable {
 
 struct MatchupDetailView: View {
     private let matchup = Matchup(
-        id: "1",
-        leftUsers: [
-            MatchupUser(
-                user: User(
-                    id: "1",
-                    displayName: "Saya Jones",
-                    imageUrl: nil,
-                    friendStatus: .friend
-                ), score: 1275)
-        ],
-        rightUsers: [
-            MatchupUser(
-                user: User(
-                    id: "4",
-                    displayName: "Judah Levine",
-                    imageUrl: nil,
-                    friendStatus: .friend
-                ), score: 1113)
-        ], endDate: ISO8601DateFormatter().date(from: "2025-01-16T11:00:00Z")!)
+        id: "1", matchupHash: "hash", displayName: "Saya Jones", ownerId: "1",
+        createTime: Date(),
+        status: .pending,
+        startTime: nil,
+        endTime: nil,
+        usersPerSide: 1,
+        leftUsers: [User(id: "1", displayName: "Saya Jones", imageUrl: nil, friendStatus: .friend)],
+        rightUsers: [User(id: "2", displayName: "Judah Levine", imageUrl: nil, friendStatus: .friend)])
 
     private let workouts = [
         WorkoutEntry(user: "Saya Jones", type: "Running", calories: 347),
@@ -58,8 +47,10 @@ struct MatchupDetailView: View {
     var body: some View {
         VStack(spacing: VivaDesign.Spacing.medium) {
             // Header with user info
-            MatchupHeader(leftUser: matchup.leftUsers[0], rightUser: matchup.rightUsers[0])
-                .padding(.horizontal)
+            MatchupHeader(
+                leftUser: matchup.leftUsers[0], rightUser: matchup.rightUsers[0]
+            )
+            .padding(.horizontal)
 
             // View toggle
             ViewToggle(isShowingTotal: $isShowingTotal)
@@ -116,9 +107,9 @@ struct MatchupDetailView: View {
 
             // Footer Stats
             MatchupFooter(
-                endTime: matchup.endDate,
-                leftUser: matchup.leftUsers[0].user,
-                rightUser: matchup.rightUsers[0].user,
+                endTime: matchup.endTime,
+                leftUser: matchup.leftUsers[0],
+                rightUser: matchup.rightUsers[0],
                 record: (wins: 11, losses: 9)
             )
             .padding(.horizontal)
@@ -133,8 +124,8 @@ struct MatchupDetailView: View {
 }
 
 struct MatchupHeader: View {
-    let leftUser: MatchupUser
-    let rightUser: MatchupUser
+    let leftUser: User
+    let rightUser: User
 
     var body: some View {
         HStack {
@@ -146,7 +137,7 @@ struct MatchupHeader: View {
 }
 
 struct UserScoreView: View {
-    let matchupUser: MatchupUser
+    let matchupUser: User
     let imageOnLeft: Bool
 
     var body: some View {
@@ -170,7 +161,7 @@ struct UserScoreView: View {
 
     private var userInfo: some View {
         LabeledValueStack(
-            label: matchupUser.user.displayName, value: "\(matchupUser.score)",
+            label: matchupUser.displayName, value: "\(1000)",
             alignment: imageOnLeft ? .leading : .trailing)
     }
 }
@@ -267,7 +258,7 @@ struct WorkoutsSection: View {
 }
 
 struct MatchupFooter: View {
-    let endTime: Date
+    let endTime: Date?
     let leftUser: User
     let rightUser: User
     let record: (wins: Int, losses: Int)
@@ -290,40 +281,45 @@ struct MatchupFooter: View {
     }
 }
 
-import SwiftUI
-
 struct TimeRemainingDisplay: View {
-    let endTime: Date
+    let endTime: Date?
 
     var body: some View {
-        let remainingTime = calculateTimeRemaining()
-        
-        HStack(spacing: VivaDesign.Spacing.minimal) {
-            Text("\(remainingTime.days)")
-                .font(.title)
-            Text("d").foregroundColor(VivaDesign.Colors.vivaGreen)
-            Text("\(remainingTime.hours)")
-                .font(.title)
-            Text("hr").foregroundColor(VivaDesign.Colors.vivaGreen)
-            Text("\(remainingTime.minutes)")
-                .font(.title)
-            Text("min").foregroundColor(VivaDesign.Colors.vivaGreen)
+        if(endTime == nil) {
+            HStack(spacing: VivaDesign.Spacing.minimal) {
+                Text("Not yest started")
+                    .font(.title)
+            }
+        } else {
+            let remainingTime = calculateTimeRemaining()
+            HStack(spacing: VivaDesign.Spacing.minimal) {
+                Text("\(remainingTime.days)")
+                    .font(.title)
+                Text("d").foregroundColor(VivaDesign.Colors.vivaGreen)
+                Text("\(remainingTime.hours)")
+                    .font(.title)
+                Text("hr").foregroundColor(VivaDesign.Colors.vivaGreen)
+                Text("\(remainingTime.minutes)")
+                    .font(.title)
+                Text("min").foregroundColor(VivaDesign.Colors.vivaGreen)
+            }
+            .foregroundColor(VivaDesign.Colors.primaryText)
         }
-        .foregroundColor(VivaDesign.Colors.primaryText)
     }
 
-    private func calculateTimeRemaining() -> (days: Int, hours: Int, minutes: Int) {
+    private func calculateTimeRemaining() -> (
+        days: Int, hours: Int, minutes: Int
+    ) {
         let currentTime = Date()
-        let timeInterval = max(endTime.timeIntervalSince(currentTime), 0)
-        
+        let timeInterval = max(endTime!.timeIntervalSince(currentTime), 0)
+
         let days = Int(timeInterval) / (24 * 60 * 60)
         let hours = (Int(timeInterval) % (24 * 60 * 60)) / (60 * 60)
         let minutes = (Int(timeInterval) % (60 * 60)) / 60
-        
+
         return (days, hours, minutes)
     }
 }
-
 
 struct RecordDisplay: View {
     let leftUser: User

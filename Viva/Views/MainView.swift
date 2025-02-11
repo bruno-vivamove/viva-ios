@@ -4,26 +4,29 @@ struct MainView: View {
     private let activeTabColor: Color = .white
     private let inactiveTabColor: UIColor = .lightGray
 
-    private var userSession: UserSession
+    private let userSession: UserSession
     private let authenticationManager: AuthenticationManager
     private let userProfileService: UserProfileService
     private let friendService: FriendService
+    private let matchupService: MatchupService
     
     init(userSession: UserSession,
          authenticationManager: AuthenticationManager,
          userProfileService: UserProfileService,
-         friendService: FriendService)
+         friendService: FriendService,
+         matchupService: MatchupService)
     {
         self.userSession = userSession
         self.authenticationManager = authenticationManager
         self.userProfileService = userProfileService
         self.friendService = friendService
+        self.matchupService = matchupService
     }
 
     var body: some View {
         TabView {
             // Home Tab
-            HomeView()
+            HomeView(matchupService: matchupService, userSession: userSession)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
                 .tabItem {
@@ -86,6 +89,7 @@ struct MainView: View {
         userSession: userSession,
         authenticationManager: vivaAppObjects.authenticationManager,
         userProfileService: vivaAppObjects.userProfileService,
-        friendService: vivaAppObjects.friendService
+        friendService: vivaAppObjects.friendService,
+        matchupService: vivaAppObjects.matchupService
     )
 }

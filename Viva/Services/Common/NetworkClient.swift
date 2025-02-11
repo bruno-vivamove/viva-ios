@@ -1,10 +1,24 @@
 import Alamofire
 import Foundation
 
+extension JSONDecoder {
+    static let vivaDecoder: JSONDecoder = {
+        let decoder = JSONDecoder()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        decoder.dateDecodingStrategy = .formatted(formatter)
+        return decoder
+    }()
+}
+
 final class NetworkClient {
     private let session: Session
     private let settings: NetworkClientSettings
-
+    private let decoder: JSONDecoder = JSONDecoder.vivaDecoder
+    
     private let defaultGetHeaders: [String: String] = [:]
     private let defaultPostHeaders = [
         "Content-Type": "application/json"
@@ -85,6 +99,35 @@ final class NetworkClient {
         return try await performRequestWithResponse(
             url: url,
             method: .post,
+            headers: buildHeaders(defaultPostHeaders, headers)
+        )
+    }
+
+    public func put<T: Decodable>(
+        path: String,
+        headers: [String: String]? = nil
+    ) async throws -> T {
+        debugPrint("📤 PUT Request with response initiated for path: \(path)")
+        let url = try buildURL(path: path)
+        return try await performRequestWithResponse(
+            url: url,
+            method: .put,
+            headers: buildHeaders(defaultPostHeaders, headers)
+        )
+    }
+
+    public func put<T: Decodable, E: Encodable>(
+        path: String,
+        body: E,
+        headers: [String: String]? = nil
+    ) async throws -> T {
+        debugPrint(
+            "📤 PUT Request with body and response initiated for path: \(path)")
+        let url = try buildURL(path: path)
+        return try await performRequestWithResponse(
+            url: url,
+            method: .put,
+            body: body,
             headers: buildHeaders(defaultPostHeaders, headers)
         )
     }
@@ -251,7 +294,7 @@ final class NetworkClient {
                 )
             }
             .validate()
-            .responseDecodable(of: T.self) { response in
+            .responseDecodable(of: T.self, decoder: decoder) { response in
                 switch response.result {
                 case .success(let value):
                     debugPrint("✅ Upload completed successfully")
@@ -329,7 +372,7 @@ final class NetworkClient {
         return try await withCheckedThrowingContinuation { continuation in
             session.request(url, method: method, headers: headers)
                 .validate()
-                .responseDecodable(of: T.self) { response in
+                .responseDecodable(of: T.self, decoder: decoder) { response in
                     debugPrint("🌐 Attempting to decode to type: \(T.self)")
                     debugPrint(
                         "📥 Response Status: \(String(describing: response.response?.statusCode))"
@@ -377,7 +420,7 @@ final class NetworkClient {
                 headers: headers
             )
             .validate()
-            .responseDecodable(of: T.self) { response in
+            .responseDecodable(of: T.self, decoder: decoder) { response in
                 debugPrint("🌐 Attempting to decode to type: \(T.self)")
                 debugPrint(
                     "📥 Response Status: \(String(describing: response.response?.statusCode))"
@@ -505,7 +548,7 @@ final class NetworkClient {
         }
 
         if let data = response.data,
-            let errorResponse = try? JSONDecoder().decode(
+            let errorResponse = try? decoder.decode(
                 ErrorResponse.self, from: data)
         {
             debugPrint("❌ Decoded Error Response: \(errorResponse)")
@@ -538,7 +581,7 @@ final class NetworkClient {
         }
 
         if let data = response.data,
-            let errorResponse = try? JSONDecoder().decode(
+            let errorResponse = try? decoder.decode(
                 ErrorResponse.self, from: data)
         {
             debugPrint("❌ Decoded Error Response: \(errorResponse)")
