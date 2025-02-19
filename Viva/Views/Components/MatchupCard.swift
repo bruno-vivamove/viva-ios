@@ -8,7 +8,7 @@ struct MatchupCard: View {
             HStack {
                 // Left User
                 HStack(spacing: VivaDesign.Spacing.small) {
-                    let user = matchup.leftUsers.count > 0 ? matchup.leftUsers[0] : nil
+                    let user = matchup.leftUsers.first
                     
                     VivaProfileImage(
                         imageUrl: user?.imageUrl,
@@ -33,7 +33,7 @@ struct MatchupCard: View {
 
                 // Right User
                 HStack(spacing: VivaDesign.Spacing.small) {
-                    let user = matchup.rightUsers.count > 0 ? matchup.rightUsers[0] : nil
+                    let user = matchup.rightUsers.first
 
                     LabeledValueStack(
                         label: user?.displayName ?? "Open Position",

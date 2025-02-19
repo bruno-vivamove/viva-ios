@@ -9,38 +9,45 @@ struct MainView: View {
     private let userProfileService: UserProfileService
     private let friendService: FriendService
     private let matchupService: MatchupService
-    
-    init(userSession: UserSession,
-         authenticationManager: AuthenticationManager,
-         userProfileService: UserProfileService,
-         friendService: FriendService,
-         matchupService: MatchupService)
-    {
+    private let userService: UserService
+
+    init(
+        userSession: UserSession,
+        authenticationManager: AuthenticationManager,
+        userProfileService: UserProfileService,
+        friendService: FriendService,
+        matchupService: MatchupService,
+        userService: UserService
+    ) {
         self.userSession = userSession
         self.authenticationManager = authenticationManager
         self.userProfileService = userProfileService
         self.friendService = friendService
         self.matchupService = matchupService
+        self.userService = userService
     }
 
     var body: some View {
         TabView {
             // Home Tab
-            HomeView(matchupService: matchupService, userSession: userSession)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
-                .tabItem {
-                    Image(systemName: "house.fill")
-                    Text("Home")
-                }
+            HomeView(
+                matchupService: matchupService, userSession: userSession,
+                friendService: friendService, userService: userService
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
+            .tabItem {
+                Image(systemName: "house.fill")
+                Text("Home")
+            }
 
-            // Friends Tab
-            FriendsView(friendService: friendService, userSession: userSession)
+            // Rewards Tab
+            RewardsView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
                 .tabItem {
                     Image(systemName: "person.2.fill")
-                    Text("Friends")
+                    Text("Rewards")
                 }
 
             // Profile Tab
@@ -66,18 +73,18 @@ struct MainView: View {
                 }
 
             // Matchups Tab
-            MatchupDetailView()
+            FriendsView(friendService: friendService, userSession: userSession)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
                 .tabItem {
-                    Image(systemName: "person.3.fill")
-                    Text("Matchups")
+                    Image(systemName: "person.2.fill")
+                    Text("Friends")
                 }
         }
         .tint(activeTabColor)
-//        .onAppear {
-//            UITabBar.appearance().unselectedItemTintColor = inactiveTabColor
-//        }
+        //        .onAppear {
+        //            UITabBar.appearance().unselectedItemTintColor = inactiveTabColor
+        //        }
     }
 }
 
@@ -90,6 +97,7 @@ struct MainView: View {
         authenticationManager: vivaAppObjects.authenticationManager,
         userProfileService: vivaAppObjects.userProfileService,
         friendService: vivaAppObjects.friendService,
-        matchupService: vivaAppObjects.matchupService
+        matchupService: vivaAppObjects.matchupService,
+        userService: vivaAppObjects.userService
     )
 }

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C075296D2D485B8D00A5EA2E /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = C075296C2D485B8D00A5EA2E /* Alamofire */; };
+		C0A1D0272D62D04D00AAD8A8 /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = C0A1D0262D62D04D00AAD8A8 /* OrderedCollections */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0A1D0272D62D04D00AAD8A8 /* OrderedCollections in Frameworks */,
 				C075296D2D485B8D00A5EA2E /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -83,6 +85,7 @@
 				C03975A82D2F83CE00BCE78F /* Viva */,
 				C03975B92D2F83D000BCE78F /* VivaTests */,
 				C03975C32D2F83D000BCE78F /* VivaUITests */,
+				C0A1D0252D62CF7100AAD8A8 /* Frameworks */,
 				C03975A72D2F83CE00BCE78F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -95,6 +98,13 @@
 				C03975C02D2F83D000BCE78F /* VivaUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		C0A1D0252D62CF7100AAD8A8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -118,6 +128,7 @@
 			name = Viva;
 			packageProductDependencies = (
 				C075296C2D485B8D00A5EA2E /* Alamofire */,
+				C0A1D0262D62D04D00AAD8A8 /* OrderedCollections */,
 			);
 			productName = Viva;
 			productReference = C03975A62D2F83CE00BCE78F /* Viva.app */;
@@ -203,6 +214,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				C075296B2D485B8D00A5EA2E /* XCRemoteSwiftPackageReference "Alamofire" */,
+				C0A1D0242D62CD9200AAD8A8 /* XCRemoteSwiftPackageReference "swift-collections" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C03975A72D2F83CE00BCE78F /* Products */;
@@ -573,6 +585,14 @@
 				minimumVersion = 5.10.2;
 			};
 		};
+		C0A1D0242D62CD9200AAD8A8 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.4;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -580,6 +600,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C075296B2D485B8D00A5EA2E /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		C0A1D0262D62D04D00AAD8A8 /* OrderedCollections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0A1D0242D62CD9200AAD8A8 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = OrderedCollections;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

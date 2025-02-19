@@ -108,7 +108,7 @@ struct ProfileHeader: View {
 
             // Points Display
             VStack(spacing: VivaDesign.Spacing.minimal) {
-                Text("\(userSession.getUserProfile().rewardPoints ?? 0)")
+                Text("\(userSession.getUserProfile().rewardPoints)")
                     .font(VivaDesign.Typography.displayText(42))
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .fontWeight(.bold)

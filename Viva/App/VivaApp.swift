@@ -20,7 +20,8 @@ struct VivaApp: App {
                 authenticationManager: vivaAppObjects.authenticationManager,
                 userProfileService: vivaAppObjects.userProfileService,
                 friendService: vivaAppObjects.friendService,
-                matchupService: vivaAppObjects.matchupService
+                matchupService: vivaAppObjects.matchupService,
+                userService: vivaAppObjects.userService
             )
             .environmentObject(appState)
             .environmentObject(appState.userSession)

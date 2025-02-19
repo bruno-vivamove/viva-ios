@@ -7,6 +7,7 @@ struct VivaAppObjects {
     public let userProfileService: UserProfileService
     public let friendService: FriendService
     public let matchupService: MatchupService
+    public let userService: UserService
     public let appNetworkClient: NetworkClient
 
     init(userSession: UserSession) {
@@ -36,6 +37,8 @@ struct VivaAppObjects {
 
         matchupService = MatchupService(networkClient: appNetworkClient)
         
+        userService = UserService(networkClient: appNetworkClient)
+        
         authenticationManager = AuthenticationManager(
             userSession: userSession,
             authService: authService,
@@ -53,7 +56,8 @@ struct VivaAppObjects {
                 emailAddress: "dumm_email_address",
                 displayName: "dummy_display_name",
                 imageUrl: "profile_bruno",
-                rewardPoints: 9876))
+                rewardPoints: 9876,
+                streakDays: 10))
         return userSession
     }
 }

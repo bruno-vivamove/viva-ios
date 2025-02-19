@@ -38,87 +38,80 @@ struct FriendsView: View {
                 Spacer()
             } else {
                 ScrollView(.vertical, showsIndicators: true) {
-                    // Main content container with leading alignment
-                    VStack(
-                        alignment: .leading, spacing: VivaDesign.Spacing.large
-                    ) {
-                        // Friend Invites Section
-                        if !viewModel.friendInvites.isEmpty {
-                            VStack(
-                                alignment: .leading,
-                                spacing: VivaDesign.Spacing.small
-                            ) {
-                                Text("Friend Invites")
-                                    .font(VivaDesign.Typography.title3)
-                                    .foregroundColor(
-                                        VivaDesign.Colors.vivaGreen
-                                    )
-                                    .padding(
-                                        .horizontal, VivaDesign.Spacing.medium)
-
-                                VStack(spacing: VivaDesign.Spacing.small) {
-                                    ForEach(viewModel.friendInvites) { user in
-                                        FriendInviteCard(
-                                            user: user,
-                                            onAccept: {
-                                                Task {
-                                                    await viewModel
-                                                        .acceptFriendRequest(
-                                                            userId: user.id)
-                                                }
-                                            },
-                                            onDecline: {
-                                                Task {
-                                                    await viewModel
-                                                        .declineFriendRequest(
-                                                            userId: user.id)
-                                                }
-                                            }
-                                        )
+                    if viewModel.friends.isEmpty && viewModel.friendInvites.isEmpty {
+                        // Show default empty state within ScrollView
+                        VStack {
+                                    VStack(spacing: VivaDesign.Spacing.medium) {
+                                        Image(systemName: "person.2.circle")
+                                            .font(.system(size: 50))
+                                            .foregroundColor(VivaDesign.Colors.secondaryText)
+                                        Text("No Friends Yet")
+                                            .font(VivaDesign.Typography.title3)
+                                            .foregroundColor(VivaDesign.Colors.primaryText)
+                                        Text("Add friends to start challenging them")
+                                            .font(VivaDesign.Typography.caption)
+                                            .foregroundColor(VivaDesign.Colors.secondaryText)
                                     }
                                 }
-                                .padding(.horizontal, VivaDesign.Spacing.medium)
-                            }
-                        }
+                                .frame(maxWidth: .infinity, maxHeight: .infinity) // This ensures full height
+                                .frame(minHeight: UIScreen.main.bounds.height - 200)
+                    } else {
+                        VStack(alignment: .leading, spacing: VivaDesign.Spacing.large) {
+                            // Friend Invites Section (only if not empty)
+                            if !viewModel.friendInvites.isEmpty {
+                                VStack(alignment: .leading, spacing: VivaDesign.Spacing.small) {
+                                    Text("Friend Invites")
+                                        .font(VivaDesign.Typography.title3)
+                                        .foregroundColor(VivaDesign.Colors.vivaGreen)
+                                        .padding(.horizontal, VivaDesign.Spacing.medium)
 
-                        // Current Friends Section with frame modifier
-                        VStack(
-                            alignment: .leading,
-                            spacing: VivaDesign.Spacing.small
-                        ) {
-                            HStack {
-                                Text("Current Friends")
-                                    .font(VivaDesign.Typography.title3)
-                                    .foregroundColor(
-                                        VivaDesign.Colors.vivaGreen)
-
-                                Text("(\(viewModel.friends.count))")
-                                    .font(VivaDesign.Typography.caption)
-                                    .foregroundColor(
-                                        VivaDesign.Colors.secondaryText)
-                            }
-                            .padding(.horizontal, VivaDesign.Spacing.medium)
-
-                            if viewModel.friends.isEmpty {
-                                Text("No friends added yet")
-                                    .font(VivaDesign.Typography.body)
-                                    .foregroundColor(
-                                        VivaDesign.Colors.secondaryText
-                                    )
-                                    .padding(
-                                        .horizontal, VivaDesign.Spacing.medium)
-                            } else {
-                                VStack(spacing: VivaDesign.Spacing.small) {
-                                    ForEach(viewModel.friends) { user in
-                                        FriendCard(user: user)
+                                    VStack(spacing: VivaDesign.Spacing.small) {
+                                        ForEach(viewModel.friendInvites) { user in
+                                            FriendInviteCard(
+                                                user: user,
+                                                onAccept: {
+                                                    Task {
+                                                        await viewModel.acceptFriendRequest(userId: user.id)
+                                                    }
+                                                },
+                                                onDecline: {
+                                                    Task {
+                                                        await viewModel.declineFriendRequest(userId: user.id)
+                                                    }
+                                                }
+                                            )
+                                        }
                                     }
+                                    .padding(.horizontal, VivaDesign.Spacing.medium)
                                 }
-                                .padding(.horizontal, VivaDesign.Spacing.medium)
+                            }
+
+                            // Current Friends Section (only if has friends)
+                            if !viewModel.friends.isEmpty {
+                                VStack(alignment: .leading, spacing: VivaDesign.Spacing.small) {
+                                    HStack {
+                                        Text("Current Friends")
+                                            .font(VivaDesign.Typography.title3)
+                                            .foregroundColor(VivaDesign.Colors.vivaGreen)
+
+                                        Text("(\(viewModel.friends.count))")
+                                            .font(VivaDesign.Typography.caption)
+                                            .foregroundColor(VivaDesign.Colors.secondaryText)
+                                    }
+                                    .padding(.horizontal, VivaDesign.Spacing.medium)
+
+                                    VStack(spacing: VivaDesign.Spacing.small) {
+                                        ForEach(viewModel.friends) { user in
+                                            FriendCard(user: user)
+                                        }
+                                    }
+                                    .padding(.horizontal, VivaDesign.Spacing.medium)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, VivaDesign.Spacing.small)
                     }
-                    .padding(.vertical, VivaDesign.Spacing.small)
                 }
                 .refreshable {
                     await viewModel.loadData()
