@@ -14,6 +14,7 @@ struct LabeledValueStack: View {
             Text(value)
                 .foregroundColor(VivaDesign.Colors.primaryText)
                 .font(VivaDesign.Typography.value)
+                .lineLimit(1)
         }
     }
 }

@@ -49,6 +49,26 @@ class HomeViewModel: ObservableObject {
         isLoading = false
     }
     
+    func removeMatchup(_ matchup: Matchup) async throws {
+        _ = try await matchupService.cancelMatchup(matchupId: matchup.id)
+
+        // Remove the matchup
+        matchups.removeAll { $0.id == matchup.id }
+
+        // Remove any associated invites
+        receivedInvites.removeAll { $0.matchupId == matchup.id }
+        sentInvites.removeAll { $0.matchupId == matchup.id }
+    }
+
+    func removeInvite(_ invite: MatchupInvite) async throws {
+        try await matchupService.deleteInvite(
+            matchupId: invite.matchupId, inviteCode: invite.inviteCode)
+
+        // Remove the matchup
+        receivedInvites.removeAll { $0.inviteCode == invite.inviteCode }
+        sentInvites.removeAll { $0.inviteCode == invite.inviteCode }
+    }
+
     func refresh() async {
         await loadData()
     }

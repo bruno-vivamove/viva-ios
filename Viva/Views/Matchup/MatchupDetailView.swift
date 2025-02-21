@@ -55,14 +55,14 @@ struct MatchupDetailView: View {
 
                      Spacer()
 
-                     WorkoutsSection(workouts: [])
-                         .padding(.horizontal, VivaDesign.Spacing.xlarge)
+//                     WorkoutsSection(workouts: [])
+//                         .padding(.horizontal, VivaDesign.Spacing.xlarge)
 
                      MatchupFooter(
                          endTime: matchup.endTime,
                          leftUser: matchup.leftUsers.first,
                          rightUser: matchup.rightUsers.first,
-                         record: (wins: 11, losses: 9)
+                         record: (wins: 0, losses: 0)
                      )
                      .padding(.horizontal)
                  }

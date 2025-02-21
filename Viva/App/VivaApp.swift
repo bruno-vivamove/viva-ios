@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct VivaApp: App {
     @StateObject var appState = AppState()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         let vivaAppObjects = VivaAppObjects(userSession: appState.userSession)
@@ -25,6 +26,19 @@ struct VivaApp: App {
             )
             .environmentObject(appState)
             .environmentObject(appState.userSession)
+        }
+        .onChange(of: scenePhase) {
+            if scenePhase == .active {
+                Task {
+                    do {
+                        let healthService = HealthService(
+                            networkClient: vivaAppObjects.appNetworkClient)
+                        _ = try await healthService.ping()
+                    } catch {
+                        print("Health ping failed: \(error)")
+                    }
+                }
+            }
         }
     }
 }

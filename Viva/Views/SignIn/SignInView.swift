@@ -130,9 +130,6 @@ struct AuthButtonStack: View {
                 title: "Sign In",
                 style: .secondary,
                 action: {
-//                    Task {
-//                        await userSession.setTestLoggedIn()
-//                    }
                     showSignInForm = true
                 }
             )

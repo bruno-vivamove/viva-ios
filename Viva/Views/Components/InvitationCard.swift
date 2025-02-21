@@ -13,11 +13,15 @@ struct InvitationCard: View {
             HStack {
                 // Action Buttons Container
                 VStack(spacing: VivaDesign.Spacing.minimal) {
+                    let isReceived = invite.user?.id == userSession.getUserId()
+                    
                     VivaPrimaryButton(
                         title: invite.user?.id == userSession.getUserId() ? "Accept" : "Remind",
                         width: buttonWidth
                     ) {
-                        onAccept()
+                        if(isReceived) {
+                            onAccept()
+                        }
                     }
 
                     if invite.user?.id != userSession.getUserId() {

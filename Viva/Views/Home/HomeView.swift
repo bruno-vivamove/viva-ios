@@ -37,185 +37,161 @@ struct HomeView: View {
             if viewModel.isLoading {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if viewModel.isEmpty {
+                EmptyStateView()
             } else {
-                let activeMatchups = viewModel.matchups.filter {
-                    $0.status == .active
-                }
-                let pendingMatchups = viewModel.matchups.filter {
-                    $0.status == .pending
-                }
-                let hasReceivedInvites = !viewModel.receivedInvites.isEmpty
-                let hasSentInvites = !viewModel.sentInvites.isEmpty
-
-                ScrollView {
-                    if activeMatchups.isEmpty && pendingMatchups.isEmpty
-                        && !hasReceivedInvites && !hasSentInvites
-                    {
-                        VStack {
-                            VStack(spacing: VivaDesign.Spacing.medium) {
-                                Image(systemName: "trophy.circle")
-                                    .font(.system(size: 50))
-                                    .foregroundColor(
-                                        VivaDesign.Colors.secondaryText)
-                                Text("No Active Challenges")
-                                    .font(VivaDesign.Typography.title3)
-                                    .foregroundColor(
-                                        VivaDesign.Colors.primaryText)
-                                Text("Create a matchup to start competing")
-                                    .font(VivaDesign.Typography.caption)
-                                    .foregroundColor(
-                                        VivaDesign.Colors.secondaryText)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .frame(minHeight: UIScreen.main.bounds.height - 200)
-                    } else {
-                        VStack(spacing: VivaDesign.Spacing.medium) {
-                            // Active Matchups Section
-                            if !activeMatchups.isEmpty {
-                                HomeSection(
-                                    title: "Active Matchups",
-                                    emptyText: "",
-                                    isEmpty: false
-                                ) {
-                                    VStack(spacing: VivaDesign.Spacing.small) {
-                                        ForEach(activeMatchups, id: \.id) {
-                                            matchup in
-                                            MatchupCard(matchup: matchup)
-                                                .onTapGesture {
-                                                    selectedMatchup = matchup
-                                                }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Pending Matchups Section
-                            if !pendingMatchups.isEmpty {
-                                HomeSection(
-                                    title: "Pending Matchups",
-                                    emptyText: "",
-                                    isEmpty: false
-                                ) {
-                                    VStack(spacing: VivaDesign.Spacing.small) {
-                                        ForEach(pendingMatchups, id: \.id) {
-                                            matchup in
-                                            MatchupCard(matchup: matchup)
-                                                .onTapGesture {
-                                                    selectedMatchup = matchup
-                                                }
-
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Pending Invitations Section
-                            if hasReceivedInvites || hasSentInvites {
-                                HomeSection(
-                                    title: "Pending Invitations",
-                                    emptyText: "",
-                                    isEmpty: false
-                                ) {
-                                    VStack(spacing: VivaDesign.Spacing.medium) {
-                                        if hasReceivedInvites {
-                                            VStack(
-                                                spacing: VivaDesign.Spacing
-                                                    .small
-                                            ) {
-                                                Text("Received")
-                                                    .font(
-                                                        VivaDesign.Typography
-                                                            .caption
-                                                    )
-                                                    .foregroundColor(
-                                                        VivaDesign.Colors
-                                                            .secondaryText
-                                                    )
-                                                    .frame(
-                                                        maxWidth: .infinity,
-                                                        alignment: .leading)
-
-                                                ForEach(
-                                                    viewModel.receivedInvites,
-                                                    id: \.inviteCode
-                                                ) { invite in
-                                                    InvitationCard(
-                                                        invite: invite,
-                                                        userSession:
-                                                            userSession,
-                                                        onAccept: {
-                                                            Task {
-                                                                await
-                                                                    handleAcceptInvite(
-                                                                        invite)
-                                                            }
-                                                        },
-                                                        onDelete: {
-                                                            Task {
-                                                                await
-                                                                    handleDeleteInvite(
-                                                                        invite)
-                                                            }
-                                                        }
-                                                    )
-                                                }
-                                            }
-                                        }
-
-                                        if hasSentInvites {
-                                            VStack(
-                                                spacing: VivaDesign.Spacing
-                                                    .small
-                                            ) {
-                                                Text("Sent")
-                                                    .font(
-                                                        VivaDesign.Typography
-                                                            .caption
-                                                    )
-                                                    .foregroundColor(
-                                                        VivaDesign.Colors
-                                                            .secondaryText
-                                                    )
-                                                    .frame(
-                                                        maxWidth: .infinity,
-                                                        alignment: .leading)
-
-                                                ForEach(
-                                                    viewModel.sentInvites,
-                                                    id: \.inviteCode
-                                                ) { invite in
-                                                    InvitationCard(
-                                                        invite: invite,
-                                                        userSession:
-                                                            userSession,
-                                                        onAccept: { /* Sent invites can't be accepted */
-                                                        },
-                                                        onDelete: {
-                                                            Task {
-                                                                await
-                                                                    handleDeleteInvite(
-                                                                        invite)
-                                                            }
-                                                        }
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        .padding(.vertical, VivaDesign.Spacing.small)
+                List {
+                    Section {
+                        // This empty section creates padding at the top
                     }
+                    .listSectionSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    // Active Matchups
+                    if !viewModel.activeMatchups.isEmpty {
+                        Section {
+                            ForEach(viewModel.activeMatchups) { matchup in
+                                MatchupCard(matchup: matchup, onCancel: nil)
+                                    .onTapGesture {
+                                        selectedMatchup = matchup
+                                    }
+                                    .listRowInsets(
+                                        EdgeInsets(
+                                            top: 4, leading: 16, bottom: 4,
+                                            trailing: 16)
+                                    )
+                                    .listRowBackground(Color.clear)
+                            }
+                        } header: {
+                            HStack {
+                                Text("Active Matchups")
+                                    .font(VivaDesign.Typography.header)
+                                    .foregroundColor(.white)
+                                Spacer()
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(Color.black)
+                            .listRowInsets(EdgeInsets())
+                        }
+                    }
+
+                    // Pending Matchups
+                    if !viewModel.pendingMatchups.isEmpty {
+                        Section {
+                            ForEach(viewModel.pendingMatchups) { matchup in
+                                MatchupCard(matchup: matchup) {
+                                    Task {
+                                        await handleCancelMatchup(matchup)
+                                    }
+                                }
+                                .onTapGesture {
+                                    selectedMatchup = matchup
+                                }
+                                .listRowInsets(
+                                    EdgeInsets(
+                                        top: 4, leading: 16, bottom: 4,
+                                        trailing: 16)
+                                )
+                                .listRowBackground(Color.clear)
+                            }
+                        } header: {
+                            HStack {
+                                Text("Pending Matchups")
+                                    .font(VivaDesign.Typography.header)
+                                    .foregroundColor(.white)
+                                Spacer()
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(Color.black)
+                            .listRowInsets(EdgeInsets())
+                        }
+                    }
+
+                    if !viewModel.receivedInvites.isEmpty
+                        || !viewModel.sentInvites.isEmpty
+                    {
+                        // Pending Invitations
+                        Section {
+                            // Received Invites
+                            if !viewModel.receivedInvites.isEmpty {
+                                ForEach(viewModel.receivedInvites, id: \.inviteCode) { invite in
+                                    UserActionCard(
+                                        user: invite.user ?? User(id: "", displayName: "Open Invite", imageUrl: nil, friendStatus: .none),
+                                        actions: [
+                                            UserActionCard.UserAction(
+                                                title: "Accept",
+                                                variant: .primary
+                                            ) {
+                                                Task {
+                                                    await handleAcceptInvite(invite)
+                                                }
+                                            },
+                                            UserActionCard.UserAction(
+                                                title: "Delete",
+                                                variant: .secondary
+                                            ) {
+                                                Task {
+                                                    await handleDeleteInvite(invite)
+                                                }
+                                            }
+                                        ]
+                                    )
+                                    .listRowBackground(Color.clear)
+                                    .buttonStyle(PlainButtonStyle()) // Removes button-like behavior
+                                }
+                            }
+
+                            // Sent Invites
+                            if !viewModel.sentInvites.isEmpty {
+                                ForEach(viewModel.sentInvites, id: \.inviteCode) { invite in
+                                    UserActionCard(
+                                        user: invite.user ?? User(id: "", displayName: "Open Invite", imageUrl: nil, friendStatus: .none),
+                                        actions: [
+                                            UserActionCard.UserAction(
+                                                title: "Remind",
+                                                variant: .primary
+                                            ) {
+                                                // Add remind functionality
+                                            },
+                                            UserActionCard.UserAction(
+                                                title: "Delete",
+                                                variant: .secondary
+                                            ) {
+                                                Task {
+                                                    await handleDeleteInvite(invite)
+                                                }
+                                            }
+                                        ]
+                                    )
+                                    .listRowBackground(Color.clear)
+                                    .buttonStyle(PlainButtonStyle()) // Removes button-like behavior
+                                }
+                            }
+                        } header: {
+                            HStack {
+                                Text("Pending Invites")
+                                    .font(VivaDesign.Typography.header)
+                                    .foregroundColor(.white)
+                                Spacer()
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(Color.black)
+                            .listRowInsets(EdgeInsets())
+                        }
+                    }
+
                 }
+                .listStyle(PlainListStyle())
+                .scrollContentBackground(.hidden)
                 .refreshable {
                     await viewModel.loadData()
                 }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(VivaDesign.Colors.background)
+        .background(Color.black)
         .onAppear {
             Task {
                 await viewModel.loadInitialDataIfNeeded()
@@ -241,7 +217,6 @@ struct HomeView: View {
     private func handleAcceptInvite(_ invite: MatchupInvite) async {
         do {
             try await matchupService.acceptInvite(inviteCode: invite.inviteCode)
-            // Refresh all data after accepting
             await viewModel.loadData()
         } catch {
             viewModel.error = error
@@ -250,10 +225,7 @@ struct HomeView: View {
 
     private func handleDeleteInvite(_ invite: MatchupInvite) async {
         do {
-            try await matchupService.deleteInvite(
-                matchupId: invite.matchupId, inviteCode: invite.inviteCode)
-            // Refresh all data after deleting
-            await viewModel.loadData()
+            try await viewModel.removeInvite(invite)
         } catch {
             viewModel.error = error
         }
@@ -261,12 +233,61 @@ struct HomeView: View {
 
     private func handleCancelMatchup(_ matchup: Matchup) async {
         do {
-            _ = try await matchupService.cancelMatchup(matchupId: matchup.id)
-            // Refresh data after cancelling
-            await viewModel.loadData()
+            // Remove matchup and its associated invites
+            try await viewModel.removeMatchup(matchup)
         } catch {
             viewModel.error = error
         }
+    }
+}
+
+extension Matchup: Equatable {
+    static func == (lhs: Matchup, rhs: Matchup) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
+// Empty State View
+struct EmptyStateView: View {
+    var body: some View {
+        VStack {
+            VStack(spacing: VivaDesign.Spacing.medium) {
+                Image(systemName: "trophy.circle")
+                    .font(.system(size: 50))
+                    .foregroundColor(VivaDesign.Colors.secondaryText)
+                Text("No Active Challenges")
+                    .font(VivaDesign.Typography.title3)
+                    .foregroundColor(VivaDesign.Colors.primaryText)
+                Text("Create a matchup to start competing")
+                    .font(VivaDesign.Typography.caption)
+                    .foregroundColor(VivaDesign.Colors.secondaryText)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(minHeight: UIScreen.main.bounds.height - 200)
+    }
+}
+
+// ViewModel Extension
+extension HomeViewModel {
+    var isEmpty: Bool {
+        matchups.isEmpty && receivedInvites.isEmpty && sentInvites.isEmpty
+    }
+
+    var activeMatchups: [Matchup] {
+        matchups.filter { $0.status == .active }
+    }
+
+    var pendingMatchups: [Matchup] {
+        matchups.filter { $0.status == .pending }
+    }
+
+    var allInvites: [MatchupInvite] {
+        receivedInvites + sentInvites
+    }
+
+    var hasInvites: Bool {
+        !receivedInvites.isEmpty || !sentInvites.isEmpty
     }
 }
 
@@ -280,20 +301,32 @@ struct HomeHeader: View {
 
     var body: some View {
         HStack(spacing: VivaDesign.Spacing.medium) {
-            LabeledValueStack(
-                label: "Streak",
-                value: "\(userSession.getUserProfile().streakDays) Days",
-                alignment: .leading)
+            VStack(alignment: .center) {
+                Text("\(userSession.getUserProfile().streakDays)")
+                    .foregroundColor(VivaDesign.Colors.primaryText)
+                    .font(VivaDesign.Typography.value)
+                    .lineLimit(1)
+                Text("Week Streak")
+                    .foregroundColor(VivaDesign.Colors.vivaGreen)
+                    .font(VivaDesign.Typography.caption)
+                    .lineLimit(1)
+            }
 
-            LabeledValueStack(
-                label: "Points",
-                value: "\(userSession.getUserProfile().rewardPoints)",
-                alignment: .leading)
+            VStack(alignment: .center) {
+                Text("\(userSession.getUserProfile().rewardPoints)")
+                    .foregroundColor(VivaDesign.Colors.primaryText)
+                    .font(VivaDesign.Typography.value)
+                    .lineLimit(1)
+                Text("Points")
+                    .foregroundColor(VivaDesign.Colors.vivaGreen)
+                    .font(VivaDesign.Typography.caption)
+                    .lineLimit(1)
+            }
 
             Spacer()
 
             VivaPrimaryButton(
-                title: "Create New Matchup"
+                title: "Create Matchup"
             ) {
                 showMatchupCreation = true
             }

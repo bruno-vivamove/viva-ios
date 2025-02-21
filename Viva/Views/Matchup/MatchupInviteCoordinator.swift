@@ -80,6 +80,28 @@ class MatchupInviteCoordinator: ObservableObject {
         }
     }
     
+    func deleteInvite(userId: String, matchupId: String) async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            // First we need to get the invite code for this user/matchup
+            let invites = try await matchupService.getMatchupInvites(matchupId: matchupId)
+            guard let invite = invites.first(where: { $0.user?.id == userId }) else {
+                return
+            }
+            
+            // Delete the invite
+            try await matchupService.deleteInvite(matchupId: matchupId, inviteCode: invite.inviteCode)
+            
+            // Update local state
+            invitedFriends.remove(userId)
+            matchupDetails = try await matchupService.getMatchup(matchupId: matchupId)
+        } catch {
+            self.error = error
+        }
+    }
+    
     func hasOpenPosition(side: MatchupUser.Side) -> Bool {
         guard let matchup = matchupDetails else { return false }
         let users = side == .left ? matchup.leftUsers : matchup.rightUsers

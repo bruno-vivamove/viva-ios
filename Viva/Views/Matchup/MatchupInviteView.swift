@@ -1,10 +1,13 @@
 import SwiftUI
 
+import SwiftUI
+
 struct MatchupInviteView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var coordinator: MatchupInviteCoordinator
     @Binding var showCreationFlow: Bool
     @State private var searchText = ""
+    @State private var showMatchupDetails = false // New state variable
     @FocusState private var isSearchFieldFocused: Bool
 
     let matchupId: String
@@ -149,16 +152,25 @@ struct MatchupInviteView: View {
                                     MatchupInviteCard(
                                         coordinator: coordinator,
                                         user: user,
-                                        usersPerSide: usersPerSide
-                                    ) { side in
-                                        Task {
-                                            await coordinator.inviteFriend(
-                                                userId: user.id,
-                                                matchupId: matchupId,
-                                                side: side
-                                            )
+                                        usersPerSide: usersPerSide,
+                                        onInvite: { side in
+                                            Task {
+                                                await coordinator.inviteFriend(
+                                                    userId: user.id,
+                                                    matchupId: matchupId,
+                                                    side: side
+                                                )
+                                            }
+                                        },
+                                        onCancel: {
+                                            Task {
+                                                await coordinator.deleteInvite(
+                                                    userId: user.id,
+                                                    matchupId: matchupId
+                                                )
+                                            }
                                         }
-                                    }
+                                    )
                                 }
                             }
                         }
@@ -169,6 +181,7 @@ struct MatchupInviteView: View {
                 // Done Button
                 Button("Done") {
                     showCreationFlow = false
+                    showMatchupDetails = true
                 }
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundColor(.black)
@@ -178,17 +191,15 @@ struct MatchupInviteView: View {
                 .cornerRadius(8)
                 .padding(.horizontal)
                 .padding(.bottom, 40)
+                .sheet(isPresented: $showMatchupDetails) {
+                    MatchupDetailView(
+                        matchupService: coordinator.matchupService,
+                        matchupId: matchupId
+                    )
+                }
             }
         }
         .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button("Back") {
-                    dismiss()
-                }
-                .foregroundColor(.white)
-            }
-        }
         .task {
             await coordinator.loadData(matchupId: matchupId)
         }
@@ -203,6 +214,7 @@ struct MatchupInviteCard: View {
     let user: User
     let usersPerSide: Int
     let onInvite: (MatchupUser.Side) -> Void
+    let onCancel: () -> Void  // New callback for canceling invites
 
     private var isInvited: Bool {
         coordinator.invitedFriends.contains(user.id)
@@ -217,61 +229,59 @@ struct MatchupInviteCard: View {
     }
 
     var body: some View {
-        VivaCard {
-            VStack(spacing: VivaDesign.Spacing.small) {
-                // User Info
-                HStack(spacing: VivaDesign.Spacing.small) {
-                    VivaProfileImage(
-                        imageUrl: user.imageUrl,
-                        size: .small
-                    )
-
-                    Text(user.displayName)
-                        .foregroundColor(VivaDesign.Colors.primaryText)
-                        .font(VivaDesign.Typography.body)
-
-                    Spacer()
-                }
-
-                if isInvited {
-                    // Invite Sent State
-                    HStack {
-                        Spacer()
-                        Text("Invite Sent")
-                            .font(VivaDesign.Typography.body)
-                            .foregroundColor(VivaDesign.Colors.vivaGreen)
-                        Spacer()
+        if isInvited {
+            // Invited state with cancel option
+            UserActionCard(
+                user: user,
+                actions: [
+                    UserActionCard.UserAction(
+                        title: "Cancel Invite",
+                        variant: .secondary
+                    ) {
+                        onCancel()
                     }
-                } else {
-                    // Invite Buttons
-                    HStack(spacing: VivaDesign.Spacing.medium) {
-                        if canJoinLeftTeam {
-                            VivaPrimaryButton(
-                                title: "Invite Teammate",
-                                width: nil
+                ]
+            )
+        } else if !canJoinLeftTeam && !canJoinRightTeam {
+            // No positions state
+            UserActionCard(
+                user: user,
+                actions: [
+                    UserActionCard.UserAction(
+                        title: "No Open Positions",
+                        variant: .secondary
+                    ) {
+                        // No action, just showing status
+                    }
+                ]
+            )
+        } else {
+            // Available positions state
+            UserActionCard(
+                user: user,
+                actions: {
+                    var actions: [UserActionCard.UserAction] = []
+                    if canJoinLeftTeam {
+                        actions.append(
+                            UserActionCard.UserAction(
+                                title: "Invite Teammate"
                             ) {
                                 onInvite(.left)
                             }
-                        }
-
-                        if canJoinRightTeam {
-                            VivaPrimaryButton(
-                                title: "Invite Opponent",
-                                width: nil
+                        )
+                    }
+                    if canJoinRightTeam {
+                        actions.append(
+                            UserActionCard.UserAction(
+                                title: "Invite"
                             ) {
                                 onInvite(.right)
                             }
-                        }
-
-                        if !canJoinLeftTeam && !canJoinRightTeam {
-                            Text("No Open Positions")
-                                .font(VivaDesign.Typography.body)
-                                .foregroundColor(
-                                    VivaDesign.Colors.secondaryText)
-                        }
+                        )
                     }
-                }
-            }
+                    return actions
+                }()
+            )
         }
     }
 }

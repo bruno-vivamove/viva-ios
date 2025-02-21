@@ -20,7 +20,7 @@ struct MatchupCategoriesView: View {
             id: "strength", name: "Strength Training Mins", isSelected: true),
         MatchupCategory(id: "sleep", name: "Sleep Minutes", isSelected: true),
     ]
-    
+
     let userService: UserService
 
     init(
@@ -57,7 +57,7 @@ struct MatchupCategoriesView: View {
                             .font(.system(size: 28, weight: .bold))
                             .foregroundColor(VivaDesign.Colors.vivaGreen)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.horizontal)
                     .padding(.top)
 
@@ -65,29 +65,22 @@ struct MatchupCategoriesView: View {
                     ScrollView {
                         VStack(spacing: VivaDesign.Spacing.small) {
                             ForEach($categories) { $category in
+                                // Inside the ForEach loop, update the Button's background to use RoundedRectangle
                                 Button(action: {
                                     category.isSelected.toggle()
                                 }) {
                                     Text(category.name)
-                                        .font(
-                                            .system(size: 18, weight: .semibold)
-                                        )
+                                        .font(.system(size: 18, weight: .semibold))
                                         .frame(maxWidth: .infinity)
                                         .padding()
                                         .background(
-                                            category.isSelected
-                                                ? VivaDesign.Colors.vivaGreen
-                                                : Color.clear
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .fill(category.isSelected ? VivaDesign.Colors.vivaGreen : Color.clear)
                                         )
-                                        .foregroundColor(
-                                            category.isSelected
-                                                ? Color.black : Color.white
-                                        )
+                                        .foregroundColor(category.isSelected ? Color.black : Color.white)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 8)
-                                                .stroke(
-                                                    VivaDesign.Colors.vivaGreen,
-                                                    lineWidth: 1)
+                                                .stroke(VivaDesign.Colors.vivaGreen, lineWidth: 1)
                                         )
                                 }
                             }

@@ -33,6 +33,7 @@ struct VivaPrimaryButton: View {
                         VivaDesign.Colors.vivaGreen,
                         lineWidth: VivaDesign.Sizing.borderWidth)
                 )
+                .lineLimit(1)
         }
     }
 }
