@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 
 struct HomeView: View {
@@ -7,12 +8,14 @@ struct HomeView: View {
     private let matchupService: MatchupService
     private let friendService: FriendService
     private let userService: UserService
+    private let healthKitDataManager: HealthKitDataManager
 
     init(
         matchupService: MatchupService,
         userSession: UserSession,
         friendService: FriendService,
-        userService: UserService
+        userService: UserService,
+        healthKitDataManager: HealthKitDataManager
     ) {
         _viewModel = StateObject(
             wrappedValue: HomeViewModel(matchupService: matchupService))
@@ -20,6 +23,7 @@ struct HomeView: View {
         self.matchupService = matchupService
         self.friendService = friendService
         self.userService = userService
+        self.healthKitDataManager = healthKitDataManager
     }
 
     var body: some View {
@@ -38,7 +42,7 @@ struct HomeView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if viewModel.isEmpty {
-                EmptyStateView()
+                HomeEmptyStateView()
             } else {
                 List {
                     Section {
@@ -46,6 +50,7 @@ struct HomeView: View {
                     }
                     .listSectionSeparator(.hidden)
                     .listRowBackground(Color.clear)
+
                     // Active Matchups
                     if !viewModel.activeMatchups.isEmpty {
                         Section {
@@ -115,16 +120,24 @@ struct HomeView: View {
                         Section {
                             // Received Invites
                             if !viewModel.receivedInvites.isEmpty {
-                                ForEach(viewModel.receivedInvites, id: \.inviteCode) { invite in
+                                ForEach(
+                                    viewModel.receivedInvites, id: \.inviteCode
+                                ) { invite in
                                     UserActionCard(
-                                        user: invite.user ?? User(id: "", displayName: "Open Invite", imageUrl: nil, friendStatus: .none),
+                                        user: invite.user
+                                            ?? User(
+                                                id: "",
+                                                displayName: "Open Invite",
+                                                imageUrl: nil,
+                                                friendStatus: .none),
                                         actions: [
                                             UserActionCard.UserAction(
                                                 title: "Accept",
                                                 variant: .primary
                                             ) {
                                                 Task {
-                                                    await handleAcceptInvite(invite)
+                                                    await handleAcceptInvite(
+                                                        invite)
                                                 }
                                             },
                                             UserActionCard.UserAction(
@@ -132,21 +145,28 @@ struct HomeView: View {
                                                 variant: .secondary
                                             ) {
                                                 Task {
-                                                    await handleDeleteInvite(invite)
+                                                    await handleDeleteInvite(
+                                                        invite)
                                                 }
-                                            }
+                                            },
                                         ]
                                     )
                                     .listRowBackground(Color.clear)
-                                    .buttonStyle(PlainButtonStyle()) // Removes button-like behavior
+                                    .buttonStyle(PlainButtonStyle())  // Removes button-like behavior
                                 }
                             }
 
                             // Sent Invites
                             if !viewModel.sentInvites.isEmpty {
-                                ForEach(viewModel.sentInvites, id: \.inviteCode) { invite in
+                                ForEach(viewModel.sentInvites, id: \.inviteCode)
+                                { invite in
                                     UserActionCard(
-                                        user: invite.user ?? User(id: "", displayName: "Open Invite", imageUrl: nil, friendStatus: .none),
+                                        user: invite.user
+                                            ?? User(
+                                                id: "",
+                                                displayName: "Open Invite",
+                                                imageUrl: nil,
+                                                friendStatus: .none),
                                         actions: [
                                             UserActionCard.UserAction(
                                                 title: "Remind",
@@ -159,13 +179,14 @@ struct HomeView: View {
                                                 variant: .secondary
                                             ) {
                                                 Task {
-                                                    await handleDeleteInvite(invite)
+                                                    await handleDeleteInvite(
+                                                        invite)
                                                 }
-                                            }
+                                            },
                                         ]
                                     )
                                     .listRowBackground(Color.clear)
-                                    .buttonStyle(PlainButtonStyle()) // Removes button-like behavior
+                                    .buttonStyle(PlainButtonStyle())  // Removes button-like behavior
                                 }
                             }
                         } header: {
@@ -181,7 +202,6 @@ struct HomeView: View {
                             .listRowInsets(EdgeInsets())
                         }
                     }
-
                 }
                 .listStyle(PlainListStyle())
                 .scrollContentBackground(.hidden)
@@ -192,11 +212,24 @@ struct HomeView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)
+        .sheet(item: $selectedMatchup) { matchup in
+            NavigationView {
+                MatchupDetailView(
+                    matchupService: matchupService,
+                    friendService: friendService,
+                    userService: userService,
+                    userSession: userSession,
+                    healthKitDataManager: healthKitDataManager,
+                    matchupId: matchup.id
+                )
+            }
+        }
         .onAppear {
             Task {
                 await viewModel.loadInitialDataIfNeeded()
             }
 
+            // Existing matchup created observer
             NotificationCenter.default.addObserver(
                 forName: .matchupCreated,
                 object: nil,
@@ -204,16 +237,49 @@ struct HomeView: View {
             ) { notification in
                 if let matchupId = notification.object as? String {
                     Task { @MainActor in
-                        selectedMatchup = viewModel.matchups.first { $0.id == matchupId }
+                        selectedMatchup = viewModel.matchups.first {
+                            $0.id == matchupId
+                        }
                     }
                 }
             }
-        }
-        .sheet(item: $selectedMatchup) { matchup in
-            MatchupDetailView(
-                matchupService: matchupService,
-                matchupId: matchup.id
-            )
+
+            // Updated matchup observer
+            NotificationCenter.default.addObserver(
+                forName: .matchupUpdated,
+                object: nil,
+                queue: .main
+            ) { notification in
+                if let matchupId = notification.object as? String {
+                    Task { @MainActor in
+                        // Get updated matchup from service
+                        do {
+                            let updatedMatchup =
+                                try await matchupService.getMatchup(
+                                    matchupId: matchupId)
+                            // Convert MatchupDetails to Matchup
+                            let matchup = Matchup(
+                                id: updatedMatchup.id,
+                                matchupHash: updatedMatchup.matchupHash,
+                                displayName: updatedMatchup.displayName,
+                                ownerId: updatedMatchup.ownerId,
+                                createTime: updatedMatchup.createTime,
+                                status: updatedMatchup.status,
+                                startTime: updatedMatchup.startTime,
+                                endTime: updatedMatchup.endTime,
+                                usersPerSide: updatedMatchup.usersPerSide,
+                                lengthInDays: updatedMatchup.lengthInDays,
+                                leftUsers: updatedMatchup.leftUsers,
+                                rightUsers: updatedMatchup.rightUsers,
+                                invites: updatedMatchup.invites
+                            )
+                            viewModel.updateMatchup(matchup)
+                        } catch {
+                            print("Error updating matchup: \(error)")
+                        }
+                    }
+                }
+            }
         }
         .alert("Error", isPresented: .constant(viewModel.error != nil)) {
             Button("OK") {
@@ -260,7 +326,7 @@ extension Matchup: Equatable {
 }
 
 // Empty State View
-struct EmptyStateView: View {
+struct HomeEmptyStateView: View {
     var body: some View {
         VStack {
             VStack(spacing: VivaDesign.Spacing.medium) {
@@ -414,6 +480,7 @@ struct HomeSection<Content: View>: View {
                 settings: vivaAppObjects.appNetworkClientSettings)),
         userSession: userSession,
         friendService: vivaAppObjects.friendService,
-        userService: vivaAppObjects.userService
+        userService: vivaAppObjects.userService,
+        healthKitDataManager: vivaAppObjects.healthKitDataManager
     )
 }

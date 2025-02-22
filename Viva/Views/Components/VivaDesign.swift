@@ -15,6 +15,7 @@ enum VivaDesign {
         static let secondaryText = Color.gray
         static let error = Color.red
         static let divider = Color.white.opacity(0.6)
+        static let destructive = Color.red
     }
     
     enum Spacing {
@@ -46,6 +47,7 @@ enum VivaDesign {
         }
         
         static let title = Font.system(size: 60, weight: .bold)
+        static let title2 = Font.title2
         static let title3 = Font.title3
         static let body = Font.body
 

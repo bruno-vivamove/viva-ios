@@ -1,9 +1,9 @@
 import Foundation
 
 final class SessionService {
-    private let networkClient: NetworkClient
+    private let networkClient: NetworkClient<VivaErrorResponse>
 
-    init(networkClient: NetworkClient) {
+    init(networkClient: NetworkClient<VivaErrorResponse>) {
         self.networkClient = networkClient
     }
 

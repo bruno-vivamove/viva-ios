@@ -101,7 +101,7 @@ struct SignUpFormView: View {
                                 )
                                 
                                 Text("Minimum of 8 characters")
-                                    .font(VivaDesign.Typography.caption)
+                                    .font(.system(size: 12))
                                     .foregroundColor(VivaDesign.Colors.secondaryText)
                             }
                             

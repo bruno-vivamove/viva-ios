@@ -1,9 +1,7 @@
-import Foundation
-
 final class FriendService {
-    private let networkClient: NetworkClient
+    private let networkClient: NetworkClient<VivaErrorResponse>
 
-    init(networkClient: NetworkClient) {
+    init(networkClient: NetworkClient<VivaErrorResponse>) {
         self.networkClient = networkClient
     }
 
@@ -11,7 +9,11 @@ final class FriendService {
 
     func getFriendRequestsSent(page: Int = 1, pageSize: Int = 10) async throws -> [User] {
         let response: PaginatedUserResponse = try await networkClient.get(
-            path: "/viva/friends/requests/sent?page=\(page)&page_size=\(pageSize)"
+            path: "/viva/friends/requests/sent",
+            queryParams: [
+                "page": page,
+                "page_size": pageSize
+            ]
         )
         return response.users
     }
@@ -32,7 +34,11 @@ final class FriendService {
 
     func getFriendRequestsReceived(page: Int = 1, pageSize: Int = 10) async throws -> [User] {
         let response: PaginatedUserResponse = try await networkClient.get(
-            path: "/viva/friends/requests/received?page=\(page)&page_size=\(pageSize)"
+            path: "/viva/friends/requests/received",
+            queryParams: [
+                "page": page,
+                "page_size": pageSize
+            ]
         )
         return response.users
     }
@@ -53,7 +59,11 @@ final class FriendService {
 
     func getFriends(page: Int = 1, pageSize: Int = 10) async throws -> [User] {
         let response: PaginatedUserResponse = try await networkClient.get(
-            path: "/viva/friends?page=\(page)&page_size=\(pageSize)"
+            path: "/viva/friends",
+            queryParams: [
+                "page": page,
+                "page_size": pageSize
+            ]
         )
         return response.users
     }

@@ -10,14 +10,18 @@ struct MatchupCard: View {
                 // Left User
                 HStack(spacing: VivaDesign.Spacing.small) {
                     let user = matchup.leftUsers.first
+                    let leftInvite = matchup.invites.first { invite in
+                        invite.side == .left
+                    }
 
                     VivaProfileImage(
-                        imageUrl: user?.imageUrl,
-                        size: .small
+                        imageUrl: leftInvite?.user?.imageUrl ?? user?.imageUrl,
+                        size: .small,
+                        isInvited: leftInvite != nil
                     )
 
                     LabeledValueStack(
-                        label: user?.displayName ?? "Open Position",
+                        label: getUserDisplayName(user: user, invite: leftInvite),
                         value: "\(0)",
                         alignment: .leading
                     )
@@ -35,21 +39,25 @@ struct MatchupCard: View {
                 // Right User
                 HStack(spacing: VivaDesign.Spacing.small) {
                     let user = matchup.rightUsers.first
+                    let rightInvite = matchup.invites.first { invite in
+                        invite.side == .right
+                    }
 
                     LabeledValueStack(
-                        label: user?.displayName ?? "Open Position",
+                        label: getUserDisplayName(user: user, invite: rightInvite),
                         value: "\(0)",
                         alignment: .trailing
                     )
 
                     VivaProfileImage(
-                        imageUrl: user?.imageUrl,
-                        size: .small
+                        imageUrl: rightInvite?.user?.imageUrl ?? user?.imageUrl,
+                        size: .small,
+                        isInvited: rightInvite != nil
                     )
                 }
             }
         }
-        .background(Color.black)  // Add black background to card
+        .background(Color.black)
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             if matchup.status == .pending {
                 Button(role: .destructive) {
@@ -57,8 +65,18 @@ struct MatchupCard: View {
                 } label: {
                     Text("Cancel")
                 }
-                .tint(Color(red: 0.5, green: 0, blue: 0))  // Use explicit red tint for destructive action
+                .tint(VivaDesign.Colors.destructive)
             }
+        }
+    }
+    
+    private func getUserDisplayName(user: User?, invite: MatchupInvite?) -> String {
+        if let invite = invite, let invitedUser = invite.user {
+            return "\(invitedUser.displayName)"
+        } else if let user = user {
+            return user.displayName
+        } else {
+            return "Open Position"
         }
     }
 }

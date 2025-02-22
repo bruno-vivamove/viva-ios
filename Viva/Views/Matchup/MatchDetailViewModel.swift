@@ -3,7 +3,10 @@ import OrderedCollections
 
 @MainActor
 class MatchupDetailViewModel: ObservableObject {
-    private let matchupService: MatchupService
+    let matchupService: MatchupService
+    let friendService: FriendService
+    let userService: UserService
+    let userSession: UserSession
     private let matchupId: String
 
     @Published var matchup: MatchupDetails?
@@ -17,8 +20,17 @@ class MatchupDetailViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var error: Error?
 
-    init(matchupService: MatchupService, matchupId: String) {
+    init(
+        matchupService: MatchupService,
+        friendService: FriendService,
+        userService: UserService,
+        userSession: UserSession,
+        matchupId: String
+    ) {
         self.matchupService = matchupService
+        self.friendService = friendService
+        self.userService = userService
+        self.userSession = userSession
         self.matchupId = matchupId
     }
 
@@ -168,5 +180,31 @@ class MatchupDetailViewModel: ObservableObject {
             .asleep, .standing:
             return true
         }
+    }
+    
+    func deleteInvite(inviteCode: String) async {
+        do {
+            // Delete the invite
+            try await matchupService.deleteInvite(
+                matchupId: matchupId,
+                inviteCode: inviteCode
+            )
+            
+            // Update the local state instead of reloading everything
+            if var updatedMatchup = self.matchup {
+                // Remove the invite from the list
+                updatedMatchup.invites.removeAll { $0.inviteCode == inviteCode }
+                self.matchup = updatedMatchup
+            }
+        } catch {
+            self.error = error
+        }
+    }
+
+    // Helper to check if a position is open
+    func hasOpenPosition(side: MatchupUser.Side) -> Bool {
+        guard let matchup = matchup else { return false }
+        let users = side == .left ? matchup.leftUsers : matchup.rightUsers
+        return users.count < matchup.usersPerSide
     }
 }

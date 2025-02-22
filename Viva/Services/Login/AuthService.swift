@@ -1,11 +1,12 @@
-import Foundation
-
 final class AuthService {
-    private let networkClient: NetworkClient
     private let apiKey: String = "AIzaSyBt_443_Npn0Rtx-Rk_xBS5CdAt_FqWHh8"
 
-    init(networkClient: NetworkClient) {
+    private let networkClient: NetworkClient<AuthErrorResponse>
+    private let settings: NetworkClientSettings
+
+    init(networkClient: NetworkClient<AuthErrorResponse>) {
         self.networkClient = networkClient
+        self.settings = networkClient.settings
     }
 
     private struct AuthRequest: Encodable {
@@ -16,7 +17,8 @@ final class AuthService {
 
     func signIn(_ email: String, _ password: String) async throws -> AuthResponse {
         return try await networkClient.post(
-            path: ":signInWithPassword?key=\(apiKey)",
+            path: ":signInWithPassword",
+            queryParams: ["key" : apiKey],
             body: AuthRequest(
                 email: email,
                 password: password,
@@ -27,7 +29,8 @@ final class AuthService {
     
     func signUp(_ email: String, _ password: String) async throws -> AuthResponse {
         return try await networkClient.post(
-            path: ":signUp?key=\(apiKey)",
+            path: ":signUp",
+            queryParams: ["key" : apiKey],
             body: AuthRequest(
                 email: email,
                 password: password,

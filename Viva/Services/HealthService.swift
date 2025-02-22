@@ -1,13 +1,13 @@
 import Foundation
 
 final class HealthService {
-    private let networkClient: NetworkClient
+    private let networkClient: NetworkClient<VivaErrorResponse>
 
     struct PingResponse: Encodable, Decodable {
         let response: String
     }
 
-    init(networkClient: NetworkClient) {
+    init(networkClient: NetworkClient<VivaErrorResponse>) {
         self.networkClient = networkClient
     }
 

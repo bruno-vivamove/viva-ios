@@ -151,11 +151,11 @@ struct SearchUserView: View {
 
 #Preview {
     let userSession = VivaAppObjects.dummyUserSession()
-    let networkClient = NetworkClient(
+    let networkClient = NetworkClient<VivaErrorResponse>(
         settings: AppNetworkClientSettings(userSession: userSession))
     let userService = UserService(networkClient: networkClient)
     let friendService = FriendService(networkClient: networkClient)
-    return SearchUserView(
+    SearchUserView(
         userService: userService,
         friendService: friendService
     )

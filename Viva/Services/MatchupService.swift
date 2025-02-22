@@ -1,9 +1,9 @@
 import Foundation
 
 final class MatchupService {
-    private let networkClient: NetworkClient
+    private let networkClient: NetworkClient<VivaErrorResponse>
 
-    init(networkClient: NetworkClient) {
+    init(networkClient: NetworkClient<VivaErrorResponse>) {
         self.networkClient = networkClient
     }
 
@@ -16,8 +16,7 @@ final class MatchupService {
         return response.matchups
     }
 
-    func createMatchup(_ matchup: MatchupRequest) async throws -> MatchupDetails
-    {
+    func createMatchup(_ matchup: MatchupRequest) async throws -> MatchupDetails {
         return try await networkClient.post(
             path: "/viva/matchups",
             body: matchup
@@ -73,25 +72,13 @@ final class MatchupService {
         return response.invites
     }
 
-    func createInvite(matchupId: String, side: String, userId: String)
-        async throws -> MatchupInvite
-    {
-        // URL encode the query parameters
-        guard
-            let encodedSide = side.addingPercentEncoding(
-                withAllowedCharacters: .urlQueryAllowed),
-            let encodedUserId = userId.addingPercentEncoding(
-                withAllowedCharacters: .urlQueryAllowed)
-        else {
-            throw NetworkClientError(
-                code: "INVALID_PARAMETERS",
-                message: "Invalid invite parameters"
-            )
-        }
-
+    func createInvite(matchupId: String, side: String, userId: String) async throws -> MatchupInvite {
         return try await networkClient.post(
-            path:
-                "/viva/matchups/\(matchupId)/invites?side=\(encodedSide)&userId=\(encodedUserId)"
+            path: "/viva/matchups/\(matchupId)/invites",
+            queryParams: [
+                "side": side,
+                "userId": userId
+            ]
         )
     }
 

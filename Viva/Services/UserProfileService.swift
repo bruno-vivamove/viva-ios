@@ -2,10 +2,10 @@ import Foundation
 import SwiftUI
 
 final class UserProfileService {
-    private let networkClient: NetworkClient
+    private let networkClient: NetworkClient<VivaErrorResponse>
     private let userSession: UserSession
 
-    init(networkClient: NetworkClient, userSession: UserSession) {
+    init(networkClient: NetworkClient<VivaErrorResponse>, userSession: UserSession) {
         self.networkClient = networkClient
         self.userSession = userSession
     }
@@ -17,13 +17,13 @@ final class UserProfileService {
     func saveCurrentUserProfile(
         _ updateRequest: UserProfileUpdateRequest, _ selectedImage: UIImage?
     ) async throws -> UserProfile {
-        var multipartData: [NetworkClient.MultipartData] = []
+        var multipartData: [MultipartData] = []
 
         // Convert profile update request to JSON data
         let jsonEncoder = JSONEncoder()
         let profileData = try jsonEncoder.encode(updateRequest)
         multipartData.append(
-            NetworkClient.MultipartData(
+            MultipartData(
                 data: profileData,
                 name: "userProfileUpdateRequest",
                 mimeType: "application/json"
@@ -34,7 +34,7 @@ final class UserProfileService {
             let imageData = image.jpegData(compressionQuality: 0.8)
         {
             multipartData.append(
-                NetworkClient.MultipartData(
+                MultipartData(
                     data: imageData,
                     name: "profileImageFile",
                     mimeType: "image/jpeg"

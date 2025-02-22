@@ -1,16 +1,16 @@
 import SwiftUI
 
-import SwiftUI
-
 struct MatchupInviteView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var coordinator: MatchupInviteCoordinator
     @Binding var showCreationFlow: Bool
     @State private var searchText = ""
     @FocusState private var isSearchFieldFocused: Bool
-
+    let isInvitingFromDetails: Bool
+    let preferredSide: MatchupUser.Side?
     let matchupId: String
     let usersPerSide: Int
+    let onInviteSent: (() -> Void)?  // New callback
 
     init(
         matchupService: MatchupService,
@@ -19,7 +19,10 @@ struct MatchupInviteView: View {
         userSession: UserSession,
         matchupId: String,
         usersPerSide: Int,
-        showCreationFlow: Binding<Bool>
+        showCreationFlow: Binding<Bool>,
+        isInvitingFromDetails: Bool = false,
+        preferredSide: MatchupUser.Side? = nil,
+        onInviteSent: (() -> Void)? = nil  // New parameter
     ) {
         self._coordinator = StateObject(
             wrappedValue: MatchupInviteCoordinator(
@@ -31,28 +34,51 @@ struct MatchupInviteView: View {
         self.matchupId = matchupId
         self.usersPerSide = usersPerSide
         self._showCreationFlow = showCreationFlow
+        self.isInvitingFromDetails = isInvitingFromDetails
+        self.preferredSide = preferredSide
+        self.onInviteSent = onInviteSent
     }
 
     var body: some View {
         ZStack {
             Color.black.edgesIgnoringSafeArea(.all)
 
+            // In MatchupInviteView, replace the if block with:
+
             VStack(spacing: VivaDesign.Spacing.large) {
-                // Success Message
-                VStack(spacing: VivaDesign.Spacing.medium) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 60))
-                        .foregroundColor(VivaDesign.Colors.vivaGreen)
+                if !isInvitingFromDetails {
+                    // Success Message - only show when not inviting from details
+                    VStack(spacing: VivaDesign.Spacing.medium) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 60))
+                            .foregroundColor(VivaDesign.Colors.vivaGreen)
 
-                    Text("Matchup Created!")
-                        .font(.system(size: 28, weight: .bold))
-                        .foregroundColor(.white)
+                        Text("Matchup Created!")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundColor(.white)
 
-                    Text("Invite friends to join")
-                        .font(.system(size: 18))
-                        .foregroundColor(VivaDesign.Colors.secondaryText)
+                        Text("Invite friends to join")
+                            .font(.system(size: 18))
+                            .foregroundColor(VivaDesign.Colors.secondaryText)
+                    }
+                    .padding(.top, 40)
+                } else {
+                    // Invitation context header when inviting from details
+                    VStack(spacing: VivaDesign.Spacing.medium) {
+                        Image(systemName: "person.badge.plus")
+                            .font(.system(size: 40))
+                            .foregroundColor(VivaDesign.Colors.vivaGreen)
+
+                        Text("Invite Opponent")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(.white)
+
+                        Text("Search for friends to invite")
+                            .font(.system(size: 16))
+                            .foregroundColor(VivaDesign.Colors.secondaryText)
+                    }
+                    .padding(.top, 40)
                 }
-                .padding(.top, 40)
 
                 // Search bar
                 HStack {
@@ -111,41 +137,8 @@ struct MatchupInviteView: View {
                                 : coordinator.friends
 
                             if usersToDisplay.isEmpty {
-                                Spacer(minLength: 100)
-                                if !searchText.isEmpty {
-                                    // No search results
-                                    VStack(spacing: VivaDesign.Spacing.medium) {
-                                        Image(systemName: "person.slash")
-                                            .font(.system(size: 40))
-                                            .foregroundColor(
-                                                VivaDesign.Colors.secondaryText)
-                                        Text("No users found")
-                                            .font(VivaDesign.Typography.body)
-                                            .foregroundColor(
-                                                VivaDesign.Colors.secondaryText)
-                                        Text("Try a different search term")
-                                            .font(VivaDesign.Typography.caption)
-                                            .foregroundColor(
-                                                VivaDesign.Colors.secondaryText)
-                                    }
-                                } else {
-                                    // No friends
-                                    VStack(spacing: VivaDesign.Spacing.medium) {
-                                        Image(systemName: "person.2.circle")
-                                            .font(.system(size: 40))
-                                            .foregroundColor(
-                                                VivaDesign.Colors.secondaryText)
-                                        Text("No Friends Yet")
-                                            .font(VivaDesign.Typography.body)
-                                            .foregroundColor(
-                                                VivaDesign.Colors.secondaryText)
-                                        Text("Search to find users to invite")
-                                            .font(VivaDesign.Typography.caption)
-                                            .foregroundColor(
-                                                VivaDesign.Colors.secondaryText)
-                                    }
-                                }
-                                Spacer()
+                                InviteEmptyStateView(
+                                    showingSearchResults: !searchText.isEmpty)
                             } else {
                                 ForEach(usersToDisplay) { user in
                                     MatchupInviteCard(
@@ -157,8 +150,11 @@ struct MatchupInviteView: View {
                                                 await coordinator.inviteFriend(
                                                     userId: user.id,
                                                     matchupId: matchupId,
-                                                    side: side
+                                                    side: side ?? preferredSide
                                                 )
+                                                await MainActor.run {
+                                                    onInviteSent?()  // Call the callback after successful invite
+                                                }
                                             }
                                         },
                                         onCancel: {
@@ -178,15 +174,12 @@ struct MatchupInviteView: View {
                 }
 
                 // Done Button
-                Button("Done") {
-                    showCreationFlow = false
-                }
-                .onDisappear {
-                    // Notify HomeView of the new matchup
-                    NotificationCenter.default.post(
-                        name: .matchupCreated,
-                        object: matchupId
-                    )
+                Button(isInvitingFromDetails ? "Close" : "Done") {
+                    if isInvitingFromDetails {
+                        dismiss()
+                    } else {
+                        showCreationFlow = false
+                    }
                 }
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundColor(.black)
@@ -201,10 +194,49 @@ struct MatchupInviteView: View {
         .navigationBarBackButtonHidden(true)
         .task {
             await coordinator.loadData(matchupId: matchupId)
+            if let side = preferredSide {
+                coordinator.setPreferredSide(side)
+            }
         }
         .onDisappear {
             coordinator.cleanup()
+            // Only post notification if not inviting from details
+            if !isInvitingFromDetails {
+                NotificationCenter.default.post(
+                    name: .matchupCreated,
+                    object: matchupId
+                )
+            }
         }
+    }
+}
+
+private struct InviteEmptyStateView: View {
+    let showingSearchResults: Bool
+
+    var body: some View {
+        Spacer(minLength: 100)
+        VStack(spacing: VivaDesign.Spacing.medium) {
+            Image(
+                systemName: showingSearchResults
+                    ? "person.slash" : "person.2.circle"
+            )
+            .font(.system(size: 40))
+            .foregroundColor(VivaDesign.Colors.secondaryText)
+
+            Text(showingSearchResults ? "No users found" : "No Friends Yet")
+                .font(VivaDesign.Typography.body)
+                .foregroundColor(VivaDesign.Colors.secondaryText)
+
+            Text(
+                showingSearchResults
+                    ? "Try a different search term"
+                    : "Search to find users to invite"
+            )
+            .font(VivaDesign.Typography.caption)
+            .foregroundColor(VivaDesign.Colors.secondaryText)
+        }
+        Spacer()
     }
 }
 
@@ -212,8 +244,9 @@ struct MatchupInviteCard: View {
     @ObservedObject var coordinator: MatchupInviteCoordinator
     let user: User
     let usersPerSide: Int
-    let onInvite: (MatchupUser.Side) -> Void
-    let onCancel: () -> Void  // New callback for canceling invites
+    let onInvite: ((MatchupUser.Side?) -> Void)
+    let onCancel: () -> Void
+    let onInviteSent: (() -> Void)? = nil  // Made optional with default value
 
     private var isInvited: Bool {
         coordinator.invitedFriends.contains(user.id)
@@ -266,6 +299,7 @@ struct MatchupInviteCard: View {
                                 title: "Invite Teammate"
                             ) {
                                 onInvite(.left)
+                                onInviteSent?()
                             }
                         )
                     }
@@ -275,6 +309,7 @@ struct MatchupInviteCard: View {
                                 title: "Invite"
                             ) {
                                 onInvite(.right)
+                                onInviteSent?()
                             }
                         )
                     }

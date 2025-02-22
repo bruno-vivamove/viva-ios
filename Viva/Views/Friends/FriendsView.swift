@@ -149,7 +149,7 @@ struct FriendsView: View {
 
 #Preview {
     let userSession = VivaAppObjects.dummyUserSession()
-    let networkClient = NetworkClient(
+    let networkClient = NetworkClient<VivaErrorResponse>(
         settings: AppNetworkClientSettings(userSession: userSession))
     let friendService = FriendService(networkClient: networkClient)
     return FriendsView(friendService: friendService, userSession: userSession)

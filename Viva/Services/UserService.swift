@@ -1,28 +1,20 @@
 import Foundation
 
 final class UserService {
-    private let networkClient: NetworkClient
+    private let networkClient: NetworkClient<VivaErrorResponse>
 
-    init(networkClient: NetworkClient) {
+    init(networkClient: NetworkClient<VivaErrorResponse>) {
         self.networkClient = networkClient
     }
 
-    func searchUsers(query: String, page: Int = 1, pageSize: Int = 20)
-        async throws -> [User]
-    {
-        // URL encode the query parameter
-        guard
-            let encodedQuery = query.addingPercentEncoding(
-                withAllowedCharacters: .urlQueryAllowed)
-        else {
-            throw NetworkClientError(
-                code: "INVALID_QUERY",
-                message: "Invalid search query"
-            )
-        }
-
+    func searchUsers(query: String, page: Int = 1, pageSize: Int = 20) async throws -> [User] {
         let response: PaginatedUserResponse = try await networkClient.get(
-            path: "/viva/users/search?q=\(encodedQuery)"
+            path: "/viva/users/search",
+            queryParams: [
+                "q": query,
+                "page": page,
+                "page_size": pageSize
+            ]
         )
         return response.users
     }

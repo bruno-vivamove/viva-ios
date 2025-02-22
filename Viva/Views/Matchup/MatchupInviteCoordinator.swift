@@ -15,10 +15,16 @@ class MatchupInviteCoordinator: ObservableObject {
     @Published var isLoading = false
     @Published var error: Error?
 
+    private var preferredSide: MatchupUser.Side?
+    
     init(matchupService: MatchupService, friendService: FriendService, userService: UserService) {
         self.matchupService = matchupService
         self.friendService = friendService
         self.userService = userService
+    }
+
+    func setPreferredSide(_ side: MatchupUser.Side) {
+        self.preferredSide = side
     }
 
     func loadData(matchupId: String) async {
@@ -63,14 +69,15 @@ class MatchupInviteCoordinator: ObservableObject {
         isLoading = false
     }
 
-    func inviteFriend(userId: String, matchupId: String, side: MatchupUser.Side) async {
+    func inviteFriend(userId: String, matchupId: String, side: MatchupUser.Side? = nil) async {
         isLoading = true
         defer { isLoading = false }
 
         do {
+            let finalSide = side ?? preferredSide ?? .left
             _ = try await matchupService.createInvite(
                 matchupId: matchupId,
-                side: side.rawValue,
+                side: finalSide.rawValue,
                 userId: userId
             )
             invitedFriends.insert(userId)

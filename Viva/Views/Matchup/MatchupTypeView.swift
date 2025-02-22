@@ -126,7 +126,7 @@ struct MatchupTypeView: View {
 #Preview {
     let userSession = VivaAppObjects.dummyUserSession()
     let vivaAppObjects = VivaAppObjects(userSession: userSession)
-    let networkClient = NetworkClient(
+    let networkClient = NetworkClient<VivaErrorResponse>(
         settings: AppNetworkClientSettings(userSession: userSession))
     let matchupService = MatchupService(networkClient: networkClient)
     let friendService = FriendService(networkClient: networkClient)

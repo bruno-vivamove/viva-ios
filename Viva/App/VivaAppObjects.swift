@@ -3,8 +3,8 @@ struct VivaAppObjects {
     public let appNetworkClientSettings: AppNetworkClientSettings
     public let appWithNoSessionNetworkClientSettings:
         AppWithNoSessionNetworkClientSettings
-    public let appNetworkClient: NetworkClient
-    public let appNetworkClientWithNoSession: NetworkClient
+    public let appNetworkClient: NetworkClient<VivaErrorResponse>
+    public let appNetworkClientWithNoSession: NetworkClient<VivaErrorResponse>
     public let authenticationManager: AuthenticationManager
     public let authService: AuthService
     public let sessionService: SessionService
@@ -25,11 +25,11 @@ struct VivaAppObjects {
 
         appNetworkClient = NetworkClient(settings: appNetworkClientSettings)
 
-        appNetworkClientWithNoSession = NetworkClient(
+        appNetworkClientWithNoSession = NetworkClient<VivaErrorResponse>(
             settings: appWithNoSessionNetworkClientSettings)
 
         authService = AuthService(
-            networkClient: NetworkClient(
+            networkClient: NetworkClient<AuthErrorResponse>(
                 settings: AuthNetworkClientSettings()))
 
         sessionService = SessionService(

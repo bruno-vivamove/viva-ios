@@ -29,6 +29,7 @@ struct Matchup: Codable, Identifiable {
     let lengthInDays: Int
     let leftUsers: [User]
     let rightUsers: [User]
+    var invites: [MatchupInvite]
 }
 
 struct MatchupDetails: Codable {
@@ -47,6 +48,25 @@ struct MatchupDetails: Codable {
 
     let measurements: [MatchupMeasurement]
     let userMeasurements: [MatchupUserMeasurement]
+    var invites: [MatchupInvite]
+
+    var asMatchup: Matchup {
+        Matchup(
+            id: id,
+            matchupHash: matchupHash,
+            displayName: displayName,
+            ownerId: ownerId,
+            createTime: createTime,
+            status: status,
+            startTime: startTime,
+            endTime: endTime,
+            usersPerSide: usersPerSide,
+            lengthInDays: lengthInDays,
+            leftUsers: leftUsers,
+            rightUsers: rightUsers,
+            invites: invites
+        )
+    }
 }
 
 enum MatchupStatus: String, Codable {
