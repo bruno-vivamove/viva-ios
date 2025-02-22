@@ -196,6 +196,18 @@ struct HomeView: View {
             Task {
                 await viewModel.loadInitialDataIfNeeded()
             }
+
+            NotificationCenter.default.addObserver(
+                forName: .matchupCreated,
+                object: nil,
+                queue: .main
+            ) { notification in
+                if let matchupId = notification.object as? String {
+                    Task { @MainActor in
+                        selectedMatchup = viewModel.matchups.first { $0.id == matchupId }
+                    }
+                }
+            }
         }
         .sheet(item: $selectedMatchup) { matchup in
             MatchupDetailView(

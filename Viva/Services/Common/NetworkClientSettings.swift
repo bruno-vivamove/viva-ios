@@ -4,10 +4,15 @@ protocol NetworkClientSettings {
 }
 
 final class AuthNetworkClientSettings: NetworkClientSettings {
-    let baseUrl = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBt_443_Npn0Rtx-Rk_xBS5CdAt_FqWHh8"
+    private let apiKey: String = "AIzaSyBt_443_Npn0Rtx-Rk_xBS5CdAt_FqWHh8"
+    let baseUrl = "https://identitytoolkit.googleapis.com/v1/accounts"
     let headers = [
         "referer": "https://dev.vivamove.io",
     ]
+    
+    func getEndpointUrl(_ endpoint: String) -> String {
+        return "\(endpoint)?key=\(apiKey)"
+    }
 }
 
 final class AppWithNoSessionNetworkClientSettings: NetworkClientSettings {

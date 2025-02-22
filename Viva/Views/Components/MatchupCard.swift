@@ -57,7 +57,7 @@ struct MatchupCard: View {
                 } label: {
                     Text("Cancel")
                 }
-                .tint(.red)  // Use explicit red tint for destructive action
+                .tint(Color(red: 0.5, green: 0, blue: 0))  // Use explicit red tint for destructive action
             }
         }
     }

@@ -105,6 +105,7 @@ struct MarketingText: View {
 
 struct AuthButtonStack: View {
     @State private var showSignInForm = false
+    @State private var showSignUpForm = false
     @ObservedObject private var userSession: UserSession
     private let authenticationManager: AuthenticationManager
 
@@ -121,7 +122,7 @@ struct AuthButtonStack: View {
                 title: "Sign Up",
                 style: .primary,
                 action: {
-                    // Add sign up action
+                    showSignUpForm = true
                 }
             )
 
@@ -157,6 +158,10 @@ struct AuthButtonStack: View {
         .padding(.horizontal, VivaDesign.Spacing.large)
         .sheet(isPresented: $showSignInForm) {
             SignInFormView(
+                authManager: authenticationManager, userSession: userSession)
+        }
+        .sheet(isPresented: $showSignUpForm) {
+            SignUpFormView(
                 authManager: authenticationManager, userSession: userSession)
         }
     }

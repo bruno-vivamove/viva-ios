@@ -7,7 +7,6 @@ struct MatchupInviteView: View {
     @StateObject private var coordinator: MatchupInviteCoordinator
     @Binding var showCreationFlow: Bool
     @State private var searchText = ""
-    @State private var showMatchupDetails = false // New state variable
     @FocusState private var isSearchFieldFocused: Bool
 
     let matchupId: String
@@ -181,7 +180,13 @@ struct MatchupInviteView: View {
                 // Done Button
                 Button("Done") {
                     showCreationFlow = false
-                    showMatchupDetails = true
+                }
+                .onDisappear {
+                    // Notify HomeView of the new matchup
+                    NotificationCenter.default.post(
+                        name: .matchupCreated,
+                        object: matchupId
+                    )
                 }
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundColor(.black)
@@ -191,12 +196,6 @@ struct MatchupInviteView: View {
                 .cornerRadius(8)
                 .padding(.horizontal)
                 .padding(.bottom, 40)
-                .sheet(isPresented: $showMatchupDetails) {
-                    MatchupDetailView(
-                        matchupService: coordinator.matchupService,
-                        matchupId: matchupId
-                    )
-                }
             }
         }
         .navigationBarBackButtonHidden(true)

@@ -31,9 +31,7 @@ struct VivaApp: App {
             if scenePhase == .active {
                 Task {
                     do {
-                        let healthService = HealthService(
-                            networkClient: vivaAppObjects.appNetworkClient)
-                        _ = try await healthService.ping()
+                        _ = try await vivaAppObjects.healthService.ping()
                     } catch {
                         print("Health ping failed: \(error)")
                     }

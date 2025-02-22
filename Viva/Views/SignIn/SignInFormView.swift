@@ -58,13 +58,8 @@ struct SignInFormView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: SignInViewModel
-    @FocusState private var focusedField: Field?
+    @FocusState private var focusedField: FormField?
     
-    enum Field {
-        case email
-        case password
-    }
-
     init(authManager: AuthenticationManager, userSession: UserSession) {
         _viewModel = StateObject(
             wrappedValue: SignInViewModel(
@@ -177,62 +172,6 @@ struct WelcomeSection: View {
                 .foregroundColor(VivaDesign.Colors.secondaryText)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-}
-
-struct EmailField: View {
-    @Binding var email: String
-    @FocusState.Binding var focusedField: SignInFormView.Field?
-
-    var body: some View {
-        TextField("", text: $email)
-            .placeholder(when: email.isEmpty) {
-                Text("Email")
-                    .foregroundColor(VivaDesign.Colors.secondaryText)
-            }
-            .textFieldStyle(VivaTextFieldStyle())
-            .autocapitalization(.none)
-            .textContentType(.emailAddress)
-            .keyboardType(.emailAddress)
-            .focused($focusedField, equals: .email)
-    }
-}
-
-struct PasswordField: View {
-    @Binding var password: String
-    @Binding var showPassword: Bool
-
-    var body: some View {
-        ZStack(alignment: .trailing) {
-            Group {
-                if showPassword {
-                    TextField("", text: $password)
-                } else {
-                    SecureField("", text: $password)
-                }
-            }
-            .textContentType(.password)
-            .autocapitalization(.none)
-            .placeholder(when: password.isEmpty) {
-                Text("Password")
-                    .foregroundColor(VivaDesign.Colors.secondaryText)
-            }
-
-            PasswordVisibilityToggle(showPassword: $showPassword)
-        }
-        .textFieldStyle(VivaTextFieldStyle())
-    }
-}
-
-struct PasswordVisibilityToggle: View {
-    @Binding var showPassword: Bool
-
-    var body: some View {
-        Button(action: { showPassword.toggle() }) {
-            Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
-                .foregroundColor(VivaDesign.Colors.secondaryText)
-        }
-        .padding(.trailing, VivaDesign.Spacing.medium)
     }
 }
 

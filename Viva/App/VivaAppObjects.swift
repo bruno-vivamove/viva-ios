@@ -1,6 +1,10 @@
 struct VivaAppObjects {
     public let userSession: UserSession
     public let appNetworkClientSettings: AppNetworkClientSettings
+    public let appWithNoSessionNetworkClientSettings:
+        AppWithNoSessionNetworkClientSettings
+    public let appNetworkClient: NetworkClient
+    public let appNetworkClientWithNoSession: NetworkClient
     public let authenticationManager: AuthenticationManager
     public let authService: AuthService
     public let sessionService: SessionService
@@ -8,24 +12,28 @@ struct VivaAppObjects {
     public let friendService: FriendService
     public let matchupService: MatchupService
     public let userService: UserService
-    public let appNetworkClient: NetworkClient
+    public let healthService: HealthService
 
     init(userSession: UserSession) {
         self.userSession = userSession
-        
 
         appNetworkClientSettings = AppNetworkClientSettings(
             userSession: userSession)
 
+        appWithNoSessionNetworkClientSettings =
+            AppWithNoSessionNetworkClientSettings()
+
         appNetworkClient = NetworkClient(settings: appNetworkClientSettings)
-        
+
+        appNetworkClientWithNoSession = NetworkClient(
+            settings: appWithNoSessionNetworkClientSettings)
+
         authService = AuthService(
             networkClient: NetworkClient(
                 settings: AuthNetworkClientSettings()))
 
         sessionService = SessionService(
-            networkClient: NetworkClient(
-                settings: AppWithNoSessionNetworkClientSettings()))
+            networkClient: appNetworkClientWithNoSession)
 
         userProfileService = UserProfileService(
             networkClient: appNetworkClient,
@@ -36,9 +44,12 @@ struct VivaAppObjects {
             networkClient: appNetworkClient)
 
         matchupService = MatchupService(networkClient: appNetworkClient)
-        
+
         userService = UserService(networkClient: appNetworkClient)
-        
+
+        healthService = HealthService(
+            networkClient: appNetworkClientWithNoSession)
+
         authenticationManager = AuthenticationManager(
             userSession: userSession,
             authService: authService,
