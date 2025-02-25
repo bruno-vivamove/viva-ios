@@ -28,6 +28,7 @@ struct MatchupDetailView: View {
         friendService: FriendService,
         userService: UserService,
         userSession: UserSession,
+        healthKitDataManager: HealthKitDataManager,
         matchupId: String
     ) {
         _viewModel = StateObject(
@@ -36,6 +37,7 @@ struct MatchupDetailView: View {
                 friendService: friendService,
                 userService: userService,
                 userSession: userSession,
+                healthKitDataManager: healthKitDataManager,
                 matchupId: matchupId
             ))
     }

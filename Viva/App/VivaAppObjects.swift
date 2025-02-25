@@ -13,6 +13,7 @@ struct VivaAppObjects {
     public let matchupService: MatchupService
     public let userService: UserService
     public let healthService: HealthService
+    public let healthKitDataManager: HealthKitDataManager
 
     init(userSession: UserSession) {
         self.userSession = userSession
@@ -56,6 +57,8 @@ struct VivaAppObjects {
             sessionService: sessionService,
             userProfileService: userProfileService
         )
+        
+        healthKitDataManager = HealthKitDataManager(userSession: userSession)
     }
 
     public static func dummyUserSession() -> UserSession {

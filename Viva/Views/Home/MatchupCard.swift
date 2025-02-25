@@ -6,8 +6,8 @@ struct MatchupCard: View {
 
     var body: some View {
         VivaCard {
-            HStack {
-                // Left User
+            HStack(spacing: 0) {
+                // Left side container - aligned to left edge
                 HStack(spacing: VivaDesign.Spacing.small) {
                     let user = matchup.leftUsers.first
                     let leftInvite = matchup.invites.first { invite in
@@ -21,30 +21,37 @@ struct MatchupCard: View {
                     )
 
                     LabeledValueStack(
-                        label: getUserDisplayName(user: user, invite: leftInvite),
+                        label: getUserDisplayName(
+                            user: user, invite: leftInvite),
                         value: "\(0)",
                         alignment: .leading
                     )
+
+                    Spacer(minLength: 0)  // Push content to left edge
                 }
+                .frame(maxWidth: .infinity)
 
-                Spacer()
+                // Centered divider with fixed width container
+                HStack {
+                    Text("|")
+                        .foregroundColor(VivaDesign.Colors.secondaryText)
+                        .font(VivaDesign.Typography.title3)
+                }
+                .frame(width: 20)  // Fixed width for divider container
+                .frame(maxHeight: .infinity)
 
-                // Divider
-                Text("|")
-                    .foregroundColor(VivaDesign.Colors.secondaryText)
-                    .font(VivaDesign.Typography.title3)
-
-                Spacer()
-
-                // Right User
+                // Right side container - aligned to right edge
                 HStack(spacing: VivaDesign.Spacing.small) {
+                    Spacer(minLength: 0)  // Push content to right edge
+
                     let user = matchup.rightUsers.first
                     let rightInvite = matchup.invites.first { invite in
                         invite.side == .right
                     }
 
                     LabeledValueStack(
-                        label: getUserDisplayName(user: user, invite: rightInvite),
+                        label: getUserDisplayName(
+                            user: user, invite: rightInvite),
                         value: "\(0)",
                         alignment: .trailing
                     )
@@ -55,6 +62,7 @@ struct MatchupCard: View {
                         isInvited: rightInvite != nil
                     )
                 }
+                .frame(maxWidth: .infinity)
             }
         }
         .background(Color.black)
@@ -69,14 +77,16 @@ struct MatchupCard: View {
             }
         }
     }
-    
-    private func getUserDisplayName(user: User?, invite: MatchupInvite?) -> String {
+
+    private func getUserDisplayName(user: User?, invite: MatchupInvite?)
+        -> String
+    {
         if let invite = invite, let invitedUser = invite.user {
             return "\(invitedUser.displayName)"
         } else if let user = user {
             return user.displayName
         } else {
-            return "Open Position"
+            return "Open"
         }
     }
 }

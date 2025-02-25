@@ -1,3 +1,5 @@
+import Foundation
+
 protocol NetworkClientSettings {
     var baseUrl: String { get }
     var headers: [String: String] { get }
@@ -11,16 +13,14 @@ final class AuthNetworkClientSettings: NetworkClientSettings {
 }
 
 final class AppWithNoSessionNetworkClientSettings: NetworkClientSettings {
-//    let baseUrl = "https://viva-svc-7e66d6saga-ue.a.run.app"
-    let baseUrl = "http://localhost:8080"
+    let baseUrl = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as! String
     let headers = [
         "referer": "https://dev.vivamove.io",
     ]
 }
 
 final class AppNetworkClientSettings: NetworkClientSettings {
-//    let baseUrl = "https://viva-svc-7e66d6saga-ue.a.run.app"
-    let baseUrl = "http://localhost:8080"
+    let baseUrl = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as! String
     let userSession: UserSession
     
     var headers: [String: String]{

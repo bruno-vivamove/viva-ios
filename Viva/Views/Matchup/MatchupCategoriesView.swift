@@ -10,7 +10,7 @@ struct MatchupCategoriesView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var coordinator: MatchupCreationCoordinator
     @State private var navigateToMatchupType = false
-    @Binding var showCreationFlow: Bool  // Add binding
+    @Binding var showCreationFlow: Bool
     @State private var categories: [MatchupCategory] = [
         MatchupCategory(
             id: "calories", name: "Active Calories", isSelected: true),
@@ -28,13 +28,15 @@ struct MatchupCategoriesView: View {
         friendService: FriendService,
         userService: UserService,
         userSession: UserSession,
-        showCreationFlow: Binding<Bool>
+        showCreationFlow: Binding<Bool>,
+        challengedUser: User? = nil  // Add optional parameter
     ) {
         self._coordinator = StateObject(
             wrappedValue: MatchupCreationCoordinator(
                 matchupService: matchupService,
                 friendService: friendService,
-                userSession: userSession
+                userSession: userSession,
+                challengedUser: challengedUser  // Pass challenged user to coordinator
             )
         )
         self._showCreationFlow = showCreationFlow
@@ -65,7 +67,6 @@ struct MatchupCategoriesView: View {
                     ScrollView {
                         VStack(spacing: VivaDesign.Spacing.small) {
                             ForEach($categories) { $category in
-                                // Inside the ForEach loop, update the Button's background to use RoundedRectangle
                                 Button(action: {
                                     category.isSelected.toggle()
                                 }) {
@@ -91,7 +92,7 @@ struct MatchupCategoriesView: View {
                     Spacer()
 
                     // Bottom Image
-                    Image("runners")  // You'll need to add this image to your assets
+                    Image("runners")
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(height: 200)
@@ -101,7 +102,7 @@ struct MatchupCategoriesView: View {
             .navigationDestination(isPresented: $navigateToMatchupType) {
                 MatchupTypeView(
                     coordinator: coordinator,
-                    showCreationFlow: $showCreationFlow,  // Pass the binding
+                    showCreationFlow: $showCreationFlow,
                     selectedCategories: categories,
                     userService: userService
                 )

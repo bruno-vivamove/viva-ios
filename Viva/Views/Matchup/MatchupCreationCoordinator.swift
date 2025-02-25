@@ -5,13 +5,21 @@ class MatchupCreationCoordinator: ObservableObject {
     let matchupService: MatchupService
     let friendService: FriendService
     let userSession: UserSession
+    let challengedUser: User?  // Optional challenged user
+    
     @Published var isCreatingMatchup = false
     @Published var error: Error?
     
-    init(matchupService: MatchupService, friendService: FriendService, userSession: UserSession) {
+    init(
+        matchupService: MatchupService,
+        friendService: FriendService,
+        userSession: UserSession,
+        challengedUser: User? = nil  // Add optional parameter
+    ) {
         self.matchupService = matchupService
         self.friendService = friendService
         self.userSession = userSession
+        self.challengedUser = challengedUser
     }
     
     func createMatchup(selectedCategories: [MatchupCategory], usersPerSide: Int) async -> MatchupDetails? {
@@ -29,7 +37,18 @@ class MatchupCreationCoordinator: ObservableObject {
         )
         
         do {
-            return try await matchupService.createMatchup(request)
+            let matchup = try await matchupService.createMatchup(request)
+            
+            // If this is a direct challenge, send the invite immediately
+            if let challengedUser = challengedUser {
+                let _ = try await matchupService.createInvite(
+                    matchupId: matchup.id,
+                    side: "R",  // Challenge opponent to right side
+                    userId: challengedUser.id
+                )
+            }
+            
+            return matchup
         } catch {
             self.error = error
             return nil
@@ -39,17 +58,17 @@ class MatchupCreationCoordinator: ObservableObject {
     private func categoryToMeasurementType(_ categoryId: String) -> MeasurementType {
         switch categoryId {
         case "calories":
-            return .energyBurned  // Will be serialized as "ENERGY_BURNED"
+            return .energyBurned
         case "steps":
-            return .steps         // Will be serialized as "STEPS"
+            return .steps
         case "ehr":
-            return .elevatedHeartRate  // Will be serialized as "ELEVATED_HEART_RATE"
+            return .elevatedHeartRate
         case "strength":
-            return .strengthTraining   // Will be serialized as "STRENGTH_TRAINING"
+            return .strengthTraining
         case "sleep":
-            return .asleep      // Will be serialized as "ASLEEP"
+            return .asleep
         default:
-            return .steps       // Default fallback
+            return .steps
         }
     }
 }

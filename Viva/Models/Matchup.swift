@@ -47,8 +47,27 @@ struct MatchupDetails: Codable {
     let rightUsers: [User]
 
     let measurements: [MatchupMeasurement]
-    let userMeasurements: [MatchupUserMeasurement]
+    var userMeasurements: [MatchupUserMeasurement]
     var invites: [MatchupInvite]
+
+    var currentDayNumber: Int? {
+        guard let startTime = self.startTime else {
+            return nil
+        }
+        
+        let now = Date()
+        let dayLength = 24 * 60 * 60
+        let elapsedSeconds = now.timeIntervalSince(startTime)
+        let currentDayNumber = Int(floor(elapsedSeconds / Double(dayLength)))
+
+        if currentDayNumber < 0
+            || (self.endTime != nil && now > self.endTime!)
+        {
+            return nil
+        }
+        
+        return currentDayNumber
+    }
 
     var asMatchup: Matchup {
         Matchup(

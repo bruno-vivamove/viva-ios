@@ -124,7 +124,7 @@ struct TrophiesView: View {
             }
             
             // Create New Matchup Button
-            VivaPrimaryButton(title: "Create New Matchup") {
+            CardButton(title: "Create New Matchup") {
                 // Add action here
             }
         }

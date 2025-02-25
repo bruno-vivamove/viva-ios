@@ -45,22 +45,6 @@ struct MatchupTypeView: View {
                                         .stroke(Color.white, lineWidth: 1)
                                 )
                         }
-
-                        //                        Button(action: {
-                        //                            Task {
-                        //                                await createMatchup(usersPerSide: 2)
-                        //                            }
-                        //                        }) {
-                        //                            Text("2v2")
-                        //                                .font(.system(size: 24, weight: .semibold))
-                        //                                .frame(maxWidth: .infinity)
-                        //                                .padding(.vertical, VivaDesign.Spacing.large)
-                        //                                .foregroundColor(.white)
-                        //                                .overlay(
-                        //                                    RoundedRectangle(cornerRadius: 8)
-                        //                                        .stroke(Color.white, lineWidth: 1)
-                        //                                )
-                        //                        }
                     }
                 }
                 .frame(maxHeight: .infinity)
@@ -86,7 +70,8 @@ struct MatchupTypeView: View {
         }
         .navigationBarBackButtonHidden(true)
         .navigationDestination(isPresented: $navigateToInvite) {
-            if let matchup = matchupCreated {
+            if let matchup = matchupCreated, coordinator.challengedUser == nil {
+                // Only show invite view if there's no challenged user
                 MatchupInviteView(
                     matchupService: coordinator.matchupService,
                     friendService: coordinator.friendService,
@@ -109,7 +94,25 @@ struct MatchupTypeView: View {
         }
         .onChange(of: matchupCreated != nil) { wasCreated, isCreated in
             if isCreated {
-                navigateToInvite = true
+                if coordinator.challengedUser != nil {
+                    // If there's a challenged user, close the flow and notify
+                    showCreationFlow = false
+                    if let matchup = matchupCreated {
+                        // Notify to open details
+                        NotificationCenter.default.post(
+                            name: .matchupCreated,
+                            object: matchup.id
+                        )
+                        // Notify to update home screen
+                        NotificationCenter.default.post(
+                            name: .matchupUpdated,
+                            object: matchup.id
+                        )
+                    }
+                } else {
+                    // Otherwise, show the invite view
+                    navigateToInvite = true
+                }
             }
         }
     }

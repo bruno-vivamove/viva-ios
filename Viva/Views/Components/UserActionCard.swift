@@ -5,26 +5,28 @@ struct UserActionCard: View {
     let user: User
     let actions: [UserAction]
     
+    enum Style {
+        case primary
+        case secondary
+        case destructive
+        case noAction
+    }
+    
     struct UserAction {
         let title: String
         let action: () -> Void
-        let variant: ButtonVariant
+        let style: Style
         let width: CGFloat?
-        
-        enum ButtonVariant {
-            case primary
-            case secondary
-        }
         
         init(
             title: String,
             width: CGFloat? = nil,
-            variant: ButtonVariant = .primary,
+            variant: Style = .primary,
             action: @escaping () -> Void
         ) {
             self.title = title
             self.width = width
-            self.variant = variant
+            self.style = variant
             self.action = action
         }
     }
@@ -49,25 +51,42 @@ struct UserActionCard: View {
                 // Action Buttons
                 HStack(spacing: VivaDesign.Spacing.small) {
                     ForEach(actions, id: \.title) { action in
-                        switch action.variant {
+                        let color = switch action.style {
                         case .primary:
-                            VivaPrimaryButton(
+                            VivaDesign.Colors.vivaGreen
+                        case .secondary, .noAction:
+                            VivaDesign.Colors.primaryText
+                        case .destructive:
+                            VivaDesign.Colors.destructive
+                        }
+
+                        switch action.style {
+                        case .primary, .secondary, .destructive:
+                            CardButton(
                                 title: action.title,
-                                width: action.width
+                                width: action.width,
+                                color: color
                             ) {
                                 action.action()
                             }
-                        case .secondary:
-                            VivaSecondaryButton(
-                                title: action.title,
-                                width: action.width
-                            ) {
-                                action.action()
-                            }
+
+                        case .noAction:
+                            Text("Already Friends")
+                                .foregroundColor(color)
+                                .font(VivaDesign.Typography.caption)
                         }
                     }
                 }
             }
         }
+        .listRowInsets(
+            EdgeInsets(
+                top: 4,
+                leading: 16,
+                bottom: 4,
+                trailing: 16
+            )
+        )
+        .listRowBackground(Color.clear)
     }
 }

@@ -124,12 +124,7 @@ struct HomeView: View {
                                     viewModel.receivedInvites, id: \.inviteCode
                                 ) { invite in
                                     UserActionCard(
-                                        user: invite.user
-                                            ?? User(
-                                                id: "",
-                                                displayName: "Open Invite",
-                                                imageUrl: nil,
-                                                friendStatus: .none),
+                                        user: invite.sender,
                                         actions: [
                                             UserActionCard.UserAction(
                                                 title: "Accept",
@@ -403,7 +398,7 @@ struct HomeHeader: View {
 
             Spacer()
 
-            VivaPrimaryButton(
+            CardButton(
                 title: "Create Matchup"
             ) {
                 showMatchupCreation = true

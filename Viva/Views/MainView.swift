@@ -10,6 +10,7 @@ struct MainView: View {
     private let friendService: FriendService
     private let matchupService: MatchupService
     private let userService: UserService
+    private let healthKitDataManager: HealthKitDataManager
 
     init(
         userSession: UserSession,
@@ -17,7 +18,8 @@ struct MainView: View {
         userProfileService: UserProfileService,
         friendService: FriendService,
         matchupService: MatchupService,
-        userService: UserService
+        userService: UserService,
+        healthKitDataManager: HealthKitDataManager
     ) {
         self.userSession = userSession
         self.authenticationManager = authenticationManager
@@ -25,6 +27,7 @@ struct MainView: View {
         self.friendService = friendService
         self.matchupService = matchupService
         self.userService = userService
+        self.healthKitDataManager = healthKitDataManager
     }
 
     var body: some View {
@@ -32,7 +35,9 @@ struct MainView: View {
             // Home Tab
             HomeView(
                 matchupService: matchupService, userSession: userSession,
-                friendService: friendService, userService: userService
+                friendService: friendService,
+                userService: userService,
+                healthKitDataManager: healthKitDataManager
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
@@ -73,18 +78,23 @@ struct MainView: View {
                 }
 
             // Matchups Tab
-            FriendsView(friendService: friendService, userSession: userSession)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
-                .tabItem {
-                    Image(systemName: "person.2.fill")
-                    Text("Friends")
-                }
+            FriendsView(
+                matchupService: matchupService, friendService: friendService,
+                userService: userService,
+                healthKitDataManager: healthKitDataManager,
+                userSession: userSession
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
+            .tabItem {
+                Image(systemName: "person.2.fill")
+                Text("Friends")
+            }
         }
         .tint(activeTabColor)
-        //        .onAppear {
-        //            UITabBar.appearance().unselectedItemTintColor = inactiveTabColor
-        //        }
+        .onAppear {
+            healthKitDataManager.requestAuthorization()
+        }
     }
 }
 
@@ -98,6 +108,7 @@ struct MainView: View {
         userProfileService: vivaAppObjects.userProfileService,
         friendService: vivaAppObjects.friendService,
         matchupService: vivaAppObjects.matchupService,
-        userService: vivaAppObjects.userService
+        userService: vivaAppObjects.userService,
+        healthKitDataManager: vivaAppObjects.healthKitDataManager
     )
 }

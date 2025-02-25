@@ -22,7 +22,8 @@ struct VivaApp: App {
                 userProfileService: vivaAppObjects.userProfileService,
                 friendService: vivaAppObjects.friendService,
                 matchupService: vivaAppObjects.matchupService,
-                userService: vivaAppObjects.userService
+                userService: vivaAppObjects.userService,
+                healthKitDataManager: vivaAppObjects.healthKitDataManager
             )
             .environmentObject(appState)
             .environmentObject(appState.userSession)

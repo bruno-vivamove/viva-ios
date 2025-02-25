@@ -7,6 +7,8 @@ class MatchupDetailViewModel: ObservableObject {
     let friendService: FriendService
     let userService: UserService
     let userSession: UserSession
+    let healthKitDataManager: HealthKitDataManager
+
     private let matchupId: String
 
     @Published var matchup: MatchupDetails?
@@ -25,6 +27,7 @@ class MatchupDetailViewModel: ObservableObject {
         friendService: FriendService,
         userService: UserService,
         userSession: UserSession,
+        healthKitDataManager: HealthKitDataManager,
         matchupId: String
     ) {
         self.matchupService = matchupService
@@ -32,6 +35,7 @@ class MatchupDetailViewModel: ObservableObject {
         self.userService = userService
         self.userSession = userSession
         self.matchupId = matchupId
+        self.healthKitDataManager = healthKitDataManager
     }
 
     func loadData() async {
@@ -44,8 +48,51 @@ class MatchupDetailViewModel: ObservableObject {
             let matchup: MatchupDetails = try await matchupService.getMatchup(
                 matchupId: matchupId)
             self.matchup = matchup
+            self.createMeasurementPairs(matchup)
 
-            createMeasurementPairs(matchup)
+            if matchup.status == .active {
+                healthKitDataManager.updateMatchupData(matchupDetail: matchup) {
+                    updatedMatchup in
+                    Task {
+                        // TODO: Save measurements in batch
+                        await withTaskGroup(of: Void.self) { group in
+                            for m in updatedMatchup.userMeasurements.filter({
+                                $0.userId == self.userSession.getUserId()
+                            }) {
+                                group.addTask {
+                                    do {
+                                        try await self.matchupService
+                                            .saveUserMeasurement(
+                                                matchupId: m.matchupId,
+                                                measurement: m)
+                                    } catch {
+                                        print(
+                                            "Failed to save measurement: \(error)"
+                                        )
+                                    }
+                                }
+                            }
+
+                            await group.waitForAll()
+                        }
+
+                        // TODO: get this as response from batch measurement update
+                        do {
+                            let matchup: MatchupDetails =
+                                try await self.matchupService.getMatchup(
+                                    matchupId: self.matchupId)
+                            self.matchup = matchup
+                            self.createMeasurementPairs(matchup)
+                        } catch {
+                            print(
+                                "Error loading updated matchup details: \(error)"
+                            )
+                        }
+                    }
+                }
+            } else {
+                self.createMeasurementPairs(matchup)
+            }
         } catch {
             self.error = error
         }
@@ -73,19 +120,7 @@ class MatchupDetailViewModel: ObservableObject {
         )
 
         // Calculate days elapsed (current day is included, so add 1)
-        var numberOfDays = 1
-        
-        if let startTime = matchup.startTime {
-            let calendar = Calendar.current
-            let currentDate = Date()
-            let daysElapsed =
-                calendar.dateComponents([.day], from: startTime, to: currentDate)
-                .day ?? 0 + 1
-
-            // Ensure we don't exceed matchup length and aren't negative
-            numberOfDays = min(max(daysElapsed, 0), matchup.lengthInDays)
-        }
-
+        let numberOfDays = (matchup.currentDayNumber ?? 0) + 1
         let matchupMeasurementPairsByDay = Array(
             repeating: totalMatchupMeasurementPairs, count: numberOfDays)
 
@@ -181,7 +216,7 @@ class MatchupDetailViewModel: ObservableObject {
             return true
         }
     }
-    
+
     func deleteInvite(inviteCode: String) async {
         do {
             // Delete the invite
@@ -189,7 +224,7 @@ class MatchupDetailViewModel: ObservableObject {
                 matchupId: matchupId,
                 inviteCode: inviteCode
             )
-            
+
             // Update the local state instead of reloading everything
             if var updatedMatchup = self.matchup {
                 // Remove the invite from the list
