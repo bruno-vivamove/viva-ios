@@ -32,7 +32,10 @@ struct MatchupTypeView: View {
                     VStack(spacing: VivaDesign.Spacing.large) {
                         Button(action: {
                             Task {
-                                await createMatchup(usersPerSide: 1)
+                                matchupCreated = await coordinator.createMatchup(
+                                    selectedCategories: selectedCategories,
+                                    usersPerSide: 1
+                                )
                             }
                         }) {
                             Text("1v1")
@@ -77,7 +80,7 @@ struct MatchupTypeView: View {
                     friendService: coordinator.friendService,
                     userService: userService,
                     userSession: coordinator.userSession,
-                    matchupId: matchup.id,
+                    matchup: matchup,
                     usersPerSide: matchup.usersPerSide,
                     showCreationFlow: $showCreationFlow
                 )
@@ -97,31 +100,12 @@ struct MatchupTypeView: View {
                 if coordinator.challengedUser != nil {
                     // If there's a challenged user, close the flow and notify
                     showCreationFlow = false
-                    if let matchup = matchupCreated {
-                        // Notify to open details
-                        NotificationCenter.default.post(
-                            name: .matchupCreated,
-                            object: matchup.id
-                        )
-                        // Notify to update home screen
-                        NotificationCenter.default.post(
-                            name: .matchupUpdated,
-                            object: matchup.id
-                        )
-                    }
                 } else {
                     // Otherwise, show the invite view
                     navigateToInvite = true
                 }
             }
         }
-    }
-
-    private func createMatchup(usersPerSide: Int) async {
-        matchupCreated = await coordinator.createMatchup(
-            selectedCategories: selectedCategories,
-            usersPerSide: usersPerSide
-        )
     }
 }
 

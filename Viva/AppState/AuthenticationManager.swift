@@ -2,7 +2,7 @@ import Foundation
 import Security
 import SwiftUI
 
-final class AuthenticationManager {
+final class AuthenticationManager: ObservableObject {
     let userSession: UserSession
     let authService: AuthService
     let sessionService: SessionService

@@ -106,82 +106,82 @@ struct MatchupDetailView: View {
             .background(VivaDesign.Colors.background)
             
             // Overlay
-            if showUnInviteSheet, let invite = selectedInvite {
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            showUnInviteSheet = false
-                            selectedInvite = nil
-                        }
-                    }
-
-                VStack(spacing: VivaDesign.Spacing.medium) {
-                    // User info
-                    HStack(spacing: VivaDesign.Spacing.medium) {
-                        VivaProfileImage(
-                            imageUrl: invite.user.imageUrl,
-                            size: .medium,
-                            isInvited: true
-                        )
-
-                        Text(invite.user.displayName)
-                            .font(VivaDesign.Typography.title2)
-                            .foregroundColor(VivaDesign.Colors.primaryText)
-                    }
-                    .padding(.top, VivaDesign.Spacing.medium)
-
-                    // Actions
-                    VStack(spacing: VivaDesign.Spacing.small) {
-                        Button {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                showUnInviteSheet = false
-                                selectedInvite = nil
-                            }
-                            Task {
-                                await viewModel.deleteInvite(
-                                    inviteCode: invite.inviteCode)
-                            }
-                        } label: {
-                            HStack {
-                                Image(systemName: "xmark.circle.fill")
-                                Text("Cancel Invitation")
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(VivaDesign.Colors.destructive)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
-                        }
-
-                        Button {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                showUnInviteSheet = false
-                                selectedInvite = nil
-                            }
-                        } label: {
-                            Text("Dismiss")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.gray.opacity(0.2))
-                                .foregroundColor(
-                                    VivaDesign.Colors.primaryText
-                                )
-                                .cornerRadius(8)
-                        }
-                    }
-                }
-                .padding()
-                .frame(width: 300)
-                .background(VivaDesign.Colors.background)
-                .cornerRadius(16)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.gray.opacity(0.4), lineWidth: 2)
-                )
-                .shadow(radius: 20)
-                .transition(.opacity.combined(with: .scale))
-            }
+//            if showUnInviteSheet, let invite = selectedInvite {
+//                Color.black.opacity(0.4)
+//                    .ignoresSafeArea()
+//                    .onTapGesture {
+//                        withAnimation(.easeInOut(duration: 0.2)) {
+//                            showUnInviteSheet = false
+//                            selectedInvite = nil
+//                        }
+//                    }
+//
+//                VStack(spacing: VivaDesign.Spacing.medium) {
+//                    // User info
+//                    HStack(spacing: VivaDesign.Spacing.medium) {
+//                        VivaProfileImage(
+//                            imageUrl: invite.user.imageUrl,
+//                            size: .medium,
+//                            isInvited: true
+//                        )
+//
+//                        Text(invite.user.displayName)
+//                            .font(VivaDesign.Typography.title2)
+//                            .foregroundColor(VivaDesign.Colors.primaryText)
+//                    }
+//                    .padding(.top, VivaDesign.Spacing.medium)
+//
+//                    // Actions
+//                    VStack(spacing: VivaDesign.Spacing.small) {
+//                        Button {
+//                            withAnimation(.easeInOut(duration: 0.2)) {
+//                                showUnInviteSheet = false
+//                                selectedInvite = nil
+//                            }
+//                            Task {
+//                                await viewModel.deleteInvite(
+//                                    inviteCode: invite.inviteCode)
+//                            }
+//                        } label: {
+//                            HStack {
+//                                Image(systemName: "xmark.circle.fill")
+//                                Text("Cancel Invitation")
+//                            }
+//                            .frame(maxWidth: .infinity)
+//                            .padding()
+//                            .background(VivaDesign.Colors.destructive)
+//                            .foregroundColor(.white)
+//                            .cornerRadius(8)
+//                        }
+//
+//                        Button {
+//                            withAnimation(.easeInOut(duration: 0.2)) {
+//                                showUnInviteSheet = false
+//                                selectedInvite = nil
+//                            }
+//                        } label: {
+//                            Text("Dismiss")
+//                                .frame(maxWidth: .infinity)
+//                                .padding()
+//                                .background(Color.gray.opacity(0.2))
+//                                .foregroundColor(
+//                                    VivaDesign.Colors.primaryText
+//                                )
+//                                .cornerRadius(8)
+//                        }
+//                    }
+//                }
+//                .padding()
+//                .frame(width: 300)
+//                .background(VivaDesign.Colors.background)
+//                .cornerRadius(16)
+//                .overlay(
+//                    RoundedRectangle(cornerRadius: 16)
+//                        .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+//                )
+//                .shadow(radius: 20)
+//                .transition(.opacity.combined(with: .scale))
+//            }
         }
         .sheet(isPresented: $showInviteView) {
             if let matchup = viewModel.matchup {
@@ -190,31 +190,23 @@ struct MatchupDetailView: View {
                     friendService: viewModel.friendService,
                     userService: viewModel.userService,
                     userSession: viewModel.userSession,
-                    matchupId: matchup.id,
+                    matchup: matchup,
                     usersPerSide: matchup.usersPerSide,
                     showCreationFlow: $showInviteView,
                     isInvitingFromDetails: true,
-                    preferredSide: inviteSide,
-                    onInviteSent: {
-                        Task {
-                            await viewModel.loadData()
-                            NotificationCenter.default.post(
-                                name: .matchupUpdated,
-                                object: matchup.id
-                            )
-                        }
-                    }
+                    preferredSide: inviteSide
                 )
             }
         }
         .task {
             await viewModel.loadData()
         }
+        // TODO Bug - maybe
         .onChange(of: viewModel.matchup?.invites.count) { _, _ in
-            if let matchupId = viewModel.matchup?.id {
+            if let matchup = viewModel.matchup {
                 NotificationCenter.default.post(
                     name: .matchupUpdated,
-                    object: matchupId
+                    object: matchup
                 )
             }
         }
@@ -345,7 +337,7 @@ struct ViewToggle: View {
     @Binding var isShowingTotal: Bool
 
     var body: some View {
-        HStack(spacing: VivaDesign.Spacing.minimal) {
+        HStack(spacing: VivaDesign.Spacing.xsmall) {
             Text("Total")
                 .lineLimit(1)
                 .truncationMode(.tail)
@@ -506,7 +498,7 @@ struct TimeRemainingDisplay: View {
 
     var body: some View {
         if endTime == nil {
-            HStack(spacing: VivaDesign.Spacing.minimal) {
+            HStack(spacing: VivaDesign.Spacing.xsmall) {
                 Text("Not started")
                     .font(.title)
                     .lineLimit(1)
@@ -515,7 +507,7 @@ struct TimeRemainingDisplay: View {
             .foregroundColor(VivaDesign.Colors.primaryText)
         } else {
             let remainingTime = calculateTimeRemaining()
-            HStack(spacing: VivaDesign.Spacing.minimal) {
+            HStack(spacing: VivaDesign.Spacing.xsmall) {
                 Text("\(remainingTime.days)")
                     .font(.title)
                     .lineLimit(1)
@@ -560,7 +552,7 @@ struct RecordDisplay: View {
     let losses: Int
 
     var body: some View {
-        HStack(spacing: VivaDesign.Spacing.minimal) {
+        HStack(spacing: VivaDesign.Spacing.xsmall) {
             VivaProfileImage(imageUrl: leftUser?.imageUrl, size: .mini)
             Text("\(wins)")
                 .font(.title)

@@ -217,18 +217,15 @@ class MatchupDetailViewModel: ObservableObject {
         }
     }
 
-    func deleteInvite(inviteCode: String) async {
+    func deleteInvite(_ matchupInvite: MatchupInvite) async {
         do {
             // Delete the invite
-            try await matchupService.deleteInvite(
-                matchupId: matchupId,
-                inviteCode: inviteCode
-            )
+            try await matchupService.deleteInvite(matchupInvite)
 
             // Update the local state instead of reloading everything
             if var updatedMatchup = self.matchup {
                 // Remove the invite from the list
-                updatedMatchup.invites.removeAll { $0.inviteCode == inviteCode }
+                updatedMatchup.invites.removeAll { $0.inviteCode == matchupInvite.inviteCode }
                 self.matchup = updatedMatchup
             }
         } catch {

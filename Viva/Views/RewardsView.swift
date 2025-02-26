@@ -52,7 +52,7 @@ struct RewardsPointsCard: View {
 
     var body: some View {
         VivaCard {
-            VStack(spacing: VivaDesign.Spacing.minimal) {
+            VStack(spacing: VivaDesign.Spacing.xsmall) {
                 Text("\(points)")
                     .font(VivaDesign.Typography.displayText(60))
                     .foregroundColor(VivaDesign.Colors.primaryText)
@@ -71,7 +71,7 @@ struct MarketplaceHeader: View {
     let logoWidth: CGFloat
 
     var body: some View {
-        VStack(spacing: VivaDesign.Spacing.minimal) {
+        VStack(spacing: VivaDesign.Spacing.xsmall) {
             HStack {
                 Spacer()
                 Image("viva_logo")

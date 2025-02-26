@@ -3,10 +3,7 @@ import SwiftUI
 struct MatchupInviteCard: View {
     @ObservedObject var coordinator: MatchupInviteCoordinator
     let user: User
-    let usersPerSide: Int
-    let onInvite: ((MatchupUser.Side?) -> Void)
-    let onCancel: () -> Void
-    let onInviteSent: (() -> Void)? = nil
+    let matchup: MatchupDetails
 
     private var isInvited: Bool {
         coordinator.invitedFriends.contains(user.id)
@@ -30,7 +27,12 @@ struct MatchupInviteCard: View {
                         title: "Cancel Invite",
                         variant: .secondary
                     ) {
-                        onCancel()
+                        Task {
+                            await coordinator.deleteInvite(
+                                userId: user.id,
+                                matchupId: matchup.id
+                            )
+                        }
                     }
                 ]
             )
@@ -81,8 +83,13 @@ struct MatchupInviteCard: View {
                             UserActionCard.UserAction(
                                 title: "Invite Teammate"
                             ) {
-                                onInvite(.left)
-                                onInviteSent?()
+                                Task {
+                                    await coordinator.inviteFriend(
+                                        userId: user.id,
+                                        matchupId: matchup.id,
+                                        side: .left
+                                    )
+                                }
                             }
                         )
                     }
@@ -92,8 +99,13 @@ struct MatchupInviteCard: View {
                             UserActionCard.UserAction(
                                 title: "Invite"
                             ) {
-                                onInvite(.right)
-                                onInviteSent?()
+                                Task {
+                                    await coordinator.inviteFriend(
+                                        userId: user.id,
+                                        matchupId: matchup.id,
+                                        side: .right
+                                    )
+                                }
                             }
                         )
                     }

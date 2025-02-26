@@ -26,7 +26,7 @@ struct CardButton: View {
                 .foregroundColor(color)
                 .font(VivaDesign.Typography.caption)
                 .frame(width: width)
-                .padding(VivaDesign.Spacing.minimal)
+                .padding(VivaDesign.Spacing.xsmall)
                 .background(
                     RoundedRectangle(
                         cornerRadius: VivaDesign.Sizing

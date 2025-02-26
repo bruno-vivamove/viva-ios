@@ -94,7 +94,7 @@ struct SignUpFormView: View {
                             )
                             
                             // Password Field
-                            VStack(alignment: .leading, spacing: VivaDesign.Spacing.minimal) {
+                            VStack(alignment: .leading, spacing: VivaDesign.Spacing.xsmall) {
                                 PasswordField(
                                     password: $viewModel.password,
                                     showPassword: $viewModel.showPassword

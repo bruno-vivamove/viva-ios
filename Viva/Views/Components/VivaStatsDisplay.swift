@@ -12,7 +12,7 @@ struct VivaStatsDisplay: View {
     let label: String
     
     var body: some View {
-        VStack(alignment: .leading, spacing: VivaDesign.Spacing.minimal) {
+        VStack(alignment: .leading, spacing: VivaDesign.Spacing.xsmall) {
             Text(value)
                 .font(VivaDesign.Typography.title3)
                 .foregroundColor(VivaDesign.Colors.primaryText)

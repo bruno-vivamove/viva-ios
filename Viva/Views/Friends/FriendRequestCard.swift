@@ -70,5 +70,6 @@ struct FriendRequestCard: View {
             user: user,
             actions: [action]
         )
+        .buttonStyle(PlainButtonStyle())
     }
 }

@@ -2,8 +2,22 @@ import Foundation
 import SwiftUI
 
 struct HomeView: View {
+    private let headerInsets = EdgeInsets(
+        top: 0,
+        leading: VivaDesign.Spacing.medium,
+        bottom: VivaDesign.Spacing.small,
+        trailing: VivaDesign.Spacing.medium
+    )
+
+    private let rowInsets = EdgeInsets(
+        top: 0,
+        leading: VivaDesign.Spacing.medium,
+        bottom: VivaDesign.Spacing.small,
+        trailing: VivaDesign.Spacing.medium
+    )
+
     @StateObject private var viewModel: HomeViewModel
-    @State private var selectedMatchup: Matchup?
+
     private let userSession: UserSession
     private let matchupService: MatchupService
     private let friendService: FriendService
@@ -18,7 +32,8 @@ struct HomeView: View {
         healthKitDataManager: HealthKitDataManager
     ) {
         _viewModel = StateObject(
-            wrappedValue: HomeViewModel(matchupService: matchupService))
+            wrappedValue: HomeViewModel(
+                userSession: userSession, matchupService: matchupService))
         self.userSession = userSession
         self.matchupService = matchupService
         self.friendService = friendService
@@ -27,7 +42,7 @@ struct HomeView: View {
     }
 
     var body: some View {
-        VStack(spacing: VivaDesign.Spacing.medium) {
+        VStack(spacing: 0) {
             HomeHeader(
                 userSession: userSession,
                 viewModel: viewModel,
@@ -35,36 +50,27 @@ struct HomeView: View {
                 friendService: friendService,
                 userService: userService
             )
-            .padding(.top, VivaDesign.Spacing.small)
-            .padding(.horizontal, VivaDesign.Spacing.medium)
+            .padding(VivaDesign.Spacing.medium)
+            .padding(.bottom, 0)
 
             if viewModel.isLoading {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if viewModel.isEmpty {
                 HomeEmptyStateView()
+                    .padding(VivaDesign.Spacing.medium)
             } else {
                 List {
-                    Section {
-                        // This empty section creates padding at the top
-                    }
-                    .listSectionSeparator(.hidden)
-                    .listRowBackground(Color.clear)
-
                     // Active Matchups
                     if !viewModel.activeMatchups.isEmpty {
                         Section {
                             ForEach(viewModel.activeMatchups) { matchup in
-                                MatchupCard(matchup: matchup, onCancel: nil)
+                                MatchupCard(matchup: matchup)
                                     .onTapGesture {
-                                        selectedMatchup = matchup
+                                        viewModel.selectedMatchup = matchup
                                     }
-                                    .listRowInsets(
-                                        EdgeInsets(
-                                            top: 4, leading: 16, bottom: 4,
-                                            trailing: 16)
-                                    )
-                                    .listRowBackground(Color.clear)
+                                    .listRowSeparator(.hidden)
+                                    .listRowInsets(rowInsets)
                             }
                         } header: {
                             HStack {
@@ -73,10 +79,8 @@ struct HomeView: View {
                                     .foregroundColor(.white)
                                 Spacer()
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
                             .background(Color.black)
-                            .listRowInsets(EdgeInsets())
+                            .listRowInsets(headerInsets)
                         }
                     }
 
@@ -84,20 +88,12 @@ struct HomeView: View {
                     if !viewModel.pendingMatchups.isEmpty {
                         Section {
                             ForEach(viewModel.pendingMatchups) { matchup in
-                                MatchupCard(matchup: matchup) {
-                                    Task {
-                                        await handleCancelMatchup(matchup)
+                                MatchupCard(matchup: matchup)
+                                    .onTapGesture {
+                                        viewModel.selectedMatchup = matchup
                                     }
-                                }
-                                .onTapGesture {
-                                    selectedMatchup = matchup
-                                }
-                                .listRowInsets(
-                                    EdgeInsets(
-                                        top: 4, leading: 16, bottom: 4,
-                                        trailing: 16)
-                                )
-                                .listRowBackground(Color.clear)
+                                    .listRowSeparator(.hidden)
+                                    .listRowInsets(rowInsets)
                             }
                         } header: {
                             HStack {
@@ -106,10 +102,8 @@ struct HomeView: View {
                                     .foregroundColor(.white)
                                 Spacer()
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
                             .background(Color.black)
-                            .listRowInsets(EdgeInsets())
+                            .listRowInsets(headerInsets)
                         }
                     }
 
@@ -131,16 +125,17 @@ struct HomeView: View {
                                                 variant: .primary
                                             ) {
                                                 Task {
-                                                    await handleAcceptInvite(
-                                                        invite)
+                                                    await viewModel
+                                                        .acceptInvite(
+                                                            invite)
                                                 }
                                             },
                                             UserActionCard.UserAction(
-                                                title: "Delete",
+                                                title: "Decline",
                                                 variant: .secondary
                                             ) {
                                                 Task {
-                                                    await handleDeleteInvite(
+                                                    await viewModel.deleteInvite(
                                                         invite)
                                                 }
                                             },
@@ -148,6 +143,8 @@ struct HomeView: View {
                                     )
                                     .listRowBackground(Color.clear)
                                     .buttonStyle(PlainButtonStyle())  // Removes button-like behavior
+                                    .listRowSeparator(.hidden)
+                                    .listRowInsets(rowInsets)
                                 }
                             }
 
@@ -174,14 +171,17 @@ struct HomeView: View {
                                                 variant: .secondary
                                             ) {
                                                 Task {
-                                                    await handleDeleteInvite(
-                                                        invite)
+                                                    await viewModel
+                                                        .deleteInvite(
+                                                            invite)
                                                 }
                                             },
                                         ]
                                     )
                                     .listRowBackground(Color.clear)
                                     .buttonStyle(PlainButtonStyle())  // Removes button-like behavior
+                                    .listRowSeparator(.hidden)
+                                    .listRowInsets(rowInsets)
                                 }
                             }
                         } header: {
@@ -191,23 +191,23 @@ struct HomeView: View {
                                     .foregroundColor(.white)
                                 Spacer()
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
                             .background(Color.black)
-                            .listRowInsets(EdgeInsets())
+                            .listRowInsets(headerInsets)
                         }
                     }
                 }
+                .listRowInsets(EdgeInsets())
                 .listStyle(PlainListStyle())
                 .scrollContentBackground(.hidden)
                 .refreshable {
                     await viewModel.loadData()
                 }
+                .listSectionSpacing(0)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)
-        .sheet(item: $selectedMatchup) { matchup in
+        .sheet(item: $viewModel.selectedMatchup) { matchup in
             NavigationView {
                 MatchupDetailView(
                     matchupService: matchupService,
@@ -219,63 +219,6 @@ struct HomeView: View {
                 )
             }
         }
-        .onAppear {
-            Task {
-                await viewModel.loadInitialDataIfNeeded()
-            }
-
-            // Existing matchup created observer
-            NotificationCenter.default.addObserver(
-                forName: .matchupCreated,
-                object: nil,
-                queue: .main
-            ) { notification in
-                if let matchupId = notification.object as? String {
-                    Task { @MainActor in
-                        selectedMatchup = viewModel.matchups.first {
-                            $0.id == matchupId
-                        }
-                    }
-                }
-            }
-
-            // Updated matchup observer
-            NotificationCenter.default.addObserver(
-                forName: .matchupUpdated,
-                object: nil,
-                queue: .main
-            ) { notification in
-                if let matchupId = notification.object as? String {
-                    Task { @MainActor in
-                        // Get updated matchup from service
-                        do {
-                            let updatedMatchup =
-                                try await matchupService.getMatchup(
-                                    matchupId: matchupId)
-                            // Convert MatchupDetails to Matchup
-                            let matchup = Matchup(
-                                id: updatedMatchup.id,
-                                matchupHash: updatedMatchup.matchupHash,
-                                displayName: updatedMatchup.displayName,
-                                ownerId: updatedMatchup.ownerId,
-                                createTime: updatedMatchup.createTime,
-                                status: updatedMatchup.status,
-                                startTime: updatedMatchup.startTime,
-                                endTime: updatedMatchup.endTime,
-                                usersPerSide: updatedMatchup.usersPerSide,
-                                lengthInDays: updatedMatchup.lengthInDays,
-                                leftUsers: updatedMatchup.leftUsers,
-                                rightUsers: updatedMatchup.rightUsers,
-                                invites: updatedMatchup.invites
-                            )
-                            viewModel.updateMatchup(matchup)
-                        } catch {
-                            print("Error updating matchup: \(error)")
-                        }
-                    }
-                }
-            }
-        }
         .alert("Error", isPresented: .constant(viewModel.error != nil)) {
             Button("OK") {
                 viewModel.error = nil
@@ -285,38 +228,11 @@ struct HomeView: View {
                 Text(error.localizedDescription)
             }
         }
-    }
-
-    private func handleAcceptInvite(_ invite: MatchupInvite) async {
-        do {
-            try await matchupService.acceptInvite(inviteCode: invite.inviteCode)
-            await viewModel.loadData()
-        } catch {
-            viewModel.error = error
+        .onAppear {
+            Task {
+                await viewModel.loadInitialDataIfNeeded()
+            }
         }
-    }
-
-    private func handleDeleteInvite(_ invite: MatchupInvite) async {
-        do {
-            try await viewModel.removeInvite(invite)
-        } catch {
-            viewModel.error = error
-        }
-    }
-
-    private func handleCancelMatchup(_ matchup: Matchup) async {
-        do {
-            // Remove matchup and its associated invites
-            try await viewModel.removeMatchup(matchup)
-        } catch {
-            viewModel.error = error
-        }
-    }
-}
-
-extension Matchup: Equatable {
-    static func == (lhs: Matchup, rhs: Matchup) -> Bool {
-        lhs.id == rhs.id
     }
 }
 
@@ -338,29 +254,6 @@ struct HomeEmptyStateView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .frame(minHeight: UIScreen.main.bounds.height - 200)
-    }
-}
-
-// ViewModel Extension
-extension HomeViewModel {
-    var isEmpty: Bool {
-        matchups.isEmpty && receivedInvites.isEmpty && sentInvites.isEmpty
-    }
-
-    var activeMatchups: [Matchup] {
-        matchups.filter { $0.status == .active }
-    }
-
-    var pendingMatchups: [Matchup] {
-        matchups.filter { $0.status == .pending }
-    }
-
-    var allInvites: [MatchupInvite] {
-        receivedInvites + sentInvites
-    }
-
-    var hasInvites: Bool {
-        !receivedInvites.isEmpty || !sentInvites.isEmpty
     }
 }
 
@@ -404,7 +297,7 @@ struct HomeHeader: View {
                 showMatchupCreation = true
             }
         }
-        .fullScreenCover(isPresented: $showMatchupCreation) {
+        .sheet(isPresented: $showMatchupCreation) {
             MatchupCategoriesView(
                 matchupService: matchupService,
                 friendService: friendService,
@@ -413,69 +306,9 @@ struct HomeHeader: View {
                 showCreationFlow: $showMatchupCreation
             )
         }
-        .onChange(of: showMatchupCreation) { _, isShowing in
-            if !isShowing {
-                // Refresh data when matchup creation is dismissed
-                Task {
-                    await viewModel.loadData()
-                }
-            }
-        }
     }
 }
 
-struct HomeSection<Content: View>: View {
-    let title: String
-    let emptyText: String
-    let content: Content
-    let isEmpty: Bool
-
-    init(
-        title: String,
-        emptyText: String,
-        isEmpty: Bool,
-        @ViewBuilder content: () -> Content
-    ) {
-        self.title = title
-        self.emptyText = emptyText
-        self.isEmpty = isEmpty
-        self.content = content()
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: VivaDesign.Spacing.small) {
-            HStack {
-                Text(title)
-                    .font(VivaDesign.Typography.header)
-                    .foregroundColor(VivaDesign.Colors.primaryText)
-                Spacer()
-            }
-
-            if isEmpty {
-                HStack {
-                    Text(emptyText)
-                        .foregroundColor(VivaDesign.Colors.secondaryText)
-                    Spacer()
-                }
-            } else {
-                content
-            }
-        }
-        .padding(.horizontal, VivaDesign.Spacing.medium)
-    }
-}
-
-#Preview {
-    let userSession = VivaAppObjects.dummyUserSession()
-    let vivaAppObjects = VivaAppObjects(userSession: userSession)
-
-    HomeView(
-        matchupService: MatchupService(
-            networkClient: NetworkClient(
-                settings: vivaAppObjects.appNetworkClientSettings)),
-        userSession: userSession,
-        friendService: vivaAppObjects.friendService,
-        userService: vivaAppObjects.userService,
-        healthKitDataManager: vivaAppObjects.healthKitDataManager
-    )
-}
+//#Preview {
+//    HomeView()
+//}

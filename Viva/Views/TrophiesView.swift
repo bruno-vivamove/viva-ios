@@ -157,7 +157,7 @@ struct TrophiesHeader: View {
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .font(VivaDesign.Typography.caption.bold())
                     .padding(.horizontal, VivaDesign.Spacing.small)
-                    .padding(.vertical, VivaDesign.Spacing.minimal)
+                    .padding(.vertical, VivaDesign.Spacing.xsmall)
                 Spacer()
             }
             
@@ -194,7 +194,7 @@ struct StatDisplay: View {
     let labelColor: Color
     
     var body: some View {
-        HStack(spacing: VivaDesign.Spacing.minimal) {
+        HStack(spacing: VivaDesign.Spacing.xsmall) {
             Image(systemName: icon)
                 .foregroundColor(iconColor)
             Text("\(value)")
@@ -227,7 +227,7 @@ struct HistoryCard: View {
                 .frame(maxWidth: .infinity, alignment: .center)
             
             // Opponent Info
-            VStack(alignment: .center, spacing: VivaDesign.Spacing.minimal) {
+            VStack(alignment: .center, spacing: VivaDesign.Spacing.xsmall) {
                 Text(history.opponent.displayName)
                     .font(VivaDesign.Typography.body)
                     .foregroundColor(VivaDesign.Colors.vivaGreen)

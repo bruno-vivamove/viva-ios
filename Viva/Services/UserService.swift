@@ -1,6 +1,7 @@
 import Foundation
+import SwiftUI
 
-final class UserService {
+final class UserService: ObservableObject {
     private let networkClient: NetworkClient<VivaErrorResponse>
 
     init(networkClient: NetworkClient<VivaErrorResponse>) {

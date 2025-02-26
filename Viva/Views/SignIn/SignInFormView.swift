@@ -22,7 +22,7 @@ class SignInViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            if (email.isEmpty || password.isEmpty) {
+            if (email.isEmpty && password.isEmpty) {
                 try await authManager.signIn(
                     email: "bruno@vivamove.com", password: "abc12345")
                 return true
@@ -121,7 +121,7 @@ struct SignInFormView: View {
                 }
             }
             .onAppear {
-                focusedField = .email
+//                focusedField = .email
             }
         }
     }

@@ -1,4 +1,6 @@
-final class FriendService {
+import SwiftUI
+
+final class FriendService: ObservableObject {
     private let networkClient: NetworkClient<VivaErrorResponse>
 
     init(networkClient: NetworkClient<VivaErrorResponse>) {

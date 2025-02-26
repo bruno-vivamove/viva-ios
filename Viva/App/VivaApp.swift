@@ -27,6 +27,11 @@ struct VivaApp: App {
             )
             .environmentObject(appState)
             .environmentObject(appState.userSession)
+            .environmentObject(vivaAppObjects.authenticationManager)
+            .environmentObject(vivaAppObjects.friendService)
+            .environmentObject(vivaAppObjects.matchupService)
+            .environmentObject(vivaAppObjects.userService)
+            .environmentObject(vivaAppObjects.healthKitDataManager)
         }
         .onChange(of: scenePhase) {
             if scenePhase == .active {

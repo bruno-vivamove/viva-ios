@@ -1,8 +1,10 @@
 import SwiftUI
 
 struct MatchupCard: View {
+    @EnvironmentObject var userSession: UserSession
+    @EnvironmentObject var matchupService: MatchupService
+
     let matchup: Matchup
-    let onCancel: (() -> Void)?
 
     var body: some View {
         VivaCard {
@@ -29,7 +31,6 @@ struct MatchupCard: View {
 
                     Spacer(minLength: 0)  // Push content to left edge
                 }
-                .frame(maxWidth: .infinity)
 
                 // Centered divider with fixed width container
                 HStack {
@@ -37,8 +38,7 @@ struct MatchupCard: View {
                         .foregroundColor(VivaDesign.Colors.secondaryText)
                         .font(VivaDesign.Typography.title3)
                 }
-                .frame(width: 20)  // Fixed width for divider container
-                .frame(maxHeight: .infinity)
+                .frame(width: 20)
 
                 // Right side container - aligned to right edge
                 HStack(spacing: VivaDesign.Spacing.small) {
@@ -62,20 +62,36 @@ struct MatchupCard: View {
                         isInvited: rightInvite != nil
                     )
                 }
-                .frame(maxWidth: .infinity)
             }
         }
         .background(Color.black)
-        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             if matchup.status == .pending {
-                Button(role: .destructive) {
-                    onCancel?()
-                } label: {
-                    Text("Cancel")
+                if matchup.ownerId == userSession.userId {
+                    Button(role: .destructive) {
+                        Task {
+                            _ = try await matchupService.cancelMatchup(
+                                matchupId: matchup.id)
+                        }
+                    } label: {
+                        Text("Cancel")
+                    }
+                    .tint(VivaDesign.Colors.destructive)
+                } else {
+                    Button(role: .destructive) {
+                        Task {
+                            _ = try await matchupService.removeMatchupUser(
+                                matchupId: matchup.id,
+                                userId: userSession.userId)
+                        }
+                    } label: {
+                        Text("Leave")
+                    }
+                    .tint(VivaDesign.Colors.warning)
                 }
-                .tint(VivaDesign.Colors.destructive)
             }
         }
+        .listRowBackground(Color.clear)
     }
 
     private func getUserDisplayName(user: User?, invite: MatchupInvite?)

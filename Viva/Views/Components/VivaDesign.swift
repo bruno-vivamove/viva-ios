@@ -15,6 +15,7 @@ enum VivaDesign {
         static let secondaryText = Color.gray
         static let error = Color.red
         static let divider = Color.white.opacity(0.6)
+        static let warning = Color.orange
         static let destructive = Color.red
     }
     
@@ -23,8 +24,8 @@ enum VivaDesign {
         static let large: CGFloat = 32
         static let medium: CGFloat = 20
         static let small: CGFloat = 12
-        static let minimal: CGFloat = 8
-        static let Xminimal: CGFloat = 2
+        static let xsmall: CGFloat = 8
+        static let minimal: CGFloat = 2
     }
     
     enum Sizing {

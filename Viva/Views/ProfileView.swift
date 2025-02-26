@@ -33,7 +33,7 @@ struct ProfileView: View {
                 userProfileService: userProfileService)
 
             // Menu Items
-            VStack(spacing: VivaDesign.Spacing.minimal) {
+            VStack(spacing: VivaDesign.Spacing.xsmall) {
                 ForEach(menuItems, id: \.title) { item in
                     MenuItemButton(item: item)
                 }
@@ -78,7 +78,7 @@ struct ProfileHeader: View {
             Spacer()
 
             // Profile Image and Name
-            VStack(spacing: VivaDesign.Spacing.minimal) {
+            VStack(spacing: VivaDesign.Spacing.xsmall) {
                 Button(action: {
                     Task {
                         let userProfile = try await userProfileService.getCurrentUserProfile()
@@ -107,7 +107,7 @@ struct ProfileHeader: View {
             }
 
             // Points Display
-            VStack(spacing: VivaDesign.Spacing.minimal) {
+            VStack(spacing: VivaDesign.Spacing.xsmall) {
                 Text("\(userSession.getUserProfile().rewardPoints)")
                     .font(VivaDesign.Typography.displayText(42))
                     .foregroundColor(VivaDesign.Colors.primaryText)

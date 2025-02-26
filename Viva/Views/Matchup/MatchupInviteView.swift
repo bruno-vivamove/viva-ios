@@ -9,21 +9,19 @@ struct MatchupInviteView: View {
     @FocusState private var isSearchFieldFocused: Bool
     let isInvitingFromDetails: Bool
     let preferredSide: MatchupUser.Side?
-    let matchupId: String
+    let matchup: MatchupDetails
     let usersPerSide: Int
-    let onInviteSent: (() -> Void)?
 
     init(
         matchupService: MatchupService,
         friendService: FriendService,
         userService: UserService,
         userSession: UserSession,
-        matchupId: String,
+        matchup: MatchupDetails,
         usersPerSide: Int,
         showCreationFlow: Binding<Bool>,
         isInvitingFromDetails: Bool = false,
-        preferredSide: MatchupUser.Side? = nil,
-        onInviteSent: (() -> Void)? = nil
+        preferredSide: MatchupUser.Side? = nil
     ) {
         self._coordinator = StateObject(
             wrappedValue: MatchupInviteCoordinator(
@@ -32,12 +30,11 @@ struct MatchupInviteView: View {
                 userService: userService
             )
         )
-        self.matchupId = matchupId
+        self.matchup = matchup
         self.usersPerSide = usersPerSide
         self._showCreationFlow = showCreationFlow
         self.isInvitingFromDetails = isInvitingFromDetails
         self.preferredSide = preferredSide
-        self.onInviteSent = onInviteSent
     }
 
     var body: some View {
@@ -75,34 +72,13 @@ struct MatchupInviteView: View {
                                             MatchupInviteCard(
                                                 coordinator: coordinator,
                                                 user: user,
-                                                usersPerSide: usersPerSide,
-                                                onInvite: { side in
-                                                    Task {
-                                                        await coordinator.inviteFriend(
-                                                            userId: user.id,
-                                                            matchupId: matchupId,
-                                                            side: side ?? preferredSide
-                                                        )
-                                                        await MainActor.run {
-                                                            onInviteSent?()
-                                                        }
-                                                    }
-                                                },
-                                                onCancel: {
-                                                    Task {
-                                                        await coordinator.deleteInvite(
-                                                            userId: user.id,
-                                                            matchupId: matchupId
-                                                        )
-                                                    }
-                                                }
+                                                matchup: matchup
                                             )
                                             .padding(.horizontal)
                                         }
                                     }
                                 }
                             } header: {
-                                // Search bar (sticks to top)
                                 searchBar
                                     .background(Color.black)
                             }
@@ -125,26 +101,18 @@ struct MatchupInviteView: View {
         }
         .navigationBarBackButtonHidden(true)
         .task {
-            await coordinator.loadData(matchupId: matchupId)
+            await coordinator.loadData(matchupId: matchup.id)
             if let side = preferredSide {
                 coordinator.setPreferredSide(side)
             }
         }
-        .onChange(of: coordinator.searchResults) { oldValue, newValue in
-            if !newValue.isEmpty {
-                withAnimation(.easeOut) {
-                    showHeader = false
-                }
+        .onChange(of: isSearchFieldFocused) { oldValue, newValue in
+            withAnimation(.easeOut) {
+                showHeader = false
             }
         }
         .onDisappear {
             coordinator.cleanup()
-            if !isInvitingFromDetails {
-                NotificationCenter.default.post(
-                    name: .matchupCreated,
-                    object: matchupId
-                )
-            }
         }
     }
     

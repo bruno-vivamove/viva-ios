@@ -84,7 +84,7 @@ class MatchupInviteCoordinator: ObservableObject {
         do {
             // Convert the side enum to string for the API
             let sideString = side == .left ? "L" : "R"
-            let _ = try await matchupService.createInvite(
+            let matchupInvite = try await matchupService.createInvite(
                 matchupId: matchupId,
                 side: sideString,
                 userId: userId
@@ -100,11 +100,8 @@ class MatchupInviteCoordinator: ObservableObject {
             // First get all invites to find the invite code for this user
             let invites = try await matchupService.getMatchupInvites(
                 matchupId: matchupId)
-            if let invite = invites.first(where: { $0.user?.id == userId }) {
-                try await matchupService.deleteInvite(
-                    matchupId: matchupId,
-                    inviteCode: invite.inviteCode
-                )
+            if let matchupInvite = invites.first(where: { $0.user?.id == userId }) {
+                try await matchupService.deleteInvite(matchupInvite)
                 invitedFriends.remove(userId)
             }
         } catch {

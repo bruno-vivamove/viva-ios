@@ -1,6 +1,6 @@
 import Foundation
 
-final class MatchupService {
+final class MatchupService: ObservableObject {
     private let networkClient: NetworkClient<VivaErrorResponse>
     
     init(networkClient: NetworkClient<VivaErrorResponse>) {
@@ -16,29 +16,50 @@ final class MatchupService {
         return response.matchups
     }
     
-    func createMatchup(_ matchup: MatchupRequest) async throws -> MatchupDetails {
-        return try await networkClient.post(
-            path: "/viva/matchups",
-            body: matchup
-        )
-    }
-    
     func getMatchup(matchupId: String) async throws -> MatchupDetails {
         return try await networkClient.get(
             path: "/viva/matchups/\(matchupId)"
         )
     }
     
+    func createMatchup(_ matchup: MatchupRequest) async throws -> MatchupDetails {
+        let matchupDetails: MatchupDetails = try await networkClient.post(
+            path: "/viva/matchups",
+            body: matchup
+        )
+        
+        NotificationCenter.default.post(
+            name: .matchupCreated,
+            object: matchupDetails
+        )
+
+        return matchupDetails
+    }
+    
     func startMatchup(matchupId: String) async throws -> Matchup {
-        return try await networkClient.put(
+        let matchup: Matchup = try await networkClient.put(
             path: "/viva/matchups/\(matchupId)/start"
         )
+
+        NotificationCenter.default.post(
+            name: .matchupStarted,
+            object: matchup
+        )
+
+        return matchup
     }
     
     func cancelMatchup(matchupId: String) async throws -> Matchup {
-        return try await networkClient.put(
+        let matchup: Matchup = try await networkClient.put(
             path: "/viva/matchups/\(matchupId)/cancel"
         )
+        
+        NotificationCenter.default.post(
+            name: .matchupCanceled,
+            object: matchup
+        )
+
+        return matchup
     }
     
     // MARK: - Matchup Users
@@ -46,6 +67,11 @@ final class MatchupService {
     func removeMatchupUser(matchupId: String, userId: String) async throws {
         try await networkClient.delete(
             path: "/viva/matchups/\(matchupId)/users/\(userId)"
+        )
+
+        NotificationCenter.default.post(
+            name: .matchupUserRemoved,
+            object: matchupId
         )
     }
     
@@ -73,24 +99,41 @@ final class MatchupService {
     }
     
     func createInvite(matchupId: String, side: String, userId: String) async throws -> MatchupInvite {
-        return try await networkClient.post(
+        let matchupInvite: MatchupInvite = try await networkClient.post(
             path: "/viva/matchups/\(matchupId)/invites",
             queryParams: [
                 "side": side,
                 "userId": userId
             ]
         )
+        
+        NotificationCenter.default.post(
+            name: .matchupInviteSent,
+            object: matchupInvite
+        )
+        
+        return matchupInvite
     }
     
-    func deleteInvite(matchupId: String, inviteCode: String) async throws {
+    func deleteInvite(_ matchupInvite: MatchupInvite) async throws {
         try await networkClient.delete(
-            path: "/viva/matchups/\(matchupId)/invites/\(inviteCode)"
+            path: "/viva/matchups/\(matchupInvite.matchupId)/invites/\(matchupInvite.inviteCode)"
+        )
+        
+        NotificationCenter.default.post(
+            name: .matchupInviteDeleted,
+            object: matchupInvite
         )
     }
     
     func acceptInvite(inviteCode: String) async throws {
         try await networkClient.put(
             path: "/viva/matchups/invites/\(inviteCode)/accept"
+        )
+        
+        NotificationCenter.default.post(
+            name: .matchupInviteAccepted,
+            object: inviteCode
         )
     }
     
