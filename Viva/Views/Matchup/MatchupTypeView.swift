@@ -100,6 +100,12 @@ struct MatchupTypeView: View {
                 if coordinator.challengedUser != nil {
                     // If there's a challenged user, close the flow and notify
                     showCreationFlow = false
+                    if let matchupCreated = self.matchupCreated {
+                        NotificationCenter.default.post(
+                            name: .friendScreenMatchupCreationCompleted,
+                            object: matchupCreated
+                        )
+                    }
                 } else {
                     // Otherwise, show the invite view
                     navigateToInvite = true

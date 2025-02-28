@@ -566,7 +566,3 @@ struct RecordDisplay: View {
         .foregroundColor(VivaDesign.Colors.primaryText)
     }
 }
-
-#Preview {
-    EmptyView()
-}

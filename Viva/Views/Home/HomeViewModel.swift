@@ -104,6 +104,19 @@ class HomeViewModel: ObservableObject {
                 }
             }
         }
+
+        // Matchup invite accepted observer
+        NotificationCenter.default.addObserver(
+            forName: .homeScreenMatchupCreationCompleted,
+            object: nil,
+            queue: .main
+        ) { notification in
+            if let matchupDetails = notification.object as? MatchupDetails {
+                Task { @MainActor in
+                    self.selectedMatchup = matchupDetails.asMatchup
+                }
+            }
+        }
     }
 
     deinit {
@@ -117,6 +130,10 @@ class HomeViewModel: ObservableObject {
             self, name: .matchupInviteSent, object: nil)
         NotificationCenter.default.removeObserver(
             self, name: .matchupInviteDeleted, object: nil)
+        NotificationCenter.default.removeObserver(
+            self, name: .matchupInviteAccepted, object: nil)
+        NotificationCenter.default.removeObserver(
+            self, name: .homeScreenMatchupCreationCompleted, object: nil)
     }
 
     private func addNotificationObservers() {
@@ -161,7 +178,6 @@ class HomeViewModel: ObservableObject {
 
     func handleMatchCreated(_ matchup: Matchup) {
         matchups.insert(matchup, at: 0)
-        self.selectedMatchup = matchup
     }
 
     func handleMatchupCanceled(_ matchup: Matchup) {

@@ -113,6 +113,10 @@ struct MatchupInviteView: View {
         }
         .onDisappear {
             coordinator.cleanup()
+            NotificationCenter.default.post(
+                name: .homeScreenMatchupCreationCompleted,
+                object: self.matchup
+            )
         }
     }
     

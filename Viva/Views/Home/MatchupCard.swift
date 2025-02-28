@@ -25,7 +25,7 @@ struct MatchupCard: View {
                     LabeledValueStack(
                         label: getUserDisplayName(
                             user: user, invite: leftInvite),
-                        value: "\(0)",
+                        value: "\(matchup.leftSidePoints)",
                         alignment: .leading
                     )
 
@@ -52,7 +52,7 @@ struct MatchupCard: View {
                     LabeledValueStack(
                         label: getUserDisplayName(
                             user: user, invite: rightInvite),
-                        value: "\(0)",
+                        value: "\(matchup.rightSidePoints)",
                         alignment: .trailing
                     )
 

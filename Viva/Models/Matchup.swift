@@ -27,6 +27,8 @@ struct Matchup: Codable, Identifiable {
     let endTime: Date?
     let usersPerSide: Int
     let lengthInDays: Int
+    let leftSidePoints: Int
+    let rightSidePoints: Int
     let leftUsers: [User]
     let rightUsers: [User]
     var invites: [MatchupInvite]
@@ -43,6 +45,8 @@ struct MatchupDetails: Codable {
     let endTime: Date?
     let usersPerSide: Int
     let lengthInDays: Int
+    let leftSidePoints: Int
+    let rightSidePoints: Int
     let leftUsers: [User]
     let rightUsers: [User]
 
@@ -81,6 +85,8 @@ struct MatchupDetails: Codable {
             endTime: endTime,
             usersPerSide: usersPerSide,
             lengthInDays: lengthInDays,
+            leftSidePoints: leftSidePoints,
+            rightSidePoints: rightSidePoints,
             leftUsers: leftUsers,
             rightUsers: rightUsers,
             invites: invites

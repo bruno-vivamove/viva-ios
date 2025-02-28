@@ -129,8 +129,3 @@ struct MatchupCategoriesView: View {
         }
     }
 }
-
-// Preview
-#Preview {
-    EmptyView()
-}

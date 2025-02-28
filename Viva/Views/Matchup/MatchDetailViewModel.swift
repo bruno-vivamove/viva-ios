@@ -36,6 +36,41 @@ class MatchupDetailViewModel: ObservableObject {
         self.userSession = userSession
         self.matchupId = matchupId
         self.healthKitDataManager = healthKitDataManager
+
+        // Matchup created observer
+        NotificationCenter.default.addObserver(
+            forName: .matchupInviteSent,
+            object: nil,
+            queue: .main
+        ) { notification in
+            if let matchupInvite = notification.object as? MatchupInvite {
+                Task { @MainActor in
+                    if matchupInvite.matchupId == matchupId {
+                        self.matchup?.invites.append(matchupInvite)
+                    }
+                }
+            }
+        }
+
+        // Matchup invite deleted observer
+        NotificationCenter.default.addObserver(
+            forName: .matchupInviteDeleted,
+            object: nil,
+            queue: .main
+        ) { notification in
+            if let matchupInvite = notification.object as? MatchupInvite {
+                Task { @MainActor in
+                    self.matchup?.invites.removeAll(where: {
+                        $0.inviteCode == matchupInvite.inviteCode
+                    })
+                }
+            }
+        }
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(
+            self, name: .matchupInviteSent, object: nil)
     }
 
     func loadData() async {
@@ -225,7 +260,9 @@ class MatchupDetailViewModel: ObservableObject {
             // Update the local state instead of reloading everything
             if var updatedMatchup = self.matchup {
                 // Remove the invite from the list
-                updatedMatchup.invites.removeAll { $0.inviteCode == matchupInvite.inviteCode }
+                updatedMatchup.invites.removeAll {
+                    $0.inviteCode == matchupInvite.inviteCode
+                }
                 self.matchup = updatedMatchup
             }
         } catch {

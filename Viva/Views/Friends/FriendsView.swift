@@ -226,7 +226,7 @@ struct FriendsView: View {
 
             // Observe matchup creation notifications
             NotificationCenter.default.addObserver(
-                forName: .matchupCreated,
+                forName: .friendScreenMatchupCreationCompleted,
                 object: nil,
                 queue: .main
             ) { notification in
@@ -331,17 +331,4 @@ struct FriendsEmptyStateView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .frame(minHeight: UIScreen.main.bounds.height - 200)
     }
-}
-
-#Preview {
-    let userSession = VivaAppObjects.dummyUserSession()
-    let vivaAppObjects = VivaAppObjects(userSession: userSession)
-
-    return FriendsView(
-        matchupService: vivaAppObjects.matchupService,
-        friendService: vivaAppObjects.friendService,
-        userService: vivaAppObjects.userService,
-        healthKitDataManager: vivaAppObjects.healthKitDataManager,
-        userSession: userSession
-    )
 }

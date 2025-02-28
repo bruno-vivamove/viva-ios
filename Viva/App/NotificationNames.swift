@@ -14,4 +14,8 @@ extension Notification.Name {
     static let matchupInviteAccepted = Notification.Name("matchupInviteAccepted")
 
     static let friendRequestSent = Notification.Name("friendRequestSent")
+    
+    
+    static let homeScreenMatchupCreationCompleted = Notification.Name("homeScreenMatchupCreationCompleted")
+    static let friendScreenMatchupCreationCompleted = Notification.Name("friendScreenMatchupCreationCompleted")
 }
