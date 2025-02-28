@@ -6,7 +6,11 @@ struct MatchupInviteCard: View {
     let matchup: MatchupDetails
 
     private var isInvited: Bool {
-        coordinator.invitedFriends.contains(user.id)
+        if let matchup = coordinator.matchup {
+            return matchup.invites.contains(where: {$0.user?.id == user.id})
+        }
+        
+        return false
     }
 
     private var canJoinLeftTeam: Bool {
@@ -40,17 +44,10 @@ struct MatchupInviteCard: View {
             // No positions state
             UserActionCard(
                 user: user,
-                actions: [
-                    UserActionCard.UserAction(
-                        title: "No Open Positions",
-                        variant: .secondary
-                    ) {
-                        // No action, just showing status
-                    }
-                ] + (user.friendStatus == .notFriend ? [
+                actions: (user.friendStatus == .notFriend ? [
                     UserActionCard.UserAction(
                         title: "Add Friend",
-                        variant: .primary
+                        variant: .secondary
                     ) {
                         Task {
                             await coordinator.sendFriendRequest(userId: user.id)
@@ -114,8 +111,4 @@ struct MatchupInviteCard: View {
             )
         }
     }
-}
-
-#Preview {
-    EmptyView()
 }

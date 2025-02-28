@@ -37,6 +37,7 @@ struct CardButton: View {
                         lineWidth: VivaDesign.Sizing.borderWidth
                     )
                 )
+                .lineLimit(1)
         }
     }
 }

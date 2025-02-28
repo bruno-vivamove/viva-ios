@@ -9,15 +9,11 @@ class MatchupInviteCoordinator: ObservableObject {
 
     @Published var searchResults: [User] = []
     @Published var friends: [User] = []
-    @Published var invitedFriends: Set<String> = []
     @Published var searchQuery: String?
     @Published var isLoading = false
     @Published var error: String?
     @Published var preferredSide: MatchupUser.Side?
-
-    private var leftSideUsers: Int = 0
-    private var rightSideUsers: Int = 0
-    private var usersPerSide: Int = 1
+    @Published var matchup: MatchupDetails?
 
     init(
         matchupService: MatchupService,
@@ -35,14 +31,7 @@ class MatchupInviteCoordinator: ObservableObject {
 
         do {
             // Load matchup data
-            let matchup = try await matchupService.getMatchup(
-                matchupId: matchupId)
-            leftSideUsers = matchup.leftUsers.count
-            rightSideUsers = matchup.rightUsers.count
-            usersPerSide = matchup.usersPerSide
-            invitedFriends = Set(matchup.invites.compactMap { $0.user?.id })
-
-            // Load friends list
+            matchup = try await matchupService.getMatchup(matchupId: matchupId)
             friends = try await friendService.getFriends()
 
         } catch {
@@ -89,7 +78,7 @@ class MatchupInviteCoordinator: ObservableObject {
                 side: sideString,
                 userId: userId
             )
-            invitedFriends.insert(userId)
+            matchup?.invites.append(matchupInvite)
         } catch {
             self.error = "Failed to invite user. Please try again."
         }
@@ -97,12 +86,11 @@ class MatchupInviteCoordinator: ObservableObject {
 
     func deleteInvite(userId: String, matchupId: String) async {
         do {
-            // First get all invites to find the invite code for this user
-            let invites = try await matchupService.getMatchupInvites(
-                matchupId: matchupId)
-            if let matchupInvite = invites.first(where: { $0.user?.id == userId }) {
+            if let matchupInvite = matchup?.invites.first(where: {
+                $0.user?.id == userId && $0.matchupId == matchupId
+            }) {
                 try await matchupService.deleteInvite(matchupInvite)
-                invitedFriends.remove(userId)
+                matchup?.invites.removeAll(where: {$0.inviteCode == matchupInvite.inviteCode})
             }
         } catch {
             self.error = "Failed to delete invite. Please try again."
@@ -110,11 +98,17 @@ class MatchupInviteCoordinator: ObservableObject {
     }
 
     func hasOpenPosition(side: MatchupUser.Side) -> Bool {
+        let usersPerSide = matchup?.usersPerSide ?? 0
+        
         switch side {
         case .left:
-            return leftSideUsers < usersPerSide
+            let leftUserCount = matchup?.leftUsers.count ?? 0
+            let leftInviteCount = matchup?.invites.filter({$0.side == .left}).count ?? 0
+            return leftUserCount + leftInviteCount < usersPerSide
         case .right:
-            return rightSideUsers < usersPerSide
+            let rightUserCount = matchup?.rightUsers.count ?? 0
+            let rightInviteCount = matchup?.invites.filter({$0.side == .right}).count ?? 0
+            return rightUserCount + rightInviteCount < usersPerSide
         }
     }
 
@@ -173,6 +167,15 @@ class MatchupInviteCoordinator: ObservableObject {
         }
     }
 
+    var usersToDisplay: [User] {
+        let invitedUsers = matchup?.invites.compactMap({$0.user}) ?? []
+        let unfilteredUsers = searchQuery?.isEmpty ?? true ? friends : searchResults        
+        let nonInvitedUsers = unfilteredUsers.filter { user in
+            !invitedUsers.contains(where: { $0.id == user.id })
+        }
+        
+        return invitedUsers + nonInvitedUsers
+    }
     func cleanup() {
         searchDebouncer.cancel()
     }

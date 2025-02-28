@@ -3,12 +3,12 @@ import SwiftUI
 struct FriendRequestCard: View {
     @ObservedObject private var viewModel: FriendsViewModel
     let user: User
-    let buttonWidth: CGFloat
+    let buttonWidth: CGFloat?
     
     @State private var showMatchupCreation = false
     @State private var selectedMatchup: Matchup?
 
-    init(viewModel: FriendsViewModel, user: User, buttonWidth: CGFloat = 120) {
+    init(viewModel: FriendsViewModel, user: User, buttonWidth: CGFloat? = nil) {
         self.viewModel = viewModel
         self.user = user
         self.buttonWidth = buttonWidth
@@ -31,7 +31,7 @@ struct FriendRequestCard: View {
             
         case .requestSent:
             UserActionCard.UserAction(
-                title: "Cancel Request",
+                title: "Cancel",
                 width: buttonWidth,
                 variant: .secondary
             ) {

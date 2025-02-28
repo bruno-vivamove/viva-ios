@@ -13,10 +13,7 @@ struct FriendCard: View {
         UserActionCard(
             user: user,
             actions: [
-                UserActionCard.UserAction(
-                    title: "Challenge",
-                    width: 100
-                ) {
+                UserActionCard.UserAction(title: "Challenge") {
                     showMatchupCreation = true
                 }
             ]

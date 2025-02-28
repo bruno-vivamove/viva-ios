@@ -14,7 +14,7 @@ struct UserActionCard: View {
     
     struct UserAction {
         let title: String
-        let action: () -> Void
+        let action: (() -> Void)?
         let style: Style
         let width: CGFloat?
         
@@ -22,7 +22,7 @@ struct UserActionCard: View {
             title: String,
             width: CGFloat? = nil,
             variant: Style = .primary,
-            action: @escaping () -> Void
+            action: (() -> Void)? = nil
         ) {
             self.title = title
             self.width = width
@@ -67,13 +67,14 @@ struct UserActionCard: View {
                                 width: action.width,
                                 color: color
                             ) {
-                                action.action()
+                                action.action?()
                             }
 
                         case .noAction:
-                            Text("Already Friends")
+                            Text(action.title)
                                 .foregroundColor(color)
                                 .font(VivaDesign.Typography.caption)
+                                .lineLimit(1)
                         }
                     }
                 }

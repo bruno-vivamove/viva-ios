@@ -63,12 +63,10 @@ struct MatchupInviteView: View {
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 40)
                                 } else {
-                                    let usersToDisplay = !searchText.isEmpty ? coordinator.searchResults : coordinator.friends
-                                    
-                                    if usersToDisplay.isEmpty {
+                                    if coordinator.usersToDisplay.isEmpty {
                                         InviteEmptyStateView(showingSearchResults: !searchText.isEmpty)
                                     } else {
-                                        ForEach(usersToDisplay) { user in
+                                        ForEach(coordinator.usersToDisplay) { user in
                                             MatchupInviteCard(
                                                 coordinator: coordinator,
                                                 user: user,

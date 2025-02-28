@@ -252,6 +252,12 @@ class MatchupDetailViewModel: ObservableObject {
         }
     }
 
+    func deleteInvite(inviteCode: String) async {
+        if let matchupInvite = matchup?.invites.first(where: {$0.inviteCode == inviteCode}) {
+            await deleteInvite(matchupInvite)
+        }
+    }
+
     func deleteInvite(_ matchupInvite: MatchupInvite) async {
         do {
             // Delete the invite
