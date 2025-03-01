@@ -51,7 +51,7 @@ struct MainView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
                 .tabItem {
-                    Image(systemName: "person.2.fill")
+                    Image(systemName: "dollarsign.circle.fill")
                     Text("Rewards")
                 }
 
@@ -96,19 +96,4 @@ struct MainView: View {
             healthKitDataManager.requestAuthorization()
         }
     }
-}
-
-#Preview {
-    let userSession = VivaAppObjects.dummyUserSession()
-    let vivaAppObjects = VivaAppObjects(userSession: userSession)
-
-    MainView(
-        userSession: userSession,
-        authenticationManager: vivaAppObjects.authenticationManager,
-        userProfileService: vivaAppObjects.userProfileService,
-        friendService: vivaAppObjects.friendService,
-        matchupService: vivaAppObjects.matchupService,
-        userService: vivaAppObjects.userService,
-        healthKitDataManager: vivaAppObjects.healthKitDataManager
-    )
 }

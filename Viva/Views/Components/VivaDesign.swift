@@ -9,7 +9,7 @@ import SwiftUI
 
 enum VivaDesign {
     enum Colors {
-        static let vivaGreen = Color(red: 4/255, green: 255/255, blue: 191/255)
+        static let vivaGreen = Color(red: 0/255, green: 255/255, blue: 190/255)
         static let background = Color.black
         static let primaryText = Color.white
         static let secondaryText = Color.gray
