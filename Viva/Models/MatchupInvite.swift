@@ -1,6 +1,6 @@
 import Foundation
 
-struct MatchupInvite: Codable {
+struct MatchupInvite: Codable, Equatable {
     let inviteCode: String
     let matchupId: String
     let user: User?  // Optional since it can be null for open invites

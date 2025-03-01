@@ -140,14 +140,19 @@ final class MatchupService: ObservableObject {
     // MARK: - User Measurements
     
     // Updated method to match backend implementation
-    func saveUserMeasurements(matchupId: String, measurements: [MatchupUserMeasurement]) async throws -> [MatchupUserMeasurement] {
+    func saveUserMeasurements(matchupId: String, measurements: [MatchupUserMeasurement]) async throws -> MatchupDetails {
         let request = MatchupUserMeasurements(matchupUserMeasurements: measurements)
         
-        let response: MatchupUserMeasurements = try await networkClient.put(
+        let matchupDetails: MatchupDetails = try await networkClient.put(
             path: "/viva/matchups/\(matchupId)/user-measurements",
             body: request
         )
         
-        return response.matchupUserMeasurements
+        NotificationCenter.default.post(
+            name: .matchupUpdated,
+            object: matchupDetails
+        )
+        
+        return matchupDetails
     }
 }

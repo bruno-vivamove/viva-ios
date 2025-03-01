@@ -81,7 +81,7 @@ class MatchupDetailViewModel: ObservableObject {
             let matchup: MatchupDetails = try await matchupService.getMatchup(
                 matchupId: matchupId)
             self.matchup = matchup
-            self.updateMeasuerments(matchup.userMeasurements)
+            self.updateMeasuerments(matchup: matchup)
 
             if matchup.status == .active {
                 healthKitDataManager.updateMatchupData(matchupDetail: matchup) {
@@ -99,14 +99,14 @@ class MatchupDetailViewModel: ObservableObject {
 
                         do {
                             // Send all measurements in a single call
-                            let savedUserMeasurements =
+                            let savedMatchupDetails =
                                 try await self.matchupService
                                 .saveUserMeasurements(
                                     matchupId: self.matchupId,
                                     measurements: userMeasurements
                                 )
 
-                            self.updateMeasuerments(savedUserMeasurements)
+                            self.updateMeasuerments(matchup: savedMatchupDetails)
                         } catch {
                             print("Failed to save measurements: \(error)")
                         }
@@ -120,12 +120,8 @@ class MatchupDetailViewModel: ObservableObject {
         isLoading = false
     }
 
-    func updateMeasuerments(_ updatedUserMeasuerments: [MatchupUserMeasurement])
+    func updateMeasuerments(matchup: MatchupDetails)
     {
-        guard let matchup = self.matchup else {
-            return
-        }
-        
         // Create set of left user IDs first
         let leftUserIds = Set(matchup.leftUsers.map { $0.id })
 
@@ -152,7 +148,7 @@ class MatchupDetailViewModel: ObservableObject {
         // Process measurements
         let (
             totalPointsLeft, totalPointsRight, updatedPairs, updatedDailyPairs
-        ) = updatedUserMeasuerments.reduce(
+        ) = matchup.userMeasurements.reduce(
             (0, 0, totalMatchupMeasurementPairs, matchupMeasurementPairsByDay)
         ) { accumulator, measurement in
             var (leftPoints, rightPoints, pairs, dailyPairs) = accumulator
@@ -185,15 +181,7 @@ class MatchupDetailViewModel: ObservableObject {
         }
 
         // Update the view model
-        self.matchup?.userMeasurements = updatedUserMeasuerments
-        self.matchup?.leftSidePoints = totalPointsLeft
-        self.matchup?.rightSidePoints = totalPointsRight
-        NotificationCenter.default.post(
-            name: .matchupUpdated,
-            object: self.matchup!
-        )
-
-        
+        self.matchup = matchup
         self.totalMatchupMeasurementPairs = updatedPairs
         self.matchupMeasurementPairsByDay = updatedDailyPairs
     }

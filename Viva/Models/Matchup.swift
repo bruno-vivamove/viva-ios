@@ -16,7 +16,7 @@ struct MatchupsResponse: Codable {
     let matchups: [Matchup]
 }
 
-struct Matchup: Codable, Identifiable {
+struct Matchup: Codable, Identifiable, Equatable {
     let id: String
     let matchupHash: String?
     let displayName: String
@@ -34,7 +34,7 @@ struct Matchup: Codable, Identifiable {
     var invites: [MatchupInvite]
 }
 
-struct MatchupDetails: Codable {
+struct MatchupDetails: Codable, Equatable {
     let id: String
     let matchupHash: String?
     let displayName: String
@@ -117,7 +117,7 @@ struct MatchupUser: Codable {
     }
 }
 
-struct MatchupMeasurement: Codable {
+struct MatchupMeasurement: Codable, Equatable {
     let matchupId: String
     let measurementType: MeasurementType
     let displayOrder: Int
@@ -143,7 +143,7 @@ enum MeasurementType: String, Codable {
     case standing = "STANDING"
 }
 
-struct MatchupUserMeasurement: Codable {
+struct MatchupUserMeasurement: Codable, Equatable {
     let matchupId: String
     let dayNumber: Int
     let measurementType: MeasurementType
@@ -157,7 +157,7 @@ struct MatchupUserMeasurements: Codable {
     let matchupUserMeasurements: [MatchupUserMeasurement]
 }
 
-struct MatchupMeasurementPair: Codable {
+struct MatchupMeasurementPair: Codable, Equatable {
     let measurementType: MeasurementType
     var leftValue: Int
     var leftPoints: Int
