@@ -53,7 +53,7 @@ struct HomeView: View {
             .padding(VivaDesign.Spacing.medium)
             .padding(.bottom, 0)
 
-            if viewModel.isLoading {
+            if viewModel.isLoading && viewModel.isEmpty {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if viewModel.isEmpty {

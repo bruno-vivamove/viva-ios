@@ -13,7 +13,7 @@ class HomeViewModel: ObservableObject {
     @Published var error: Error?
     @Published var selectedMatchup: Matchup?
 
-    private var hasLoadedInitialData = false
+    private var dataRefreshedTime: Date? = nil
 
     init(
         userSession: UserSession,
@@ -136,13 +136,13 @@ class HomeViewModel: ObservableObject {
             self, name: .homeScreenMatchupCreationCompleted, object: nil)
     }
 
-    private func addNotificationObservers() {
-    }
-
     func loadInitialDataIfNeeded() async {
-        guard !hasLoadedInitialData else { return }
-        await loadData()
-        hasLoadedInitialData = true
+        // Only load data if it hasn't been refreshed in the last 10 minutes
+        if dataRefreshedTime == nil
+            || Date().timeIntervalSince(dataRefreshedTime!) > 600
+        {
+            await loadData()
+        }
     }
 
     func loadData() async {
@@ -165,6 +165,8 @@ class HomeViewModel: ObservableObject {
             self.matchups = fetchedMatchups
             self.receivedInvites = fetchedReceivedInvites
             self.sentInvites = fetchedSentInvites
+
+            self.dataRefreshedTime = Date()
         } catch {
             self.error = error
         }

@@ -14,7 +14,7 @@ struct FriendsView: View {
         bottom: VivaDesign.Spacing.small,
         trailing: VivaDesign.Spacing.medium
     )
-    
+
     @StateObject private var viewModel: FriendsViewModel
     @State private var searchText = ""
     @State private var hasLoaded = false
@@ -48,14 +48,14 @@ struct FriendsView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Search Header
-            FriendsHeader(searchText: $searchText, viewModel: viewModel, isSearchFieldFocused: _isSearchFieldFocused)
-                .padding(VivaDesign.Spacing.medium)
-                .padding(.bottom, 0)
+            FriendsHeader(
+                searchText: $searchText, viewModel: viewModel,
+                isSearchFieldFocused: _isSearchFieldFocused
+            )
+            .padding(VivaDesign.Spacing.medium)
+            .padding(.bottom, 0)
 
-            if viewModel.isLoading {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if viewModel.isSearchMode {
+            if viewModel.isSearchMode {
                 // SEARCH RESULTS MODE
                 if viewModel.searchResults.isEmpty {
                     // Empty search results - use similar layout to HomeEmptyStateView
@@ -66,9 +66,11 @@ struct FriendsView: View {
                     List {
                         Section {
                             ForEach(viewModel.searchResults) { user in
-                                FriendRequestCard(viewModel: viewModel, user: user)
-                                    .listRowSeparator(.hidden)
-                                    .listRowInsets(rowInsets)
+                                FriendRequestCard(
+                                    viewModel: viewModel, user: user
+                                )
+                                .listRowSeparator(.hidden)
+                                .listRowInsets(rowInsets)
                             }
                         } header: {
                             HStack {
@@ -86,7 +88,15 @@ struct FriendsView: View {
                 }
             } else {
                 // FRIENDS LIST MODE
-                if viewModel.friends.isEmpty && viewModel.friendInvites.isEmpty && viewModel.sentInvites.isEmpty {
+                let isViewEmpty =
+                    viewModel.friends.isEmpty
+                    && viewModel.friendInvites.isEmpty
+                    && viewModel.sentInvites.isEmpty
+
+                if viewModel.isLoading && isViewEmpty {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if isViewEmpty {
                     // Empty friends state - use similar layout to HomeEmptyStateView
                     FriendsEmptyStateView()
                         .padding(VivaDesign.Spacing.medium)
@@ -96,18 +106,23 @@ struct FriendsView: View {
                         if !viewModel.friendInvites.isEmpty {
                             Section {
                                 ForEach(viewModel.friendInvites) { user in
-                                    FriendRequestCard(viewModel: viewModel, user: user)
-                                        .listRowSeparator(.hidden)
-                                        .listRowInsets(rowInsets)
+                                    FriendRequestCard(
+                                        viewModel: viewModel, user: user
+                                    )
+                                    .listRowSeparator(.hidden)
+                                    .listRowInsets(rowInsets)
                                 }
                             } header: {
                                 HStack {
                                     Text("Requests Received")
                                         .font(VivaDesign.Typography.header)
                                         .foregroundColor(.white)
-                                    Text("(\(viewModel.friendInvites.count))")
-                                        .font(VivaDesign.Typography.caption)
-                                        .foregroundColor(VivaDesign.Colors.secondaryText)
+                                    Text(
+                                        "(\(viewModel.friendInvites.count))"
+                                    )
+                                    .font(VivaDesign.Typography.caption)
+                                    .foregroundColor(
+                                        VivaDesign.Colors.secondaryText)
                                     Spacer()
                                 }
                                 .background(Color.black)
@@ -119,9 +134,11 @@ struct FriendsView: View {
                         if !viewModel.sentInvites.isEmpty {
                             Section {
                                 ForEach(viewModel.sentInvites) { user in
-                                    FriendRequestCard(viewModel: viewModel, user: user)
-                                        .listRowSeparator(.hidden)
-                                        .listRowInsets(rowInsets)
+                                    FriendRequestCard(
+                                        viewModel: viewModel, user: user
+                                    )
+                                    .listRowSeparator(.hidden)
+                                    .listRowInsets(rowInsets)
                                 }
                             } header: {
                                 HStack {
@@ -130,7 +147,8 @@ struct FriendsView: View {
                                         .foregroundColor(.white)
                                     Text("(\(viewModel.sentInvites.count))")
                                         .font(VivaDesign.Typography.caption)
-                                        .foregroundColor(VivaDesign.Colors.secondaryText)
+                                        .foregroundColor(
+                                            VivaDesign.Colors.secondaryText)
                                     Spacer()
                                 }
                                 .background(Color.black)
@@ -147,10 +165,12 @@ struct FriendsView: View {
                                         matchupService: matchupService,
                                         friendService: friendService,
                                         userService: userService,
-                                        healthKitDataManager: healthKitDataManager,
-                                        userSession: viewModel.userSession)
-                                        .listRowSeparator(.hidden)
-                                        .listRowInsets(rowInsets)
+                                        healthKitDataManager:
+                                            healthKitDataManager,
+                                        userSession: viewModel.userSession
+                                    )
+                                    .listRowSeparator(.hidden)
+                                    .listRowInsets(rowInsets)
                                 }
                             } header: {
                                 HStack {
@@ -159,7 +179,8 @@ struct FriendsView: View {
                                         .foregroundColor(.white)
                                     Text("(\(viewModel.friends.count))")
                                         .font(VivaDesign.Typography.caption)
-                                        .foregroundColor(VivaDesign.Colors.secondaryText)
+                                        .foregroundColor(
+                                            VivaDesign.Colors.secondaryText)
                                     Spacer()
                                 }
                                 .background(Color.black)
@@ -174,6 +195,7 @@ struct FriendsView: View {
                         await viewModel.loadFriendsData()
                     }
                     .listSectionSpacing(0)
+
                 }
             }
 
@@ -250,7 +272,7 @@ struct FriendsHeader: View {
     @Binding var searchText: String
     @ObservedObject var viewModel: FriendsViewModel
     @FocusState var isSearchFieldFocused: Bool
-    
+
     var body: some View {
         HStack {
             Image(systemName: "magnifyingglass")

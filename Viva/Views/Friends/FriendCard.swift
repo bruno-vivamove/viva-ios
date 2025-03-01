@@ -19,7 +19,7 @@ struct FriendCard: View {
             ]
         )
         .buttonStyle(PlainButtonStyle())
-        .fullScreenCover(isPresented: $showMatchupCreation) {
+        .sheet(isPresented: $showMatchupCreation) {
             MatchupCategoriesView(
                 matchupService: matchupService,
                 friendService: friendService,
