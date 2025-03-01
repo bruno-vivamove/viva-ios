@@ -98,11 +98,11 @@ final class MatchupService: ObservableObject {
         return response.invites
     }
     
-    func createInvite(matchupId: String, side: String, userId: String) async throws -> MatchupInvite {
+    func createInvite(matchupId: String, side: MatchupUser.Side, userId: String) async throws -> MatchupInvite {
         let matchupInvite: MatchupInvite = try await networkClient.post(
             path: "/viva/matchups/\(matchupId)/invites",
             queryParams: [
-                "side": side,
+                "side": side.rawValue,
                 "userId": userId
             ]
         )

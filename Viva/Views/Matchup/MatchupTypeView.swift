@@ -32,10 +32,11 @@ struct MatchupTypeView: View {
                     VStack(spacing: VivaDesign.Spacing.large) {
                         Button(action: {
                             Task {
-                                matchupCreated = await coordinator.createMatchup(
-                                    selectedCategories: selectedCategories,
-                                    usersPerSide: 1
-                                )
+                                matchupCreated =
+                                    await coordinator.createMatchup(
+                                        selectedCategories: selectedCategories,
+                                        usersPerSide: 1
+                                    )
                             }
                         }) {
                             Text("1v1")
@@ -53,17 +54,13 @@ struct MatchupTypeView: View {
                 .frame(maxHeight: .infinity)
                 .padding(.horizontal, VivaDesign.Spacing.large)
 
+                Spacer()
                 // Footer Logo
-                HStack(spacing: VivaDesign.Spacing.small) {
-                    Image(systemName: "crown.fill")
-                        .font(.system(size: 24))
-                        .foregroundColor(VivaDesign.Colors.vivaGreen)
-
-                    Text("VIVA")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.white)
-                }
-                .padding(.bottom, 40)
+                Image("viva_logo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 100)
+                    .padding(.bottom, VivaDesign.Spacing.xlarge)
             }
 
             if coordinator.isCreatingMatchup {
@@ -115,30 +112,6 @@ struct MatchupTypeView: View {
     }
 }
 
-// Preview
-#Preview {
-    let userSession = VivaAppObjects.dummyUserSession()
-    let vivaAppObjects = VivaAppObjects(userSession: userSession)
-    let networkClient = NetworkClient<VivaErrorResponse>(
-        settings: AppNetworkClientSettings(userSession: userSession))
-    let matchupService = MatchupService(networkClient: networkClient)
-    let friendService = FriendService(networkClient: networkClient)
-
-    MatchupTypeView(
-        coordinator: MatchupCreationCoordinator(
-            matchupService: matchupService,
-            friendService: friendService,
-            userSession: userSession
-        ),
-        showCreationFlow: .constant(true),
-        selectedCategories: [
-            MatchupCategory(id: "steps", name: "Steps", isSelected: true),
-            MatchupCategory(
-                id: "calories", name: "Active Calories", isSelected: true),
-        ], userService: vivaAppObjects.userService
-    )
-}
-
 struct MatchupTypeButton: View {
     let title: String
     let isSelected: Bool
@@ -157,11 +130,5 @@ struct MatchupTypeButton: View {
                         .stroke(Color.white, lineWidth: 1)
                 )
         }
-    }
-}
-
-struct MatchupTypeView_Previews: PreviewProvider {
-    static var previews: some View {
-        EmptyView()
     }
 }

@@ -110,8 +110,8 @@ struct MatchupUser: Codable {
     let userInfo: User?
     
     enum Side: String, Codable {
-        case left = "L"
-        case right = "R"
+        case left = "LEFT"
+        case right = "RIGHT"
     }
 }
 

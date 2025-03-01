@@ -9,6 +9,7 @@ class MatchupInviteCoordinator: ObservableObject {
 
     @Published var searchResults: [User] = []
     @Published var friends: [User] = []
+    @Published var usersToDisplay: [User] = []
     @Published var searchQuery: String?
     @Published var isLoading = false
     @Published var error: String?
@@ -33,7 +34,7 @@ class MatchupInviteCoordinator: ObservableObject {
             // Load matchup data
             matchup = try await matchupService.getMatchup(matchupId: matchupId)
             friends = try await friendService.getFriends()
-
+            usersToDisplay = getUsersToDisplay()
         } catch {
             self.error = "Failed to load matchup data. Please try again."
         }
@@ -51,6 +52,7 @@ class MatchupInviteCoordinator: ObservableObject {
         guard !query.isEmpty else {
             searchResults = []
             searchQuery = nil
+            usersToDisplay = getUsersToDisplay()
             return
         }
 
@@ -60,6 +62,7 @@ class MatchupInviteCoordinator: ObservableObject {
         do {
             searchResults = try await userService.searchUsers(query: query)
             searchQuery = query
+            usersToDisplay = getUsersToDisplay()
         } catch {
             self.error = "Failed to search users. Please try again."
         }
@@ -68,14 +71,13 @@ class MatchupInviteCoordinator: ObservableObject {
     }
 
     func inviteFriend(
-        userId: String, matchupId: String, side: MatchupUser.Side?
+        userId: String, matchupId: String, side: MatchupUser.Side
     ) async {
         do {
             // Convert the side enum to string for the API
-            let sideString = side == .left ? "L" : "R"
             let matchupInvite = try await matchupService.createInvite(
                 matchupId: matchupId,
-                side: sideString,
+                side: side,
                 userId: userId
             )
             matchup?.invites.append(matchupInvite)
@@ -167,7 +169,7 @@ class MatchupInviteCoordinator: ObservableObject {
         }
     }
 
-    var usersToDisplay: [User] {
+    func getUsersToDisplay() -> [User] {
         let invitedUsers = matchup?.invites.compactMap({$0.user}) ?? []
         let unfilteredUsers = searchQuery?.isEmpty ?? true ? friends : searchResults        
         let nonInvitedUsers = unfilteredUsers.filter { user in
