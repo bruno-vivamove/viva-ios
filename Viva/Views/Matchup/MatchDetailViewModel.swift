@@ -16,8 +16,6 @@ class MatchupDetailViewModel: ObservableObject {
         OrderedDictionary<MeasurementType, MatchupMeasurementPair>?
     @Published var matchupMeasurementPairsByDay:
         [OrderedDictionary<MeasurementType, MatchupMeasurementPair>]?
-    @Published var totalPointsLeft: Int?
-    @Published var totalPointsRight: Int?
 
     @Published var isLoading = false
     @Published var error: Error?
@@ -83,50 +81,37 @@ class MatchupDetailViewModel: ObservableObject {
             let matchup: MatchupDetails = try await matchupService.getMatchup(
                 matchupId: matchupId)
             self.matchup = matchup
-            self.createMeasurementPairs(matchup)
+            self.updateMeasuerments(matchup.userMeasurements)
 
             if matchup.status == .active {
                 healthKitDataManager.updateMatchupData(matchupDetail: matchup) {
                     updatedMatchup in
                     Task {
-                        // TODO: Save measurements in batch
-                        await withTaskGroup(of: Void.self) { group in
-                            for m in updatedMatchup.userMeasurements.filter({
+                        // Get only the current user's measurements
+                        let userMeasurements = updatedMatchup.userMeasurements
+                            .filter {
                                 $0.userId == self.userSession.getUserId()
-                            }) {
-                                group.addTask {
-                                    do {
-                                        try await self.matchupService
-                                            .saveUserMeasurement(
-                                                matchupId: m.matchupId,
-                                                measurement: m)
-                                    } catch {
-                                        print(
-                                            "Failed to save measurement: \(error)"
-                                        )
-                                    }
-                                }
                             }
 
-                            await group.waitForAll()
+                        if userMeasurements.isEmpty {
+                            return
                         }
 
-                        // TODO: get this as response from batch measurement update
                         do {
-                            let matchup: MatchupDetails =
-                                try await self.matchupService.getMatchup(
-                                    matchupId: self.matchupId)
-                            self.matchup = matchup
-                            self.createMeasurementPairs(matchup)
+                            // Send all measurements in a single call
+                            let savedUserMeasurements =
+                                try await self.matchupService
+                                .saveUserMeasurements(
+                                    matchupId: self.matchupId,
+                                    measurements: userMeasurements
+                                )
+
+                            self.updateMeasuerments(savedUserMeasurements)
                         } catch {
-                            print(
-                                "Error loading updated matchup details: \(error)"
-                            )
+                            print("Failed to save measurements: \(error)")
                         }
                     }
                 }
-            } else {
-                self.createMeasurementPairs(matchup)
             }
         } catch {
             self.error = error
@@ -135,7 +120,12 @@ class MatchupDetailViewModel: ObservableObject {
         isLoading = false
     }
 
-    func createMeasurementPairs(_ matchup: MatchupDetails) {
+    func updateMeasuerments(_ updatedUserMeasuerments: [MatchupUserMeasurement])
+    {
+        guard let matchup = self.matchup else {
+            return
+        }
+        
         // Create set of left user IDs first
         let leftUserIds = Set(matchup.leftUsers.map { $0.id })
 
@@ -162,7 +152,7 @@ class MatchupDetailViewModel: ObservableObject {
         // Process measurements
         let (
             totalPointsLeft, totalPointsRight, updatedPairs, updatedDailyPairs
-        ) = matchup.userMeasurements.reduce(
+        ) = updatedUserMeasuerments.reduce(
             (0, 0, totalMatchupMeasurementPairs, matchupMeasurementPairsByDay)
         ) { accumulator, measurement in
             var (leftPoints, rightPoints, pairs, dailyPairs) = accumulator
@@ -195,8 +185,15 @@ class MatchupDetailViewModel: ObservableObject {
         }
 
         // Update the view model
-        self.totalPointsLeft = totalPointsLeft
-        self.totalPointsRight = totalPointsRight
+        self.matchup?.userMeasurements = updatedUserMeasuerments
+        self.matchup?.leftSidePoints = totalPointsLeft
+        self.matchup?.rightSidePoints = totalPointsRight
+        NotificationCenter.default.post(
+            name: .matchupUpdated,
+            object: self.matchup!
+        )
+
+        
         self.totalMatchupMeasurementPairs = updatedPairs
         self.matchupMeasurementPairsByDay = updatedDailyPairs
     }
@@ -253,7 +250,9 @@ class MatchupDetailViewModel: ObservableObject {
     }
 
     func deleteInvite(inviteCode: String) async {
-        if let matchupInvite = matchup?.invites.first(where: {$0.inviteCode == inviteCode}) {
+        if let matchupInvite = matchup?.invites.first(where: {
+            $0.inviteCode == inviteCode
+        }) {
             await deleteInvite(matchupInvite)
         }
     }

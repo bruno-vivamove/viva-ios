@@ -126,7 +126,7 @@ final class NetworkClient<ErrorType: Decodable & Error> {
             .merging(settings.headers) { _, new in new }
             .merging(additionalHeaders ?? [:]) { _, new in new }
         
-        debugPrint("🔨 Built headers: \(headers)")
+        debugPrint("🔨 Built headers: \(headers.filter({$0.key != "Authorization"}))")
         return HTTPHeaders(headers)
     }
     
@@ -315,7 +315,7 @@ final class NetworkClient<ErrorType: Decodable & Error> {
         let requestHeaders = buildHeaders(defaultUploadHeaders, headers)
         
         debugPrint("🌐 Upload Request: \(url.absoluteString)")
-        debugPrint("📋 Headers: \(requestHeaders)")
+        debugPrint("📋 Headers: \(requestHeaders.filter({$0.name != "Authorization"}))")
         debugPrint("📦 Uploading \(data.count) files")
         
         return try await withCheckedThrowingContinuation { continuation in
@@ -367,7 +367,7 @@ final class NetworkClient<ErrorType: Decodable & Error> {
         let requestHeaders = buildHeaders(defaultUploadHeaders, headers)
         
         debugPrint("🌐 Upload Request: \(url.absoluteString)")
-        debugPrint("📋 Headers: \(requestHeaders)")
+        debugPrint("📋 Headers: \(requestHeaders.filter({$0.name != "Authorization"}))")
         debugPrint("📦 Uploading \(data.count) files")
         
         try await withCheckedThrowingContinuation { continuation in
@@ -417,8 +417,8 @@ final class NetworkClient<ErrorType: Decodable & Error> {
         headers: HTTPHeaders
     ) async throws -> T {
         debugPrint("🌐 \(method.rawValue) Request: \(url.absoluteString)")
-        debugPrint("📋 Headers: \(headers)")
-        
+        debugPrint("📋 Headers: \(headers.filter({$0.name != "Authorization"}))")
+
         return try await withCheckedThrowingContinuation { continuation in
             session.request(url, method: method, headers: headers)
                 .validate()
@@ -458,7 +458,7 @@ final class NetworkClient<ErrorType: Decodable & Error> {
         body: E
     ) async throws -> T {
         debugPrint("🌐 \(method.rawValue) Request: \(url.absoluteString)")
-        debugPrint("📋 Headers: \(headers)")
+        debugPrint("📋 Headers: \(headers.filter({$0.name != "Authorization"}))")
         debugPrint("📦 Body: \(body)")
         
         return try await withCheckedThrowingContinuation { continuation in
@@ -505,8 +505,8 @@ final class NetworkClient<ErrorType: Decodable & Error> {
             headers: HTTPHeaders
         ) async throws {
             debugPrint("🌐 \(method.rawValue) Request: \(url.absoluteString)")
-            debugPrint("📋 Headers: \(headers)")
-            
+            debugPrint("📋 Headers: \(headers.filter({$0.name != "Authorization"}))")
+
             try await withCheckedThrowingContinuation { continuation in
                 session.request(url, method: method, headers: headers)
                     .validate()
@@ -545,7 +545,7 @@ final class NetworkClient<ErrorType: Decodable & Error> {
             headers: HTTPHeaders
         ) async throws {
             debugPrint("🌐 \(method.rawValue) Request: \(url.absoluteString)")
-            debugPrint("📋 Headers: \(headers)")
+            debugPrint("📋 Headers: \(headers.filter({$0.name != "Authorization"}))")
             debugPrint("📦 Body: \(body)")
             
             try await withCheckedThrowingContinuation { continuation in

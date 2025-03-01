@@ -203,14 +203,14 @@ struct MatchupDetailView: View {
             await viewModel.loadData()
         }
         // TODO Bug - maybe
-        .onChange(of: viewModel.matchup?.invites.count) { _, _ in
-            if let matchup = viewModel.matchup {
-                NotificationCenter.default.post(
-                    name: .matchupUpdated,
-                    object: matchup
-                )
-            }
-        }
+//        .onChange(of: viewModel.matchup?.invites.count) { _, _ in
+//            if let matchup = viewModel.matchup {
+//                NotificationCenter.default.post(
+//                    name: .matchupUpdated,
+//                    object: matchup
+//                )
+//            }
+//        }
         .alert("Error", isPresented: .constant(viewModel.error != nil)) {
             Button("OK") {
                 viewModel.error = nil
@@ -240,7 +240,7 @@ struct MatchupHeader: View {
                 inviteCode: viewModel.matchup?.invites.first(where: {
                     $0.side == .left
                 })?.inviteCode,
-                totalPoints: viewModel.totalPointsLeft ?? 0,
+                totalPoints: viewModel.matchup?.leftSidePoints ?? 0,
                 imageOnLeft: true,
                 onInviteTap: onInviteTap,
                 onOpenPositionTap: {
@@ -256,7 +256,7 @@ struct MatchupHeader: View {
                 inviteCode: viewModel.matchup?.invites.first(where: {
                     $0.side == .right
                 })?.inviteCode,
-                totalPoints: viewModel.totalPointsRight ?? 0,
+                totalPoints: viewModel.matchup?.rightSidePoints ?? 0,
                 imageOnLeft: false,
                 onInviteTap: onInviteTap,
                 onOpenPositionTap: {

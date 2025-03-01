@@ -45,8 +45,8 @@ struct MatchupDetails: Codable {
     let endTime: Date?
     let usersPerSide: Int
     let lengthInDays: Int
-    let leftSidePoints: Int
-    let rightSidePoints: Int
+    var leftSidePoints: Int
+    var rightSidePoints: Int
     let leftUsers: [User]
     let rightUsers: [User]
 
@@ -64,10 +64,12 @@ struct MatchupDetails: Codable {
         let elapsedSeconds = now.timeIntervalSince(startTime)
         let currentDayNumber = Int(floor(elapsedSeconds / Double(dayLength)))
 
-        if currentDayNumber < 0
-            || (self.endTime != nil && now > self.endTime!)
-        {
+        if currentDayNumber < 0 {
             return nil
+        }
+        
+        if(currentDayNumber >= self.lengthInDays) {
+            return lengthInDays - 1
         }
         
         return currentDayNumber
@@ -149,6 +151,10 @@ struct MatchupUserMeasurement: Codable {
     let completeDay: Bool
     let value: Int
     let points: Int
+}
+
+struct MatchupUserMeasurements: Codable {
+    let matchupUserMeasurements: [MatchupUserMeasurement]
 }
 
 struct MatchupMeasurementPair: Codable {
