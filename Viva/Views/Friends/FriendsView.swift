@@ -73,14 +73,7 @@ struct FriendsView: View {
                                 .listRowInsets(rowInsets)
                             }
                         } header: {
-                            HStack {
-                                Text("Search Results")
-                                    .font(VivaDesign.Typography.header)
-                                    .foregroundColor(.white)
-                                Spacer()
-                            }
-                            .background(Color.black)
-                            .listRowInsets(headerInsets)
+                            SectionHeaderView(title: "Search Results")
                         }
                     }
                     .listStyle(PlainListStyle())
@@ -113,20 +106,11 @@ struct FriendsView: View {
                                     .listRowInsets(rowInsets)
                                 }
                             } header: {
-                                HStack {
-                                    Text("Requests Received")
-                                        .font(VivaDesign.Typography.header)
-                                        .foregroundColor(.white)
-                                    Text(
+                                SectionHeaderView(
+                                    title: "Requests Received",
+                                    subtitle:
                                         "(\(viewModel.friendInvites.count))"
-                                    )
-                                    .font(VivaDesign.Typography.caption)
-                                    .foregroundColor(
-                                        VivaDesign.Colors.secondaryText)
-                                    Spacer()
-                                }
-                                .background(Color.black)
-                                .listRowInsets(headerInsets)
+                                )
                             }
                         }
 
@@ -141,18 +125,10 @@ struct FriendsView: View {
                                     .listRowInsets(rowInsets)
                                 }
                             } header: {
-                                HStack {
-                                    Text("Requests Sent")
-                                        .font(VivaDesign.Typography.header)
-                                        .foregroundColor(.white)
-                                    Text("(\(viewModel.sentInvites.count))")
-                                        .font(VivaDesign.Typography.caption)
-                                        .foregroundColor(
-                                            VivaDesign.Colors.secondaryText)
-                                    Spacer()
-                                }
-                                .background(Color.black)
-                                .listRowInsets(headerInsets)
+                                SectionHeaderView(
+                                    title: "Requests Sent",
+                                    subtitle: "(\(viewModel.sentInvites.count))"
+                                )
                             }
                         }
 
@@ -173,18 +149,10 @@ struct FriendsView: View {
                                     .listRowInsets(rowInsets)
                                 }
                             } header: {
-                                HStack {
-                                    Text("Current Friends")
-                                        .font(VivaDesign.Typography.header)
-                                        .foregroundColor(.white)
-                                    Text("(\(viewModel.friends.count))")
-                                        .font(VivaDesign.Typography.caption)
-                                        .foregroundColor(
-                                            VivaDesign.Colors.secondaryText)
-                                    Spacer()
-                                }
-                                .background(Color.black)
-                                .listRowInsets(headerInsets)
+                                SectionHeaderView(
+                                    title: "Current Friends",
+                                    subtitle: "(\(viewModel.friends.count))"
+                                )
                             }
                         }
                     }

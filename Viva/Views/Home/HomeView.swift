@@ -73,14 +73,7 @@ struct HomeView: View {
                                     .listRowInsets(rowInsets)
                             }
                         } header: {
-                            HStack {
-                                Text("Active Matchups")
-                                    .font(VivaDesign.Typography.header)
-                                    .foregroundColor(.white)
-                                Spacer()
-                            }
-                            .background(Color.black)
-                            .listRowInsets(headerInsets)
+                            SectionHeaderView(title: "Active Matchups")
                         }
                     }
 
@@ -96,14 +89,7 @@ struct HomeView: View {
                                     .listRowInsets(rowInsets)
                             }
                         } header: {
-                            HStack {
-                                Text("Pending Matchups")
-                                    .font(VivaDesign.Typography.header)
-                                    .foregroundColor(.white)
-                                Spacer()
-                            }
-                            .background(Color.black)
-                            .listRowInsets(headerInsets)
+                            SectionHeaderView(title: "Pending Matchups")
                         }
                     }
 
@@ -185,14 +171,20 @@ struct HomeView: View {
                                 }
                             }
                         } header: {
-                            HStack {
-                                Text("Pending Invites")
-                                    .font(VivaDesign.Typography.header)
-                                    .foregroundColor(.white)
-                                Spacer()
+                            ZStack {
+                                Rectangle()
+                                    .fill(Color.black)
+                                    .frame(maxWidth: .infinity)
+                                
+                                HStack {
+                                    Text("Pending Invites")
+                                        .font(VivaDesign.Typography.header)
+                                        .foregroundColor(.white)
+                                    Spacer()
+                                }
+                                .padding(headerInsets)
                             }
-                            .background(Color.black)
-                            .listRowInsets(headerInsets)
+                            .listRowInsets(EdgeInsets())
                         }
                     }
                 }
@@ -308,7 +300,3 @@ struct HomeHeader: View {
         }
     }
 }
-
-//#Preview {
-//    HomeView()
-//}

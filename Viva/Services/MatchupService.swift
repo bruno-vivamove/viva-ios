@@ -116,9 +116,15 @@ final class MatchupService: ObservableObject {
     }
     
     func deleteInvite(_ matchupInvite: MatchupInvite) async throws {
-        try await networkClient.delete(
-            path: "/viva/matchups/\(matchupInvite.matchupId)/invites/\(matchupInvite.inviteCode)"
-        )
+        do {
+            try await networkClient.delete(
+                path: "/viva/matchups/\(matchupInvite.matchupId)/invites/\(matchupInvite.inviteCode)"
+            )
+        } catch let error as VivaErrorResponse {
+            if(error.code != "MATCHUP_INVITE_NOT_FOUND") {
+                throw error
+            }
+        }
         
         NotificationCenter.default.post(
             name: .matchupInviteDeleted,
@@ -126,14 +132,14 @@ final class MatchupService: ObservableObject {
         )
     }
     
-    func acceptInvite(inviteCode: String) async throws {
+    func acceptInvite(_ invite: MatchupInvite) async throws {
         try await networkClient.put(
-            path: "/viva/matchups/invites/\(inviteCode)/accept"
+            path: "/viva/matchups/invites/\(invite.inviteCode)/accept"
         )
-        
+
         NotificationCenter.default.post(
             name: .matchupInviteAccepted,
-            object: inviteCode
+            object: invite
         )
     }
     

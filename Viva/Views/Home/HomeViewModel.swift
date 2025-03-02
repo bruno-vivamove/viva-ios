@@ -101,6 +101,15 @@ class HomeViewModel: ObservableObject {
                     self.sentInvites.removeAll(where: {
                         $0.matchupId == matchupInvite.matchupId
                     })
+
+                    do {
+                        self.selectedMatchup =
+                            try await matchupService.getMatchup(
+                                matchupId: matchupInvite.matchupId
+                            ).asMatchup
+                    } catch {
+                        self.error = error
+                    }
                 }
             }
         }
@@ -246,7 +255,7 @@ class HomeViewModel: ObservableObject {
 
     func acceptInvite(_ invite: MatchupInvite) async {
         do {
-            try await matchupService.acceptInvite(inviteCode: invite.inviteCode)
+            try await matchupService.acceptInvite(invite)
         } catch {
             self.error = error
         }
