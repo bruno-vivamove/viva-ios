@@ -17,6 +17,9 @@ struct HomeView: View {
     )
 
     @StateObject private var viewModel: HomeViewModel
+    
+    // A counter to trigger refresh for MatchupCards
+    @State private var refreshTrigger = 0
 
     private let userSession: UserSession
     private let matchupService: MatchupService
@@ -65,12 +68,16 @@ struct HomeView: View {
                     if !viewModel.activeMatchups.isEmpty {
                         Section {
                             ForEach(viewModel.activeMatchups) { matchup in
-                                MatchupCard(matchup: matchup)
-                                    .onTapGesture {
-                                        viewModel.selectedMatchup = matchup
-                                    }
-                                    .listRowSeparator(.hidden)
-                                    .listRowInsets(rowInsets)
+                                MatchupCard(
+                                    matchupId: matchup.id,
+                                    matchupService: matchupService
+                                )
+                                .id("active-\(matchup.id)-\(refreshTrigger)") // Force redraw on refresh
+                                .onTapGesture {
+                                    viewModel.selectedMatchup = matchup
+                                }
+                                .listRowSeparator(.hidden)
+                                .listRowInsets(rowInsets)
                             }
                         } header: {
                             SectionHeaderView(title: "Active Matchups")
@@ -81,12 +88,16 @@ struct HomeView: View {
                     if !viewModel.pendingMatchups.isEmpty {
                         Section {
                             ForEach(viewModel.pendingMatchups) { matchup in
-                                MatchupCard(matchup: matchup)
-                                    .onTapGesture {
-                                        viewModel.selectedMatchup = matchup
-                                    }
-                                    .listRowSeparator(.hidden)
-                                    .listRowInsets(rowInsets)
+                                MatchupCard(
+                                    matchupId: matchup.id,
+                                    matchupService: matchupService
+                                )
+                                .id("pending-\(matchup.id)-\(refreshTrigger)") // Force redraw on refresh
+                                .onTapGesture {
+                                    viewModel.selectedMatchup = matchup
+                                }
+                                .listRowSeparator(.hidden)
+                                .listRowInsets(rowInsets)
                             }
                         } header: {
                             SectionHeaderView(title: "Pending Matchups")
@@ -96,7 +107,7 @@ struct HomeView: View {
                     if !viewModel.receivedInvites.isEmpty
                         || !viewModel.sentInvites.isEmpty
                     {
-                        // Pending Invitations
+                        // Pending Invitations section
                         Section {
                             // Received Invites
                             if !viewModel.receivedInvites.isEmpty {
@@ -128,7 +139,7 @@ struct HomeView: View {
                                         ]
                                     )
                                     .listRowBackground(Color.clear)
-                                    .buttonStyle(PlainButtonStyle())  // Removes button-like behavior
+                                    .buttonStyle(PlainButtonStyle())
                                     .listRowSeparator(.hidden)
                                     .listRowInsets(rowInsets)
                                 }
@@ -165,7 +176,7 @@ struct HomeView: View {
                                         ]
                                     )
                                     .listRowBackground(Color.clear)
-                                    .buttonStyle(PlainButtonStyle())  // Removes button-like behavior
+                                    .buttonStyle(PlainButtonStyle())
                                     .listRowSeparator(.hidden)
                                     .listRowInsets(rowInsets)
                                 }
@@ -193,6 +204,8 @@ struct HomeView: View {
                 .scrollContentBackground(.hidden)
                 .refreshable {
                     await viewModel.loadData()
+                    // Increment the refresh trigger to force recreating MatchupCards
+                    refreshTrigger += 1
                 }
                 .listSectionSpacing(0)
             }
@@ -249,6 +262,7 @@ struct HomeEmptyStateView: View {
     }
 }
 
+// HomeHeader
 struct HomeHeader: View {
     @ObservedObject var userSession: UserSession
     @ObservedObject var viewModel: HomeViewModel

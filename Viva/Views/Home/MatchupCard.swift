@@ -2,17 +2,69 @@ import SwiftUI
 
 struct MatchupCard: View {
     @EnvironmentObject var userSession: UserSession
-    @EnvironmentObject var matchupService: MatchupService
-
-    let matchup: Matchup
-
+    @StateObject private var viewModel: MatchupCardViewModel
+    
+    init(matchupId: String, matchupService: MatchupService) {
+        _viewModel = StateObject(wrappedValue: MatchupCardViewModel(
+            matchupId: matchupId,
+            matchupService: matchupService
+        ))
+    }
+    
+    // This function allows parent views to refresh this card
+    func refresh() async {
+        await viewModel.refresh()
+    }
+    
     var body: some View {
+        Group {
+            if viewModel.isLoading && viewModel.matchupDetails == nil {
+                loadingView
+            } else if let details = viewModel.matchupDetails {
+                matchupCardView(details)
+            } else {
+                errorView
+            }
+        }
+        .background(Color.black)
+        .listRowBackground(Color.clear)
+    }
+    
+    private var loadingView: some View {
+        VivaCard {
+            HStack {
+                Spacer()
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+                Spacer()
+            }
+            .padding()
+        }
+    }
+    
+    private var errorView: some View {
+        VivaCard {
+            VStack {
+                Text("Unable to load matchup")
+                    .foregroundColor(VivaDesign.Colors.secondaryText)
+                Button("Retry") {
+                    Task {
+                        await viewModel.loadMatchupDetails()
+                    }
+                }
+                .padding(.top, VivaDesign.Spacing.small)
+            }
+            .padding()
+        }
+    }
+    
+    private func matchupCardView(_ details: MatchupDetails) -> some View {
         VivaCard {
             HStack(spacing: 0) {
                 // Left side container - aligned to left edge
                 HStack(spacing: VivaDesign.Spacing.small) {
-                    let user = matchup.leftUsers.first
-                    let leftInvite = matchup.invites.first { invite in
+                    let user = details.leftUsers.first
+                    let leftInvite = details.invites.first { invite in
                         invite.side == .left
                     }
 
@@ -25,7 +77,7 @@ struct MatchupCard: View {
                     LabeledValueStack(
                         label: getUserDisplayName(
                             user: user, invite: leftInvite),
-                        value: "\(matchup.leftSidePoints)",
+                        value: "\(details.leftSidePoints)",
                         alignment: .leading
                     )
 
@@ -44,15 +96,15 @@ struct MatchupCard: View {
                 HStack(spacing: VivaDesign.Spacing.small) {
                     Spacer(minLength: 0)  // Push content to right edge
 
-                    let user = matchup.rightUsers.first
-                    let rightInvite = matchup.invites.first { invite in
+                    let user = details.rightUsers.first
+                    let rightInvite = details.invites.first { invite in
                         invite.side == .right
                     }
 
                     LabeledValueStack(
                         label: getUserDisplayName(
                             user: user, invite: rightInvite),
-                        value: "\(matchup.rightSidePoints)",
+                        value: "\(details.rightSidePoints)",
                         alignment: .trailing
                     )
 
@@ -64,14 +116,12 @@ struct MatchupCard: View {
                 }
             }
         }
-        .background(Color.black)
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            if matchup.status == .pending {
-                if matchup.ownerId == userSession.userId {
+            if details.status == .pending {
+                if details.ownerId == userSession.userId {
                     Button(role: .destructive) {
                         Task {
-                            _ = try await matchupService.cancelMatchup(
-                                matchupId: matchup.id)
+                            _ = await viewModel.cancelMatchup()
                         }
                     } label: {
                         Text("Cancel")
@@ -80,9 +130,7 @@ struct MatchupCard: View {
                 } else {
                     Button(role: .destructive) {
                         Task {
-                            _ = try await matchupService.removeMatchupUser(
-                                matchupId: matchup.id,
-                                userId: userSession.userId)
+                            _ = await viewModel.removeCurrentUser(userId: userSession.userId)
                         }
                     } label: {
                         Text("Leave")
@@ -91,7 +139,6 @@ struct MatchupCard: View {
                 }
             }
         }
-        .listRowBackground(Color.clear)
     }
 
     private func getUserDisplayName(user: User?, invite: MatchupInvite?)

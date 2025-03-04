@@ -29,14 +29,14 @@ struct MatchupCategoriesView: View {
         userService: UserService,
         userSession: UserSession,
         showCreationFlow: Binding<Bool>,
-        challengedUser: User? = nil  // Add optional parameter
+        challengedUser: User? = nil
     ) {
         self._coordinator = StateObject(
             wrappedValue: MatchupCreationCoordinator(
                 matchupService: matchupService,
                 friendService: friendService,
                 userSession: userSession,
-                challengedUser: challengedUser  // Pass challenged user to coordinator
+                challengedUser: challengedUser
             )
         )
         self._showCreationFlow = showCreationFlow

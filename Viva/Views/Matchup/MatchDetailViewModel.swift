@@ -147,11 +147,11 @@ class MatchupDetailViewModel: ObservableObject {
 
         // Process measurements
         let (
-            totalPointsLeft, totalPointsRight, updatedPairs, updatedDailyPairs
+            updatedPairs, updatedDailyPairs
         ) = matchup.userMeasurements.reduce(
-            (0, 0, totalMatchupMeasurementPairs, matchupMeasurementPairsByDay)
+            (totalMatchupMeasurementPairs, matchupMeasurementPairsByDay)
         ) { accumulator, measurement in
-            var (leftPoints, rightPoints, pairs, dailyPairs) = accumulator
+            var (pairs, dailyPairs) = accumulator
 
             if var pair = pairs[measurement.measurementType],
                 var dailyPair = dailyPairs[measurement.dayNumber][
@@ -159,13 +159,11 @@ class MatchupDetailViewModel: ObservableObject {
             {
 
                 if leftUserIds.contains(measurement.userId) {
-                    leftPoints += measurement.points
                     pair.leftValue += measurement.value
                     pair.leftPoints += measurement.points
                     dailyPair.leftValue += measurement.value
                     dailyPair.leftPoints += measurement.points
                 } else {
-                    rightPoints += measurement.points
                     pair.rightValue += measurement.value
                     pair.rightPoints += measurement.points
                     dailyPair.rightValue += measurement.value
@@ -177,7 +175,7 @@ class MatchupDetailViewModel: ObservableObject {
                     dailyPair
             }
 
-            return (leftPoints, rightPoints, pairs, dailyPairs)
+            return (pairs, dailyPairs)
         }
 
         // Update the view model

@@ -40,7 +40,7 @@ struct MatchupDetails: Codable, Equatable {
     let displayName: String
     let ownerId: String
     let createTime: Date
-    let status: MatchupStatus
+    var status: MatchupStatus
     let startTime: Date?
     let endTime: Date?
     let usersPerSide: Int
