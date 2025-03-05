@@ -1,63 +1,62 @@
 struct VivaAppObjects {
     public let userSession: UserSession
+
+    public let authNetworkClientSettings: AuthNetworkClientSettings
     public let appNetworkClientSettings: AppNetworkClientSettings
     public let appWithNoSessionNetworkClientSettings:
         AppWithNoSessionNetworkClientSettings
+
+    public let authNetworkClient: NetworkClient<AuthErrorResponse>
     public let appNetworkClient: NetworkClient<VivaErrorResponse>
     public let appNetworkClientWithNoSession: NetworkClient<VivaErrorResponse>
-    public let authenticationManager: AuthenticationManager
-    public let authService: AuthService
+    
+    public let authService: AuthService    
     public let sessionService: SessionService
     public let userProfileService: UserProfileService
     public let friendService: FriendService
     public let matchupService: MatchupService
     public let userService: UserService
     public let healthService: HealthService
+    
+    public let authenticationManager: AuthenticationManager
     public let healthKitDataManager: HealthKitDataManager
 
     init(userSession: UserSession) {
-        self.userSession = userSession
+        self.userSession = UserSession()
 
-        appNetworkClientSettings = AppNetworkClientSettings(
-            userSession: userSession)
-
+        // Network client settings
+        authNetworkClientSettings = AuthNetworkClientSettings()
+        appNetworkClientSettings = AppNetworkClientSettings(userSession)
         appWithNoSessionNetworkClientSettings =
             AppWithNoSessionNetworkClientSettings()
 
+        // Network clients
+        authNetworkClient = NetworkClient<AuthErrorResponse>(
+            settings: authNetworkClientSettings)
         appNetworkClient = NetworkClient(settings: appNetworkClientSettings)
-
         appNetworkClientWithNoSession = NetworkClient<VivaErrorResponse>(
             settings: appWithNoSessionNetworkClientSettings)
 
-        authService = AuthService(
-            networkClient: NetworkClient<AuthErrorResponse>(
-                settings: AuthNetworkClientSettings()))
-
-        sessionService = SessionService(
-            networkClient: appNetworkClientWithNoSession)
-
+        // Services
+        authService = AuthService(networkClient: authNetworkClient)
+        sessionService = SessionService(networkClient: appNetworkClientWithNoSession)
         userProfileService = UserProfileService(
-            networkClient: appNetworkClient,
-            userSession: userSession
-        )
-
+            networkClient: appNetworkClient, userSession: userSession)
         friendService = FriendService(
             networkClient: appNetworkClient)
-
         matchupService = MatchupService(networkClient: appNetworkClient)
-
         userService = UserService(networkClient: appNetworkClient)
-
         healthService = HealthService(
             networkClient: appNetworkClientWithNoSession)
 
+        // Other
         authenticationManager = AuthenticationManager(
             userSession: userSession,
             authService: authService,
             sessionService: sessionService,
             userProfileService: userProfileService
         )
-        
+
         healthKitDataManager = HealthKitDataManager(userSession: userSession)
     }
 

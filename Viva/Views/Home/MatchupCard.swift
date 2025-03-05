@@ -3,22 +3,25 @@ import SwiftUI
 struct MatchupCard: View {
     @EnvironmentObject var userSession: UserSession
     @StateObject private var viewModel: MatchupCardViewModel
-    
-    init(matchupId: String, matchupService: MatchupService) {
-        _viewModel = StateObject(wrappedValue: MatchupCardViewModel(
-            matchupId: matchupId,
-            matchupService: matchupService
-        ))
+
+    init(
+        matchupId: String,
+        matchupService: MatchupService,
+        healthKitDataManager: HealthKitDataManager,
+        userSession: UserSession
+    ) {
+        _viewModel = StateObject(
+            wrappedValue: MatchupCardViewModel(
+                matchupId: matchupId,
+                matchupService: matchupService,
+                healthKitDataManager: healthKitDataManager,
+                userSession: userSession
+            ))
     }
-    
-    // This function allows parent views to refresh this card
-    func refresh() async {
-        await viewModel.refresh()
-    }
-    
+
     var body: some View {
         Group {
-            if viewModel.isLoading && viewModel.matchupDetails == nil {
+            if viewModel.isLoading {
                 loadingView
             } else if let details = viewModel.matchupDetails {
                 matchupCardView(details)
@@ -29,7 +32,7 @@ struct MatchupCard: View {
         .background(Color.black)
         .listRowBackground(Color.clear)
     }
-    
+
     private var loadingView: some View {
         VivaCard {
             HStack {
@@ -41,7 +44,7 @@ struct MatchupCard: View {
             .padding()
         }
     }
-    
+
     private var errorView: some View {
         VivaCard {
             VStack {
@@ -57,7 +60,7 @@ struct MatchupCard: View {
             .padding()
         }
     }
-    
+
     private func matchupCardView(_ details: MatchupDetails) -> some View {
         VivaCard {
             HStack(spacing: 0) {
@@ -130,7 +133,8 @@ struct MatchupCard: View {
                 } else {
                     Button(role: .destructive) {
                         Task {
-                            _ = await viewModel.removeCurrentUser(userId: userSession.userId)
+                            _ = await viewModel.removeCurrentUser(
+                                userId: userSession.userId)
                         }
                     } label: {
                         Text("Leave")

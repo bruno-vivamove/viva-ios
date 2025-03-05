@@ -1,16 +1,13 @@
-//
-//  VivaApp.swift
-//  Viva
-//
-//  Created by Bruno Souto on 1/8/25.
-//
-
 import SwiftUI
 
 @main
 struct VivaApp: App {
     @StateObject var appState = AppState()
     @Environment(\.scenePhase) private var scenePhase
+
+    init() {
+        BackgroundTaskManager.shared.registerBackgroundTasks()
+    }
 
     var body: some Scene {
         let vivaAppObjects = VivaAppObjects(userSession: appState.userSession)
@@ -33,15 +30,11 @@ struct VivaApp: App {
             .environmentObject(vivaAppObjects.userService)
             .environmentObject(vivaAppObjects.healthKitDataManager)
         }
-        .onChange(of: scenePhase) {
-            if scenePhase == .active {
-                Task {
-                    do {
-                        _ = try await vivaAppObjects.healthService.ping()
-                    } catch {
-                        print("Health ping failed: \(error)")
-                    }
-                }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            print("App state changed: \(oldPhase) -> \(newPhase)")
+            if newPhase == .background {
+                print("App entered background - scheduling tasks")
+                BackgroundTaskManager.shared.scheduleHealthUpdateTask()
             }
         }
     }

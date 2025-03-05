@@ -70,7 +70,9 @@ struct HomeView: View {
                             ForEach(viewModel.activeMatchups) { matchup in
                                 MatchupCard(
                                     matchupId: matchup.id,
-                                    matchupService: matchupService
+                                    matchupService: matchupService,
+                                    healthKitDataManager: healthKitDataManager,
+                                    userSession: userSession
                                 )
                                 .id("active-\(matchup.id)-\(refreshTrigger)") // Force redraw on refresh
                                 .onTapGesture {
@@ -90,7 +92,9 @@ struct HomeView: View {
                             ForEach(viewModel.pendingMatchups) { matchup in
                                 MatchupCard(
                                     matchupId: matchup.id,
-                                    matchupService: matchupService
+                                    matchupService: matchupService,
+                                    healthKitDataManager: healthKitDataManager,
+                                    userSession: userSession
                                 )
                                 .id("pending-\(matchup.id)-\(refreshTrigger)") // Force redraw on refresh
                                 .onTapGesture {

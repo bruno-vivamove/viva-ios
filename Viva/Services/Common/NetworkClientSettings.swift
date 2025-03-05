@@ -32,7 +32,7 @@ final class AppNetworkClientSettings: NetworkClientSettings {
         }
     }
     
-    init(userSession: UserSession) {
+    init(_ userSession: UserSession) {
         self.userSession = userSession
     }
 }
