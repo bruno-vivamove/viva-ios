@@ -434,7 +434,7 @@ final class NetworkClient<ErrorType: Decodable & Error> {
                     if let data = response.data {
                         debugPrint("📥 Response size: \(data.count) bytes")
                         if let rawString = String(data: data, encoding: .utf8) {
-                            debugPrint("📥 Raw Response string: \(rawString)")
+//                            debugPrint("📥 Raw Response string: \(rawString)")
                         }
                     }
                     
@@ -459,7 +459,7 @@ final class NetworkClient<ErrorType: Decodable & Error> {
     ) async throws -> T {
         debugPrint("🌐 \(method.rawValue) Request: \(url.absoluteString)")
         debugPrint("📋 Headers: \(headers.filter({$0.name != "Authorization"}))")
-        debugPrint("📦 Body: \(body)")
+//        debugPrint("📦 Body: \(body)")
         
         return try await withCheckedThrowingContinuation { continuation in
             session.request(
@@ -482,7 +482,7 @@ final class NetworkClient<ErrorType: Decodable & Error> {
                 if let data = response.data {
                     debugPrint("📥 Response size: \(data.count) bytes")
                     if let rawString = String(data: data, encoding: .utf8) {
-                        debugPrint("📥 Raw Response string: \(rawString)")
+//                        debugPrint("📥 Raw Response string: \(rawString)")
                     }
                 }
                 
@@ -521,7 +521,7 @@ final class NetworkClient<ErrorType: Decodable & Error> {
                         if let data = response.data {
                             debugPrint("📥 Response size: \(data.count) bytes")
                             if let rawString = String(data: data, encoding: .utf8) {
-                                debugPrint("📥 Raw Response string: \(rawString)")
+//                                debugPrint("📥 Raw Response string: \(rawString)")
                             }
                         }
                         
@@ -546,7 +546,7 @@ final class NetworkClient<ErrorType: Decodable & Error> {
         ) async throws {
             debugPrint("🌐 \(method.rawValue) Request: \(url.absoluteString)")
             debugPrint("📋 Headers: \(headers.filter({$0.name != "Authorization"}))")
-            debugPrint("📦 Body: \(body)")
+//            debugPrint("📦 Body: \(body)")
             
             try await withCheckedThrowingContinuation { continuation in
                 session.request(
@@ -568,7 +568,7 @@ final class NetworkClient<ErrorType: Decodable & Error> {
                     if let data = response.data {
                         debugPrint("📥 Response size: \(data.count) bytes")
                         if let rawString = String(data: data, encoding: .utf8) {
-                            debugPrint("📥 Raw Response string: \(rawString)")
+//                            debugPrint("📥 Raw Response string: \(rawString)")
                         }
                     }
                     

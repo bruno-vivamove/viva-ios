@@ -2,7 +2,7 @@ import SwiftUI
 
 @main
 struct VivaApp: App {
-    @StateObject var appState = AppState()
+    @StateObject var vivaAppObjects = VivaAppObjects()
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
@@ -10,11 +10,10 @@ struct VivaApp: App {
     }
 
     var body: some Scene {
-        let vivaAppObjects = VivaAppObjects(userSession: appState.userSession)
 
         WindowGroup {
             SignInView(
-                userSession: appState.userSession,
+                userSession: vivaAppObjects.userSession,
                 authenticationManager: vivaAppObjects.authenticationManager,
                 userProfileService: vivaAppObjects.userProfileService,
                 friendService: vivaAppObjects.friendService,
@@ -22,8 +21,7 @@ struct VivaApp: App {
                 userService: vivaAppObjects.userService,
                 healthKitDataManager: vivaAppObjects.healthKitDataManager
             )
-            .environmentObject(appState)
-            .environmentObject(appState.userSession)
+            .environmentObject(vivaAppObjects.userSession)
             .environmentObject(vivaAppObjects.authenticationManager)
             .environmentObject(vivaAppObjects.friendService)
             .environmentObject(vivaAppObjects.matchupService)

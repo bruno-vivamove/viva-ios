@@ -263,17 +263,3 @@ struct AuthButtonView: View {
     }
 }
 
-#Preview {
-    let userSession = VivaAppObjects.dummyUserSession()
-    let vivaAppObjects = VivaAppObjects(userSession: userSession)
-
-    SignInView(
-        userSession: userSession,
-        authenticationManager: vivaAppObjects.authenticationManager,
-        userProfileService: vivaAppObjects.userProfileService,
-        friendService: vivaAppObjects.friendService,
-        matchupService: vivaAppObjects.matchupService,
-        userService: vivaAppObjects.userService,
-        healthKitDataManager: vivaAppObjects.healthKitDataManager
-    )
-}

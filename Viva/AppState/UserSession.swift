@@ -9,6 +9,10 @@ final class UserSession: ObservableObject {
     @Published private(set) var isLoggedIn = false
     @Published private(set) var userProfile: UserProfile? = nil
 
+    init() {
+        print("Creating user session")
+    }
+    
     var userId: String {
         return userProfile!.id
     }

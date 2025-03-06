@@ -254,12 +254,3 @@ extension View {
         }
     }
 }
-
-#Preview {
-    let userSession = VivaAppObjects.dummyUserSession()
-    let vivaAppObjects = VivaAppObjects(userSession: userSession)
-
-    SignInFormView(
-        authManager: vivaAppObjects.authenticationManager,
-        userSession: userSession)
-}

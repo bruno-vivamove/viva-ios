@@ -242,7 +242,3 @@ struct HistoryCard: View {
         }
     }
 }
-
-#Preview {
-    TrophiesView()
-}

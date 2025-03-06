@@ -190,14 +190,3 @@ struct SignUpButton: View {
         }
     }
 }
-
-#Preview {
-    let userSession = VivaAppObjects.dummyUserSession()
-    let vivaAppObjects = VivaAppObjects(userSession: userSession)
-    
-    return SignUpFormView(
-        authManager: vivaAppObjects.authenticationManager,
-        userSession: userSession
-    )
-    .environmentObject(AppState())
-}

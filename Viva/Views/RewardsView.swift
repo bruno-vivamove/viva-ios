@@ -43,10 +43,6 @@ struct RewardsView: View {
     }
 }
 
-#Preview {
-    RewardsView()
-}
-
 struct RewardsPointsCard: View {
     let points: Int
 

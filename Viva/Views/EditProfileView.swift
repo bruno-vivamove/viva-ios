@@ -245,12 +245,3 @@ struct ImagePicker: UIViewControllerRepresentable {
         }
     }
 }
-
-#Preview {
-    let userSession = VivaAppObjects.dummyUserSession()
-    let vivaAppObjects = VivaAppObjects(userSession: userSession)
-
-    EditProfileView(
-        userSession: userSession,
-        userProfileService: vivaAppObjects.userProfileService)
-}

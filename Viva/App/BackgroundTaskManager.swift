@@ -38,7 +38,7 @@ class BackgroundTaskManager {
 
         Task {
             do {
-                let vivaAppObjects = VivaAppObjects(userSession: AppState().userSession)
+                let vivaAppObjects = VivaAppObjects()
                 let result = try await vivaAppObjects.healthService.ping()
                 print("✅ HealthService Ping Result: \(result)")
                 task.setTaskCompleted(success: true)

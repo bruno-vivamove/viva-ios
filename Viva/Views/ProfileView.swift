@@ -167,14 +167,3 @@ struct MenuItem: Identifiable {
     let icon: String
     let title: String
 }
-
-#Preview {
-    let userSession = VivaAppObjects.dummyUserSession()
-    let vivaAppObjects = VivaAppObjects(userSession: userSession)
-
-    ProfileView(
-        userSession: userSession,
-        authManager: vivaAppObjects.authenticationManager,
-        userProfileService: vivaAppObjects.userProfileService
-    )
-}

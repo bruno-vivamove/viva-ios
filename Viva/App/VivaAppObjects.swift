@@ -1,4 +1,6 @@
-struct VivaAppObjects {
+import Foundation
+
+class VivaAppObjects: ObservableObject {
     public let userSession: UserSession
 
     public let authNetworkClientSettings: AuthNetworkClientSettings
@@ -21,7 +23,7 @@ struct VivaAppObjects {
     public let authenticationManager: AuthenticationManager
     public let healthKitDataManager: HealthKitDataManager
 
-    init(userSession: UserSession) {
+    init() {
         self.userSession = UserSession()
 
         // Network client settings
