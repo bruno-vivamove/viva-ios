@@ -104,7 +104,7 @@ class HomeViewModel: ObservableObject {
 
                     do {
                         self.selectedMatchup =
-                            try await matchupService.getMatchup(
+                        try await self.matchupService.getMatchup(
                                 matchupId: matchupInvite.matchupId
                             ).asMatchup
                     } catch {

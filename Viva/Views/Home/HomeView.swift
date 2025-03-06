@@ -2,6 +2,12 @@ import Foundation
 import SwiftUI
 
 struct HomeView: View {
+    @EnvironmentObject var userSession: UserSession
+    @EnvironmentObject var friendService: FriendService
+    @EnvironmentObject var matchupService: MatchupService
+    @EnvironmentObject var userService: UserService
+    @EnvironmentObject var healthKitDataManager: HealthKitDataManager
+
     private let headerInsets = EdgeInsets(
         top: 0,
         leading: VivaDesign.Spacing.medium,
@@ -21,27 +27,8 @@ struct HomeView: View {
     // A counter to trigger refresh for MatchupCards
     @State private var refreshTrigger = 0
 
-    private let userSession: UserSession
-    private let matchupService: MatchupService
-    private let friendService: FriendService
-    private let userService: UserService
-    private let healthKitDataManager: HealthKitDataManager
-
-    init(
-        matchupService: MatchupService,
-        userSession: UserSession,
-        friendService: FriendService,
-        userService: UserService,
-        healthKitDataManager: HealthKitDataManager
-    ) {
-        _viewModel = StateObject(
-            wrappedValue: HomeViewModel(
-                userSession: userSession, matchupService: matchupService))
-        self.userSession = userSession
-        self.matchupService = matchupService
-        self.friendService = friendService
-        self.userService = userService
-        self.healthKitDataManager = healthKitDataManager
+    init(viewModel: HomeViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     var body: some View {

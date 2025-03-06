@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-final class UserProfileService {
+final class UserProfileService: ObservableObject {
     private let networkClient: NetworkClient<VivaErrorResponse>
     private let userSession: UserSession
 

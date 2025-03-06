@@ -3,33 +3,9 @@ import Security
 import SwiftUI
 
 struct SignInView: View {
+    @EnvironmentObject var userSession: UserSession
+
     private let logoWidth: CGFloat = 180
-
-    @ObservedObject private var userSession: UserSession
-    private let authenticationManager: AuthenticationManager
-    private let userProfileService: UserProfileService
-    private let friendService: FriendService
-    private let matchupService: MatchupService
-    private let userService: UserService
-    private let healthKitDataManager: HealthKitDataManager
-
-    init(userSession: UserSession,
-         authenticationManager: AuthenticationManager,
-         userProfileService: UserProfileService,
-         friendService: FriendService,
-         matchupService: MatchupService,
-         userService: UserService,
-         healthKitDataManager: HealthKitDataManager
-    )
-    {
-        self.userSession = userSession
-        self.authenticationManager = authenticationManager
-        self.userProfileService = userProfileService
-        self.friendService = friendService
-        self.matchupService = matchupService
-        self.userService = userService
-        self.healthKitDataManager = healthKitDataManager
-    }
 
     var body: some View {
         ZStack {
@@ -37,16 +13,8 @@ struct SignInView: View {
                 .ignoresSafeArea()
 
             if userSession.isLoggedIn {
-                MainView(
-                    userSession: userSession,
-                    authenticationManager: authenticationManager,
-                    userProfileService: userProfileService,
-                    friendService: friendService,
-                    matchupService: matchupService,
-                    userService: userService,
-                    healthKitDataManager: healthKitDataManager
-                )
-                .transition(.move(edge: .trailing))
+                MainView()
+                    .transition(.move(edge: .trailing))
             } else {
                 VStack(spacing: VivaDesign.Spacing.medium) {
                     // Logo
@@ -60,9 +28,7 @@ struct SignInView: View {
                     Spacer()
 
                     // Auth Buttons
-                    AuthButtonStack(
-                        userSession: userSession,
-                        authenticationManager: authenticationManager)
+                    AuthButtonStack()
                 }
                 .padding(.vertical, VivaDesign.Spacing.large)
             }
@@ -109,16 +75,11 @@ struct MarketingText: View {
 }
 
 struct AuthButtonStack: View {
+    @EnvironmentObject var userSession: UserSession
+    @EnvironmentObject var authenticationManager: AuthenticationManager
+
     @State private var showSignInForm = false
     @State private var showSignUpForm = false
-    @ObservedObject private var userSession: UserSession
-    private let authenticationManager: AuthenticationManager
-
-    init(userSession: UserSession, authenticationManager: AuthenticationManager)
-    {
-        self.userSession = userSession
-        self.authenticationManager = authenticationManager
-    }
 
     var body: some View {
         VStack(spacing: VivaDesign.Spacing.small) {
@@ -262,4 +223,3 @@ struct AuthButtonView: View {
         }
     }
 }
-

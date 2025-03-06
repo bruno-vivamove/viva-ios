@@ -1,43 +1,23 @@
 import SwiftUI
 
 struct MainView: View {
+    @EnvironmentObject var userSession: UserSession
+    @EnvironmentObject var authenticationManager: AuthenticationManager
+    @EnvironmentObject var userProfileService: UserProfileService
+    @EnvironmentObject var friendService: FriendService
+    @EnvironmentObject var matchupService: MatchupService
+    @EnvironmentObject var userService: UserService
+    @EnvironmentObject var healthKitDataManager: HealthKitDataManager
+
     private let activeTabColor: Color = .white
     private let inactiveTabColor: UIColor = .lightGray
-
-    private let userSession: UserSession
-    private let authenticationManager: AuthenticationManager
-    private let userProfileService: UserProfileService
-    private let friendService: FriendService
-    private let matchupService: MatchupService
-    private let userService: UserService
-    private let healthKitDataManager: HealthKitDataManager
-
-    init(
-        userSession: UserSession,
-        authenticationManager: AuthenticationManager,
-        userProfileService: UserProfileService,
-        friendService: FriendService,
-        matchupService: MatchupService,
-        userService: UserService,
-        healthKitDataManager: HealthKitDataManager
-    ) {
-        self.userSession = userSession
-        self.authenticationManager = authenticationManager
-        self.userProfileService = userProfileService
-        self.friendService = friendService
-        self.matchupService = matchupService
-        self.userService = userService
-        self.healthKitDataManager = healthKitDataManager
-    }
 
     var body: some View {
         TabView {
             // Home Tab
             HomeView(
-                matchupService: matchupService, userSession: userSession,
-                friendService: friendService,
-                userService: userService,
-                healthKitDataManager: healthKitDataManager
+                viewModel: HomeViewModel(
+                    userSession: userSession, matchupService: matchupService)
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
@@ -56,17 +36,13 @@ struct MainView: View {
                 }
 
             // Profile Tab
-            ProfileView(
-                userSession: userSession,
-                authManager: authenticationManager,
-                userProfileService: userProfileService
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
-            .tabItem {
-                Image(systemName: "person.fill")
-                Text("Profile")
-            }
+            ProfileView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
+                .tabItem {
+                    Image(systemName: "person.fill")
+                    Text("Profile")
+                }
 
             // Trophies Tab
             TrophiesView()
@@ -79,10 +55,11 @@ struct MainView: View {
 
             // Matchups Tab
             FriendsView(
-                matchupService: matchupService, friendService: friendService,
-                userService: userService,
-                healthKitDataManager: healthKitDataManager,
-                userSession: userSession
+                viewModel: FriendsViewModel(
+                    friendService: friendService,
+                    userService: userService,
+                    userSession: userSession
+                )
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)

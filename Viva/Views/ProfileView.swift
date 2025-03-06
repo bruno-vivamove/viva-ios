@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct ProfileView: View {
-    private let userSession: UserSession
-    private let authManager: AuthenticationManager
-    private let userProfileService: UserProfileService
+    @EnvironmentObject var userSession: UserSession
+    @EnvironmentObject var authManager: AuthenticationManager
+    @EnvironmentObject var userProfileService: UserProfileService
 
     private let menuItems = [
         MenuItem(icon: "applewatch", title: "Linked Devices"),
@@ -14,16 +14,6 @@ struct ProfileView: View {
         MenuItem(icon: "star.fill", title: "Subscription"),
         MenuItem(icon: "questionmark.circle", title: "Help"),
     ]
-
-    init(
-        userSession: UserSession,
-        authManager: AuthenticationManager,
-        userProfileService: UserProfileService
-    ) {
-        self.userSession = userSession
-        self.authManager = authManager
-        self.userProfileService = userProfileService
-    }
 
     var body: some View {
         VStack(spacing: VivaDesign.Spacing.large) {

@@ -1,6 +1,12 @@
 import SwiftUI
 
 struct FriendsView: View {
+    @EnvironmentObject var userSession: UserSession
+    @EnvironmentObject var friendService: FriendService
+    @EnvironmentObject var matchupService: MatchupService
+    @EnvironmentObject var userService: UserService
+    @EnvironmentObject var healthKitDataManager: HealthKitDataManager
+
     private let headerInsets = EdgeInsets(
         top: 0,
         leading: VivaDesign.Spacing.medium,
@@ -21,28 +27,8 @@ struct FriendsView: View {
     @State private var selectedMatchup: Matchup?
     @FocusState private var isSearchFieldFocused: Bool
 
-    let friendService: FriendService
-    let matchupService: MatchupService
-    let userService: UserService
-    let healthKitDataManager: HealthKitDataManager
-
-    init(
-        matchupService: MatchupService,
-        friendService: FriendService,
-        userService: UserService,
-        healthKitDataManager: HealthKitDataManager,
-        userSession: UserSession
-    ) {
-        self.matchupService = matchupService
-        self.friendService = friendService
-        self.userService = userService
-        self.healthKitDataManager = healthKitDataManager
-        _viewModel = StateObject(
-            wrappedValue: FriendsViewModel(
-                friendService: friendService,
-                userService: userService,
-                userSession: userSession
-            ))
+    init(viewModel: FriendsViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     var body: some View {

@@ -2,6 +2,8 @@ import Foundation
 
 class VivaAppObjects: ObservableObject {
     public let userSession: UserSession
+    public let authManager: AuthenticationManager
+    public let healthKitDataManager: HealthKitDataManager
 
     public let authNetworkClientSettings: AuthNetworkClientSettings
     public let appNetworkClientSettings: AppNetworkClientSettings
@@ -20,8 +22,6 @@ class VivaAppObjects: ObservableObject {
     public let userService: UserService
     public let healthService: HealthService
     
-    public let authenticationManager: AuthenticationManager
-    public let healthKitDataManager: HealthKitDataManager
 
     init() {
         self.userSession = UserSession()
@@ -52,7 +52,7 @@ class VivaAppObjects: ObservableObject {
             networkClient: appNetworkClientWithNoSession)
 
         // Other
-        authenticationManager = AuthenticationManager(
+        authManager = AuthenticationManager(
             userSession: userSession,
             authService: authService,
             sessionService: sessionService,
