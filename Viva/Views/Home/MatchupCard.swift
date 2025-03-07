@@ -67,22 +67,26 @@ struct MatchupCard: View {
                 // Left side container - aligned to left edge
                 HStack(spacing: VivaDesign.Spacing.small) {
                     let user = details.leftUsers.first
-                    let leftInvite = details.invites.first { invite in
+                    let invite = details.invites.first { invite in
                         invite.side == .left
                     }
 
                     VivaProfileImage(
-                        imageUrl: leftInvite?.user?.imageUrl ?? user?.imageUrl,
+                        imageUrl: invite?.user?.imageUrl ?? user?.imageUrl,
                         size: .small,
-                        isInvited: leftInvite != nil
+                        isInvited: invite != nil
                     )
 
-                    LabeledValueStack(
-                        label: getUserDisplayName(
-                            user: user, invite: leftInvite),
-                        value: "\(details.leftSidePoints)",
-                        alignment: .leading
-                    )
+                    VStack(alignment: .leading) {
+                        Text(getUserDisplayName(user: user, invite: invite))
+                            .foregroundColor(VivaDesign.Colors.vivaGreen)
+                            .font(VivaDesign.Typography.caption)
+                            .lineLimit(1)
+                        Text("\(details.leftSidePoints)")
+                            .foregroundColor(VivaDesign.Colors.primaryText)
+                            .font(VivaDesign.Typography.value)
+                            .lineLimit(1)
+                    }
 
                     Spacer(minLength: 0)  // Push content to left edge
                 }
@@ -100,21 +104,25 @@ struct MatchupCard: View {
                     Spacer(minLength: 0)  // Push content to right edge
 
                     let user = details.rightUsers.first
-                    let rightInvite = details.invites.first { invite in
+                    let invite = details.invites.first { invite in
                         invite.side == .right
                     }
 
-                    LabeledValueStack(
-                        label: getUserDisplayName(
-                            user: user, invite: rightInvite),
-                        value: "\(details.rightSidePoints)",
-                        alignment: .trailing
-                    )
+                    VStack(alignment: .trailing) {
+                        Text(getUserDisplayName(user: user, invite: invite))
+                            .foregroundColor(VivaDesign.Colors.vivaGreen)
+                            .font(VivaDesign.Typography.caption)
+                            .lineLimit(1)
+                        Text("\(details.leftSidePoints)")
+                            .foregroundColor(VivaDesign.Colors.primaryText)
+                            .font(VivaDesign.Typography.value)
+                            .lineLimit(1)
+                    }
 
                     VivaProfileImage(
-                        imageUrl: rightInvite?.user?.imageUrl ?? user?.imageUrl,
+                        imageUrl: invite?.user?.imageUrl ?? user?.imageUrl,
                         size: .small,
-                        isInvited: rightInvite != nil
+                        isInvited: invite != nil
                     )
                 }
             }

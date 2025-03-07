@@ -62,7 +62,7 @@ struct MatchupDetailView: View {
                                 showInviteView = true
                             }
                         )
-                        .padding(.horizontal)
+                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
 
                         ViewToggle(isShowingTotal: $isShowingTotal)
 
@@ -89,7 +89,7 @@ struct MatchupDetailView: View {
                                 )
                             }
                         }
-                        .padding(.horizontal, VivaDesign.Spacing.xlarge)
+                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
 
                         Spacer()
 
@@ -99,7 +99,7 @@ struct MatchupDetailView: View {
                             rightUser: matchup.rightUsers.first,
                             record: (wins: 0, losses: 0)
                         )
-                        .padding(.horizontal)
+                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
                     }
                     .padding(.vertical, VivaDesign.Spacing.medium)
                 }
@@ -202,15 +202,6 @@ struct MatchupDetailView: View {
         .task {
             await viewModel.loadData()
         }
-        // TODO Bug - maybe
-//        .onChange(of: viewModel.matchup?.invites.count) { _, _ in
-//            if let matchup = viewModel.matchup {
-//                NotificationCenter.default.post(
-//                    name: .matchupUpdated,
-//                    object: matchup
-//                )
-//            }
-//        }
         .alert("Error", isPresented: .constant(viewModel.error != nil)) {
             Button("OK") {
                 viewModel.error = nil
@@ -231,15 +222,17 @@ struct MatchupHeader: View {
     let onOpenPositionTap: ((MatchupUser.Side) -> Void)?
 
     var body: some View {
-        HStack {
+        HStack(spacing: 0) {
+            // Left user with full width to center
+            let leftUser = viewModel.matchup?.leftUsers.first;
+            let leftInvite = viewModel.matchup?.invites.first(where: {
+                $0.side == .left
+            })
+            
             UserScoreView(
-                matchupUser: viewModel.matchup?.leftUsers.first,
-                invitedUser: viewModel.matchup?.invites.first(where: {
-                    $0.side == .left
-                })?.user,
-                inviteCode: viewModel.matchup?.invites.first(where: {
-                    $0.side == .left
-                })?.inviteCode,
+                matchupUser: leftUser,
+                invitedUser: leftInvite?.user,
+                inviteCode: leftInvite?.inviteCode,
                 totalPoints: viewModel.matchup?.leftSidePoints ?? 0,
                 imageOnLeft: true,
                 onInviteTap: onInviteTap,
@@ -247,15 +240,18 @@ struct MatchupHeader: View {
                     onOpenPositionTap?(.left)
                 }
             )
-            Spacer()
+            .frame(maxWidth: .infinity)
+            
+            // Right user with full width to center
+            let rightUser = viewModel.matchup?.rightUsers.first
+            let rightInvite = viewModel.matchup?.invites.first(where: {
+                $0.side == .right
+            })
+            
             UserScoreView(
-                matchupUser: viewModel.matchup?.rightUsers.first,
-                invitedUser: viewModel.matchup?.invites.first(where: {
-                    $0.side == .right
-                })?.user,
-                inviteCode: viewModel.matchup?.invites.first(where: {
-                    $0.side == .right
-                })?.inviteCode,
+                matchupUser: rightUser,
+                invitedUser: rightInvite?.user,
+                inviteCode: rightInvite?.inviteCode,
                 totalPoints: viewModel.matchup?.rightSidePoints ?? 0,
                 imageOnLeft: false,
                 onInviteTap: onInviteTap,
@@ -263,7 +259,9 @@ struct MatchupHeader: View {
                     onOpenPositionTap?(.right)
                 }
             )
+            .frame(maxWidth: .infinity)
         }
+        .frame(height: 60)
     }
 }
 
@@ -277,23 +275,28 @@ struct UserScoreView: View {
     let onOpenPositionTap: (() -> Void)?
 
     var body: some View {
-        HStack(spacing: 12) {
+        // Replace GeometryReader with a fixed height HStack
+        HStack(alignment: .center, spacing: 0) {
             if imageOnLeft {
                 userImage
                 userInfo
+                    .frame(maxWidth: .infinity)
             } else {
                 userInfo
+                    .frame(maxWidth: .infinity)
                 userImage
             }
         }
+        .frame(height: 60) // Use a fixed height instead of GeometryReader
     }
 
+    // Rest of the code remains the same...
     private var userImage: some View {
         Group {
             if invitedUser != nil || matchupUser != nil {
                 VivaProfileImage(
                     imageUrl: invitedUser?.imageUrl ?? matchupUser?.imageUrl,
-                    size: .medium,
+                    size: .large,
                     isInvited: invitedUser != nil
                 )
                 .onTapGesture {
@@ -314,11 +317,16 @@ struct UserScoreView: View {
     }
 
     private var userInfo: some View {
-        LabeledValueStack(
-            label: displayName,
-            value: "\(totalPoints)",
-            alignment: imageOnLeft ? .leading : .trailing
-        )
+        VStack(alignment: .center) {
+            Text(displayName)
+                .foregroundColor(VivaDesign.Colors.vivaGreen)
+                .font(VivaDesign.Typography.caption)
+                .lineLimit(1)
+            Text("\(totalPoints)")
+                .foregroundColor(VivaDesign.Colors.primaryText)
+                .font(VivaDesign.Typography.points)
+                .lineLimit(1)
+        }
         .lineLimit(1)
         .truncationMode(.tail)
     }
@@ -338,23 +346,39 @@ struct ViewToggle: View {
     @Binding var isShowingTotal: Bool
 
     var body: some View {
-        HStack(spacing: VivaDesign.Spacing.xsmall) {
-            Text("Total")
-                .lineLimit(1)
-                .truncationMode(.tail)
-                .foregroundColor(
-                    isShowingTotal
-                        ? VivaDesign.Colors.primaryText
-                        : VivaDesign.Colors.secondaryText)
-            Text("|")
-                .foregroundColor(VivaDesign.Colors.vivaGreen)
-            Text("Today")
-                .lineLimit(1)
-                .truncationMode(.tail)
-                .foregroundColor(
-                    isShowingTotal
-                        ? VivaDesign.Colors.secondaryText
-                        : VivaDesign.Colors.primaryText)
+        HStack(spacing: VivaDesign.Spacing.medium) {
+            // Left line
+            VivaDivider()
+                .padding(.leading, VivaDesign.Spacing.small)
+            
+            // Toggle text with vertical separator
+            HStack(spacing: VivaDesign.Spacing.xsmall) {
+                Text("Today")
+                    .lineLimit(1)
+                    .fontWeight(.bold)
+                    .truncationMode(.tail)
+                    .foregroundColor(
+                        isShowingTotal
+                            ? VivaDesign.Colors.secondaryText
+                            : VivaDesign.Colors.vivaGreen)
+                
+                Text("|")
+                    .foregroundColor(VivaDesign.Colors.vivaGreen)
+                
+                Text("Total")
+                    .lineLimit(1)
+                    .fontWeight(.bold)
+                    .truncationMode(.tail)
+                    .foregroundColor(
+                        isShowingTotal
+                            ? VivaDesign.Colors.vivaGreen
+                            : VivaDesign.Colors.secondaryText)
+            }
+            .padding(.vertical, 4)
+            
+            // Right line
+            VivaDivider()
+                .padding(.trailing, VivaDesign.Spacing.small)
         }
         .onTapGesture {
             withAnimation {
@@ -374,20 +398,25 @@ struct ComparisonRow: View {
     var body: some View {
         VStack {
             HStack {
+                Spacer()
+                    .frame(width: VivaDesign.Spacing.medium)
+                
                 // Left side with fixed width
-                VStack(alignment: .leading) {
+                VStack(alignment: .center) {
                     Text(leftValue)
                         .font(.title2)
+                        .fontWeight(.bold)
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .foregroundColor(VivaDesign.Colors.primaryText)
                     Text(leftPoints)
                         .font(VivaDesign.Typography.caption)
+                        .fontWeight(.bold)
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .foregroundColor(VivaDesign.Colors.secondaryText)
                 }
-                .frame(width: 80, alignment: .leading)  // Fixed width
+                .frame(width: 80, alignment: .center)  // Fixed width with center alignment
 
                 Spacer()
 
@@ -395,26 +424,31 @@ struct ComparisonRow: View {
                 Text(title)
                     .lineLimit(1)
                     .truncationMode(.tail)
-                    .font(.title2)
+                    .font(VivaDesign.Typography.pointsTitle)
                     .foregroundColor(VivaDesign.Colors.vivaGreen)
                     .frame(width: 140, alignment: .center)  // Fixed width
 
                 Spacer()
 
                 // Right side with fixed width
-                VStack(alignment: .trailing) {
+                VStack(alignment: .center) {
                     Text(rightValue)
                         .font(.title2)
+                        .fontWeight(.bold)
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .foregroundColor(VivaDesign.Colors.primaryText)
                     Text(rightPoints)
                         .font(VivaDesign.Typography.caption)
+                        .fontWeight(.bold)
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .foregroundColor(VivaDesign.Colors.secondaryText)
                 }
-                .frame(width: 80, alignment: .trailing)  // Fixed width
+                .frame(width: 80, alignment: .center)  // Fixed width with center alignment
+                
+                Spacer()
+                    .frame(width: VivaDesign.Spacing.medium)
             }
 
             VivaDivider()

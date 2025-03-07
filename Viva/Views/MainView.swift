@@ -9,9 +9,13 @@ struct MainView: View {
     @EnvironmentObject var userService: UserService
     @EnvironmentObject var healthKitDataManager: HealthKitDataManager
 
-    private let activeTabColor: Color = .white
-    private let inactiveTabColor: UIColor = .lightGray
+    private let activeTabColor: Color = VivaDesign.Colors.vivaGreen
+    private let inactiveTabColor: UIColor = .white
 
+    init() {
+        UITabBar.appearance().unselectedItemTintColor = .white
+    }
+    
     var body: some View {
         TabView {
             // Home Tab

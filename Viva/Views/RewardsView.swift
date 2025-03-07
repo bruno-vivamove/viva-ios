@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RewardsView: View {
-    private let points = 3017
+    private let points = 0
     private let logoWidth: CGFloat = 120
 
     var body: some View {

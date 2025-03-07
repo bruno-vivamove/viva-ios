@@ -20,6 +20,8 @@ enum VivaDesign {
     }
     
     enum Spacing {
+        static let outerPadding: CGFloat = 12
+
         static let xlarge: CGFloat = 44
         static let large: CGFloat = 32
         static let medium: CGFloat = 20
@@ -35,7 +37,7 @@ enum VivaDesign {
         static let buttonBorderWidth: CGFloat = 2
         
         enum ProfileImage: CGFloat {
-            case large = 80
+            case large = 75
             case medium = 60
             case small = 50
             case mini = 30
@@ -51,6 +53,9 @@ enum VivaDesign {
         static let title2 = Font.title2
         static let title3 = Font.title3
         static let body = Font.body
+
+        static let pointsTitle = Font.system(size: 15, weight: .bold)
+        static let points = Font.system(size: 30, weight: .bold)
 
         
         static let header = Font.system(size: 18, weight: .bold)

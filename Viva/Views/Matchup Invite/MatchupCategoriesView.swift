@@ -12,14 +12,16 @@ struct MatchupCategoriesView: View {
     @State private var navigateToMatchupType = false
     @Binding var showCreationFlow: Bool
     @State private var categories: [MatchupCategory] = [
-        MatchupCategory(
-            id: "calories", name: "Active Calories", isSelected: true),
-        MatchupCategory(id: "steps", name: "Steps", isSelected: true),
-        MatchupCategory(id: "ehr", name: "eHR Mins", isSelected: true),
-        MatchupCategory(
-            id: "strength", name: "Strength Training Mins", isSelected: true),
-        MatchupCategory(id: "sleep", name: "Sleep Minutes", isSelected: true),
+        MatchupCategory(id: "calories", name: "Active Calories", isSelected: false),
+        MatchupCategory(id: "steps", name: "Steps", isSelected: false),
+        MatchupCategory(id: "ehr", name: "eHR Mins", isSelected: false),
+        MatchupCategory(id: "strength", name: "Strength Training Mins", isSelected: false),
+        MatchupCategory(id: "sleep", name: "Sleep Minutes", isSelected: false),
     ]
+    
+    private var isCategorySelected: Bool {
+        return categories.contains(where: { $0.isSelected })
+    }
 
     let userService: UserService
 
@@ -45,60 +47,63 @@ struct MatchupCategoriesView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                // Background color
-                Color.black.edgesIgnoringSafeArea(.all)
-
-                VStack(spacing: VivaDesign.Spacing.medium) {
-                    // Title
-                    HStack {
-                        Text("Choose your ")
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(.white)
-                            + Text("categories")
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(VivaDesign.Colors.vivaGreen)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.horizontal)
-                    .padding(.top)
-
-                    // Category Buttons
-                    ScrollView {
-                        VStack(spacing: VivaDesign.Spacing.small) {
-                            ForEach($categories) { $category in
-                                Button(action: {
-                                    category.isSelected.toggle()
-                                }) {
-                                    Text(category.name)
-                                        .font(.system(size: 18, weight: .semibold))
-                                        .frame(maxWidth: .infinity)
-                                        .padding()
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .fill(category.isSelected ? VivaDesign.Colors.vivaGreen : Color.clear)
-                                        )
-                                        .foregroundColor(category.isSelected ? Color.black : Color.white)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(VivaDesign.Colors.vivaGreen, lineWidth: 1)
-                                        )
-                                }
+            VStack(spacing: VivaDesign.Spacing.medium) {
+                // Title
+                Text("Choose your ")
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundColor(.white)
+                    + Text("categories")
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundColor(VivaDesign.Colors.vivaGreen)
+                
+                // Category List
+                ScrollView {
+                    VStack(spacing: VivaDesign.Spacing.small) {
+                        ForEach($categories) { $category in
+                            Button(action: {
+                                category.isSelected.toggle()
+                            }) {
+                                Text(category.name)
+                                    .font(.system(size: 18, weight: .semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(category.isSelected ? VivaDesign.Colors.vivaGreen : Color.clear)
+                                    )
+                                    .foregroundColor(category.isSelected ? Color.black : Color.white)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(VivaDesign.Colors.vivaGreen, lineWidth: 1)
+                                    )
                             }
                         }
-                        .padding(.horizontal)
                     }
-
-                    Spacer()
-
-                    // Bottom Image
-                    Image("runners")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(height: 200)
-                        .clipped()
                 }
+
+                // Select All Button
+                Button(action: {
+                    let allSelected = categories.allSatisfy { $0.isSelected }
+                    for i in 0..<categories.count {
+                        categories[i].isSelected = !allSelected
+                    }
+                }) {
+                    Text(categories.allSatisfy { $0.isSelected } ? "Deselect All" : "Select All")
+                        .font(.system(size: 16, weight: .semibold))
+                        .padding(.horizontal, VivaDesign.Spacing.medium)
+                        .padding(.vertical, VivaDesign.Spacing.small)
+                        .background(Color.clear)
+                        .foregroundColor(VivaDesign.Colors.vivaGreen)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(VivaDesign.Colors.vivaGreen, lineWidth: 1)
+                        )
+                }
+                
+                Spacer()
             }
+            .padding()
+            .background(Color.black.edgesIgnoringSafeArea(.all))
             .navigationDestination(isPresented: $navigateToMatchupType) {
                 MatchupTypeView(
                     coordinator: coordinator,
@@ -118,12 +123,10 @@ struct MatchupCategoriesView: View {
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Next") {
-                        // Verify at least one category is selected
-                        if categories.contains(where: { $0.isSelected }) {
-                            navigateToMatchupType = true
-                        }
+                        navigateToMatchupType = true
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(isCategorySelected ? .white : Color.gray.opacity(0.5))
+                    .disabled(!isCategorySelected)
                 }
             }
         }
