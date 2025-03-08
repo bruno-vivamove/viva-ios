@@ -60,26 +60,27 @@ struct ProfileView: View {
                             }
                             
                             // Streak counter next to profile image
-                            VStack(spacing: 4) {
-                                ZStack {
-                                    Circle()
-                                        .stroke(VivaDesign.Colors.vivaGreen, lineWidth: 1)
-                                        .frame(width: 44, height: 44)
-                                    
-                                    Text("9")
-                                        .font(.system(size: 20, weight: .bold))
-                                        .foregroundColor(.white)
-                                    
-                                    // Lightning bolt in top right
-                                    Image(systemName: "bolt.fill")
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.white)
-                                        .offset(x: 14, y: -14)
-                                }
+                            ZStack(alignment: .bottom) {
+                                Circle()
+                                    .stroke(VivaDesign.Colors.vivaGreen, lineWidth: 1)
+                                    .frame(width: 44, height: 44)
                                 
+                                Text("9")
+                                    .font(.system(size: 20, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .offset(y: -10)
+
+                                // Lightning bolt in top right
+                                Image(systemName: "bolt.fill")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.white)
+                                    .offset(x: 14, y: -30)
+                                
+                                // Added "Streak" text under the circle but offset down
                                 Text("Streak")
-                                    .font(.system(size: 10))
-                                    .foregroundColor(VivaDesign.Colors.vivaGreen)
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.white)
+                                    .offset(y: 20) // Position it below the circle
                             }
                             
                             Spacer()
@@ -233,18 +234,29 @@ struct StatItem: View {
     let iconName: String
     
     var body: some View {
-        VStack(spacing: 6) {
-            Text(value)
-                .font(.system(size: 18, weight: .bold))
-                .foregroundColor(.white)
+        VStack(spacing: 0) {
+            // Circled value
+            ZStack {
+                Circle()
+                    .stroke(VivaDesign.Colors.vivaGreen, lineWidth: 1)
+                    .frame(width: 60, height: 60)
+                
+                Text(value)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.white)
+            }
             
-            Image(systemName: iconName)
-                .font(.system(size: 16))
-                .foregroundColor(.white)
-            
-            Text(label)
-                .font(.system(size: 12))
-                .foregroundColor(.white)
+            // Icon and label positioned to overlap with bottom of circle
+            VStack(spacing: 4) {
+                Image(systemName: iconName)
+                    .font(.system(size: 16))
+                    .foregroundColor(.white)
+                
+                Text(label)
+                    .font(.system(size: 12))
+                    .foregroundColor(.white)
+            }
+            .offset(y: -10) // Adjust this value to control how much overlap you want
         }
         .frame(width: 60)
     }
