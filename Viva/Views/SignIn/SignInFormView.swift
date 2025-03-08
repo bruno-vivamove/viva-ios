@@ -8,6 +8,18 @@ class SignInViewModel: ObservableObject {
     @Published var showPassword = false
     @Published var isLoading = false
     @Published var errorMessage: String?
+    
+    // Computed property to check if form is valid
+    var isFormValid: Bool {
+        return isValidEmail(email) && !password.isEmpty
+    }
+    
+    // Email validation
+    private func isValidEmail(_ email: String) -> Bool {
+        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
+        let emailPredicate = NSPredicate(format: "SELF MATCHES %@", emailRegex)
+        return emailPredicate.evaluate(with: email) && !email.isEmpty
+    }
 
     let authManager: AuthenticationManager
 
@@ -88,6 +100,7 @@ struct SignInFormView: View {
                         // Sign In Button
                         SignInButton(
                             isLoading: viewModel.isLoading,
+                            isEnabled: viewModel.isFormValid,
                             action: signIn
                         )
                         
@@ -124,6 +137,30 @@ struct SignInFormView: View {
         Task {
             if await viewModel.signIn() {
                 dismiss()
+            }
+        }
+    }
+}
+
+// Updated SignInButton to include isEnabled parameter
+struct SignInButton: View {
+    let isLoading: Bool
+    let isEnabled: Bool
+    let action: () -> Void
+
+    var body: some View {
+        ZStack {
+            AuthButtonView(
+                title: "Sign In",
+                style: .primary,
+                action: action
+            )
+            .opacity(isLoading || !isEnabled ? 0.5 : 1.0)
+            .disabled(isLoading || !isEnabled)
+
+            if isLoading {
+                ProgressView()
+                    .tint(VivaDesign.Colors.vivaGreen)
             }
         }
     }
@@ -166,28 +203,6 @@ struct WelcomeSection: View {
                 .foregroundColor(VivaDesign.Colors.secondaryText)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-}
-
-struct SignInButton: View {
-    let isLoading: Bool
-    let action: () -> Void
-
-    var body: some View {
-        ZStack {
-            AuthButtonView(
-                title: "Sign In",
-                style: .primary,
-                action: action
-            )
-            .opacity(isLoading ? 0.5 : 1.0)
-            .disabled(isLoading)
-
-            if isLoading {
-                ProgressView()
-                    .tint(VivaDesign.Colors.vivaGreen)
-            }
-        }
     }
 }
 
