@@ -140,11 +140,37 @@ class MatchupCardViewModel: ObservableObject {
             .filter { $0.id == self.matchupId }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] matchup in
-                if let details = self?.matchupDetails {
-                    // Update just the status without re-fetching
-                    var updatedDetails = details
-                    updatedDetails.status = matchup.status
-                    self?.matchupDetails = updatedDetails
+                self?.matchupDetails?.status = matchup.status
+            }
+            .store(in: &cancellables)
+
+        // Matchup invite sent observer
+        NotificationCenter.default.publisher(for: .matchupInviteSent)
+            .compactMap { $0.object as? MatchupInvite }
+            .filter { $0.matchupId == self.matchupId }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] matchupInvite in
+                // Only add the invite if it doesn't already exist in the matchup
+                if let invites = self?.matchupDetails?.invites {
+                    if !invites.contains(where: {
+                        $0.inviteCode == matchupInvite.inviteCode
+                    }) {
+                        self?.matchupDetails?.invites.append(matchupInvite)
+                    }
+                }
+            }
+            .store(in: &cancellables)
+
+        // Matchup invite deleted observer
+        NotificationCenter.default.publisher(for: .matchupInviteDeleted)
+            .compactMap { $0.object as? MatchupInvite }
+            .filter { $0.matchupId == self.matchupId }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] matchupInvite in
+                if var invites = self?.matchupDetails?.invites {
+                    invites.removeAll {
+                        $0.inviteCode == matchupInvite.inviteCode
+                    }
                 }
             }
             .store(in: &cancellables)

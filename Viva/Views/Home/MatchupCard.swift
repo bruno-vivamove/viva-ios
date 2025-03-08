@@ -113,7 +113,7 @@ struct MatchupCard: View {
                             .foregroundColor(VivaDesign.Colors.vivaGreen)
                             .font(VivaDesign.Typography.caption)
                             .lineLimit(1)
-                        Text("\(details.leftSidePoints)")
+                        Text("\(details.rightSidePoints)")
                             .foregroundColor(VivaDesign.Colors.primaryText)
                             .font(VivaDesign.Typography.value)
                             .lineLimit(1)
