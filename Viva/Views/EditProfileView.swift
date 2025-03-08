@@ -47,6 +47,8 @@ class EditProfileViewModel: ObservableObject {
 }
 
 struct EditProfileView: View {
+    private let captionLengthLimit = 150
+
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: EditProfileViewModel
     @State private var showImagePicker = false
@@ -66,7 +68,8 @@ struct EditProfileView: View {
             get: { viewModel.caption },
             set: {
                 viewModel.caption = String(
-                    $0.prefix(150).replacingOccurrences(of: "\n", with: ""))
+                    $0.prefix(captionLengthLimit).replacingOccurrences(
+                        of: "\n", with: ""))
             }
         )
     }
@@ -134,7 +137,7 @@ struct EditProfileView: View {
 
                             HStack {
                                 Spacer()
-                                Text("\(viewModel.caption.count)/255")
+                                Text("\(viewModel.caption.count)/\(captionLengthLimit)")
                                     .font(Font.system(size: 12))
                                     .foregroundColor(
                                         VivaDesign.Colors.secondaryText

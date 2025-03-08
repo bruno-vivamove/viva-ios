@@ -5,6 +5,10 @@ struct ProfileView: View {
     @EnvironmentObject var userProfileService: UserProfileService
     @State private var showSettings = false
     @State private var showEditProfile = false
+    @State private var showImagePicker = false
+    @State private var selectedImage: UIImage?
+    @State private var isLoading = false
+    @State private var errorMessage: String?
 
     var body: some View {
         ZStack {
@@ -44,17 +48,32 @@ struct ProfileView: View {
                             HStack(alignment: .bottom, spacing: 32) {
                                 // Profile image (left aligned)
                                 ZStack(alignment: .bottomTrailing) {
-                                    VivaProfileImage(
-                                        imageUrl: userSession.getUserProfile()
-                                            .imageUrl,
-                                        size: .xlarge
-                                    )
-                                    .padding(.top, 16)
+                                    if isLoading {
+                                        // Show loading indicator over the profile image when saving
+                                        ZStack {
+                                            VivaProfileImage(
+                                                imageUrl: userSession.getUserProfile().imageUrl,
+                                                size: .xlarge
+                                            )
+                                            .padding(.top, 16)
+                                            .blur(radius: 3)
+                                            
+                                            ProgressView()
+                                                .tint(VivaDesign.Colors.vivaGreen)
+                                                .scaleEffect(1.5)
+                                        }
+                                    } else {
+                                        VivaProfileImage(
+                                            imageUrl: userSession.getUserProfile().imageUrl,
+                                            size: .xlarge
+                                        )
+                                        .padding(.top, 16)
+                                    }
 
                                     // Plus button for editing profile picture
                                     Button(action: {
-                                        // Action to change profile picture
-                                        showEditProfile = true
+                                        // Action to open image picker directly
+                                        showImagePicker = true
                                     }) {
                                         Circle()
                                             .fill(Color.white)
@@ -69,6 +88,7 @@ struct ProfileView: View {
                                             )
                                     }
                                     .offset(x: -4, y: -4)
+                                    .disabled(isLoading)
                                 }
 
                                 // Streak counter next to profile image
@@ -113,6 +133,7 @@ struct ProfileView: View {
                             .padding(.top, 16)
                             .padding(.horizontal, 16)
 
+                            // Rest of content remains the same...
                             // User name (left aligned)
                             Text(userSession.getUserProfile().displayName)
                                 .font(.system(size: 28, weight: .bold))
@@ -254,7 +275,61 @@ struct ProfileView: View {
                 userSession: userSession, userProfileService: userProfileService
             )
         }
+        .sheet(isPresented: $showImagePicker, onDismiss: {
+            // When the image picker is dismissed and an image was selected
+            if let selectedImage = selectedImage {
+                saveProfileImage(selectedImage)
+            }
+        }) {
+            ImagePicker(selectedImage: $selectedImage)
+        }
         .edgesIgnoringSafeArea(.top)
+        .alert(item: errorMessageBinding) { message in
+            Alert(
+                title: Text("Error"),
+                message: Text(message.text),
+                dismissButton: .default(Text("OK"))
+            )
+        }
+    }
+    
+    private func saveProfileImage(_ image: UIImage) {
+        isLoading = true
+        
+        Task {
+            do {
+                // Only pass the image, not the update request
+                let _ = try await userProfileService.saveCurrentUserProfile(nil, image)
+                
+                await MainActor.run {
+                    isLoading = false
+                    // Reset the selected image
+                    selectedImage = nil
+                }
+            } catch {
+                await MainActor.run {
+                    isLoading = false
+                    errorMessage = "Failed to save image: \(error.localizedDescription)"
+                }
+            }
+        }
+    }
+    
+    // Helper struct to wrap error messages for the alert API
+    struct ErrorMessage: Identifiable {
+        let id = UUID()
+        let text: String
+    }
+    
+    private var errorMessageBinding: Binding<ErrorMessage?> {
+        Binding<ErrorMessage?>(
+            get: {
+                errorMessage.map { ErrorMessage(text: $0) }
+            },
+            set: { _ in
+                errorMessage = nil
+            }
+        )
     }
 }
 
@@ -267,6 +342,7 @@ struct ViewOffsetKey: PreferenceKey {
 }
 
 struct StatItem: View {
+    // StatItem implementation remains unchanged...
     let value: String
     let label: String
     let iconName: String
