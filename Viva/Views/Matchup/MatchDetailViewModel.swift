@@ -90,7 +90,7 @@ class MatchupDetailViewModel: ObservableObject {
                         // Get only the current user's measurements
                         let userMeasurements = updatedMatchup.userMeasurements
                             .filter {
-                                $0.userId == self.userSession.getUserId()
+                                $0.userId == self.userSession.userId
                             }
 
                         if userMeasurements.isEmpty {

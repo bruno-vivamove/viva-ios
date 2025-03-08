@@ -20,28 +20,30 @@ final class AuthenticationManager: ObservableObject {
 
     func signIn(email: String, password: String) async throws {
         let authResponse = try await authService.signIn(email, password)
-        let sessionResponse = try await sessionService.createSession(authResponse.idToken)
-        userSession.setAccessToken(sessionResponse.accessToken)
-        let userProfile = try await userProfileService.getCurrentUserProfile()
+        let sessionResponse = try await sessionService.createSession(
+            authResponse.idToken)
 
-        await MainActor.run(){
-            userSession.setLoggedIn(userProfile)
+        await MainActor.run {
+            userSession.setLoggedIn(
+                userProfile: sessionResponse.userProfile,
+                sessionToken: sessionResponse.accessToken)
         }
     }
-    
+
     func signUp(email: String, password: String) async throws {
         let authResponse = try await authService.signUp(email, password)
-        let sessionResponse = try await sessionService.createSession(authResponse.idToken)
-        userSession.setAccessToken(sessionResponse.accessToken)
-        let userProfile = try await userProfileService.getCurrentUserProfile()
+        let sessionResponse = try await sessionService.createSession(
+            authResponse.idToken)
         
-        await MainActor.run(){
-            userSession.setLoggedIn(userProfile)
+        await MainActor.run {
+            userSession.setLoggedIn(
+                userProfile: sessionResponse.userProfile,
+                sessionToken: sessionResponse.accessToken)
         }
     }
 
     func signOut() async {
-        await MainActor.run(){
+        await MainActor.run {
             userSession.setLoggedOut()
         }
     }

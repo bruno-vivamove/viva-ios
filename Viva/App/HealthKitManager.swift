@@ -205,7 +205,7 @@ final class HealthKitDataManager: ObservableObject {
                         matchupId: matchupId,
                         dayNumber: dayNumber,
                         measurementType: .steps,
-                        userId: userSession.getUserId(),
+                        userId: userSession.userId,
                         completeDay: dayNumber < currentDayNumber,
                         value: steps,
                         points: 0
@@ -260,7 +260,7 @@ final class HealthKitDataManager: ObservableObject {
                         matchupId: matchupId,
                         dayNumber: dayNumber,
                         measurementType: .energyBurned,
-                        userId: userSession.getUserId(),
+                        userId: userSession.userId,
                         completeDay: dayNumber < currentDayNumber,
                         value: calories,
                         points: 0
@@ -334,7 +334,7 @@ final class HealthKitDataManager: ObservableObject {
                         matchupId: matchupId,
                         dayNumber: dayNumber,
                         measurementType: type,
-                        userId: userSession.getUserId(),
+                        userId: userSession.userId,
                         completeDay: dayNumber < currentDayNumber,
                         value: totalMinutes,
                         points: 0
@@ -393,7 +393,7 @@ final class HealthKitDataManager: ObservableObject {
                         matchupId: matchupId,
                         dayNumber: dayNumber,
                         measurementType: .elevatedHeartRate,
-                        userId: userSession.getUserId(),
+                        userId: userSession.userId,
                         completeDay: dayNumber < currentDayNumber,
                         value: totalMinutes,
                         points: 0
@@ -452,7 +452,7 @@ final class HealthKitDataManager: ObservableObject {
                         matchupId: matchupId,
                         dayNumber: dayNumber,
                         measurementType: .asleep,
-                        userId: userSession.getUserId(),
+                        userId: userSession.userId,
                         completeDay: dayNumber < currentDayNumber,
                         value: totalMinutes,
                         points: 0
@@ -506,7 +506,7 @@ final class HealthKitDataManager: ObservableObject {
                         matchupId: matchupId,
                         dayNumber: dayNumber,
                         measurementType: .standing,
-                        userId: userSession.getUserId(),
+                        userId: userSession.userId,
                         completeDay: dayNumber < currentDayNumber,
                         value: minutes,
                         points: 0

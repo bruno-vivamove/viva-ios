@@ -53,7 +53,7 @@ class MatchupCardViewModel: ObservableObject {
                         // If there are updated measurements from the current user, save them
                         let userMeasurements = updatedMatchup.userMeasurements
                             .filter {
-                                $0.userId == self.userSession.getUserId()
+                                $0.userId == self.userSession.userId
                             }
 
                         if !userMeasurements.isEmpty {
