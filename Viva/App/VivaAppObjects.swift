@@ -61,18 +61,4 @@ class VivaAppObjects: ObservableObject {
 
         healthKitDataManager = HealthKitDataManager(userSession: userSession)
     }
-
-    public static func dummyUserSession() -> UserSession {
-        let userSession = UserSession()
-        userSession.setAccessToken("dummy_token")
-        userSession.setLoggedIn(
-            UserProfile(
-                id: "dummy_user_id",
-                emailAddress: "dumm_email_address",
-                displayName: "dummy_display_name",
-                imageUrl: "profile_bruno",
-                rewardPoints: 9876,
-                streakDays: 10))
-        return userSession
-    }
 }

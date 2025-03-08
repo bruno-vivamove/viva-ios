@@ -41,10 +41,15 @@ final class UserProfileService: ObservableObject {
                 ))
         }
 
-        return try await networkClient.upload(
+        let savedUserProfile: UserProfile = try await networkClient.upload(
             path: "/viva/me",
             headers: nil,
             data: multipartData
         )
+        
+        Task { @MainActor in
+            userSession.setUserProfile(savedUserProfile)
+        }
+        return savedUserProfile
     }
 }

@@ -3,6 +3,7 @@ import SwiftUI
 class EditProfileViewModel: ObservableObject {
     @Published var displayName: String
     @Published var email: String
+    @Published var caption: String
     @Published var selectedImage: UIImage?
     @Published var isLoading = false
     @Published var errorMessage: String?
@@ -16,6 +17,7 @@ class EditProfileViewModel: ObservableObject {
 
         self.displayName = userSession.getUserProfile().displayName
         self.email = userSession.getUserProfile().emailAddress
+        self.caption = userSession.getUserProfile().caption ?? ""
     }
 
     @MainActor
@@ -26,9 +28,11 @@ class EditProfileViewModel: ObservableObject {
         do {
             let updateRequest = UserProfileUpdateRequest(
                 emailAddress: self.email,
-                displayName: self.displayName)
+                displayName: self.displayName,
+                caption: self.caption)
             let savedUserProfile =
-                try await userProfileService.saveCurrentUserProfile(updateRequest, selectedImage)
+                try await userProfileService.saveCurrentUserProfile(
+                    updateRequest, selectedImage)
 
             self.userSession.setUserProfile(savedUserProfile)
             // Update successful
@@ -55,6 +59,16 @@ struct EditProfileView: View {
                 userSession: userSession, userProfileService: userProfileService
             ))
         self.userProfileService = userProfileService
+    }
+
+    private var limitedCaption: Binding<String> {
+        Binding(
+            get: { viewModel.caption },
+            set: {
+                viewModel.caption = String(
+                    $0.prefix(150).replacingOccurrences(of: "\n", with: ""))
+            }
+        )
     }
 
     var body: some View {
@@ -89,6 +103,46 @@ struct EditProfileView: View {
                             .autocapitalization(.none)
                             .textContentType(.emailAddress)
                             .keyboardType(.emailAddress)
+
+                        // Caption Field - Multi-line with text wrapping
+                        ZStack(alignment: .topLeading) {
+                            if viewModel.caption.isEmpty {
+                                Text("Caption")
+                                    .foregroundColor(
+                                        VivaDesign.Colors.secondaryText
+                                    )
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 16)
+                            }
+
+                            TextEditor(text: limitedCaption)
+                                .scrollContentBackground(.hidden)
+                                .foregroundColor(VivaDesign.Colors.primaryText)
+                                .frame(height: 80)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(
+                                    RoundedRectangle(
+                                        cornerRadius: VivaDesign.Sizing
+                                            .cornerRadius
+                                    )
+                                    .stroke(
+                                        VivaDesign.Colors.divider,
+                                        lineWidth: VivaDesign.Sizing.borderWidth
+                                    )
+                                )
+
+                            HStack {
+                                Spacer()
+                                Text("\(viewModel.caption.count)/255")
+                                    .font(Font.system(size: 12))
+                                    .foregroundColor(
+                                        VivaDesign.Colors.secondaryText
+                                    )
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                            }
+                        }
                     }
                     .padding(.horizontal, VivaDesign.Spacing.large)
 
