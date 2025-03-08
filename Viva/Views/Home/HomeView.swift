@@ -58,12 +58,14 @@ struct HomeView: View {
         .sheet(item: $viewModel.selectedMatchup) { matchup in
             NavigationView {
                 MatchupDetailView(
-                    matchupService: matchupService,
-                    friendService: friendService,
-                    userService: userService,
-                    userSession: userSession,
-                    healthKitDataManager: healthKitDataManager,
-                    matchupId: matchup.id
+                    viewModel: MatchupDetailViewModel(
+                        matchupService: matchupService,
+                        friendService: friendService,
+                        userService: userService,
+                        userSession: userSession,
+                        healthKitDataManager: healthKitDataManager,
+                        matchupId: matchup.id
+                    )
                 )
             }
         }

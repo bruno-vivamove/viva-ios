@@ -10,9 +10,8 @@ struct VivaApp: App {
     }
 
     var body: some Scene {
-
         WindowGroup {
-            SignInView()
+            AppContainerView()
                 .environmentObject(vivaAppObjects.userSession)
                 .environmentObject(vivaAppObjects.authManager)
                 .environmentObject(vivaAppObjects.userProfileService)
@@ -26,6 +25,25 @@ struct VivaApp: App {
             if newPhase == .background {
                 print("App entered background - scheduling tasks")
                 BackgroundTaskManager.shared.scheduleHealthUpdateTask()
+            }
+        }
+    }
+}
+
+struct AppContainerView: View {
+    @EnvironmentObject var userSession: UserSession
+    
+    var body: some View {
+        ZStack {
+            VivaDesign.Colors.background
+                .ignoresSafeArea()
+            
+            if userSession.isLoggedIn {
+                MainView()
+                    .transition(.move(edge: .trailing))
+            } else {
+                SignInView()
+                    .transition(.opacity)
             }
         }
     }

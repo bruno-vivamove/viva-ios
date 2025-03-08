@@ -165,12 +165,14 @@ struct FriendsView: View {
         .sheet(item: $selectedMatchup) { matchup in
             NavigationView {
                 MatchupDetailView(
-                    matchupService: matchupService,
-                    friendService: friendService,
-                    userService: userService,
-                    userSession: viewModel.userSession,
-                    healthKitDataManager: healthKitDataManager,
-                    matchupId: matchup.id
+                    viewModel: MatchupDetailViewModel(
+                        matchupService: matchupService,
+                        friendService: friendService,
+                        userService: userService,
+                        userSession: userSession,
+                        healthKitDataManager: healthKitDataManager,
+                        matchupId: matchup.id
+                    )
                 )
             }
         }

@@ -19,183 +19,94 @@ struct MatchupDetailView: View {
     @StateObject private var viewModel: MatchupDetailViewModel
     @State private var isShowingTotal = true
     @State private var showUnInviteSheet = false
-    @State private var selectedInvite: (user: User, inviteCode: String)? = nil
-    @State private var showInviteView = false
-    @State private var inviteSide: MatchupUser.Side?
+    @State private var selectedInvite: MatchupInvite? = nil
 
     init(
-        matchupService: MatchupService,
-        friendService: FriendService,
-        userService: UserService,
-        userSession: UserSession,
-        healthKitDataManager: HealthKitDataManager,
-        matchupId: String
+        viewModel: MatchupDetailViewModel
     ) {
-        _viewModel = StateObject(
-            wrappedValue: MatchupDetailViewModel(
-                matchupService: matchupService,
-                friendService: friendService,
-                userService: userService,
-                userSession: userSession,
-                healthKitDataManager: healthKitDataManager,
-                matchupId: matchupId
-            ))
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     var body: some View {
         ZStack {
             // Main content
-            Group {
-                if viewModel.isLoading {
-                    ProgressView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if let matchup = viewModel.matchup {
+            if viewModel.isLoading {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(.black)
+            } else if let matchup = viewModel.matchup {
+                VStack(spacing: VivaDesign.Spacing.medium) {
+                    // Matchup Header
+                    MatchupHeader(
+                        viewModel: viewModel,
+                        selectedInvite: $selectedInvite,
+                        showUnInviteSheet: $showUnInviteSheet
+                    )
+                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+
+                    // Toggle
+                    ViewToggle(isShowingTotal: $isShowingTotal)
+
+                    // Comparison rows
+                    let totalMatchupMeasurementPairs =
+                        isShowingTotal
+                        ? viewModel.totalMatchupMeasurementPairs
+                        : viewModel.matchupMeasurementPairsByDay?.last
+
                     VStack(spacing: VivaDesign.Spacing.medium) {
-                        MatchupHeader(
-                            viewModel: viewModel,
-                            onInviteTap: { user, inviteCode in
-                                selectedInvite = (user, inviteCode)
-                                showUnInviteSheet = true
-                            },
-                            onOpenPositionTap: { side in
-                                inviteSide = side
-                                showInviteView = true
-                            }
-                        )
-                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
-
-                        ViewToggle(isShowingTotal: $isShowingTotal)
-
-                        let totalMatchupMeasurementPairs =
-                            isShowingTotal
-                            ? viewModel.totalMatchupMeasurementPairs
-                            : viewModel.matchupMeasurementPairsByDay?.last
-
-                        VStack(spacing: VivaDesign.Spacing.medium) {
-                            ForEach(
-                                Array(totalMatchupMeasurementPairs ?? [:]),
-                                id: \.key
-                            ) { type, measurementPair in
-                                ComparisonRow(
-                                    leftValue: viewModel.formatValue(
-                                        measurementPair.leftValue, for: type),
-                                    leftPoints:
-                                        "\(measurementPair.leftPoints) pts",
-                                    title: viewModel.displayName(for: type),
-                                    rightValue: viewModel.formatValue(
-                                        measurementPair.rightValue, for: type),
-                                    rightPoints:
-                                        "\(measurementPair.rightPoints) pts"
-                                )
-                            }
+                        ForEach(
+                            Array(totalMatchupMeasurementPairs ?? [:]),
+                            id: \.key
+                        ) { type, measurementPair in
+                            ComparisonRow(
+                                leftValue: viewModel.formatValue(
+                                    measurementPair.leftValue, for: type),
+                                leftPoints:
+                                    "\(measurementPair.leftPoints) pts",
+                                title: viewModel.displayName(for: type),
+                                rightValue: viewModel.formatValue(
+                                    measurementPair.rightValue, for: type),
+                                rightPoints:
+                                    "\(measurementPair.rightPoints) pts"
+                            )
                         }
-                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
-
-                        Spacer()
-
-                        MatchupFooter(
-                            endTime: matchup.endTime,
-                            leftUser: matchup.leftUsers.first,
-                            rightUser: matchup.rightUsers.first,
-                            record: (wins: 0, losses: 0)
-                        )
-                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
                     }
-                    .padding(.vertical, VivaDesign.Spacing.medium)
+                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+
+                    Spacer()
+
+                    // Footer
+                    MatchupFooter(
+                        endTime: matchup.endTime,
+                        leftUser: matchup.leftUsers.first,
+                        rightUser: matchup.rightUsers.first,
+                        record: (wins: 0, losses: 0)
+                    )
+                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
                 }
+                .padding(.vertical, VivaDesign.Spacing.medium)
+                .background(.black)
             }
-            .background(VivaDesign.Colors.background)
 
             // Overlay
-            if showUnInviteSheet, let invite = selectedInvite {
+            if showUnInviteSheet, let user = selectedInvite?.user,
+                let invite = selectedInvite
+            {
                 Color.black.opacity(0.4)
                     .ignoresSafeArea()
                     .onTapGesture {
                         withAnimation(.easeInOut(duration: 0.2)) {
                             showUnInviteSheet = false
-                            selectedInvite = nil
                         }
+                        selectedInvite = nil
                     }
 
-                VStack(spacing: VivaDesign.Spacing.medium) {
-                    // User info
-                    HStack(spacing: VivaDesign.Spacing.medium) {
-                        VivaProfileImage(
-                            imageUrl: invite.user.imageUrl,
-                            size: .medium,
-                            isInvited: true
-                        )
-
-                        Text(invite.user.displayName)
-                            .font(VivaDesign.Typography.title2)
-                            .foregroundColor(VivaDesign.Colors.primaryText)
-                    }
-                    .padding(.top, VivaDesign.Spacing.medium)
-
-                    // Actions
-                    VStack(spacing: VivaDesign.Spacing.small) {
-                        Button {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                showUnInviteSheet = false
-                                selectedInvite = nil
-                            }
-                            Task {
-                                await viewModel.deleteInvite(
-                                    inviteCode: invite.inviteCode)
-                            }
-                        } label: {
-                            HStack {
-                                Image(systemName: "xmark.circle.fill")
-                                Text("Cancel Invitation")
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(VivaDesign.Colors.destructive)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
-                        }
-
-                        Button {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                showUnInviteSheet = false
-                                selectedInvite = nil
-                            }
-                        } label: {
-                            Text("Dismiss")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.gray.opacity(0.2))
-                                .foregroundColor(
-                                    VivaDesign.Colors.primaryText
-                                )
-                                .cornerRadius(8)
-                        }
-                    }
-                }
-                .padding()
-                .frame(width: 300)
-                .background(VivaDesign.Colors.background)
-                .cornerRadius(16)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.gray.opacity(0.4), lineWidth: 1)
-                )
-                .shadow(radius: 20)
-                .transition(.opacity.combined(with: .scale))
-            }
-        }
-        .sheet(isPresented: $showInviteView) {
-            if let matchup = viewModel.matchup {
-                MatchupInviteView(
-                    matchupService: viewModel.matchupService,
-                    friendService: viewModel.friendService,
-                    userService: viewModel.userService,
-                    userSession: viewModel.userSession,
-                    matchup: matchup,
-                    usersPerSide: matchup.usersPerSide,
-                    showCreationFlow: $showInviteView,
-                    isInvitingFromDetails: true,
-                    preferredSide: inviteSide
+                InviteDialog(
+                    viewModel: viewModel,
+                    showUnInviteSheet: $showUnInviteSheet,
+                    selectedInvite: $selectedInvite,
+                    user: user,
+                    inviteCode: invite.inviteCode
                 )
             }
         }
@@ -216,66 +127,102 @@ struct MatchupDetailView: View {
     }
 }
 
+// MARK: - View Components
+
 struct MatchupHeader: View {
-    let viewModel: MatchupDetailViewModel
-    let onInviteTap: ((User, String) -> Void)?
-    let onOpenPositionTap: ((MatchupUser.Side) -> Void)?
+    @ObservedObject var viewModel: MatchupDetailViewModel
+    @Binding var selectedInvite: MatchupInvite?
+    @Binding var showUnInviteSheet: Bool
+
+    @State private var showInviteView = false
+    @State private var inviteSide: MatchupUser.Side?
 
     var body: some View {
         HStack(spacing: 0) {
             // Left user with full width to center
-            let leftUser = viewModel.matchup?.leftUsers.first;
-            let leftInvite = viewModel.matchup?.invites.first(where: {
-                $0.side == .left
-            })
-            
-            UserScoreView(
-                matchupUser: leftUser,
-                invitedUser: leftInvite?.user,
-                inviteCode: leftInvite?.inviteCode,
-                totalPoints: viewModel.matchup?.leftSidePoints ?? 0,
-                imageOnLeft: true,
-                onInviteTap: onInviteTap,
-                onOpenPositionTap: {
-                    onOpenPositionTap?(.left)
-                }
-            )
-            .frame(maxWidth: .infinity)
-            
+            leftUserView
+                .frame(maxWidth: .infinity)
+
             // Right user with full width to center
-            let rightUser = viewModel.matchup?.rightUsers.first
-            let rightInvite = viewModel.matchup?.invites.first(where: {
-                $0.side == .right
-            })
-            
-            UserScoreView(
-                matchupUser: rightUser,
-                invitedUser: rightInvite?.user,
-                inviteCode: rightInvite?.inviteCode,
-                totalPoints: viewModel.matchup?.rightSidePoints ?? 0,
-                imageOnLeft: false,
-                onInviteTap: onInviteTap,
-                onOpenPositionTap: {
-                    onOpenPositionTap?(.right)
-                }
-            )
-            .frame(maxWidth: .infinity)
+            rightUserView
+                .frame(maxWidth: .infinity)
         }
         .frame(height: 60)
+        .sheet(isPresented: $showInviteView) {
+            if let matchup = viewModel.matchup {
+                MatchupInviteView(
+                    matchupService: viewModel.matchupService,
+                    friendService: viewModel.friendService,
+                    userService: viewModel.userService,
+                    userSession: viewModel.userSession,
+                    matchup: matchup,
+                    usersPerSide: matchup.usersPerSide,
+                    showCreationFlow: $showInviteView,
+                    isInvitingFromDetails: true,
+                    preferredSide: inviteSide
+                )
+            }
+        }
+    }
+
+    private var leftUserView: some View {
+        let leftUser = viewModel.matchup?.leftUsers.first
+        let leftInvite = viewModel.matchup?.invites.first(where: {
+            $0.side == .left
+        })
+
+        return UserScoreView(
+            matchupUser: leftUser,
+            invite: leftInvite,
+            totalPoints: viewModel.matchup?.leftSidePoints ?? 0,
+            imageOnLeft: true,
+            onInviteTap: { invite in
+                selectedInvite = invite
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    showUnInviteSheet = true
+                }
+            },
+            onOpenPositionTap: {
+                inviteSide = .left
+                showInviteView = true
+            }
+        )
+    }
+
+    private var rightUserView: some View {
+        let rightUser = viewModel.matchup?.rightUsers.first
+        let rightInvite = viewModel.matchup?.invites.first(where: {
+            $0.side == .right
+        })
+
+        return UserScoreView(
+            matchupUser: rightUser,
+            invite: rightInvite,
+            totalPoints: viewModel.matchup?.rightSidePoints ?? 0,
+            imageOnLeft: false,
+            onInviteTap: { invite in
+                selectedInvite = invite
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    showUnInviteSheet = true
+                }
+            },
+            onOpenPositionTap: {
+                inviteSide = .right
+                showInviteView = true
+            }
+        )
     }
 }
 
 struct UserScoreView: View {
     let matchupUser: User?
-    let invitedUser: User?
-    let inviteCode: String?
+    let invite: MatchupInvite?
     let totalPoints: Int
     let imageOnLeft: Bool
-    let onInviteTap: ((User, String) -> Void)?
+    let onInviteTap: ((MatchupInvite) -> Void)?
     let onOpenPositionTap: (() -> Void)?
 
     var body: some View {
-        // Replace GeometryReader with a fixed height HStack
         HStack(alignment: .center, spacing: 0) {
             if imageOnLeft {
                 userImage
@@ -287,21 +234,20 @@ struct UserScoreView: View {
                 userImage
             }
         }
-        .frame(height: 60) // Use a fixed height instead of GeometryReader
+        .frame(height: 60)
     }
 
-    // Rest of the code remains the same...
     private var userImage: some View {
         Group {
-            if invitedUser != nil || matchupUser != nil {
+            if invite != nil || matchupUser != nil {
                 VivaProfileImage(
-                    imageUrl: invitedUser?.imageUrl ?? matchupUser?.imageUrl,
+                    imageUrl: invite?.user?.imageUrl ?? matchupUser?.imageUrl,
                     size: .large,
-                    isInvited: invitedUser != nil
+                    isInvited: invite?.user != nil
                 )
                 .onTapGesture {
-                    if let user = invitedUser, let code = inviteCode {
-                        onInviteTap?(user, code)
+                    if let invite = invite {
+                        onInviteTap?(invite)
                     }
                 }
             } else {
@@ -332,7 +278,7 @@ struct UserScoreView: View {
     }
 
     private var displayName: String {
-        if let invitedUser = invitedUser {
+        if let invitedUser = invite?.user {
             return "\(invitedUser.displayName)"
         } else if let user = matchupUser {
             return user.displayName
@@ -350,7 +296,7 @@ struct ViewToggle: View {
             // Left line
             VivaDivider()
                 .padding(.leading, VivaDesign.Spacing.small)
-            
+
             // Toggle text with vertical separator
             HStack(spacing: VivaDesign.Spacing.xsmall) {
                 Text("Today")
@@ -361,10 +307,10 @@ struct ViewToggle: View {
                         isShowingTotal
                             ? VivaDesign.Colors.secondaryText
                             : VivaDesign.Colors.vivaGreen)
-                
+
                 Text("|")
                     .foregroundColor(VivaDesign.Colors.vivaGreen)
-                
+
                 Text("Total")
                     .lineLimit(1)
                     .fontWeight(.bold)
@@ -375,7 +321,7 @@ struct ViewToggle: View {
                             : VivaDesign.Colors.secondaryText)
             }
             .padding(.vertical, 4)
-            
+
             // Right line
             VivaDivider()
                 .padding(.trailing, VivaDesign.Spacing.small)
@@ -400,59 +346,71 @@ struct ComparisonRow: View {
             HStack {
                 Spacer()
                     .frame(width: VivaDesign.Spacing.medium)
-                
-                // Left side with fixed width
-                VStack(alignment: .center) {
-                    Text(leftValue)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .foregroundColor(VivaDesign.Colors.primaryText)
-                    Text(leftPoints)
-                        .font(VivaDesign.Typography.caption)
-                        .fontWeight(.bold)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .foregroundColor(VivaDesign.Colors.secondaryText)
-                }
-                .frame(width: 80, alignment: .center)  // Fixed width with center alignment
+
+                leftSide
 
                 Spacer()
 
                 // Center text with fixed position
-                Text(title)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .font(VivaDesign.Typography.pointsTitle)
-                    .foregroundColor(VivaDesign.Colors.vivaGreen)
-                    .frame(width: 140, alignment: .center)  // Fixed width
+                centerTitle
 
                 Spacer()
 
-                // Right side with fixed width
-                VStack(alignment: .center) {
-                    Text(rightValue)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .foregroundColor(VivaDesign.Colors.primaryText)
-                    Text(rightPoints)
-                        .font(VivaDesign.Typography.caption)
-                        .fontWeight(.bold)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .foregroundColor(VivaDesign.Colors.secondaryText)
-                }
-                .frame(width: 80, alignment: .center)  // Fixed width with center alignment
-                
+                rightSide
+
                 Spacer()
                     .frame(width: VivaDesign.Spacing.medium)
             }
 
             VivaDivider()
         }
+    }
+
+    private var leftSide: some View {
+        // Left side with fixed width
+        VStack(alignment: .center) {
+            Text(leftValue)
+                .font(.title2)
+                .fontWeight(.bold)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .foregroundColor(VivaDesign.Colors.primaryText)
+            Text(leftPoints)
+                .font(VivaDesign.Typography.caption)
+                .fontWeight(.bold)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .foregroundColor(VivaDesign.Colors.secondaryText)
+        }
+        .frame(width: 80, alignment: .center)  // Fixed width with center alignment
+    }
+
+    private var centerTitle: some View {
+        Text(title)
+            .lineLimit(1)
+            .truncationMode(.tail)
+            .font(VivaDesign.Typography.pointsTitle)
+            .foregroundColor(VivaDesign.Colors.vivaGreen)
+            .frame(width: 140, alignment: .center)  // Fixed width
+    }
+
+    private var rightSide: some View {
+        // Right side with fixed width
+        VStack(alignment: .center) {
+            Text(rightValue)
+                .font(.title2)
+                .fontWeight(.bold)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .foregroundColor(VivaDesign.Colors.primaryText)
+            Text(rightPoints)
+                .font(VivaDesign.Typography.caption)
+                .fontWeight(.bold)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .foregroundColor(VivaDesign.Colors.secondaryText)
+        }
+        .frame(width: 80, alignment: .center)  // Fixed width with center alignment
     }
 }
 
@@ -533,37 +491,46 @@ struct TimeRemainingDisplay: View {
 
     var body: some View {
         if endTime == nil {
-            HStack(spacing: VivaDesign.Spacing.xsmall) {
-                Text("Not started")
-                    .font(.title)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-            }
-            .foregroundColor(VivaDesign.Colors.primaryText)
+            notStartedView
         } else {
-            let remainingTime = calculateTimeRemaining()
-            HStack(spacing: VivaDesign.Spacing.xsmall) {
-                Text("\(remainingTime.days)")
-                    .font(.title)
-                    .lineLimit(1)
-                Text("d")
-                    .foregroundColor(VivaDesign.Colors.vivaGreen)
-                    .lineLimit(1)
-                Text("\(remainingTime.hours)")
-                    .font(.title)
-                    .lineLimit(1)
-                Text("hr")
-                    .foregroundColor(VivaDesign.Colors.vivaGreen)
-                    .lineLimit(1)
-                Text("\(remainingTime.minutes)")
-                    .font(.title)
-                    .lineLimit(1)
-                Text("min")
-                    .foregroundColor(VivaDesign.Colors.vivaGreen)
-                    .lineLimit(1)
-            }
-            .foregroundColor(VivaDesign.Colors.primaryText)
+            countdownView
         }
+    }
+
+    private var notStartedView: some View {
+        HStack(spacing: VivaDesign.Spacing.xsmall) {
+            Text("Not started")
+                .font(.title)
+                .lineLimit(1)
+                .truncationMode(.tail)
+        }
+        .foregroundColor(VivaDesign.Colors.primaryText)
+    }
+
+    private var countdownView: some View {
+        let remainingTime = calculateTimeRemaining()
+
+        return HStack(spacing: VivaDesign.Spacing.xsmall) {
+            Text("\(remainingTime.days)")
+                .font(.title)
+                .lineLimit(1)
+            Text("d")
+                .foregroundColor(VivaDesign.Colors.vivaGreen)
+                .lineLimit(1)
+            Text("\(remainingTime.hours)")
+                .font(.title)
+                .lineLimit(1)
+            Text("hr")
+                .foregroundColor(VivaDesign.Colors.vivaGreen)
+                .lineLimit(1)
+            Text("\(remainingTime.minutes)")
+                .font(.title)
+                .lineLimit(1)
+            Text("min")
+                .foregroundColor(VivaDesign.Colors.vivaGreen)
+                .lineLimit(1)
+        }
+        .foregroundColor(VivaDesign.Colors.primaryText)
     }
 
     private func calculateTimeRemaining() -> (
@@ -599,5 +566,81 @@ struct RecordDisplay: View {
             VivaProfileImage(imageUrl: rightUser?.imageUrl, size: .mini)
         }
         .foregroundColor(VivaDesign.Colors.primaryText)
+    }
+}
+
+struct InviteDialog: View {
+    @ObservedObject var viewModel: MatchupDetailViewModel
+    @Binding var showUnInviteSheet: Bool
+    @Binding var selectedInvite: MatchupInvite?
+    
+    let user: User
+    let inviteCode: String
+
+    var body: some View {
+        VStack(spacing: VivaDesign.Spacing.medium) {
+            // User info
+            HStack(spacing: VivaDesign.Spacing.medium) {
+                VivaProfileImage(
+                    imageUrl: user.imageUrl,
+                    size: .medium,
+                    isInvited: true
+                )
+
+                Text(user.displayName)
+                    .font(VivaDesign.Typography.title2)
+                    .foregroundColor(VivaDesign.Colors.primaryText)
+            }
+            .padding(.top, VivaDesign.Spacing.medium)
+
+            // Actions
+            VStack(spacing: VivaDesign.Spacing.small) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showUnInviteSheet = false
+                        selectedInvite = nil
+                    }
+                    Task {
+                        await viewModel.deleteInvite(inviteCode: inviteCode)
+                    }
+                } label: {
+                    HStack {
+                        Image(systemName: "xmark.circle.fill")
+                        Text("Cancel Invitation")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(VivaDesign.Colors.destructive)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                }
+
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showUnInviteSheet = false
+                        selectedInvite = nil
+                    }
+                } label: {
+                    Text("Dismiss")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray.opacity(0.2))
+                        .foregroundColor(
+                            VivaDesign.Colors.primaryText
+                        )
+                        .cornerRadius(8)
+                }
+            }
+        }
+        .padding()
+        .frame(width: 300)
+        .background(VivaDesign.Colors.background)
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+        )
+        .shadow(radius: 20)
+        .transition(.opacity.combined(with: .scale))
     }
 }

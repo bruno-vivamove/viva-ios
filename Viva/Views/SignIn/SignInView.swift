@@ -2,37 +2,33 @@ import Foundation
 import Security
 import SwiftUI
 
+import Foundation
+import Security
+import SwiftUI
+
 struct SignInView: View {
     @EnvironmentObject var userSession: UserSession
+    @EnvironmentObject var authenticationManager: AuthenticationManager
 
     private let logoWidth: CGFloat = 180
 
     var body: some View {
-        ZStack {
-            VivaDesign.Colors.background
-                .ignoresSafeArea()
+        VStack(spacing: VivaDesign.Spacing.medium) {
+            // Logo
+            LogoHeader(width: logoWidth)
 
-            if userSession.isLoggedIn {
-                MainView()
-                    .transition(.move(edge: .trailing))
-            } else {
-                VStack(spacing: VivaDesign.Spacing.medium) {
-                    // Logo
-                    LogoHeader(width: logoWidth)
+            Spacer()
 
-                    Spacer()
+            // Main Text
+            MarketingText()
 
-                    // Main Text
-                    MarketingText()
+            Spacer()
 
-                    Spacer()
-
-                    // Auth Buttons
-                    AuthButtonStack()
-                }
-                .padding(.vertical, VivaDesign.Spacing.large)
-            }
+            // Auth Buttons
+            AuthButtonStack()
         }
+        .padding(.vertical, VivaDesign.Spacing.large)
+        .background(VivaDesign.Colors.background)
     }
 }
 
@@ -124,10 +120,6 @@ struct AuthButtonStack: View {
         .padding(.horizontal, VivaDesign.Spacing.large)
         .sheet(isPresented: $showSignInForm) {
             SignInFormView(
-                authManager: authenticationManager, userSession: userSession)
-        }
-        .sheet(isPresented: $showSignUpForm) {
-            SignUpFormView(
                 authManager: authenticationManager, userSession: userSession)
         }
     }
