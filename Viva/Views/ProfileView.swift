@@ -2,158 +2,219 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var userSession: UserSession
-    @EnvironmentObject var authManager: AuthenticationManager
     @EnvironmentObject var userProfileService: UserProfileService
-
-    private let menuItems = [
-        MenuItem(icon: "applewatch", title: "Linked Devices"),
-        MenuItem(icon: "doc.text", title: "Rules & FAQ"),
-        MenuItem(icon: "bell.fill", title: "Notifications"),
-        MenuItem(icon: "gearshape.fill", title: "Settings"),
-        MenuItem(icon: "person.2.fill", title: "Referrals"),
-        MenuItem(icon: "star.fill", title: "Subscription"),
-        MenuItem(icon: "questionmark.circle", title: "Help"),
-    ]
-
+    @State private var showSettings = false
+    
     var body: some View {
-        VStack(spacing: VivaDesign.Spacing.large) {
-            // Profile Header
-            ProfileHeader(
-                userSession: userSession,
-                userProfileService: userProfileService)
-
-            // Menu Items
-            VStack(spacing: VivaDesign.Spacing.xsmall) {
-                ForEach(menuItems, id: \.title) { item in
-                    MenuItemButton(item: item)
-                }
+        ZStack {
+            // Split background - dark gray top, black bottom
+            VStack(spacing: 0) {
+                // Dark gray for top half (space for future background image)
+                Color(red: 35/255, green: 35/255, blue: 35/255)
+                    .frame(height: 225)
+                
+                // Black for bottom half
+                Color.black
+                    .frame(height: UIScreen.main.bounds.height - 225)
             }
-            .padding(.horizontal)
-
-            Button(action: {
-                Task {
-                    await authManager.signOut()
-                }
-            }) {
-                Text("LOG OUT")
-                    .font(.headline)
-                    .foregroundColor(VivaDesign.Colors.vivaGreen)
-                    .padding(.vertical)
-            }
-            .padding(.horizontal)
-            Spacer()
-        }
-        .padding(.vertical, VivaDesign.Spacing.medium)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(VivaDesign.Colors.background)
-    }
-}
-
-struct ProfileHeader: View {
-    @ObservedObject var userSession: UserSession
-    @State private var showEditProfile = false
-
-    private let userProfileService: UserProfileService
-
-    init(
-        userSession: UserSession,
-        userProfileService: UserProfileService
-    ) {
-        self.userSession = userSession
-        self.userProfileService = userProfileService
-    }
-
-    var body: some View {
-        HStack(spacing: VivaDesign.Spacing.large) {
-            Spacer()
-
-            // Profile Image and Name
-            VStack(spacing: VivaDesign.Spacing.xsmall) {
-                Button(action: {
-                    Task {
-                        let userProfile = try await userProfileService.getCurrentUserProfile()
-                        await MainActor.run() {
-                            userSession.setUserProfile(userProfile)
+            .edgesIgnoringSafeArea(.all)
+            
+            VStack(spacing: 0) {
+                // Top section with profile image and aligned elements
+                VStack(alignment: .leading, spacing: 12) {
+                    // Add significant top padding to move content down
+                    Spacer()
+                        .frame(height: 125)
+                    
+                    // Profile image and streak in same row
+                    HStack(alignment: .bottom, spacing: 32) {
+                        // Profile image (left aligned)
+                        ZStack(alignment: .bottomTrailing) {
+                            VivaProfileImage(
+                                imageUrl: userSession.getUserProfile().imageUrl,
+                                size: .xlarge
+                            )
+                            
+                            // Plus button for editing profile picture
+                            Button(action: {
+                                // Action to change profile picture
+                            }) {
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 30, height: 30)
+                                    .overlay(
+                                        Image(systemName: "plus")
+                                            .foregroundColor(.black)
+                                            .font(.system(size: 24, weight: .bold))
+                                    )
+                            }
+                            .offset(x: -4, y: -4)
+                        }
+                        
+                        // Streak counter next to profile image
+                        VStack(spacing: 4) {
+                            ZStack {
+                                Circle()
+                                    .stroke(VivaDesign.Colors.vivaGreen, lineWidth: 1)
+                                    .frame(width: 44, height: 44)
+                                
+                                Text("9")
+                                    .font(.system(size: 20, weight: .bold))
+                                    .foregroundColor(.white)
+                                
+                                // Lightning bolt in top right
+                                Image(systemName: "bolt.fill")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.white)
+                                    .offset(x: 14, y: -14)
+                            }
+                            
+                            Text("Streak")
+                                .font(.system(size: 10))
+                                .foregroundColor(VivaDesign.Colors.vivaGreen)
+                        }
+                        
+                        Spacer()
+                        
+                        // Hamburger menu button positioned in the HStack to align with profile image
+                        Button(action: {
+                            showSettings = true
+                        }) {
+                            Image(systemName: "line.3.horizontal")
+                                .font(.system(size: 30))
+                                .foregroundColor(.white)
+                                .padding(.trailing, 16)
                         }
                     }
-                }) {
-                    VivaProfileImage(
-                        imageUrl: userSession.getUserProfile().imageUrl,
-                        size: .large
-                    ).id(userSession.getUserProfile().imageUrl)
+                    .padding(.top, 16)
+                    .padding(.horizontal, 16)
+                    
+                    // User name (left aligned)
+                    Text(userSession.getUserProfile().displayName)
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 16)
+                    
+                    // Location (left aligned)
+                    HStack(spacing: 6) {
+                        Image(systemName: "mappin.circle.fill")
+                            .foregroundColor(VivaDesign.Colors.vivaGreen)
+                            .font(.system(size: 14))
+                        
+                        Text("New York, NY")
+                            .font(.system(size: 16))
+                            .foregroundColor(VivaDesign.Colors.vivaGreen)
+                    }
+                    .padding(.top, 2)
+                    .padding(.horizontal, 16)
+                    
+                    // Edit Profile Button (left aligned)
+                    Button(action: {
+                        // Action to edit profile
+                    }) {
+                        HStack(spacing: 6) {
+                            Text("Edit Profile")
+                                .font(.system(size: 16))
+                                .foregroundColor(.white)
+                            
+                            Image(systemName: "pencil")
+                                .font(.system(size: 14))
+                                .foregroundColor(.white)
+                        }
+                        .padding(.top, 8)
+                    }
+                    .padding(.horizontal, 16)
+                    
+                    // User Bio (left aligned)
+                    Text("Former D1 soccer player, 2x marathon finisher, strength training is my sanctuary")
+                        .font(.system(size: 16))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(2)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
+                    
+                    // Stats row
+                    HStack(alignment: .top, spacing: 0) {
+                        Spacer()
+                        
+                        StatItem(value: "90", label: "Matchups", iconName: "person.2.fill")
+                        
+                        Spacer()
+                        
+                        StatItem(value: "221", label: "Workouts", iconName: "figure.run")
+                        
+                        Spacer()
+                        
+                        StatItem(value: "3.9K", label: "Minutes", iconName: "clock.fill")
+                        
+                        Spacer()
+                        
+                        StatItem(value: "11.3k", label: "Calories", iconName: "flame.fill")
+                        
+                        Spacer()
+                        
+                        StatItem(value: "2.1K", label: "Cheers", iconName: "hand.thumbsup.fill")
+                        
+                        Spacer()
+                    }
+                    .padding(.top, 32)
                 }
-
-                Text(userSession.getUserProfile().displayName)
-                    .font(.title2)
-                    .foregroundColor(VivaDesign.Colors.primaryText)
-
-                Button(action: {
-                    showEditProfile = true
-                }) {
-                    Text("Edit")
-                        .font(VivaDesign.Typography.caption)
-                        .foregroundColor(VivaDesign.Colors.vivaGreen)
+                
+                Divider()
+                    .background(Color.gray.opacity(0.6))
+                    .padding(.top, 32)
+                
+                // Trophy case section
+                VStack(spacing: 8) {
+                    HStack {
+                        Text("Trophy case")
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundColor(.white)
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            // Action to view all trophies
+                        }) {
+                            Text("View all")
+                                .font(.system(size: 16))
+                                .foregroundColor(.white)
+                                .opacity(0.7)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
                 }
-            }
-
-            // Points Display
-            VStack(spacing: VivaDesign.Spacing.xsmall) {
-                Text("\(userSession.getUserProfile().rewardPoints)")
-                    .font(VivaDesign.Typography.displayText(42))
-                    .foregroundColor(VivaDesign.Colors.primaryText)
-                    .fontWeight(.bold)
-
-                Text("Reward Points")
-                    .font(VivaDesign.Typography.caption)
-                    .foregroundColor(VivaDesign.Colors.vivaGreen)
-            }
-
-            Spacer()
-        }
-        .padding(.top)
-        .sheet(isPresented: $showEditProfile) {
-            EditProfileView(
-                userSession: userSession, userProfileService: userProfileService
-            )
-        }
-    }
-}
-
-struct MenuItemButton: View {
-    let item: MenuItem
-
-    var body: some View {
-        Button(action: {
-            // Add navigation action
-        }) {
-            HStack {
-                Image(systemName: item.icon)
-                    .foregroundColor(VivaDesign.Colors.primaryText)
-                    .frame(width: 24)
-
-                Text(item.title)
-                    .foregroundColor(VivaDesign.Colors.primaryText)
-                    .font(VivaDesign.Typography.body)
-
+                
                 Spacer()
-
-                Image(systemName: "chevron.right")
-                    .foregroundColor(VivaDesign.Colors.secondaryText)
             }
-            .padding(.vertical, VivaDesign.Spacing.small)
-            .padding(.horizontal, VivaDesign.Spacing.small)
-            .background(
-                RoundedRectangle(cornerRadius: VivaDesign.Sizing.cornerRadius)
-                    .stroke(
-                        VivaDesign.Colors.divider,
-                        lineWidth: VivaDesign.Sizing.borderWidth)
-            )
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
         }
     }
 }
 
-struct MenuItem: Identifiable {
-    let id = UUID()
-    let icon: String
-    let title: String
+struct StatItem: View {
+    let value: String
+    let label: String
+    let iconName: String
+    
+    var body: some View {
+        VStack(spacing: 6) {
+            Text(value)
+                .font(.system(size: 18, weight: .bold))
+                .foregroundColor(.white)
+            
+            Image(systemName: iconName)
+                .font(.system(size: 16))
+                .foregroundColor(.white)
+            
+            Text(label)
+                .font(.system(size: 12))
+                .foregroundColor(.white)
+        }
+        .frame(width: 60)
+    }
 }

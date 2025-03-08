@@ -37,6 +37,7 @@ enum VivaDesign {
         static let buttonBorderWidth: CGFloat = 2
         
         enum ProfileImage: CGFloat {
+            case xlarge = 150
             case large = 75
             case medium = 60
             case small = 50

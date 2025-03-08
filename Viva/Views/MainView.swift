@@ -39,7 +39,7 @@ struct MainView: View {
                     Text("Rewards")
                 }
 
-            // Profile Tab
+            // Profile Tab - Updated to use our new ProfileView
             ProfileView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
