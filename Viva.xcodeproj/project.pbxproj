@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		C0C51AE62D792E4D002CC61A /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = C0C51AE52D792E4D002CC61A /* Alamofire */; };
 		C0C51AE82D792E6D002CC61A /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = C0C51AE72D792E6D002CC61A /* OrderedCollections */; };
+		C0C6F8D42D7E1AFA00DDCE99 /* SkeletonView in Frameworks */ = {isa = PBXBuildFile; productRef = C0C6F8D32D7E1AFA00DDCE99 /* SkeletonView */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +74,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C0C51AE82D792E6D002CC61A /* OrderedCollections in Frameworks */,
+				C0C6F8D42D7E1AFA00DDCE99 /* SkeletonView in Frameworks */,
 				C0C51AE62D792E4D002CC61A /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -146,6 +148,7 @@
 			packageProductDependencies = (
 				C0C51AE52D792E4D002CC61A /* Alamofire */,
 				C0C51AE72D792E6D002CC61A /* OrderedCollections */,
+				C0C6F8D32D7E1AFA00DDCE99 /* SkeletonView */,
 			);
 			productName = Viva;
 			productReference = C03975A62D2F83CE00BCE78F /* Viva.app */;
@@ -232,6 +235,7 @@
 			packageReferences = (
 				C0C51AE32D792E3C002CC61A /* XCRemoteSwiftPackageReference "swift-collections" */,
 				C0C51AE42D792E4D002CC61A /* XCRemoteSwiftPackageReference "Alamofire" */,
+				C0C6F8D22D7E1AFA00DDCE99 /* XCRemoteSwiftPackageReference "SkeletonView" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C03975A72D2F83CE00BCE78F /* Products */;
@@ -747,6 +751,14 @@
 				minimumVersion = 5.10.2;
 			};
 		};
+		C0C6F8D22D7E1AFA00DDCE99 /* XCRemoteSwiftPackageReference "SkeletonView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Juanpe/SkeletonView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.31.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -759,6 +771,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C0C51AE32D792E3C002CC61A /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = OrderedCollections;
+		};
+		C0C6F8D32D7E1AFA00DDCE99 /* SkeletonView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0C6F8D22D7E1AFA00DDCE99 /* XCRemoteSwiftPackageReference "SkeletonView" */;
+			productName = SkeletonView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

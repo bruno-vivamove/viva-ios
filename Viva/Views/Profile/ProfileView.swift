@@ -49,29 +49,14 @@ struct ProfileView: View {
                             HStack(alignment: .bottom, spacing: 32) {
                                 // Profile image (left aligned)
                                 ZStack(alignment: .bottomTrailing) {
-                                    if isLoading {
-                                        // Show loading indicator over the profile image when saving
-                                        ZStack {
-                                            VivaProfileImage(
-                                                userId: userSession.getUserProfile().id,
-                                                imageUrl: userSession.getUserProfile().imageUrl,
-                                                size: .xlarge
-                                            )
-                                            .padding(.top, 16)
-                                            .blur(radius: 3)
-                                            
-                                            ProgressView()
-                                                .tint(VivaDesign.Colors.vivaGreen)
-                                                .scaleEffect(1.5)
-                                        }
-                                    } else {
-                                        VivaProfileImage(
-                                            userId: userSession.getUserProfile().id,
-                                            imageUrl: userSession.getUserProfile().imageUrl,
-                                            size: .xlarge
-                                        )
-                                        .padding(.top, 16)
-                                    }
+                                    // Profile image with skeleton loading built in
+                                    VivaProfileImage(
+                                        userId: userSession.getUserProfile().id,
+                                        imageUrl: userSession.getUserProfile().imageUrl,
+                                        size: .xlarge
+                                    )
+                                    .padding(.top, 16)
+                                    .opacity(isLoading ? 0.6 : 1) // Slightly dim when uploading new image
 
                                     // Plus button for editing profile picture
                                     Button(action: {

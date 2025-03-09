@@ -1,3 +1,4 @@
+import SkeletonView
 import SwiftUI
 
 // Static image cache for sharing across all instances
@@ -19,12 +20,66 @@ final class ImageCacheManager {
     }
 }
 
+// UIViewRepresentable wrapper for UIView with SkeletonView
+struct SkeletonProfileImageView: UIViewRepresentable {
+    let size: CGFloat
+    let isInvited: Bool
+
+    func makeUIView(context: Context) -> UIView {
+        let containerView = UIView(
+            frame: CGRect(x: 0, y: 0, width: size, height: size))
+        containerView.backgroundColor = .clear
+
+        let imageView = UIImageView(frame: containerView.bounds)
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = size / 2
+        imageView.isSkeletonable = true
+
+        containerView.addSubview(imageView)
+
+        // Apply skeleton animation with gradient
+        let gradient = SkeletonGradient(baseColor: UIColor.black, secondaryColor: UIColor.white)
+        imageView.showAnimatedGradientSkeleton(usingGradient: gradient)
+
+        // Apply invited modifier if needed
+        if isInvited {
+            imageView.alpha = 0.6
+
+            let shapeLayer = CAShapeLayer()
+            shapeLayer.path =
+                UIBezierPath(
+                    arcCenter: CGPoint(x: size / 2, y: size / 2),
+                    radius: size / 2 - 1,
+                    startAngle: 0,
+                    endAngle: 2 * .pi,
+                    clockwise: true
+                ).cgPath
+            shapeLayer.fillColor = UIColor.clear.cgColor
+            shapeLayer.strokeColor =
+                UIColor(named: "VivaGreen")?.cgColor ?? UIColor.green.cgColor
+            shapeLayer.lineWidth = 2
+            shapeLayer.lineDashPattern = [5, 5]
+
+            containerView.layer.addSublayer(shapeLayer)
+        }
+
+        return containerView
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {
+        // Update view if needed
+    }
+}
+
 struct VivaProfileImage: View {
     let userId: String?
     @State private var imageUrl: String?
     let size: VivaDesign.Sizing.ProfileImage
     let isInvited: Bool
     @State private var cachedImage: UIImage? = nil
+    @State private var isLoading: Bool = true
+    @State private var imageOpacity: Double = 0
 
     init(
         userId: String?,
@@ -40,7 +95,15 @@ struct VivaProfileImage: View {
     var body: some View {
         if let urlString = imageUrl, let url = URL(string: urlString) {
             ZStack {
-                // If we have a cached image, show it immediately
+                // Always show skeleton during loading
+                if isLoading {
+                    SkeletonProfileImageView(
+                        size: size.rawValue, isInvited: isInvited
+                    )
+                    .frame(width: size.rawValue, height: size.rawValue)
+                }
+
+                // Show image with opacity animation when available
                 if let cachedImage = cachedImage {
                     Image(uiImage: cachedImage)
                         .resizable()
@@ -48,16 +111,17 @@ struct VivaProfileImage: View {
                         .frame(width: size.rawValue, height: size.rawValue)
                         .modifier(InvitedModifier(isInvited: isInvited))
                         .clipShape(Circle())
-                } else {
-                    // Otherwise, use AsyncImage as a fallback
+                        .opacity(imageOpacity)
+                } else if !isLoading {
+                    // Fallback to AsyncImage if cache failed but loading completed
                     AsyncImage(url: url) { phase in
                         switch phase {
                         case .empty:
-                            ProgressView()
-                                .frame(
-                                    width: size.rawValue, height: size.rawValue
-                                )
-                                .modifier(InvitedModifier(isInvited: isInvited))
+                            // This should rarely show since we have the skeleton
+                            SkeletonProfileImageView(
+                                size: size.rawValue, isInvited: isInvited
+                            )
+                            .frame(width: size.rawValue, height: size.rawValue)
                         case .success(let image):
                             image
                                 .resizable()
@@ -66,6 +130,11 @@ struct VivaProfileImage: View {
                                     width: size.rawValue, height: size.rawValue
                                 )
                                 .modifier(InvitedModifier(isInvited: isInvited))
+                                .opacity(imageOpacity)
+                                .onAppear {
+                                    imageOpacity = 1.0
+                                    isLoading = false
+                                }
                         case .failure(let error):
                             defaultImage
                                 .modifier(InvitedModifier(isInvited: isInvited))
@@ -114,34 +183,54 @@ struct VivaProfileImage: View {
                 }
             }
             .onAppear {
+                // Reset states
+                isLoading = true
+                imageOpacity = 0
+
                 // Check memory cache first for instant results
                 if let memCachedImage = ImageCacheManager.shared.get(
                     for: urlString)
                 {
                     self.cachedImage = memCachedImage
+                    // Delay slightly to ensure UI is ready, then animate in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        imageOpacity = 1.0
+                        isLoading = false
+                    }
                 } else {
                     // Check disk cache
                     checkCache(for: url, urlString: urlString)
                 }
-                
+
                 // Subscribe to profile update notifications
                 NotificationCenter.default.addObserver(
                     forName: .userProfileUpdated,
                     object: nil,
                     queue: .main
                 ) { [userId] notification in
-                    guard let updatedProfile = notification.object as? UserProfile,
-                          let currentUserId = userId,
-                          currentUserId == updatedProfile.id else { return }
-                    
+                    guard
+                        let updatedProfile = notification.object
+                            as? UserProfile,
+                        let currentUserId = userId,
+                        currentUserId == updatedProfile.id
+                    else { return }
+
                     // If this is the user whose profile was updated, update the image URL
                     self.imageUrl = updatedProfile.imageUrl
-                    self.cachedImage = nil // Clear the cached image to force a reload
-                    
-                    // If we have a new URL, preload it
-                    if let newUrlString = updatedProfile.imageUrl,
-                       let newUrl = URL(string: newUrlString) {
-                        checkCache(for: newUrl, urlString: newUrlString)
+                    withAnimation {
+                        self.imageOpacity = 0  // Fade out current image
+                    }
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        self.cachedImage = nil  // Clear the cached image to force a reload
+                        self.isLoading = true  // Show skeleton while loading
+
+                        // If we have a new URL, preload it
+                        if let newUrlString = updatedProfile.imageUrl,
+                            let newUrl = URL(string: newUrlString)
+                        {
+                            checkCache(for: newUrl, urlString: newUrlString)
+                        }
                     }
                 }
             }
@@ -172,6 +261,16 @@ struct VivaProfileImage: View {
                     // Update memory cache for other instances to use
                     ImageCacheManager.shared.set(image, for: urlString)
                     self.cachedImage = image
+
+                    // Animate the image in
+                    withAnimation(.easeIn(duration: 0.3)) {
+                        self.imageOpacity = 1.0
+                        self.isLoading = false
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.isLoading = false
                 }
             }
         }
