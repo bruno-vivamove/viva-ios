@@ -13,7 +13,7 @@ class HomeViewModel: ObservableObject {
     @Published var error: Error?
     @Published var selectedMatchup: Matchup?
 
-    private var dataRefreshedTime: Date? = nil
+    var dataRefreshedTime: Date? = nil
 
     init(
         userSession: UserSession,

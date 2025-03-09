@@ -10,9 +10,6 @@ struct HomeView: View {
 
     @StateObject private var viewModel: HomeViewModel
 
-    // A counter to trigger refresh for MatchupCards
-    @State private var refreshTrigger = 0
-
     init(viewModel: HomeViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -43,23 +40,19 @@ struct HomeView: View {
                 .scrollContentBackground(.hidden)
                 .refreshable {
                     await viewModel.loadData()
-                    refreshTrigger += 1
                 }
             } else {
                 HomeContentList(
                     viewModel: viewModel,
                     matchupService: matchupService,
                     healthKitDataManager: healthKitDataManager,
-                    userSession: userSession,
-                    refreshTrigger: $refreshTrigger
+                    userSession: userSession
                 )
                 .listRowInsets(EdgeInsets())
                 .listStyle(PlainListStyle())
                 .scrollContentBackground(.hidden)
                 .refreshable {
                     await viewModel.loadData()
-                    // Increment the refresh trigger to force recreating MatchupCards
-                    refreshTrigger += 1
                 }
                 .listSectionSpacing(0)
             }
@@ -182,7 +175,6 @@ struct HomeContentList: View {
     let matchupService: MatchupService
     let healthKitDataManager: HealthKitDataManager
     let userSession: UserSession
-    @Binding var refreshTrigger: Int
 
     private let rowInsets = EdgeInsets(
         top: 0,
@@ -200,7 +192,6 @@ struct HomeContentList: View {
                     matchupService: matchupService,
                     healthKitDataManager: healthKitDataManager,
                     userSession: userSession,
-                    refreshTrigger: refreshTrigger,
                     rowInsets: rowInsets
                 )
             }
@@ -212,7 +203,6 @@ struct HomeContentList: View {
                     matchupService: matchupService,
                     healthKitDataManager: healthKitDataManager,
                     userSession: userSession,
-                    refreshTrigger: refreshTrigger,
                     rowInsets: rowInsets
                 )
             }
@@ -235,7 +225,6 @@ struct ActiveMatchupsSection: View {
     let matchupService: MatchupService
     let healthKitDataManager: HealthKitDataManager
     let userSession: UserSession
-    let refreshTrigger: Int
     let rowInsets: EdgeInsets
 
     var body: some View {
@@ -245,9 +234,10 @@ struct ActiveMatchupsSection: View {
                     matchupId: matchup.id,
                     matchupService: matchupService,
                     healthKitDataManager: healthKitDataManager,
-                    userSession: userSession
+                    userSession: userSession,
+                    lastRefreshTime: viewModel.dataRefreshedTime
                 )
-                .id("active-\(matchup.id)-\(refreshTrigger)")  // Force redraw on refresh
+                .id(matchup.id)
                 .onTapGesture {
                     viewModel.selectedMatchup = matchup
                 }
@@ -266,7 +256,6 @@ struct PendingMatchupsSection: View {
     let matchupService: MatchupService
     let healthKitDataManager: HealthKitDataManager
     let userSession: UserSession
-    let refreshTrigger: Int
     let rowInsets: EdgeInsets
 
     var body: some View {
@@ -276,9 +265,10 @@ struct PendingMatchupsSection: View {
                     matchupId: matchup.id,
                     matchupService: matchupService,
                     healthKitDataManager: healthKitDataManager,
-                    userSession: userSession
+                    userSession: userSession,
+                    lastRefreshTime: viewModel.dataRefreshedTime  // Add this parameter
                 )
-                .id("pending-\(matchup.id)-\(refreshTrigger)")  // Force redraw on refresh
+                .id(matchup.id)
                 .onTapGesture {
                     viewModel.selectedMatchup = matchup
                 }

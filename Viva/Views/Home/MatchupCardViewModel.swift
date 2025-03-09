@@ -5,23 +5,28 @@ class MatchupCardViewModel: ObservableObject {
     @Published var matchupDetails: MatchupDetails?
     @Published var isLoading: Bool = false
     @Published var error: Error?
-    @Published var refreshTrigger: Bool = false
 
     private let matchupId: String
     private let matchupService: MatchupService
     private let healthKitDataManager: HealthKitDataManager
     private let userSession: UserSession
     private var cancellables = Set<AnyCancellable>()
+    
+    // Add this property to track refresh time
+    private var lastRefreshTime: Date?
 
     init(
-        matchupId: String, matchupService: MatchupService,
+        matchupId: String,
+        matchupService: MatchupService,
         healthKitDataManager: HealthKitDataManager,
-        userSession: UserSession
+        userSession: UserSession,
+        lastRefreshTime: Date? = nil
     ) {
         self.matchupId = matchupId
         self.matchupService = matchupService
         self.healthKitDataManager = healthKitDataManager
         self.userSession = userSession
+        self.lastRefreshTime = lastRefreshTime
         self.isLoading = true
 
         // Listen for relevant notifications that should trigger a refresh
@@ -30,6 +35,17 @@ class MatchupCardViewModel: ObservableObject {
         // Load the matchup details
         Task {
             await loadMatchupDetails()
+        }
+    }
+    
+    // Add this method to update the refresh time
+    func updateLastRefreshTime(_ newTime: Date?) {
+        // Only refresh if the new time is different (and later) than the current one
+        if let newTime = newTime, (lastRefreshTime == nil || newTime > lastRefreshTime!) {
+            lastRefreshTime = newTime
+            Task {
+                await loadMatchupDetails()
+            }
         }
     }
 

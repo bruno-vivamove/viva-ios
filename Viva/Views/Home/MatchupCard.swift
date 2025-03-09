@@ -3,25 +3,31 @@ import SwiftUI
 struct MatchupCard: View {
     @EnvironmentObject var userSession: UserSession
     @StateObject private var viewModel: MatchupCardViewModel
+    
+    // Add this property to trigger updates
+    var lastRefreshTime: Date?
 
     init(
         matchupId: String,
         matchupService: MatchupService,
         healthKitDataManager: HealthKitDataManager,
-        userSession: UserSession
+        userSession: UserSession,
+        lastRefreshTime: Date? = nil
     ) {
+        self.lastRefreshTime = lastRefreshTime
         _viewModel = StateObject(
             wrappedValue: MatchupCardViewModel(
                 matchupId: matchupId,
                 matchupService: matchupService,
                 healthKitDataManager: healthKitDataManager,
-                userSession: userSession
+                userSession: userSession,
+                lastRefreshTime: lastRefreshTime
             ))
     }
 
     var body: some View {
         Group {
-            if viewModel.isLoading {
+            if viewModel.isLoading && viewModel.matchupDetails == nil {
                 loadingView
             } else if let details = viewModel.matchupDetails {
                 matchupCardView(details)
@@ -31,6 +37,10 @@ struct MatchupCard: View {
         }
         .background(Color.black)
         .listRowBackground(Color.clear)
+        // Add this modifier to observe changes to lastRefreshTime
+        .onChange(of: lastRefreshTime) { oldValue, newValue in
+            viewModel.updateLastRefreshTime(newValue)
+        }
     }
 
     private var loadingView: some View {
