@@ -53,6 +53,7 @@ struct ProfileView: View {
                                         // Show loading indicator over the profile image when saving
                                         ZStack {
                                             VivaProfileImage(
+                                                userId: userSession.getUserProfile().id,
                                                 imageUrl: userSession.getUserProfile().imageUrl,
                                                 size: .xlarge
                                             )
@@ -65,6 +66,7 @@ struct ProfileView: View {
                                         }
                                     } else {
                                         VivaProfileImage(
+                                            userId: userSession.getUserProfile().id,
                                             imageUrl: userSession.getUserProfile().imageUrl,
                                             size: .xlarge
                                         )

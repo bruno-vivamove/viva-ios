@@ -82,6 +82,7 @@ struct MatchupCard: View {
                     }
 
                     VivaProfileImage(
+                        userId: invite?.user?.id ?? user?.id,
                         imageUrl: invite?.user?.imageUrl ?? user?.imageUrl,
                         size: .small,
                         isInvited: invite != nil
@@ -130,6 +131,7 @@ struct MatchupCard: View {
                     }
 
                     VivaProfileImage(
+                        userId: invite?.user?.id ?? user?.id,
                         imageUrl: invite?.user?.imageUrl ?? user?.imageUrl,
                         size: .small,
                         isInvited: invite != nil

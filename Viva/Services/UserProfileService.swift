@@ -68,6 +68,12 @@ final class UserProfileService: ObservableObject {
         Task { @MainActor in
             userSession.setUserProfile(savedUserProfile)
         }
+        
+        NotificationCenter.default.post(
+            name: .userProfileUpdated,
+            object: savedUserProfile
+        )
+        
         return savedUserProfile
     }
 }

@@ -15,6 +15,7 @@ extension Notification.Name {
 
     static let friendRequestSent = Notification.Name("friendRequestSent")
     
+    static let userProfileUpdated = Notification.Name("userProfileUpdated")
     
     static let homeScreenMatchupCreationCompleted = Notification.Name("homeScreenMatchupCreationCompleted")
     static let friendScreenMatchupCreationCompleted = Notification.Name("friendScreenMatchupCreationCompleted")

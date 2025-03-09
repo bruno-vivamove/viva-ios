@@ -37,6 +37,7 @@ struct UserActionCard: View {
                 // User Info
                 HStack(spacing: VivaDesign.Spacing.small) {
                     VivaProfileImage(
+                        userId: user.id,
                         imageUrl: user.imageUrl,
                         size: .small
                     )

@@ -104,6 +104,7 @@ struct ProfileHeader: View {
                     }
                 }) {
                     VivaProfileImage(
+                        userId: userSession.getUserProfile().id,
                         imageUrl: userSession.getUserProfile().imageUrl,
                         size: .large
                     ).id(userSession.getUserProfile().imageUrl)

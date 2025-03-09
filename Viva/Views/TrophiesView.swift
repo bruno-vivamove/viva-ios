@@ -234,6 +234,7 @@ struct HistoryCard: View {
                     .lineLimit(1)
                 
                 VivaProfileImage(
+                    userId: history.opponent.id,
                     imageUrl: history.opponent.imageUrl,
                     size: .medium
                 )

@@ -241,6 +241,7 @@ struct UserScoreView: View {
         Group {
             if invite != nil || matchupUser != nil {
                 VivaProfileImage(
+                    userId: invite?.user?.id ?? matchupUser?.id,
                     imageUrl: invite?.user?.imageUrl ?? matchupUser?.imageUrl,
                     size: .large,
                     isInvited: invite?.user != nil
@@ -555,7 +556,7 @@ struct RecordDisplay: View {
 
     var body: some View {
         HStack(spacing: VivaDesign.Spacing.xsmall) {
-            VivaProfileImage(imageUrl: leftUser?.imageUrl, size: .mini)
+            VivaProfileImage(userId: leftUser?.id, imageUrl: leftUser?.imageUrl, size: .mini)
             Text("\(wins)")
                 .font(.title)
                 .lineLimit(1)
@@ -563,7 +564,7 @@ struct RecordDisplay: View {
             Text("\(losses)")
                 .font(.title)
                 .lineLimit(1)
-            VivaProfileImage(imageUrl: rightUser?.imageUrl, size: .mini)
+            VivaProfileImage(userId: rightUser?.id, imageUrl: rightUser?.imageUrl, size: .mini)
         }
         .foregroundColor(VivaDesign.Colors.primaryText)
     }
@@ -582,6 +583,7 @@ struct InviteDialog: View {
             // User info
             HStack(spacing: VivaDesign.Spacing.medium) {
                 VivaProfileImage(
+                    userId: user.id,
                     imageUrl: user.imageUrl,
                     size: .medium,
                     isInvited: true

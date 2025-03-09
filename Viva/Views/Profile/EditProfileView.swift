@@ -197,7 +197,8 @@ struct EditProfileView: View {
                         .clipShape(Circle())
                 } else {
                     VivaProfileImage(
-                        imageUrl: viewModel.userSession.userProfile?.imageUrl
+                        userId: viewModel.userSession.getUserProfile().id,
+                        imageUrl: viewModel.userSession.getUserProfile().imageUrl
                             ?? "profile_default", size: .large)
                 }
 
