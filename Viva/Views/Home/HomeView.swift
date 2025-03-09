@@ -32,8 +32,19 @@ struct HomeView: View {
             if viewModel.isLoading && viewModel.isEmpty {
                 LoadingView()
             } else if viewModel.isEmpty {
-                HomeEmptyStateView()
-                    .padding(VivaDesign.Spacing.medium)
+                // Empty state with refreshable list
+                List {
+                    HomeEmptyStateView()
+                        .listRowBackground(Color.black)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(EdgeInsets())
+                }
+                .listStyle(PlainListStyle())
+                .scrollContentBackground(.hidden)
+                .refreshable {
+                    await viewModel.loadData()
+                    refreshTrigger += 1
+                }
             } else {
                 HomeContentList(
                     viewModel: viewModel,
@@ -109,9 +120,9 @@ struct HomeHeader: View {
             StreakCounter(streakDays: userSession.getUserProfile().streakDays)
             PointsCounter(
                 rewardPoints: userSession.getUserProfile().rewardPoints)
-            Spacer()
+            Spacer(minLength: 1)
             CardButton(
-                title: "Create Matchup",
+                title: "Create Match",
                 color: VivaDesign.Colors.primaryText
             ) {
                 showMatchupCreation = true

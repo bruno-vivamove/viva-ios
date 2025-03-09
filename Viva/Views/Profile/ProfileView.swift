@@ -29,14 +29,15 @@ struct ProfileView: View {
                     // Top section with profile image and aligned elements
                     // Using ZStack to position gray area behind content
                     ZStack(alignment: .top) {
-                        // Gray area at the top that scrolls with content
-                        Rectangle()
-                            .fill(
+                        // Gray area with warp_speed image
+                        Image("warp_speed")
+                            .resizable()
+                            .frame(height: 200)
+                            .background(
                                 Color(
                                     red: 35 / 255, green: 35 / 255,
                                     blue: 35 / 255)
                             )
-                            .frame(height: 200)
                             .offset(y: 0)
 
                         VStack(alignment: .leading, spacing: 12) {
