@@ -54,6 +54,12 @@ struct MatchupDetails: Codable, Equatable {
     var userMeasurements: [MatchupUserMeasurement]
     var invites: [MatchupInvite]
 
+    func getInvites() -> [MatchupInvite] {
+        print(invites.count)
+        return invites
+    }
+    
+
     var currentDayNumber: Int? {
         guard let startTime = self.startTime else {
             return nil

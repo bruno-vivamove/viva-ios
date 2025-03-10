@@ -112,6 +112,8 @@ final class MatchupService: ObservableObject {
             object: matchupInvite
         )
         
+        print(matchupInvite.side.rawValue)
+        
         return matchupInvite
     }
     

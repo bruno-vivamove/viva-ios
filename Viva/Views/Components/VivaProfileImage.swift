@@ -1,5 +1,6 @@
 import SkeletonView
 import SwiftUI
+import Combine
 
 // Static image cache for sharing across all instances
 final class ImageCacheManager {
@@ -74,12 +75,16 @@ struct SkeletonProfileImageView: UIViewRepresentable {
 
 struct VivaProfileImage: View {
     let userId: String?
-    @State private var imageUrl: String?
-    let size: VivaDesign.Sizing.ProfileImage
-    let isInvited: Bool
+    let imageUrl: String?
     @State private var cachedImage: UIImage? = nil
     @State private var isLoading: Bool = true
     @State private var imageOpacity: Double = 0
+    
+    // Add cancellables set for Combine subscriptions
+    @State private var cancellables = Set<AnyCancellable>()
+
+    let size: VivaDesign.Sizing.ProfileImage
+    let isInvited: Bool
 
     init(
         userId: String?,
@@ -87,7 +92,7 @@ struct VivaProfileImage: View {
         isInvited: Bool = false
     ) {
         self.userId = userId
-        self._imageUrl = State(initialValue: imageUrl)
+        self.imageUrl = imageUrl
         self.size = size
         self.isInvited = isInvited
     }
@@ -202,51 +207,49 @@ struct VivaProfileImage: View {
                     checkCache(for: url, urlString: urlString)
                 }
 
-                // Subscribe to profile update notifications
-                NotificationCenter.default.addObserver(
-                    forName: .userProfileUpdated,
-                    object: nil,
-                    queue: .main
-                ) { [userId] notification in
-                    guard
-                        let updatedProfile = notification.object
-                            as? UserProfile,
-                        let currentUserId = userId,
-                        currentUserId == updatedProfile.id
-                    else { return }
-
-                    // If this is the user whose profile was updated, update the image URL
-                    self.imageUrl = updatedProfile.imageUrl
-                    withAnimation {
-                        self.imageOpacity = 0  // Fade out current image
-                    }
-
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        self.cachedImage = nil  // Clear the cached image to force a reload
-                        self.isLoading = true  // Show skeleton while loading
-
-                        // If we have a new URL, preload it
-                        if let newUrlString = updatedProfile.imageUrl,
-                            let newUrl = URL(string: newUrlString)
-                        {
-                            checkCache(for: newUrl, urlString: newUrlString)
-                        }
-                    }
-                }
-            }
-            .onDisappear {
-                // Unsubscribe when view disappears
-                NotificationCenter.default.removeObserver(
-                    self,
-                    name: .userProfileUpdated,
-                    object: nil
-                )
+                // Subscribe to profile update notifications using Combine
+                setupNotificationObserver()
             }
         } else {
             defaultImage
                 .clipShape(Circle())
                 .modifier(InvitedModifier(isInvited: isInvited))
         }
+    }
+    
+    private func setupNotificationObserver() {
+        // Clear any existing subscriptions to avoid duplicates
+        cancellables.removeAll()
+        
+        // Subscribe to profile update notifications
+        NotificationCenter.default.publisher(for: .userProfileUpdated)
+            .compactMap { $0.object as? UserProfile }
+            .filter { [userId] updatedProfile in
+                // Only process notifications for this user
+                guard let currentUserId = userId else { return false }
+                return currentUserId == updatedProfile.id
+            }
+            .receive(on: DispatchQueue.main)
+            .sink { updatedProfile in
+                // Update the image URL
+                //self.imageUrl = updatedProfile.imageUrl
+                
+                withAnimation {
+                    self.imageOpacity = 0  // Fade out current image
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    self.cachedImage = nil  // Clear the cached image to force a reload
+                    self.isLoading = true  // Show skeleton while loading
+                    
+                    // If we have a new URL, preload it
+                    if let newUrlString = updatedProfile.imageUrl,
+                       let newUrl = URL(string: newUrlString) {
+                        checkCache(for: newUrl, urlString: newUrlString)
+                    }
+                }
+            }
+            .store(in: &cancellables)
     }
 
     private func checkCache(for url: URL, urlString: String) {

@@ -11,7 +11,7 @@ class MatchupCardViewModel: ObservableObject {
     private let healthKitDataManager: HealthKitDataManager
     private let userSession: UserSession
     private var cancellables = Set<AnyCancellable>()
-    
+
     // Add this property to track refresh time
     private var lastRefreshTime: Date?
 
@@ -37,11 +37,13 @@ class MatchupCardViewModel: ObservableObject {
             await loadMatchupDetails()
         }
     }
-    
+
     // Add this method to update the refresh time
     func updateLastRefreshTime(_ newTime: Date?) {
         // Only refresh if the new time is different (and later) than the current one
-        if let newTime = newTime, (lastRefreshTime == nil || newTime > lastRefreshTime!) {
+        if let newTime = newTime,
+            lastRefreshTime == nil || newTime > lastRefreshTime!
+        {
             lastRefreshTime = newTime
             Task {
                 await loadMatchupDetails()
@@ -156,7 +158,12 @@ class MatchupCardViewModel: ObservableObject {
             .filter { $0.id == self.matchupId }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] matchup in
-                self?.matchupDetails?.status = matchup.status
+                guard let self = self else { return }
+
+                if var details = self.matchupDetails {
+                    details.status = matchup.status
+                    self.matchupDetails = details
+                }
             }
             .store(in: &cancellables)
 
@@ -166,12 +173,15 @@ class MatchupCardViewModel: ObservableObject {
             .filter { $0.matchupId == self.matchupId }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] matchupInvite in
+                guard let self = self else { return }
+
                 // Only add the invite if it doesn't already exist in the matchup
-                if let invites = self?.matchupDetails?.invites {
-                    if !invites.contains(where: {
+                if var details = self.matchupDetails {
+                    if !details.invites.contains(where: {
                         $0.inviteCode == matchupInvite.inviteCode
                     }) {
-                        self?.matchupDetails?.invites.append(matchupInvite)
+                        details.invites.append(matchupInvite)
+                        self.matchupDetails = details  // Update the published property to trigger UI refresh
                     }
                 }
             }
@@ -183,10 +193,13 @@ class MatchupCardViewModel: ObservableObject {
             .filter { $0.matchupId == self.matchupId }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] matchupInvite in
-                if var invites = self?.matchupDetails?.invites {
-                    invites.removeAll {
+                guard let self = self else { return }
+
+                if var details = self.matchupDetails {
+                    details.invites.removeAll {
                         $0.inviteCode == matchupInvite.inviteCode
                     }
+                    self.matchupDetails = details  // Update the published property to trigger UI refresh
                 }
             }
             .store(in: &cancellables)

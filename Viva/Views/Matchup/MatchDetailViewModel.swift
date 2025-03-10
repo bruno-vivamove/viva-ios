@@ -1,5 +1,6 @@
 import Foundation
 import OrderedCollections
+import Combine
 
 @MainActor
 class MatchupDetailViewModel: ObservableObject {
@@ -10,6 +11,7 @@ class MatchupDetailViewModel: ObservableObject {
     let healthKitDataManager: HealthKitDataManager
 
     private let matchupId: String
+    private var cancellables = Set<AnyCancellable>()
 
     @Published var matchup: MatchupDetails?
     @Published var totalMatchupMeasurementPairs:
@@ -35,40 +37,49 @@ class MatchupDetailViewModel: ObservableObject {
         self.matchupId = matchupId
         self.healthKitDataManager = healthKitDataManager
 
-        // Matchup created observer
-        NotificationCenter.default.addObserver(
-            forName: .matchupInviteSent,
-            object: nil,
-            queue: .main
-        ) { notification in
-            if let matchupInvite = notification.object as? MatchupInvite {
-                Task { @MainActor in
-                    if matchupInvite.matchupId == matchupId {
-                        self.matchup?.invites.append(matchupInvite)
-                    }
-                }
-            }
-        }
-
-        // Matchup invite deleted observer
-        NotificationCenter.default.addObserver(
-            forName: .matchupInviteDeleted,
-            object: nil,
-            queue: .main
-        ) { notification in
-            if let matchupInvite = notification.object as? MatchupInvite {
-                Task { @MainActor in
-                    self.matchup?.invites.removeAll(where: {
-                        $0.inviteCode == matchupInvite.inviteCode
-                    })
-                }
-            }
-        }
+        setupNotificationObservers()
     }
 
     deinit {
-        NotificationCenter.default.removeObserver(
-            self, name: .matchupInviteSent, object: nil)
+        cancellables.removeAll()
+    }
+
+    private func setupNotificationObservers() {
+        // Matchup invite sent observer
+        NotificationCenter.default.publisher(for: .matchupInviteSent)
+            .compactMap { $0.object as? MatchupInvite }
+            .filter { $0.matchupId == self.matchupId }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] matchupInvite in
+                guard let self = self else { return }
+
+                if var updatedMatchup = self.matchup {
+                    if !updatedMatchup.invites.contains(where: {
+                        $0.inviteCode == matchupInvite.inviteCode
+                    }) {
+                        updatedMatchup.invites.append(matchupInvite)
+                        self.matchup = updatedMatchup
+                    }
+                }
+            }
+            .store(in: &cancellables)
+
+        // Matchup invite deleted observer
+        NotificationCenter.default.publisher(for: .matchupInviteDeleted)
+            .compactMap { $0.object as? MatchupInvite }
+            .filter { $0.matchupId == self.matchupId }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] matchupInvite in
+                guard let self = self else { return }
+
+                if var updatedMatchup = self.matchup {
+                    updatedMatchup.invites.removeAll {
+                        $0.inviteCode == matchupInvite.inviteCode
+                    }
+                    self.matchup = updatedMatchup
+                }
+            }
+            .store(in: &cancellables)
     }
 
     func loadData() async {
@@ -106,7 +117,8 @@ class MatchupDetailViewModel: ObservableObject {
                                     measurements: userMeasurements
                                 )
 
-                            self.updateMeasuerments(matchup: savedMatchupDetails)
+                            self.updateMeasuerments(
+                                matchup: savedMatchupDetails)
                         } catch {
                             print("Failed to save measurements: \(error)")
                         }
@@ -120,8 +132,7 @@ class MatchupDetailViewModel: ObservableObject {
         isLoading = false
     }
 
-    func updateMeasuerments(matchup: MatchupDetails)
-    {
+    func updateMeasuerments(matchup: MatchupDetails) {
         // Create set of left user IDs first
         let leftUserIds = Set(matchup.leftUsers.map { $0.id })
 

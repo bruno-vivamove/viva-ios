@@ -115,7 +115,7 @@ struct MatchupCard: View {
                     Spacer(minLength: 0)  // Push content to right edge
 
                     let user = details.rightUsers.first
-                    let invite = details.invites.first { invite in
+                    let invite = details.getInvites().first { invite in
                         invite.side == .right
                     }
 
