@@ -15,9 +15,9 @@ class EditProfileViewModel: ObservableObject {
         self.userSession = userSession
         self.userProfileService = userProfileService
 
-        self.displayName = userSession.getUserProfile().displayName
-        self.email = userSession.getUserProfile().emailAddress
-        self.caption = userSession.getUserProfile().caption ?? ""
+        self.displayName = userSession.userProfile?.displayName ?? ""
+        self.email = userSession.userProfile?.emailAddress ?? ""
+        self.caption = userSession.userProfile?.caption ?? ""
     }
 
     @MainActor
@@ -197,8 +197,8 @@ struct EditProfileView: View {
                         .clipShape(Circle())
                 } else {
                     VivaProfileImage(
-                        userId: viewModel.userSession.getUserProfile().id,
-                        imageUrl: viewModel.userSession.getUserProfile().imageUrl
+                        userId: viewModel.userSession.userProfile?.id,
+                        imageUrl: viewModel.userSession.userProfile?.imageUrl
                             ?? "profile_default", size: .large)
                 }
 

@@ -110,9 +110,9 @@ struct HomeHeader: View {
 
     var body: some View {
         HStack(spacing: VivaDesign.Spacing.medium) {
-            StreakCounter(streakDays: userSession.getUserProfile().streakDays)
+            StreakCounter(streakDays: userSession.userProfile?.streakDays ?? 0)
             PointsCounter(
-                rewardPoints: userSession.getUserProfile().rewardPoints)
+                rewardPoints: userSession.userProfile?.rewardPoints ?? 0)
             Spacer(minLength: 1)
             CardButton(
                 title: "Create Match",

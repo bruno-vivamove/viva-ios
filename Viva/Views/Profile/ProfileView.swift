@@ -51,8 +51,8 @@ struct ProfileView: View {
                                 ZStack(alignment: .bottomTrailing) {
                                     // Profile image with skeleton loading built in
                                     VivaProfileImage(
-                                        userId: userSession.getUserProfile().id,
-                                        imageUrl: userSession.getUserProfile().imageUrl,
+                                        userId: userSession.userProfile?.id,
+                                        imageUrl: userSession.userProfile?.imageUrl,
                                         size: .xlarge
                                     )
                                     .padding(.top, 16)
@@ -93,13 +93,11 @@ struct ProfileView: View {
                                         .foregroundColor(.white)
                                         .offset(y: -10)
 
-                                    // Lightning bolt in top right
                                     Image(systemName: "bolt.fill")
                                         .font(.system(size: 14))
                                         .foregroundColor(.white)
                                         .offset(x: 14, y: -30)
 
-                                    // Added "Streak" text under the circle but offset down
                                     Text("Streak")
                                         .font(.system(size: 12))
                                         .foregroundColor(.white)
@@ -108,7 +106,7 @@ struct ProfileView: View {
 
                                 Spacer()
 
-                                // Hamburger menu button positioned in the HStack to align with profile image
+                                // Hamburger menu button
                                 Button(action: {
                                     showSettings = true
                                 }) {
@@ -121,9 +119,8 @@ struct ProfileView: View {
                             .padding(.top, 16)
                             .padding(.horizontal, 16)
 
-                            // Rest of content remains the same...
                             // User name (left aligned)
-                            Text(userSession.getUserProfile().displayName)
+                            Text(userSession.userProfile?.displayName ?? "")
                                 .font(.system(size: 28, weight: .bold))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 16)
@@ -163,8 +160,7 @@ struct ProfileView: View {
                             .padding(.horizontal, 16)
 
                             // User caption
-                            if let caption = userSession.getUserProfile()
-                                .caption, !caption.isEmpty
+                            if let caption = userSession.userProfile?.caption, !caption.isEmpty
                             {
                                 Text(caption)
                                     .font(.system(size: 16))

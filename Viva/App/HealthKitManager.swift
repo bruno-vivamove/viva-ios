@@ -32,8 +32,10 @@ final class HealthKitDataManager: ObservableObject {
         matchupDetail: MatchupDetails,
         completion: @escaping (MatchupDetails) -> Void
     ) {
-        guard let startTime = matchupDetail.startTime else { return }
-        guard let currentDayNumber = matchupDetail.currentDayNumber else {
+        guard let startTime = matchupDetail.startTime,
+            let currentDayNumber = matchupDetail.currentDayNumber,
+            let userId = userSession.userId
+        else {
             return
         }
 
@@ -47,6 +49,7 @@ final class HealthKitDataManager: ObservableObject {
             case .steps:
                 queryGroup.enter()
                 querySteps(
+                    userId: userId,
                     startTime: startTime,
                     currentDayNumber: currentDayNumber,
                     matchupId: matchupDetail.id
@@ -59,6 +62,7 @@ final class HealthKitDataManager: ObservableObject {
             case .energyBurned:
                 queryGroup.enter()
                 queryEnergyBurned(
+                    userId: userId,
                     startTime: startTime,
                     currentDayNumber: currentDayNumber,
                     matchupId: matchupDetail.id
@@ -72,6 +76,7 @@ final class HealthKitDataManager: ObservableObject {
                 .strengthTraining:
                 queryGroup.enter()
                 queryWorkout(
+                    userId: userId,
                     type: measurement.measurementType,
                     startTime: startTime,
                     currentDayNumber: currentDayNumber,
@@ -85,6 +90,7 @@ final class HealthKitDataManager: ObservableObject {
             case .elevatedHeartRate:
                 queryGroup.enter()
                 queryElevatedHeartRate(
+                    userId: userId,
                     startTime: startTime,
                     currentDayNumber: currentDayNumber,
                     matchupId: matchupDetail.id
@@ -97,6 +103,7 @@ final class HealthKitDataManager: ObservableObject {
             case .asleep:
                 queryGroup.enter()
                 querySleep(
+                    userId: userId,
                     startTime: startTime,
                     currentDayNumber: currentDayNumber,
                     matchupId: matchupDetail.id
@@ -109,6 +116,7 @@ final class HealthKitDataManager: ObservableObject {
             case .standing:
                 queryGroup.enter()
                 queryStanding(
+                    userId: userId,
                     startTime: startTime,
                     currentDayNumber: currentDayNumber,
                     matchupId: matchupDetail.id
@@ -169,6 +177,7 @@ final class HealthKitDataManager: ObservableObject {
     }
 
     private func querySteps(
+        userId: String,
         startTime: Date,
         currentDayNumber: Int,
         matchupId: String,
@@ -194,10 +203,8 @@ final class HealthKitDataManager: ObservableObject {
                 quantityType: stepsType,
                 quantitySamplePredicate: predicate,
                 options: .cumulativeSum
-            ) { [weak self] _, result, error in
+            ) { _, result, error in
                 defer { queryGroup.leave() }
-
-                guard let self = self else { return }
 
                 if let sum = result?.sumQuantity() {
                     let steps = Int(sum.doubleValue(for: HKUnit.count()))
@@ -205,7 +212,7 @@ final class HealthKitDataManager: ObservableObject {
                         matchupId: matchupId,
                         dayNumber: dayNumber,
                         measurementType: .steps,
-                        userId: userSession.userId,
+                        userId: userId,
                         completeDay: dayNumber < currentDayNumber,
                         value: steps,
                         points: 0
@@ -222,6 +229,7 @@ final class HealthKitDataManager: ObservableObject {
     }
 
     private func queryEnergyBurned(
+        userId: String,
         startTime: Date,
         currentDayNumber: Int,
         matchupId: String,
@@ -248,10 +256,8 @@ final class HealthKitDataManager: ObservableObject {
                 quantityType: energyType,
                 quantitySamplePredicate: predicate,
                 options: .cumulativeSum
-            ) { [weak self] _, result, error in
+            ) { _, result, error in
                 defer { queryGroup.leave() }
-
-                guard let self = self else { return }
 
                 if let sum = result?.sumQuantity() {
                     let calories = Int(
@@ -260,7 +266,7 @@ final class HealthKitDataManager: ObservableObject {
                         matchupId: matchupId,
                         dayNumber: dayNumber,
                         measurementType: .energyBurned,
-                        userId: userSession.userId,
+                        userId: userId,
                         completeDay: dayNumber < currentDayNumber,
                         value: calories,
                         points: 0
@@ -277,6 +283,7 @@ final class HealthKitDataManager: ObservableObject {
     }
 
     private func queryWorkout(
+        userId: String,
         type: MeasurementType,
         startTime: Date,
         currentDayNumber: Int,
@@ -321,10 +328,8 @@ final class HealthKitDataManager: ObservableObject {
                 predicate: compoundPredicate,
                 limit: HKObjectQueryNoLimit,
                 sortDescriptors: nil
-            ) { [weak self] _, samples, error in
+            ) { _, samples, error in
                 defer { queryGroup.leave() }
-
-                guard let self = self else { return }
 
                 if let workouts = samples as? [HKWorkout] {
                     let totalMinutes = Int(
@@ -334,7 +339,7 @@ final class HealthKitDataManager: ObservableObject {
                         matchupId: matchupId,
                         dayNumber: dayNumber,
                         measurementType: type,
-                        userId: userSession.userId,
+                        userId: userId,
                         completeDay: dayNumber < currentDayNumber,
                         value: totalMinutes,
                         points: 0
@@ -351,6 +356,7 @@ final class HealthKitDataManager: ObservableObject {
     }
 
     private func queryElevatedHeartRate(
+        userId: String,
         startTime: Date,
         currentDayNumber: Int,
         matchupId: String,
@@ -378,10 +384,8 @@ final class HealthKitDataManager: ObservableObject {
                 predicate: predicate,
                 limit: HKObjectQueryNoLimit,
                 sortDescriptors: nil
-            ) { [weak self] _, samples, error in
+            ) { _, samples, error in
                 defer { queryGroup.leave() }
-
-                guard let self = self else { return }
 
                 if let events = samples as? [HKCategorySample] {
                     let totalMinutes = Int(
@@ -393,7 +397,7 @@ final class HealthKitDataManager: ObservableObject {
                         matchupId: matchupId,
                         dayNumber: dayNumber,
                         measurementType: .elevatedHeartRate,
-                        userId: userSession.userId,
+                        userId: userId,
                         completeDay: dayNumber < currentDayNumber,
                         value: totalMinutes,
                         points: 0
@@ -410,6 +414,7 @@ final class HealthKitDataManager: ObservableObject {
     }
 
     private func querySleep(
+        userId: String,
         startTime: Date,
         currentDayNumber: Int,
         matchupId: String,
@@ -437,10 +442,8 @@ final class HealthKitDataManager: ObservableObject {
                 predicate: predicate,
                 limit: HKObjectQueryNoLimit,
                 sortDescriptors: nil
-            ) { [weak self] _, samples, error in
+            ) { _, samples, error in
                 defer { queryGroup.leave() }
-
-                guard let self = self else { return }
 
                 if let sleepSamples = samples as? [HKCategorySample] {
                     let totalMinutes = Int(
@@ -452,7 +455,7 @@ final class HealthKitDataManager: ObservableObject {
                         matchupId: matchupId,
                         dayNumber: dayNumber,
                         measurementType: .asleep,
-                        userId: userSession.userId,
+                        userId: userId,
                         completeDay: dayNumber < currentDayNumber,
                         value: totalMinutes,
                         points: 0
@@ -469,6 +472,7 @@ final class HealthKitDataManager: ObservableObject {
     }
 
     private func queryStanding(
+        userId: String,
         startTime: Date,
         currentDayNumber: Int,
         matchupId: String,
@@ -495,10 +499,8 @@ final class HealthKitDataManager: ObservableObject {
                 quantityType: standingType,
                 quantitySamplePredicate: predicate,
                 options: .cumulativeSum
-            ) { [weak self] _, result, error in
+            ) { _, result, error in
                 defer { queryGroup.leave() }
-
-                guard let self = self else { return }
 
                 if let sum = result?.sumQuantity() {
                     let minutes = Int(sum.doubleValue(for: HKUnit.minute()))
@@ -506,7 +508,7 @@ final class HealthKitDataManager: ObservableObject {
                         matchupId: matchupId,
                         dayNumber: dayNumber,
                         measurementType: .standing,
-                        userId: userSession.userId,
+                        userId: userId,
                         completeDay: dayNumber < currentDayNumber,
                         value: minutes,
                         points: 0

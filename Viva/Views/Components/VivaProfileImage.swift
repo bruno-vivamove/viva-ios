@@ -6,7 +6,8 @@ struct VivaProfileImage: View {
     let imageUrl: String?
     let size: VivaDesign.Sizing.ProfileImage
     let isInvited: Bool
-
+    
+    // Configure URL cache
     init(
         userId: String?,
         imageUrl: String?,
@@ -18,10 +19,10 @@ struct VivaProfileImage: View {
         self.size = size
         self.isInvited = isInvited
     }
-
+    
     var body: some View {
         if let urlString = imageUrl, let url = URL(string: urlString) {
-            AsyncImage(url: url) { phase in
+            CachedAsyncImage(url: url) { phase in
                 switch phase {
                 case .empty:
                     SkeletonProfileImageView(
@@ -56,6 +57,41 @@ struct VivaProfileImage: View {
             .resizable()
             .foregroundColor(.gray)
             .frame(width: size.rawValue, height: size.rawValue)
+    }
+}
+
+// Custom CachedAsyncImage wrapper for enhanced caching
+struct CachedAsyncImage<Content: View>: View {
+    private let url: URL
+    private let scale: CGFloat
+    private let transaction: Transaction
+    private let content: (AsyncImagePhase) -> Content
+    
+    init(
+        url: URL,
+        scale: CGFloat = 1.0,
+        transaction: Transaction = Transaction(),
+        @ViewBuilder content: @escaping (AsyncImagePhase) -> Content
+    ) {
+        self.url = url
+        self.scale = scale
+        self.transaction = transaction
+        self.content = content
+        
+        // Create a URL request with cache policy
+        let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
+        
+        // Check if the image is already cached, and if so, prefetch it
+        URLSession.shared.dataTask(with: request) { _, _, _ in }.resume()
+    }
+    
+    var body: some View {
+        AsyncImage(
+            url: url,
+            scale: scale,
+            transaction: transaction,
+            content: content
+        )
     }
 }
 

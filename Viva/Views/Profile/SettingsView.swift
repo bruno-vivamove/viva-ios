@@ -104,13 +104,13 @@ struct ProfileHeader: View {
                     }
                 }) {
                     VivaProfileImage(
-                        userId: userSession.getUserProfile().id,
-                        imageUrl: userSession.getUserProfile().imageUrl,
+                        userId: userSession.userProfile?.id,
+                        imageUrl: userSession.userProfile?.imageUrl,
                         size: .large
-                    ).id(userSession.getUserProfile().imageUrl)
+                    )
                 }
 
-                Text(userSession.getUserProfile().displayName)
+                Text(userSession.userProfile?.displayName ?? "")
                     .font(.title2)
                     .foregroundColor(VivaDesign.Colors.primaryText)
 
@@ -125,7 +125,7 @@ struct ProfileHeader: View {
 
             // Points Display
             VStack(spacing: VivaDesign.Spacing.xsmall) {
-                Text("\(userSession.getUserProfile().rewardPoints)")
+                Text("\(userSession.userProfile?.rewardPoints ?? 0)")
                     .font(VivaDesign.Typography.displayText(42))
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .fontWeight(.bold)

@@ -38,7 +38,6 @@ struct MatchupCard: View {
         }
         .background(Color.black)
         .listRowBackground(Color.clear)
-        // Add this modifier to observe changes to lastRefreshTime
         .onChange(of: lastRefreshTime) { oldValue, newValue in
             viewModel.updateLastRefreshTime(newValue)
         }
@@ -125,9 +124,13 @@ struct MatchupCard: View {
                     .tint(VivaDesign.Colors.destructive)
                 } else {
                     Button(role: .destructive) {
+                        guard let userId = userSession.userId else {
+                            return
+                        }
+
                         Task {
                             _ = await viewModel.removeCurrentUser(
-                                userId: userSession.userId)
+                                userId: userId)
                         }
                     } label: {
                         Text("Leave")

@@ -8,24 +8,15 @@ final class UserSession: ObservableObject {
     
     @Published private(set) var isLoggedIn = false
     @Published private(set) var userProfile: UserProfile? = nil
-    private var sessionToken: String? = nil
+    var sessionToken: String? = nil
 
     init() {
         print("Creating user session")
-        // Try to restore session from keychain on initialization
         restoreSessionFromKeychain()
     }
     
-    var userId: String {
-        return userProfile!.id
-    }
-
-    func getUserProfile() -> UserProfile {
-        return userProfile!
-    }
-
-    func getAccessToken() -> String? {
-        return sessionToken
+    var userId: String? {
+        return userProfile?.id
     }
     
     func setUserProfile(_ userProfile: UserProfile) {
