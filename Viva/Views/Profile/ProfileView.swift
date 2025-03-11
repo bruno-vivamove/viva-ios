@@ -7,7 +7,7 @@ struct ProfileView: View {
     @State private var showEditProfile = false
     @State private var showImagePicker = false
     @State private var selectedImage: UIImage?
-    @State private var isLoading = false
+    @State private var isImageLoading = false
     @State private var errorMessage: String?
 
     var body: some View {
@@ -56,7 +56,7 @@ struct ProfileView: View {
                                         size: .xlarge
                                     )
                                     .padding(.top, 16)
-                                    .opacity(isLoading ? 0.6 : 1) // Slightly dim when uploading new image
+                                    .opacity(isImageLoading ? 0.6 : 1) // Slightly dim when uploading new image
 
                                     // Plus button for editing profile picture
                                     Button(action: {
@@ -76,7 +76,7 @@ struct ProfileView: View {
                                             )
                                     }
                                     .offset(x: -4, y: -4)
-                                    .disabled(isLoading)
+                                    .disabled(isImageLoading)
                                 }
 
                                 // Streak counter next to profile image
@@ -282,7 +282,7 @@ struct ProfileView: View {
     }
     
     private func saveProfileImage(_ image: UIImage) {
-        isLoading = true
+        isImageLoading = true
         
         Task {
             do {
@@ -290,13 +290,13 @@ struct ProfileView: View {
                 let _ = try await userProfileService.saveCurrentUserProfile(nil, image)
                 
                 await MainActor.run {
-                    isLoading = false
+                    isImageLoading = false
                     // Reset the selected image
                     selectedImage = nil
                 }
             } catch {
                 await MainActor.run {
-                    isLoading = false
+                    isImageLoading = false
                     errorMessage = "Failed to save image: \(error.localizedDescription)"
                 }
             }

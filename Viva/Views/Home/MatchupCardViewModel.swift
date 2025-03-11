@@ -52,7 +52,7 @@ class MatchupCardViewModel: ObservableObject {
     }
 
     @MainActor
-    func loadMatchupDetails() async {
+    func loadMatchupDetails(uploadHealthData: Bool = true) async {
         isLoading = true
         error = nil
 
@@ -62,7 +62,7 @@ class MatchupCardViewModel: ObservableObject {
                 matchupId: matchupId)
 
             // If the matchup is active to update the health data
-            if details.status == .active {
+            if details.status == .active && uploadHealthData {
                 healthKitDataManager.updateMatchupData(matchupDetail: details) {
                     updatedMatchup in
                     Task { @MainActor in
@@ -130,6 +130,17 @@ class MatchupCardViewModel: ObservableObject {
     }
 
     private func setupNotificationObservers() {
+        // Refresh when user profile is updated
+        NotificationCenter.default.publisher(for: .userProfileUpdated)
+            .compactMap { $0.object as? UserProfile }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] details in
+                Task {
+                    await self?.loadMatchupDetails(uploadHealthData: false)
+                }
+            }
+            .store(in: &cancellables)
+
         // Refresh when a matchup is updated
         NotificationCenter.default.publisher(for: .matchupUpdated)
             .compactMap { $0.object as? MatchupDetails }
