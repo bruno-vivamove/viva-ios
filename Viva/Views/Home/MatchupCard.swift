@@ -1,4 +1,3 @@
-import SkeletonView
 import SwiftUI
 
 struct MatchupCard: View {
@@ -141,65 +140,76 @@ struct MatchupCard: View {
         }
     }
 
-    private var skeletonLoadingView: some View {
-        VivaCard {
+    var skeletonLoadingView: some View {
+        // Extract the placeholder color as a constant
+        let placeholderColor = Color.gray.opacity(0.6)
+
+        return VivaCard {
             HStack(spacing: 0) {
                 // Left side container - aligned to left edge
                 HStack(spacing: VivaDesign.Spacing.small) {
-                    SkeletonProfileImageView(
-                        size: VivaDesign.Sizing.ProfileImage.small.rawValue,
-                        isInvited: false
-                    )
-                    .frame(
-                        width: VivaDesign.Sizing.ProfileImage.small.rawValue,
-                        height: VivaDesign.Sizing.ProfileImage.small.rawValue)
+                    // Profile image placeholder
+                    Circle()
+                        .fill(placeholderColor)
+                        .frame(
+                            width: VivaDesign.Sizing.ProfileImage.small
+                                .rawValue,
+                            height: VivaDesign.Sizing.ProfileImage.small
+                                .rawValue)
 
                     VStack(alignment: .leading) {
-                        SkeletonTextView(width: 80, height: 14, fontSize: 12)
+                        // Name placeholder
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(placeholderColor)
                             .frame(width: 80, height: 14)
-                            .padding(.bottom, 4)
-                        SkeletonTextView(width: 40, height: 20, fontSize: 16)
-                            .frame(width: 40, height: 20)
+
+                        // Points placeholder
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(placeholderColor)
+                            .frame(width: 40, height: 18)
                     }
 
-                    Spacer(minLength: 0)  // Push content to left edge
+                    Spacer(minLength: 0)
                 }
 
                 // Centered divider with fixed width container
                 HStack {
                     Text("|")
-                        .foregroundColor(VivaDesign.Colors.secondaryText)
+                        .foregroundColor(
+                            VivaDesign.Colors.secondaryText.opacity(0.5)
+                        )
                         .font(VivaDesign.Typography.title3)
                 }
                 .frame(width: 20)
 
                 // Right side container - aligned to right edge
                 HStack(spacing: VivaDesign.Spacing.small) {
-                    Spacer(minLength: 0)  // Push content to right edge
+                    Spacer(minLength: 0)
 
                     VStack(alignment: .trailing) {
-                        SkeletonTextView(
-                            width: 80, height: 14, fontSize: 12,
-                            alignment: .right
-                        )
-                        .frame(width: 80, height: 14)
-                        .padding(.bottom, 4)
-                        SkeletonTextView(
-                            width: 40, height: 20, fontSize: 16,
-                            alignment: .right
-                        )
-                        .frame(width: 40, height: 20)
+                        // Name placeholder
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(placeholderColor)
+                            .frame(width: 80, height: 14)
+
+                        // Points placeholder
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(placeholderColor)
+                            .frame(width: 40, height: 18)
                     }
 
-                    SkeletonProfileImageView(
-                        size: VivaDesign.Sizing.ProfileImage.small.rawValue,
-                        isInvited: false
-                    )
-                    .frame(
-                        width: VivaDesign.Sizing.ProfileImage.small.rawValue,
-                        height: VivaDesign.Sizing.ProfileImage.small.rawValue)
+                    // Profile image placeholder
+                    Circle()
+                        .fill(placeholderColor)
+                        .frame(
+                            width: VivaDesign.Sizing.ProfileImage.small
+                                .rawValue,
+                            height: VivaDesign.Sizing.ProfileImage.small
+                                .rawValue)
                 }
             }
+            .shimmering(
+                animation: VivaDesign.AnimationStyle.loadingShimmer)
         }
     }
 
@@ -243,66 +253,5 @@ struct MatchupCard: View {
         } else {
             return "Open"
         }
-    }
-}
-
-// UIViewRepresentable wrapper for skeleton text using SkeletonView's built-in text support
-struct SkeletonTextView: UIViewRepresentable {
-    let width: CGFloat
-    let height: CGFloat
-    let fontSize: CGFloat
-    let multiline: Bool
-    let alignment: NSTextAlignment
-
-    init(
-        width: CGFloat,
-        height: CGFloat,
-        fontSize: CGFloat = 14,
-        multiline: Bool = false,
-        alignment: NSTextAlignment = .left
-    ) {
-        self.width = width
-        self.height = height
-        self.fontSize = fontSize
-        self.multiline = multiline
-        self.alignment = alignment
-    }
-
-    func makeUIView(context: Context) -> UILabel {
-        let label = UILabel()
-        label.numberOfLines = multiline ? 0 : 1
-        label.font = UIFont.systemFont(ofSize: fontSize)
-        label.textColor = .white
-        label.isSkeletonable = true
-        label.linesCornerRadius = 4
-        label.textAlignment = alignment  // This sets the alignment for the skeleton lines
-
-        // Set specific width if needed
-        if width > 0 {
-            label.preferredMaxLayoutWidth = width
-        }
-
-        // Apply skeleton animation with gradient
-        let gradient = SkeletonGradient(
-            baseColor: UIColor(Color(red: 0.1, green: 0.1, blue: 0.1)),
-            secondaryColor: UIColor.lightGray)
-        let animation = SkeletonAnimationBuilder().makeSlidingAnimation(
-            withDirection: .topLeftBottomRight)
-
-        // This is key - SkeletonView has special handling for UILabels
-        label.showAnimatedGradientSkeleton(
-            usingGradient: gradient, animation: animation)
-
-        return label
-    }
-
-    func updateUIView(_ uiView: UILabel, context: Context) {
-        // No updates needed
-    }
-
-    func sizeThatFits(
-        _ proposal: ProposedViewSize, uiView: UILabel, context: Context
-    ) -> CGSize {
-        return CGSize(width: width, height: height)
     }
 }
