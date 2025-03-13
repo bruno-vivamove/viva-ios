@@ -17,4 +17,15 @@ final class SessionService {
             body: CreateSessionRequest(idToken: idToken)
         )
     }
+    
+    func refreshSession(_ refreshToken: String) async throws -> RefreshSessionResponse {
+        struct RefreshSessionRequest: Encodable {
+            let refreshToken: String
+        }
+        
+        return try await networkClient.post(
+            path: "/viva/session/refresh",
+            body: RefreshSessionRequest(refreshToken: refreshToken)
+        )
+    }
 }

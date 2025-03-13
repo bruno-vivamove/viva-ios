@@ -26,7 +26,9 @@ final class AuthenticationManager: ObservableObject {
         await MainActor.run {
             userSession.setLoggedIn(
                 userProfile: sessionResponse.userProfile,
-                sessionToken: sessionResponse.accessToken)
+                accessToken: sessionResponse.accessToken,
+                refreshToken: sessionResponse.refreshToken
+            )
         }
     }
 
@@ -38,13 +40,13 @@ final class AuthenticationManager: ObservableObject {
         await MainActor.run {
             userSession.setLoggedIn(
                 userProfile: sessionResponse.userProfile,
-                sessionToken: sessionResponse.accessToken)
+                accessToken: sessionResponse.accessToken,
+                refreshToken: sessionResponse.refreshToken
+            )
         }
     }
 
     func signOut() async {
-        await MainActor.run {
-            userSession.setLoggedOut()
-        }
+        await userSession.setLoggedOut()
     }
 }

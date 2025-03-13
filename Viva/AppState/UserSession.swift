@@ -8,15 +8,17 @@ final class UserSession: ObservableObject {
     
     @Published private(set) var isLoggedIn = false
     @Published private(set) var userProfile: UserProfile? = nil
-    var sessionToken: String? = nil
+    var accessToken: String? = nil
+    var refreshToken: String? = nil
+    
+    // Add nonisolated to make the method callable from any isolation context
+    nonisolated var userId: String? {
+        return userProfile?.id
+    }
 
     init() {
         print("Creating user session")
         restoreSessionFromKeychain()
-    }
-    
-    var userId: String? {
-        return userProfile?.id
     }
     
     func setUserProfile(_ userProfile: UserProfile) {
@@ -30,10 +32,11 @@ final class UserSession: ObservableObject {
         }
     }
     
-    func setLoggedIn(userProfile: UserProfile, sessionToken: String) {
+    func setLoggedIn(userProfile: UserProfile, accessToken: String, refreshToken: String) {
         withAnimation(.easeInOut(duration: 0.5)) {
             self.userProfile = userProfile
-            self.sessionToken = sessionToken
+            self.accessToken = accessToken
+            self.refreshToken = refreshToken
             self.isLoggedIn = true
         }
         
@@ -41,16 +44,29 @@ final class UserSession: ObservableObject {
         saveSessionToKeychain()
     }
     
-    func setLoggedOut()  {
-        withAnimation(.easeInOut(duration: 0.5)) {
-            self.isLoggedIn = false;
-        } completion: {
-            self.userProfile = nil
-            self.sessionToken = nil
-            self.deleteSessionFromKeychain()
+    func updateTokens(accessToken: String, refreshToken: String? = nil) {
+        self.accessToken = accessToken
+        if let refreshToken = refreshToken {
+            self.refreshToken = refreshToken
         }
+        saveSessionToKeychain()
     }
-
+    
+    // Make this function async-compatible
+    func setLoggedOut() async {
+        await MainActor.run {
+            withAnimation(.easeInOut(duration: 0.5)) {
+                self.isLoggedIn = false
+            }
+        }
+        
+        // These operations don't need to be on the MainActor
+        self.userProfile = nil
+        self.accessToken = nil
+        self.refreshToken = nil
+        self.deleteSessionFromKeychain()
+    }
+    
     // MARK: - Keychain Operations
     
     private func saveSessionToKeychain() {
@@ -58,7 +74,8 @@ final class UserSession: ObservableObject {
         
         // Create a dictionary to store all session data
         let sessionData: [String: Any] = [
-            "sessionToken": sessionToken ?? "",
+            "sessionToken": accessToken ?? "",
+            "refreshToken": refreshToken ?? "",
             "isLoggedIn": isLoggedIn,
             "userProfileData": (try? JSONEncoder().encode(userProfile)) ?? Data()
         ]
@@ -128,7 +145,8 @@ final class UserSession: ObservableObject {
         }
         
         self.userProfile = userProfile
-        self.sessionToken = sessionDict["sessionToken"] as? String
+        self.accessToken = sessionDict["sessionToken"] as? String
+        self.refreshToken = sessionDict["refreshToken"] as? String
         
         if let isLoggedIn = sessionDict["isLoggedIn"] as? Bool, isLoggedIn {
             self.isLoggedIn = true

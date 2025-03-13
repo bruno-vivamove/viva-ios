@@ -25,13 +25,13 @@ final class AppNetworkClientSettings: NetworkClientSettings {
     
     var headers: [String: String]{
         get {
-            guard let sessionToken = userSession.sessionToken else {
+            guard let accessToken = userSession.accessToken else {
                 return [:]
             }
             
             return [
                 "referer": "https://dev.vivamove.io",
-                "Authorization": "Bearer \(sessionToken)"
+                "Authorization": "Bearer \(accessToken)"
             ]
         }
     }
