@@ -3,6 +3,7 @@ import SwiftUI
 struct PasswordField: View {
     @Binding var password: String
     @Binding var showPassword: Bool
+    let placeholder: String
 
     var body: some View {
         ZStack(alignment: .trailing) {
@@ -16,7 +17,7 @@ struct PasswordField: View {
             .textContentType(.password)
             .autocapitalization(.none)
             .placeholder(when: password.isEmpty) {
-                Text("Password")
+                Text(placeholder)
                     .foregroundColor(VivaDesign.Colors.secondaryText)
             }
 

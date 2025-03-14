@@ -122,6 +122,10 @@ struct AuthButtonStack: View {
             SignInFormView(
                 authManager: authenticationManager, userSession: userSession)
         }
+        .sheet(isPresented: $showSignUpForm) {
+            SignUpFormView(
+                authManager: authenticationManager, userSession: userSession)
+        }
     }
 }
 

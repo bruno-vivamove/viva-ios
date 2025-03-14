@@ -94,7 +94,8 @@ struct SignInFormView: View {
                         EmailField(email: $viewModel.email, focusedField: $focusedField)
                         PasswordField(
                             password: $viewModel.password,
-                            showPassword: $viewModel.showPassword
+                            showPassword: $viewModel.showPassword,
+                            placeholder: "Password"
                         )
                         
                         // Sign In Button

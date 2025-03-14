@@ -1,4 +1,3 @@
 enum FormField {
-    case email
-    case password
+    case email, password, confirmPassword
 }

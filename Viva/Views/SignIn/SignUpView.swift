@@ -5,7 +5,9 @@ class SignUpViewModel: ObservableObject {
     
     @Published var email = ""
     @Published var password = ""
+    @Published var confirmPassword = ""
     @Published var showPassword = false
+    @Published var showConfirmPassword = false
     @Published var isLoading = false
     @Published var errorMessage: String?
     
@@ -20,6 +22,13 @@ class SignUpViewModel: ObservableObject {
     func signUp() async -> Bool {
         isLoading = true
         errorMessage = nil
+        
+        // Validate passwords match
+        if password != confirmPassword {
+            errorMessage = "Passwords do not match."
+            isLoading = false
+            return false
+        }
         
         do {
             try await authManager.signUp(email: email, password: password)
@@ -97,9 +106,16 @@ struct SignUpFormView: View {
                             VStack(alignment: .leading, spacing: VivaDesign.Spacing.xsmall) {
                                 PasswordField(
                                     password: $viewModel.password,
-                                    showPassword: $viewModel.showPassword
+                                    showPassword: $viewModel.showPassword,
+                                    placeholder: "Password"
                                 )
                                 
+                                PasswordField(
+                                    password: $viewModel.confirmPassword,
+                                    showPassword: $viewModel.showConfirmPassword,
+                                    placeholder: "Password"
+                                )
+
                                 Text("Minimum of 8 characters")
                                     .font(.system(size: 12))
                                     .foregroundColor(VivaDesign.Colors.secondaryText)

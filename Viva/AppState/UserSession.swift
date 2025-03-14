@@ -52,19 +52,17 @@ final class UserSession: ObservableObject {
         saveSessionToKeychain()
     }
     
-    // Make this function async-compatible
     func setLoggedOut() async {
         await MainActor.run {
             withAnimation(.easeInOut(duration: 0.5)) {
                 self.isLoggedIn = false
+            } completion: {
+                self.userProfile = nil
+                self.accessToken = nil
+                self.refreshToken = nil
+                self.deleteSessionFromKeychain()
             }
         }
-        
-        // These operations don't need to be on the MainActor
-        self.userProfile = nil
-        self.accessToken = nil
-        self.refreshToken = nil
-        self.deleteSessionFromKeychain()
     }
     
     // MARK: - Keychain Operations

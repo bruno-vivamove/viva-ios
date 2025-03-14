@@ -55,7 +55,6 @@ struct MatchupDetails: Codable, Equatable {
     var invites: [MatchupInvite]
 
     func getInvites() -> [MatchupInvite] {
-        print(invites.count)
         return invites
     }
     
