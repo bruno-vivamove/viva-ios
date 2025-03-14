@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 class SignInViewModel: ObservableObject {
     @ObservedObject var userSession: UserSession
@@ -128,13 +129,13 @@ struct SignInFormView: View {
                     DismissButton(action: { dismiss() })
                 }
             }
-            .onAppear {
-//                focusedField = .email
-            }
         }
     }
 
     private func signIn() {
+        // Explicitly dismiss the keyboard by removing focus
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        
         Task {
             if await viewModel.signIn() {
                 dismiss()

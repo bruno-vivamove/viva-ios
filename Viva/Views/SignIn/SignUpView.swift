@@ -1,6 +1,5 @@
 import SwiftUI
-
-import SwiftUI
+import UIKit
 
 class SignUpViewModel: ObservableObject {
     @ObservedObject var userSession: UserSession
@@ -215,6 +214,9 @@ struct SignUpFormView: View {
     }
     
     private func signUp() {
+        // Explicitly dismiss the keyboard by removing focus
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        
         Task {
             if await viewModel.signUp() {
                 dismiss()
