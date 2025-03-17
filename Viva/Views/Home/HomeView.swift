@@ -129,6 +129,7 @@ struct HomeHeader: View {
                 userSession: userSession,
                 showCreationFlow: $showMatchupCreation
             )
+            .presentationBackground(.clear)
         }
     }
 }

@@ -90,9 +90,12 @@ struct SignUpFormView: View {
         // Custom layout approach without NavigationStack
         ZStack {
             // Background
-            VivaDesign.Colors.background
+            VisualEffectView(effect: UIBlurEffect(style: .dark))
                 .ignoresSafeArea()
-            
+            VivaDesign.Colors.background
+                .opacity(0.30)
+                .ignoresSafeArea()
+
             // Main content
             ScrollView {
                 VStack(spacing: VivaDesign.Spacing.large) {

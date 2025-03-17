@@ -9,12 +9,12 @@ class SignInViewModel: ObservableObject {
     @Published var showPassword = false
     @Published var isLoading = false
     @Published var errorMessage: String?
-    
+
     // Computed property to check if form is valid
     var isFormValid: Bool {
         return isValidEmail(email) && !password.isEmpty
     }
-    
+
     // Email validation
     private func isValidEmail(_ email: String) -> Bool {
         let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
@@ -61,12 +61,24 @@ class SignInViewModel: ObservableObject {
     }
 }
 
+struct VisualEffectBlur: UIViewRepresentable {
+    var blurStyle: UIBlurEffect.Style
+
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        return UIVisualEffectView(effect: UIBlurEffect(style: blurStyle))
+    }
+
+    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
+        uiView.effect = UIBlurEffect(style: blurStyle)
+    }
+}
+
 struct SignInFormView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: SignInViewModel
     @FocusState private var focusedField: FormField?
-    
+
     init(authManager: AuthenticationManager, userSession: UserSession) {
         _viewModel = StateObject(
             wrappedValue: SignInViewModel(
@@ -78,34 +90,40 @@ struct SignInFormView: View {
         NavigationStack {
             ZStack {
                 // Background
-                VivaDesign.Colors.background
+                VisualEffectView(effect: UIBlurEffect(style: .dark))
                     .ignoresSafeArea()
-                
+                VivaDesign.Colors.background
+                    .opacity(0.30)
+                    .ignoresSafeArea()
+
+
                 // Top decorative elements
-                TopDesignElement()
-                
+                //                TopDesignElement()
+
                 VStack(spacing: VivaDesign.Spacing.large) {
                     // Welcome Text
                     WelcomeSection()
-                        .padding(.top, 140) // Adjust based on design element
+                        .padding(.top, 140)  // Adjust based on design element
                         .padding(.horizontal, VivaDesign.Spacing.large)
-                    
+
                     // Form Fields
                     VStack(spacing: VivaDesign.Spacing.large) {
-                        EmailField(email: $viewModel.email, focusedField: $focusedField)
+                        EmailField(
+                            email: $viewModel.email, focusedField: $focusedField
+                        )
                         PasswordField(
                             password: $viewModel.password,
                             showPassword: $viewModel.showPassword,
                             placeholder: "Password"
                         )
-                        
+
                         // Sign In Button
                         SignInButton(
                             isLoading: viewModel.isLoading,
                             isEnabled: viewModel.isFormValid,
                             action: signIn
                         )
-                        
+
                         // Forgot Password
                         HStack {
                             Spacer()
@@ -117,9 +135,9 @@ struct SignInFormView: View {
                         }
                     }
                     .padding(.horizontal, VivaDesign.Spacing.large)
-                    
+
                     Spacer()
-                                        
+
                     ErrorMessageView(message: viewModel.errorMessage)
                 }
             }
@@ -134,8 +152,10 @@ struct SignInFormView: View {
 
     private func signIn() {
         // Explicitly dismiss the keyboard by removing focus
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        
+        UIApplication.shared.sendAction(
+            #selector(UIResponder.resignFirstResponder), to: nil, from: nil,
+            for: nil)
+
         Task {
             if await viewModel.signIn() {
                 dismiss()
@@ -180,7 +200,7 @@ struct TopDesignElement: View {
                     .opacity(0.2)
                     .blur(radius: 60)
                     .offset(x: 100, y: -80)
-                
+
                 Circle()
                     .fill(VivaDesign.Colors.vivaGreen)
                     .frame(width: 150, height: 150)
@@ -199,7 +219,7 @@ struct WelcomeSection: View {
             Text("Welcome Back")
                 .font(.system(size: 34, weight: .bold))
                 .foregroundColor(VivaDesign.Colors.primaryText)
-            
+
             Text("Sign in to continue your fitness journey")
                 .font(VivaDesign.Typography.body)
                 .foregroundColor(VivaDesign.Colors.secondaryText)

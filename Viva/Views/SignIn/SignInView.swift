@@ -2,10 +2,6 @@ import Foundation
 import Security
 import SwiftUI
 
-import Foundation
-import Security
-import SwiftUI
-
 struct SignInView: View {
     @EnvironmentObject var userSession: UserSession
     @EnvironmentObject var authenticationManager: AuthenticationManager
@@ -120,11 +116,15 @@ struct AuthButtonStack: View {
         .padding(.horizontal, VivaDesign.Spacing.large)
         .sheet(isPresented: $showSignInForm) {
             SignInFormView(
-                authManager: authenticationManager, userSession: userSession)
+                authManager: authenticationManager, userSession: userSession
+            )
+            .presentationBackground(.clear)
         }
         .sheet(isPresented: $showSignUpForm) {
             SignUpFormView(
-                authManager: authenticationManager, userSession: userSession)
+                authManager: authenticationManager, userSession: userSession
+            )
+            .presentationBackground(.clear)
         }
     }
 }
