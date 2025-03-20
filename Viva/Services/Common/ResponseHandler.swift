@@ -15,8 +15,7 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         response: DataResponse<T, AFError>,
         continuation: CheckedContinuation<T, Error>
     ) {
-        AppLogger.error("Error occurred during request", category: .network)
-        AppLogger.error("Error description: \(error.localizedDescription)", category: .network)
+        AppLogger.error("Error occurred during request: \(error.localizedDescription)", category: .network)
         
         if let underlyingError = error.underlyingError {
             AppLogger.error("Underlying error: \(underlyingError)", category: .network)
@@ -68,8 +67,7 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
             }
         } else {
             // Handle error normally for non-401 errors or when we don't have a refresh handler
-            AppLogger.error("Error occurred during request", category: .network)
-            AppLogger.error("Error description: \(error.localizedDescription)", category: .network)
+            AppLogger.error("Error occurred during request: \(error.localizedDescription)", category: .network)
             
             if let underlyingError = error.underlyingError {
                 AppLogger.error("Underlying error: \(underlyingError)", category: .network)
@@ -99,8 +97,7 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         response: AFDataResponse<Data?>,
         continuation: CheckedContinuation<Void, Error>
     ) {
-        AppLogger.error("Error occurred during request", category: .network)
-        AppLogger.error("Error description: \(error.localizedDescription)", category: .network)
+        AppLogger.error("Error occurred during request: \(error.localizedDescription)", category: .network)
         
         if let underlyingError = error.underlyingError {
             AppLogger.error("Underlying error: \(underlyingError)", category: .network)
@@ -152,8 +149,7 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
             }
         } else {
             // Handle error normally for non-401 errors or when we don't have a refresh handler
-            AppLogger.error("Error occurred during request", category: .network)
-            AppLogger.error("Error description: \(error.localizedDescription)", category: .network)
+            AppLogger.error("Error occurred during request: \(error.localizedDescription)", category: .network)
             
             if let underlyingError = error.underlyingError {
                 AppLogger.error("Underlying error: \(underlyingError)", category: .network)
@@ -183,27 +179,28 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
     }
     
     func logResponse<T>(_ response: DataResponse<T, AFError>) {
-        AppLogger.debug("Attempting to decode to type: \(T.self)", category: .network)
-        AppLogger.debug("Response Status: \(String(describing: response.response?.statusCode))", category: .network)
-        AppLogger.debug("Response Headers: \(String(describing: response.response?.headers))", category: .network)
+        var logMessage = "Response:\nType: \(T.self)\nStatus: \(String(describing: response.response?.statusCode))\nHeaders: \(String(describing: response.response?.headers))"
         
         if let data = response.data {
-            AppLogger.debug("Response size: \(data.count) bytes", category: .network)
+            logMessage += "\nSize: \(data.count) bytes"
             if shouldLogBodies, let rawString = String(data: data, encoding: .utf8) {
-                AppLogger.debug("Raw Response string: \(rawString)", category: .network)
+                logMessage += "\nRaw Response: \(rawString)"
             }
         }
+        
+        AppLogger.debug(logMessage, category: .network)
     }
     
     func logResponse(_ response: AFDataResponse<Data?>) {
-        AppLogger.debug("Response Status: \(String(describing: response.response?.statusCode))", category: .network)
-        AppLogger.debug("Response Headers: \(String(describing: response.response?.headers))", category: .network)
+        var logMessage = "Response:\nStatus: \(String(describing: response.response?.statusCode))\nHeaders: \(String(describing: response.response?.headers))"
         
         if let data = response.data {
-            AppLogger.debug("Response size: \(data.count) bytes", category: .network)
+            logMessage += "\nSize: \(data.count) bytes"
             if shouldLogBodies, let rawString = String(data: data, encoding: .utf8) {
-                AppLogger.debug("Raw Response string: \(rawString)", category: .network)
+                logMessage += "\nRaw Response: \(rawString)"
             }
         }
+        
+        AppLogger.debug(logMessage, category: .network)
     }
 }

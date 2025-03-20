@@ -25,11 +25,7 @@ struct AppLogger {
     ///   - line: Line number (auto-filled)
     static func debug(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
-        category.logger.debug("[\(context)] \(message)")
-        
-        #if DEBUG
-        printToConsole(level: "DEBUG", category: category, context: context, message: message)
-        #endif
+        category.logger.debug("[\(context)]\n\(message)")
     }
     
     /// Log an info message (collected but may be dynamically disabled)
@@ -41,11 +37,7 @@ struct AppLogger {
     ///   - line: Line number (auto-filled)
     static func info(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
-        category.logger.info("[\(context)] \(message)")
-        
-        #if DEBUG
-        printToConsole(level: "INFO", category: category, context: context, message: message)
-        #endif
+        category.logger.info("[\(context)]\n\(message)")
     }
     
     /// Log a default message (standard level for most logging needs)
@@ -57,11 +49,7 @@ struct AppLogger {
     ///   - line: Line number (auto-filled)
     static func log(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
-        category.logger.log("[\(context)] \(message)")
-        
-        #if DEBUG
-        printToConsole(level: "LOG", category: category, context: context, message: message)
-        #endif
+        category.logger.log("[\(context)]\n\(message)")
     }
     
     /// Log a warning message (default visibility)
@@ -73,11 +61,7 @@ struct AppLogger {
     ///   - line: Line number (auto-filled)
     static func warning(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
-        category.logger.warning("[\(context)] \(message)")
-        
-        #if DEBUG
-        printToConsole(level: "WARNING", category: category, context: context, message: message)
-        #endif
+        category.logger.warning("[\(context)]\n\(message)")
     }
     
     /// Log an error message (persisted due to higher importance)
@@ -89,11 +73,7 @@ struct AppLogger {
     ///   - line: Line number (auto-filled)
     static func error(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
-        category.logger.error("[\(context)] \(message)")
-        
-        #if DEBUG
-        printToConsole(level: "ERROR", category: category, context: context, message: message)
-        #endif
+        category.logger.error("[\(context)]\n\(message)")
     }
     
     /// Log a critical fault (always collected, for severe issues)
@@ -105,11 +85,7 @@ struct AppLogger {
     ///   - line: Line number (auto-filled)
     static func fault(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
-        category.logger.fault("[\(context)] \(message)")
-        
-        #if DEBUG
-        printToConsole(level: "FAULT", category: category, context: context, message: message)
-        #endif
+        category.logger.fault("[\(context)]\n\(message)")
     }
     
     /// Log network requests with privacy considerations
@@ -130,18 +106,11 @@ struct AppLogger {
         }
         
         let message = "Request: \(method) \(url.absoluteString)"
-        Category.network.logger.debug("[\(context)] \(message)")
+        Category.network.logger.debug("[\(context)]\n\(message)")
         
         if let headers = safeHeaders as? [String: String], !headers.isEmpty {
-            Category.network.logger.debug("[\(context)] Headers: \(headers)")
+            Category.network.logger.debug("[\(context)]\nHeaders: \(headers)")
         }
-        
-        #if DEBUG
-        printToConsole(level: "DEBUG", category: .network, context: context, message: message)
-        if let headers = safeHeaders as? [String: String], !headers.isEmpty {
-            printToConsole(level: "DEBUG", category: .network, context: context, message: "Headers: \(headers)")
-        }
-        #endif
     }
     
     /// Log network responses with appropriate privacy considerations
@@ -156,15 +125,10 @@ struct AppLogger {
         let message = "Response: \(statusCode) \(url.absoluteString)"
         
         if statusCode >= 400 {
-            Category.network.logger.error("[\(context)] \(message)")
+            Category.network.logger.error("[\(context)]\n\(message)")
         } else {
-            Category.network.logger.debug("[\(context)] \(message)")
+            Category.network.logger.debug("[\(context)]\n\(message)")
         }
-        
-        #if DEBUG
-        let level = statusCode >= 400 ? "ERROR" : "DEBUG"
-        printToConsole(level: level, category: .network, context: context, message: message)
-        #endif
     }
     
     // MARK: - Helper Methods
@@ -173,26 +137,6 @@ struct AppLogger {
     private static func extractContext(file: String, function: String, line: Int) -> String {
         let fileName = URL(fileURLWithPath: file).lastPathComponent
         return "\(fileName):\(line) \(function)"
-    }
-    
-    /// Print formatted log message to console in DEBUG mode
-    private static func printToConsole(level: String, category: Category, context: String, message: String) {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
-        let timestamp = dateFormatter.string(from: Date())
-        
-        let emoji: String
-        switch level {
-        case "DEBUG": emoji = "🔍"
-        case "INFO": emoji = "ℹ️"
-        case "LOG": emoji = "📝"
-        case "WARNING": emoji = "⚠️"
-        case "ERROR": emoji = "❌"
-        case "FAULT": emoji = "🔥"
-        default: emoji = "📌"
-        }
-        
-        print("\(emoji) [\(timestamp)] [\(level)] [\(category.rawValue)] [\(context)] \(message)")
     }
 }
 

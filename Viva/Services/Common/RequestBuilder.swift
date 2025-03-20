@@ -32,7 +32,6 @@ final class RequestBuilder {
             throw NetworkClientError(code: "INVALID_URL", message: "Invalid URL")
         }
         
-        AppLogger.debug("Built URL: \(url.absoluteString)", category: .network)
         return url
     }
     
@@ -57,7 +56,6 @@ final class RequestBuilder {
             .merging(settings.headers) { _, new in new }
             .merging(additionalHeaders ?? [:]) { _, new in new }
         
-        AppLogger.debug("Built headers: \(headers.filter { $0.key != "Authorization" })", category: .network)
         return HTTPHeaders(headers)
     }
     
