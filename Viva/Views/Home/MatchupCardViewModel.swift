@@ -90,7 +90,7 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
                                 self.matchupDetails = savedMatchupDetails
                                 self.isLoading = false
                             } catch {
-                                print("Failed to save measurements: \(error)")
+                                AppLogger.error("Failed to save measurements: \(error)", category: .data)
                             }
                         }
                     }
@@ -100,7 +100,7 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
                 self.isLoading = false
             }
         } catch {
-            print("Error loading matchup details: \(error)")
+            AppLogger.error("Error loading matchup details: \(error)", category: .network)
             self.error = error
             self.isLoading = false
         }

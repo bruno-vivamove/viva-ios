@@ -112,7 +112,7 @@ final class MatchupService: ObservableObject {
             object: matchupInvite
         )
         
-        print(matchupInvite.side.rawValue)
+        AppLogger.debug("Matchup invite side: \(matchupInvite.side.rawValue)", category: .data)
         
         return matchupInvite
     }

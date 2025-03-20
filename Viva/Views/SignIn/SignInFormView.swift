@@ -40,7 +40,7 @@ class SignInViewModel: ObservableObject {
             return true
         } catch let errorResponse as AuthErrorResponse {
             // TODO map the error code to user readable messages
-            print("Auth Error: " + errorResponse.error.message)
+            AppLogger.error("Auth Error: " + errorResponse.error.message, category: .auth)
             switch errorResponse.error.message {
             case "MISSING_EMAIL", "INVALID_EMAIL", "INVALID_LOGIN_CREDENTIALS":
                 errorMessage = "Invalid email or password."
@@ -49,10 +49,10 @@ class SignInViewModel: ObservableObject {
             }
         } catch let clientError as NetworkClientError {
             // TODO map the error code to user readable messages
-            print("Network Client Error: " + clientError.message)
+            AppLogger.error("Network Client Error: " + clientError.message, category: .network)
             errorMessage = "Error logging in. Please try again."
         } catch {
-            print("Unknown Error: " + error.localizedDescription)
+            AppLogger.error("Unknown Error: " + error.localizedDescription, category: .auth)
             errorMessage = "Error logging in. Please try again."
         }
 

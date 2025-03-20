@@ -129,37 +129,16 @@ Logs are captured by the system and can be viewed in Console.app:
 3. Filter by your app's bundle identifier
 4. Filter by category (subsystem) with: `subsystem:com.yourcompany.viva.network`
 
-## Important: Migrating from NetworkLogger
-
-⚠️ **NetworkLogger is deprecated and should not be used in new code.**
-
-If you see code using the old `NetworkLogger`, it should be updated to use `AppLogger` directly:
-
-```swift
-// ❌ OLD WAY (DEPRECATED)
-NetworkLogger.log(message: "Started request", level: .debug)
-NetworkLogger.log(message: "Operation completed", level: .info)
-NetworkLogger.log(message: "Request failed", level: .error)
-
-// ✅ NEW WAY (PREFERRED)
-AppLogger.debug("Started request", category: .network)
-AppLogger.info("Operation completed", category: .network)
-AppLogger.error("Request failed", category: .network)
-```
-
-The legacy `NetworkLogger` will forward calls to `AppLogger` but is only maintained for backward compatibility and will display deprecation warnings in DEBUG mode.
-
 ## Best Practices
 
-1. **Always Use AppLogger Directly**: Never use the deprecated NetworkLogger
-2. **Choose Appropriate Categories**: Select the most specific category for your log
-3. **Use Correct Log Levels**: Match the severity with the appropriate level
-4. **Protect Private Data**: Always use privacy methods for sensitive information:
+1. **Choose Appropriate Categories**: Select the most specific category for your log
+2. **Use Correct Log Levels**: Match the severity with the appropriate level
+3. **Protect Private Data**: Always use privacy methods for sensitive information:
    - `logPrivate()`: For highly sensitive data like emails, passwords
    - `logMasked()`: For IDs and account numbers where partial visibility is helpful
    - `logSensitive()`: For data you want to see in debug but never in production
-5. **Be Descriptive**: Include enough context in messages to understand the event
-6. **Don't Over-Log**: Avoid excessive logging, especially in performance-critical paths
+4. **Be Descriptive**: Include enough context in messages to understand the event
+5. **Don't Over-Log**: Avoid excessive logging, especially in performance-critical paths
 
 ## Troubleshooting
 

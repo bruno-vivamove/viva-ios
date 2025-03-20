@@ -17,7 +17,7 @@ final class UserSession: ObservableObject {
     }
 
     init() {
-        print("Creating user session")
+        AppLogger.info("Creating user session", category: .auth)
         restoreSessionFromKeychain()
     }
     
@@ -83,7 +83,7 @@ final class UserSession: ObservableObject {
             fromPropertyList: sessionData,
             format: .binary,
             options: 0) else {
-            print("Error encoding session data")
+            AppLogger.error("Error encoding session data", category: .auth)
             return
         }
         
@@ -100,7 +100,7 @@ final class UserSession: ObservableObject {
         // Then save the new session
         let status = SecItemAdd(query as CFDictionary, nil)
         guard status == errSecSuccess else {
-            print("Error saving session to Keychain: \(status)")
+            AppLogger.error("Error saving session to Keychain: \(status)", category: .auth)
             return
         }
     }
@@ -117,12 +117,12 @@ final class UserSession: ObservableObject {
         let status = SecItemCopyMatching(query as CFDictionary, &result)
         
         if status != errSecSuccess {
-            print("No session found in keychain: \(status)")
+            AppLogger.info("No session found in keychain: \(status)", category: .auth)
             return
         }
         
         guard let sessionData = result as? Data else {
-            print("No session data found in keychain")
+            AppLogger.warning("No session data found in keychain", category: .auth)
             return
         }
         
@@ -131,14 +131,14 @@ final class UserSession: ObservableObject {
             from: sessionData,
             options: [],
             format: nil) as? [String: Any] else {
-            print("Error decoding session data")
+            AppLogger.error("Error decoding session data", category: .auth)
             return
         }
         
         // Extract user profile data
         guard let userProfileData = sessionDict["userProfileData"] as? Data,
               let userProfile = try? JSONDecoder().decode(UserProfile.self, from: userProfileData) else {
-            print("Error decoding user profile data")
+            AppLogger.error("Error decoding user profile data", category: .auth)
             return
         }
         

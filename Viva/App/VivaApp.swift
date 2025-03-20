@@ -24,27 +24,27 @@ struct VivaApp: App {
                 .environmentObject(vivaAppObjects.userMeasurementService)
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
-            print("App state changed: \(oldPhase) -> \(newPhase)")
+            AppLogger.info("App state changed: \(oldPhase) -> \(newPhase)", category: .general)
             
             switch newPhase {
             case .active:
                 // App became active, perform any necessary updates
                 // This is a good place to refresh data
-                print("App became active")
+                AppLogger.info("App became active", category: .general)
                 
             case .background:
                 // App is entering background, schedule background tasks
-                print("App entered background - scheduling background refresh task")
+                AppLogger.info("App entered background - scheduling background refresh task", category: .general)
                 if vivaAppObjects.userSession.isLoggedIn {
                     BackgroundTaskManager.shared.scheduleHealthUpdateTask()
                 }
                 
             case .inactive:
                 // App is inactive but visible
-                print("App became inactive")
+                AppLogger.info("App became inactive", category: .general)
                 
             @unknown default:
-                print("Unknown scene phase: \(newPhase)")
+                AppLogger.warning("Unknown scene phase: \(newPhase)", category: .general)
             }
         }
     }

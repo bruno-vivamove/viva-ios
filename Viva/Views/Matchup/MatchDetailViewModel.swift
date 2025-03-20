@@ -123,7 +123,7 @@ class MatchupDetailViewModel: ObservableObject {
                             self.updateMeasuerments(
                                 matchup: savedMatchupDetails)
                         } catch {
-                            print("Failed to save measurements: \(error)")
+                            AppLogger.error("Failed to save measurements: \(error)", category: .data)
                         }
                     }
                 }

@@ -14,8 +14,9 @@ struct MultipartData {
         self.name = name
         self.fileName = fileName
         self.mimeType = mimeType
-        debugPrint(
-            "📦 MultipartData initialized - name: \(name), fileName: \(String(describing: fileName)), mimeType: \(String(describing: mimeType)), size: \(data.count) bytes"
+        AppLogger.debug(
+            "📦 MultipartData initialized - name: \(name), fileName: \(String(describing: fileName)), mimeType: \(String(describing: mimeType)), size: \(data.count) bytes",
+            category: .network
         )
     }
 }

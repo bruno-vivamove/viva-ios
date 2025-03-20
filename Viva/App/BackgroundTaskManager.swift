@@ -17,7 +17,7 @@ class BackgroundTaskManager {
         ) { task in
             self.handleAppRefreshTask(task: task as! BGAppRefreshTask)
         }
-        print("✅ Registered background app refresh task: \(backgroundTaskIdentifier)")
+        AppLogger.info("✅ Registered background app refresh task: \(backgroundTaskIdentifier)", category: .general)
     }
 
     /// Schedules the background app refresh task
@@ -33,16 +33,16 @@ class BackgroundTaskManager {
 
         do {
             try BGTaskScheduler.shared.submit(request)
-            print("✅ Successfully scheduled background app refresh task for \(request.earliestBeginDate?.description ?? "unknown time")")
+            AppLogger.info("✅ Successfully scheduled background app refresh task for \(request.earliestBeginDate?.description ?? "unknown time")", category: .general)
         } catch {
-            print("❌ Could not schedule background app refresh task: \(error.localizedDescription)")
-            print("Error details: \(error)")
+            AppLogger.error("❌ Could not schedule background app refresh task: \(error.localizedDescription)", category: .general)
+            AppLogger.error("Error details: \(error)", category: .general)
         }
     }
 
     /// Handles execution of the background app refresh task
     private func handleAppRefreshTask(task: BGAppRefreshTask) {
-        print("🔄 Running background health update task...")
+        AppLogger.info("🔄 Running background health update task...", category: .general)
         
         // Create a task to reschedule this background task when it completes
         // This ensures we always schedule the next refresh when this one finishes
@@ -52,7 +52,7 @@ class BackgroundTaskManager {
         
         // Set up expiration handler to ensure we reschedule even if the task expires
         task.expirationHandler = {
-            print("⚠️ Background task expired")
+            AppLogger.warning("⚠️ Background task expired", category: .general)
             rescheduleTask()
             task.setTaskCompleted(success: false)
         }
@@ -62,7 +62,7 @@ class BackgroundTaskManager {
             do {
                 let vivaAppObjects = VivaAppObjects()
                 let result = try await vivaAppObjects.healthService.ping()
-                print("✅ HealthService Ping Result: \(result)")
+                AppLogger.info("✅ HealthService Ping Result: \(result)", category: .general)
                 
                 // Optional: Update app UI if needed
                 NotificationCenter.default.post(name: .healthDataUpdated, object: nil)
@@ -70,7 +70,7 @@ class BackgroundTaskManager {
                 // Mark task as successfully completed
                 task.setTaskCompleted(success: true)
             } catch {
-                print("❌ Failed to update health data: \(error)")
+                AppLogger.error("❌ Failed to update health data: \(error)", category: .general)
                 task.setTaskCompleted(success: false)
             }
             
