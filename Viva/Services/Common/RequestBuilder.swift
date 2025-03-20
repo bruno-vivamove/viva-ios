@@ -17,7 +17,7 @@ final class RequestBuilder {
     
     func buildURL(path: String, queryParams: [String: Any]? = nil) throws -> URL {
         guard var components = URLComponents(string: settings.baseUrl + path) else {
-            NetworkLogger.log(message: "Failed to create URL components with base: \(settings.baseUrl) and path: \(path)", level: .error)
+            AppLogger.error("Failed to create URL components with base: \(settings.baseUrl) and path: \(path)", category: .network)
             throw NetworkClientError(code: "INVALID_URL", message: "Invalid URL")
         }
         
@@ -28,11 +28,11 @@ final class RequestBuilder {
         }
         
         guard let url = components.url else {
-            NetworkLogger.log(message: "Failed to create URL from components", level: .error)
+            AppLogger.error("Failed to create URL from components", category: .network)
             throw NetworkClientError(code: "INVALID_URL", message: "Invalid URL")
         }
         
-        NetworkLogger.log(message: "Built URL: \(url.absoluteString)", level: .debug)
+        AppLogger.debug("Built URL: \(url.absoluteString)", category: .network)
         return url
     }
     
@@ -57,7 +57,7 @@ final class RequestBuilder {
             .merging(settings.headers) { _, new in new }
             .merging(additionalHeaders ?? [:]) { _, new in new }
         
-        NetworkLogger.log(message: "Built headers: \(headers.filter { $0.key != "Authorization" })", level: .debug)
+        AppLogger.debug("Built headers: \(headers.filter { $0.key != "Authorization" })", category: .network)
         return HTTPHeaders(headers)
     }
     

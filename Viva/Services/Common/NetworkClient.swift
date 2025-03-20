@@ -115,7 +115,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         self.responseHandler = ResponseHandler<ErrorType>(decoder: decoder)
         self.tokenRefreshHandler = tokenRefreshHandler
         
-        NetworkLogger.log(message: "NetworkClient initialized with baseURL: \(settings.baseUrl)", level: .info)
+        AppLogger.info("NetworkClient initialized with baseURL: \(settings.baseUrl)", category: .network)
     }
     
     // MARK: - Public Request Methods with Response
@@ -125,7 +125,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         queryParams: [String: Any]? = nil,
         headers: [String: String]? = nil
     ) async throws -> T {
-        NetworkLogger.log(message: "GET Request initiated for path: \(path)", level: .info)
+        AppLogger.info("GET Request initiated for path: \(path)", category: .network)
         let url = try requestBuilder.buildURL(path: path, queryParams: queryParams)
         return try await performRequestWithResponse(
             url: url,
@@ -140,7 +140,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         queryParams: [String: Any]? = nil,
         body: E
     ) async throws -> T {
-        NetworkLogger.log(message: "POST Request initiated for path: \(path)", level: .info)
+        AppLogger.info("POST Request initiated for path: \(path)", category: .network)
         let url = try requestBuilder.buildURL(path: path, queryParams: queryParams)
         return try await performRequestWithResponse(
             url: url,
@@ -155,7 +155,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         queryParams: [String: Any]? = nil,
         headers: [String: String]? = nil
     ) async throws -> T {
-        NetworkLogger.log(message: "POST Request initiated for path: \(path)", level: .info)
+        AppLogger.info("POST Request initiated for path: \(path)", category: .network)
         let url = try requestBuilder.buildURL(path: path, queryParams: queryParams)
         return try await performRequestWithResponse(
             url: url,
@@ -168,7 +168,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         path: String,
         headers: [String: String]? = nil
     ) async throws -> T {
-        NetworkLogger.log(message: "PUT Request with response initiated for path: \(path)", level: .info)
+        AppLogger.info("PUT Request with response initiated for path: \(path)", category: .network)
         let url = try requestBuilder.buildURL(path: path)
         return try await performRequestWithResponse(
             url: url,
@@ -182,7 +182,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         body: E,
         headers: [String: String]? = nil
     ) async throws -> T {
-        NetworkLogger.log(message: "PUT Request with body and response initiated for path: \(path)", level: .info)
+        AppLogger.info("PUT Request with body and response initiated for path: \(path)", category: .network)
         let url = try requestBuilder.buildURL(path: path)
         return try await performRequestWithResponse(
             url: url,
@@ -198,7 +198,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         path: String,
         headers: [String: String]? = nil
     ) async throws {
-        NetworkLogger.log(message: "POST Request (no response) initiated for path: \(path)", level: .info)
+        AppLogger.info("POST Request (no response) initiated for path: \(path)", category: .network)
         let url = try requestBuilder.buildURL(path: path)
         try await performRequestWithoutResponse(
             url: url,
@@ -212,7 +212,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         body: E,
         headers: [String: String]? = nil
     ) async throws {
-        NetworkLogger.log(message: "POST Request (no response) with body initiated for path: \(path)", level: .info)
+        AppLogger.info("POST Request (no response) with body initiated for path: \(path)", category: .network)
         let url = try requestBuilder.buildURL(path: path)
         try await performRequestWithoutResponse(
             url: url,
@@ -226,7 +226,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         path: String,
         headers: [String: String]? = nil
     ) async throws {
-        NetworkLogger.log(message: "PUT Request initiated for path: \(path)", level: .info)
+        AppLogger.info("PUT Request initiated for path: \(path)", category: .network)
         let url = try requestBuilder.buildURL(path: path)
         try await performRequestWithoutResponse(
             url: url,
@@ -240,7 +240,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         body: E,
         headers: [String: String]? = nil
     ) async throws {
-        NetworkLogger.log(message: "PUT Request with body initiated for path: \(path)", level: .info)
+        AppLogger.info("PUT Request with body initiated for path: \(path)", category: .network)
         let url = try requestBuilder.buildURL(path: path)
         try await performRequestWithoutResponse(
             url: url,
@@ -254,7 +254,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         path: String,
         headers: [String: String]? = nil
     ) async throws {
-        NetworkLogger.log(message: "PATCH Request initiated for path: \(path)", level: .info)
+        AppLogger.info("PATCH Request initiated for path: \(path)", category: .network)
         let url = try requestBuilder.buildURL(path: path)
         try await performRequestWithoutResponse(
             url: url,
@@ -268,7 +268,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         body: E,
         headers: [String: String]? = nil
     ) async throws {
-        NetworkLogger.log(message: "PATCH Request with body initiated for path: \(path)", level: .info)
+        AppLogger.info("PATCH Request with body initiated for path: \(path)", category: .network)
         let url = try requestBuilder.buildURL(path: path)
         try await performRequestWithoutResponse(
             url: url,
@@ -282,7 +282,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         path: String,
         headers: [String: String]? = nil
     ) async throws {
-        NetworkLogger.log(message: "DELETE Request initiated for path: \(path)", level: .info)
+        AppLogger.info("DELETE Request initiated for path: \(path)", category: .network)
         let url = try requestBuilder.buildURL(path: path)
         try await performRequestWithoutResponse(
             url: url,
@@ -298,13 +298,13 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         headers: [String: String]? = nil,
         data: [MultipartData]
     ) async throws -> T {
-        NetworkLogger.log(message: "Upload Request initiated for path: \(path)", level: .info)
+        AppLogger.info("Upload Request initiated for path: \(path)", category: .network)
         let url = try requestBuilder.buildURL(path: path)
         let requestHeaders = requestBuilder.buildHeaders(for: .upload, additionalHeaders: headers)
         
-        NetworkLogger.log(message: "Upload Request: \(url.absoluteString)", level: .debug)
-        NetworkLogger.log(message: "Headers: \(requestHeaders.filter { $0.name != "Authorization" })", level: .debug)
-        NetworkLogger.log(message: "Uploading \(data.count) files", level: .debug)
+        AppLogger.debug("Upload Request: \(url.absoluteString)", category: .network)
+        AppLogger.debug("Headers: \(requestHeaders.filter { $0.name != "Authorization" })", category: .network)
+        AppLogger.debug("Uploading \(data.count) files", category: .network)
         
         return try await withCheckedThrowingContinuation { continuation in
             session.upload(
@@ -316,9 +316,9 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
                 headers: requestHeaders
             )
             .uploadProgress { progress in
-                NetworkLogger.log(
-                    message: "Upload progress: \(progress.fractionCompleted * 100)% (\(progress.completedUnitCount)/\(progress.totalUnitCount) bytes)",
-                    level: .debug
+                AppLogger.debug(
+                    "Upload progress: \(progress.fractionCompleted * 100)% (\(progress.completedUnitCount)/\(progress.totalUnitCount) bytes)",
+                    category: .network
                 )
             }
             .validate()
@@ -329,7 +329,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
                 
                 switch response.result {
                 case .success(let value):
-                    NetworkLogger.log(message: "Upload completed successfully", level: .info)
+                    AppLogger.info("Upload completed successfully", category: .network)
                     continuation.resume(returning: value)
                 case .failure(let error):
                     // Create retry handler closure for uploads
@@ -359,13 +359,13 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         headers: [String: String]? = nil,
         data: [MultipartData]
     ) async throws {
-        NetworkLogger.log(message: "Upload Request (no response) initiated for path: \(path)", level: .info)
+        AppLogger.info("Upload Request (no response) initiated for path: \(path)", category: .network)
         let url = try requestBuilder.buildURL(path: path)
         let requestHeaders = requestBuilder.buildHeaders(for: .upload, additionalHeaders: headers)
         
-        NetworkLogger.log(message: "Upload Request: \(url.absoluteString)", level: .debug)
-        NetworkLogger.log(message: "Headers: \(requestHeaders.filter { $0.name != "Authorization" })", level: .debug)
-        NetworkLogger.log(message: "Uploading \(data.count) files", level: .debug)
+        AppLogger.debug("Upload Request: \(url.absoluteString)", category: .network)
+        AppLogger.debug("Headers: \(requestHeaders.filter { $0.name != "Authorization" })", category: .network)
+        AppLogger.debug("Uploading \(data.count) files", category: .network)
         
         try await withCheckedThrowingContinuation { continuation in
             session.upload(
@@ -377,9 +377,9 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
                 headers: requestHeaders
             )
             .uploadProgress { progress in
-                NetworkLogger.log(
-                    message: "Upload progress: \(progress.fractionCompleted * 100)% (\(progress.completedUnitCount)/\(progress.totalUnitCount) bytes)",
-                    level: .debug
+                AppLogger.debug(
+                    "Upload progress: \(progress.fractionCompleted * 100)% (\(progress.completedUnitCount)/\(progress.totalUnitCount) bytes)",
+                    category: .network
                 )
             }
             .validate()
@@ -390,7 +390,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
                 
                 switch response.result {
                 case .success:
-                    NetworkLogger.log(message: "Upload completed successfully", level: .info)
+                    AppLogger.info("Upload completed successfully", category: .network)
                     continuation.resume()
                 case .failure(let error):
                     // Create retry handler closure for uploads without response
@@ -421,8 +421,8 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         method: HTTPMethod,
         headers: HTTPHeaders
     ) async throws -> T {
-        NetworkLogger.log(message: "\(method.rawValue) Request: \(url.absoluteString)", level: .debug)
-        NetworkLogger.log(message: "Headers: \(headers.filter { $0.name != "Authorization" })", level: .debug)
+        AppLogger.debug("\(method.rawValue) Request: \(url.absoluteString)", category: .network)
+        AppLogger.debug("Headers: \(headers.filter { $0.name != "Authorization" })", category: .network)
         
         return try await withCheckedThrowingContinuation { continuation in
             session.request(url, method: method, headers: headers)
@@ -434,7 +434,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
                     
                     switch response.result {
                     case .success(let value):
-                        NetworkLogger.log(message: "Request completed successfully", level: .info)
+                        AppLogger.info("Request completed successfully", category: .network)
                         continuation.resume(returning: value)
                     case .failure(let error):
                         // Create retry handler closure
@@ -465,9 +465,9 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         headers: HTTPHeaders,
         body: E
     ) async throws -> T {
-        NetworkLogger.log(message: "\(method.rawValue) Request: \(url.absoluteString)", level: .debug)
-        NetworkLogger.log(message: "Headers: \(headers.filter { $0.name != "Authorization" })", level: .debug)
-        NetworkLogger.log(message: "Body: \(body)", level: .debug)
+        AppLogger.debug("\(method.rawValue) Request: \(url.absoluteString)", category: .network)
+        AppLogger.debug("Headers: \(headers.filter { $0.name != "Authorization" })", category: .network)
+        AppLogger.debug("Body: \(body)", category: .network)
         
         return try await withCheckedThrowingContinuation { continuation in
             session.request(
@@ -485,7 +485,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
                 
                 switch response.result {
                 case .success(let value):
-                    NetworkLogger.log(message: "Request completed successfully", level: .info)
+                    AppLogger.info("Request completed successfully", category: .network)
                     continuation.resume(returning: value)
                 case .failure(let error):
                     // Create retry handler closure
@@ -515,8 +515,8 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         method: HTTPMethod,
         headers: HTTPHeaders
     ) async throws {
-        NetworkLogger.log(message: "\(method.rawValue) Request: \(url.absoluteString)", level: .debug)
-        NetworkLogger.log(message: "Headers: \(headers.filter { $0.name != "Authorization" })", level: .debug)
+        AppLogger.debug("\(method.rawValue) Request: \(url.absoluteString)", category: .network)
+        AppLogger.debug("Headers: \(headers.filter { $0.name != "Authorization" })", category: .network)
         
         try await withCheckedThrowingContinuation { continuation in
             session.request(url, method: method, headers: headers)
@@ -528,7 +528,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
                     
                     switch response.result {
                     case .success:
-                        NetworkLogger.log(message: "Request completed successfully", level: .info)
+                        AppLogger.info("Request completed successfully", category: .network)
                         continuation.resume()
                     case .failure(let error):
                         // Create retry handler closure
@@ -559,9 +559,9 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         body: E,
         headers: HTTPHeaders
     ) async throws {
-        NetworkLogger.log(message: "\(method.rawValue) Request: \(url.absoluteString)", level: .debug)
-        NetworkLogger.log(message: "Headers: \(headers.filter { $0.name != "Authorization" })", level: .debug)
-        NetworkLogger.log(message: "Body: \(body)", level: .debug)
+        AppLogger.debug("\(method.rawValue) Request: \(url.absoluteString)", category: .network)
+        AppLogger.debug("Headers: \(headers.filter { $0.name != "Authorization" })", category: .network)
+        AppLogger.debug("Body: \(body)", category: .network)
         
         try await withCheckedThrowingContinuation { continuation in
             session.request(
@@ -579,7 +579,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
                 
                 switch response.result {
                 case .success:
-                    NetworkLogger.log(message: "Request completed successfully", level: .info)
+                    AppLogger.info("Request completed successfully", category: .network)
                     continuation.resume()
                 case .failure(let error):
                     // Create retry handler closure
@@ -608,7 +608,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
     
     private func configureMultipartFormData(_ multipartFormData: MultipartFormData, with data: [MultipartData]) {
         data.forEach { dataItem in
-            NetworkLogger.log(message: "Appending file: \(dataItem.name)", level: .debug)
+            AppLogger.debug("Appending file: \(dataItem.name)", category: .network)
             multipartFormData.append(
                 dataItem.data,
                 withName: dataItem.name,
@@ -616,7 +616,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
                 mimeType: dataItem.mimeType
             )
         }
-        NetworkLogger.log(message: "Total upload size: \(multipartFormData.contentLength) bytes", level: .debug)
+        AppLogger.debug("Total upload size: \(multipartFormData.contentLength) bytes", category: .network)
     }
 }
 

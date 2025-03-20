@@ -13,26 +13,26 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         response: DataResponse<T, AFError>,
         continuation: CheckedContinuation<T, Error>
     ) {
-        NetworkLogger.log(message: "Error occurred during request", level: .error)
-        NetworkLogger.log(message: "Error description: \(error.localizedDescription)", level: .error)
+        AppLogger.error("Error occurred during request", category: .network)
+        AppLogger.error("Error description: \(error.localizedDescription)", category: .network)
         
         if let underlyingError = error.underlyingError {
-            NetworkLogger.log(message: "Underlying error: \(underlyingError)", level: .error)
+            AppLogger.error("Underlying error: \(underlyingError)", category: .network)
         }
         
         if let data = response.data,
            let errorResponse = try? decoder.decode(ErrorType.self, from: data) {
-            NetworkLogger.log(message: "Decoded Error Response: \(errorResponse)", level: .error)
+            AppLogger.error("Decoded Error Response: \(errorResponse)", category: .network)
             continuation.resume(throwing: errorResponse)
         } else {
             let networkError = NetworkClientError(
                 code: "REQUEST_ERROR",
                 message: error.localizedDescription
             )
-            NetworkLogger.log(message: "Network Error: \(networkError)", level: .error)
+            AppLogger.error("Network Error: \(networkError)", category: .network)
             if let data = response.data,
                let rawString = String(data: data, encoding: .utf8) {
-                NetworkLogger.log(message: "Raw error response: \(rawString)", level: .error)
+                AppLogger.error("Raw error response: \(rawString)", category: .network)
             }
             continuation.resume(throwing: networkError)
         }
@@ -60,32 +60,32 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
                     continuation.resume(returning: result)
                 } catch {
                     // If refresh fails, return the original error
-                    NetworkLogger.log(message: "Request retry after token refresh failed: \(error.localizedDescription)", level: .error)
+                    AppLogger.error("Request retry after token refresh failed: \(error.localizedDescription)", category: .network)
                     continuation.resume(throwing: error)
                 }
             }
         } else {
             // Handle error normally for non-401 errors or when we don't have a refresh handler
-            NetworkLogger.log(message: "Error occurred during request", level: .error)
-            NetworkLogger.log(message: "Error description: \(error.localizedDescription)", level: .error)
+            AppLogger.error("Error occurred during request", category: .network)
+            AppLogger.error("Error description: \(error.localizedDescription)", category: .network)
             
             if let underlyingError = error.underlyingError {
-                NetworkLogger.log(message: "Underlying error: \(underlyingError)", level: .error)
+                AppLogger.error("Underlying error: \(underlyingError)", category: .network)
             }
             
             if let data = response.data,
                let errorResponse = try? decoder.decode(ErrorType.self, from: data) {
-                NetworkLogger.log(message: "Decoded Error Response: \(errorResponse)", level: .error)
+                AppLogger.error("Decoded Error Response: \(errorResponse)", category: .network)
                 continuation.resume(throwing: errorResponse)
             } else {
                 let networkError = NetworkClientError(
                     code: "REQUEST_ERROR",
                     message: error.localizedDescription
                 )
-                NetworkLogger.log(message: "Network Error: \(networkError)", level: .error)
+                AppLogger.error("Network Error: \(networkError)", category: .network)
                 if let data = response.data,
                    let rawString = String(data: data, encoding: .utf8) {
-                    NetworkLogger.log(message: "Raw error response: \(rawString)", level: .error)
+                    AppLogger.error("Raw error response: \(rawString)", category: .network)
                 }
                 continuation.resume(throwing: networkError)
             }
@@ -97,26 +97,26 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         response: AFDataResponse<Data?>,
         continuation: CheckedContinuation<Void, Error>
     ) {
-        NetworkLogger.log(message: "Error occurred during request", level: .error)
-        NetworkLogger.log(message: "Error description: \(error.localizedDescription)", level: .error)
+        AppLogger.error("Error occurred during request", category: .network)
+        AppLogger.error("Error description: \(error.localizedDescription)", category: .network)
         
         if let underlyingError = error.underlyingError {
-            NetworkLogger.log(message: "Underlying error: \(underlyingError)", level: .error)
+            AppLogger.error("Underlying error: \(underlyingError)", category: .network)
         }
         
         if let data = response.data,
            let errorResponse = try? decoder.decode(ErrorType.self, from: data) {
-            NetworkLogger.log(message: "Decoded Error Response: \(errorResponse)", level: .error)
+            AppLogger.error("Decoded Error Response: \(errorResponse)", category: .network)
             continuation.resume(throwing: errorResponse)
         } else {
             let networkError = NetworkClientError(
                 code: "REQUEST_ERROR",
                 message: error.localizedDescription
             )
-            NetworkLogger.log(message: "Network Error: \(networkError)", level: .error)
+            AppLogger.error("Network Error: \(networkError)", category: .network)
             if let data = response.data,
                let rawString = String(data: data, encoding: .utf8) {
-                NetworkLogger.log(message: "Raw error response: \(rawString)", level: .error)
+                AppLogger.error("Raw error response: \(rawString)", category: .network)
             }
             continuation.resume(throwing: networkError)
         }
@@ -144,32 +144,32 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
                     continuation.resume()
                 } catch {
                     // If refresh fails, return the original error
-                    NetworkLogger.log(message: "Request retry after token refresh failed: \(error.localizedDescription)", level: .error)
+                    AppLogger.error("Request retry after token refresh failed: \(error.localizedDescription)", category: .network)
                     continuation.resume(throwing: error)
                 }
             }
         } else {
             // Handle error normally for non-401 errors or when we don't have a refresh handler
-            NetworkLogger.log(message: "Error occurred during request", level: .error)
-            NetworkLogger.log(message: "Error description: \(error.localizedDescription)", level: .error)
+            AppLogger.error("Error occurred during request", category: .network)
+            AppLogger.error("Error description: \(error.localizedDescription)", category: .network)
             
             if let underlyingError = error.underlyingError {
-                NetworkLogger.log(message: "Underlying error: \(underlyingError)", level: .error)
+                AppLogger.error("Underlying error: \(underlyingError)", category: .network)
             }
             
             if let data = response.data,
                let errorResponse = try? decoder.decode(ErrorType.self, from: data) {
-                NetworkLogger.log(message: "Decoded Error Response: \(errorResponse)", level: .error)
+                AppLogger.error("Decoded Error Response: \(errorResponse)", category: .network)
                 continuation.resume(throwing: errorResponse)
             } else {
                 let networkError = NetworkClientError(
                     code: "REQUEST_ERROR",
                     message: error.localizedDescription
                 )
-                NetworkLogger.log(message: "Network Error: \(networkError)", level: .error)
+                AppLogger.error("Network Error: \(networkError)", category: .network)
                 if let data = response.data,
                    let rawString = String(data: data, encoding: .utf8) {
-                    NetworkLogger.log(message: "Raw error response: \(rawString)", level: .error)
+                    AppLogger.error("Raw error response: \(rawString)", category: .network)
                 }
                 continuation.resume(throwing: networkError)
             }
@@ -181,26 +181,26 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
     }
     
     func logResponse<T>(_ response: DataResponse<T, AFError>) {
-        NetworkLogger.log(message: "Attempting to decode to type: \(T.self)", level: .debug)
-        NetworkLogger.log(message: "Response Status: \(String(describing: response.response?.statusCode))", level: .debug)
-        NetworkLogger.log(message: "Response Headers: \(String(describing: response.response?.headers))", level: .debug)
+        AppLogger.debug("Attempting to decode to type: \(T.self)", category: .network)
+        AppLogger.debug("Response Status: \(String(describing: response.response?.statusCode))", category: .network)
+        AppLogger.debug("Response Headers: \(String(describing: response.response?.headers))", category: .network)
         
         if let data = response.data {
-            NetworkLogger.log(message: "Response size: \(data.count) bytes", level: .debug)
+            AppLogger.debug("Response size: \(data.count) bytes", category: .network)
             if let rawString = String(data: data, encoding: .utf8) {
-                NetworkLogger.log(message: "Raw Response string: \(rawString)", level: .debug)
+                AppLogger.debug("Raw Response string: \(rawString)", category: .network)
             }
         }
     }
     
     func logResponse(_ response: AFDataResponse<Data?>) {
-        NetworkLogger.log(message: "Response Status: \(String(describing: response.response?.statusCode))", level: .debug)
-        NetworkLogger.log(message: "Response Headers: \(String(describing: response.response?.headers))", level: .debug)
+        AppLogger.debug("Response Status: \(String(describing: response.response?.statusCode))", category: .network)
+        AppLogger.debug("Response Headers: \(String(describing: response.response?.headers))", category: .network)
         
         if let data = response.data {
-            NetworkLogger.log(message: "Response size: \(data.count) bytes", level: .debug)
+            AppLogger.debug("Response size: \(data.count) bytes", category: .network)
             if let rawString = String(data: data, encoding: .utf8) {
-                NetworkLogger.log(message: "Raw Response string: \(rawString)", level: .debug)
+                AppLogger.debug("Raw Response string: \(rawString)", category: .network)
             }
         }
     }

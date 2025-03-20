@@ -27,10 +27,10 @@ actor TokenRefreshHandler {
         
         // Create a new refresh task
         let task = Task {
-            NetworkLogger.log(message: "Attempting to refresh expired token", level: .info)
+            AppLogger.info("Attempting to refresh expired token", category: .auth)
             
             guard let refreshToken = userSession.refreshToken else {
-                NetworkLogger.log(message: "No refresh token available, cannot refresh session", level: .error)
+                AppLogger.error("No refresh token available, cannot refresh session", category: .auth)
                 await userSession.setLoggedOut()
                 throw NetworkClientError(code: "NO_REFRESH_TOKEN", message: "No refresh token available")
             }
@@ -45,9 +45,9 @@ actor TokenRefreshHandler {
                     refreshToken: response.refreshToken
                 )
                 
-                NetworkLogger.log(message: "Token refresh successful", level: .info)
+                AppLogger.info("Token refresh successful", category: .auth)
             } catch {
-                NetworkLogger.log(message: "Token refresh failed: \(error.localizedDescription)", level: .error)
+                AppLogger.error("Token refresh failed: \(error.localizedDescription)", category: .auth)
                 Task { @MainActor in
                     await userSession.setLoggedOut()
                 }
