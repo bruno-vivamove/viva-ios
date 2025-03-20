@@ -19,4 +19,7 @@ extension Notification.Name {
     
     static let homeScreenMatchupCreationCompleted = Notification.Name("homeScreenMatchupCreationCompleted")
     static let friendScreenMatchupCreationCompleted = Notification.Name("friendScreenMatchupCreationCompleted")
+
+    // Notification sent when health data is updated in the background
+    static let healthDataUpdated = Notification.Name("healthDataUpdated")
 }

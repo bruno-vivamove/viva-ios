@@ -6,6 +6,7 @@ struct VivaApp: App {
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
+        // Register background tasks at app startup
         BackgroundTaskManager.shared.registerBackgroundTasks()
         configureVivaImageCache()
     }
@@ -23,9 +24,26 @@ struct VivaApp: App {
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             print("App state changed: \(oldPhase) -> \(newPhase)")
-            if newPhase == .background {
-                print("App entered background - scheduling tasks")
-                BackgroundTaskManager.shared.scheduleHealthUpdateTask()
+            
+            switch newPhase {
+            case .active:
+                // App became active, perform any necessary updates
+                // This is a good place to refresh data
+                print("App became active")
+                
+            case .background:
+                // App is entering background, schedule background tasks
+                print("App entered background - scheduling background refresh task")
+                if vivaAppObjects.userSession.isLoggedIn {
+                    BackgroundTaskManager.shared.scheduleHealthUpdateTask()
+                }
+                
+            case .inactive:
+                // App is inactive but visible
+                print("App became inactive")
+                
+            @unknown default:
+                print("Unknown scene phase: \(newPhase)")
             }
         }
     }
