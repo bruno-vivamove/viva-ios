@@ -111,11 +111,9 @@ struct HomeHeader: View {
     var body: some View {
         HStack(spacing: VivaDesign.Spacing.medium) {
             StreakCounter(streakDays: userSession.userProfile?.streakDays ?? 0)
-            PointsCounter(
-                rewardPoints: userSession.userProfile?.rewardPoints ?? 0)
             Spacer(minLength: 1)
             CardButton(
-                title: "Create Match",
+                title: "Create Matchup",
                 color: VivaDesign.Colors.primaryText
             ) {
                 showMatchupCreation = true
@@ -145,24 +143,6 @@ struct StreakCounter: View {
                 .font(VivaDesign.Typography.value)
                 .lineLimit(1)
             Text("Week Streak")
-                .foregroundColor(VivaDesign.Colors.vivaGreen)
-                .font(VivaDesign.Typography.caption)
-                .lineLimit(1)
-        }
-    }
-}
-
-// MARK: - Points Counter
-struct PointsCounter: View {
-    let rewardPoints: Int
-
-    var body: some View {
-        VStack(alignment: .center) {
-            Text("\(rewardPoints)")
-                .foregroundColor(VivaDesign.Colors.primaryText)
-                .font(VivaDesign.Typography.value)
-                .lineLimit(1)
-            Text("Reward Points")
                 .foregroundColor(VivaDesign.Colors.vivaGreen)
                 .font(VivaDesign.Typography.caption)
                 .lineLimit(1)

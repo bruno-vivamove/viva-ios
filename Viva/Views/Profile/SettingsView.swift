@@ -123,18 +123,6 @@ struct ProfileHeader: View {
                 }
             }
 
-            // Points Display
-            VStack(spacing: VivaDesign.Spacing.xsmall) {
-                Text("\(userSession.userProfile?.rewardPoints ?? 0)")
-                    .font(VivaDesign.Typography.displayText(42))
-                    .foregroundColor(VivaDesign.Colors.primaryText)
-                    .fontWeight(.bold)
-
-                Text("Reward Points")
-                    .font(VivaDesign.Typography.caption)
-                    .foregroundColor(VivaDesign.Colors.vivaGreen)
-            }
-
             Spacer()
         }
         .padding(.top)
