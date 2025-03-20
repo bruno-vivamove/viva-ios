@@ -7,11 +7,13 @@ class VivaAppObjects: ObservableObject {
 
     public let authNetworkClientSettings: AuthNetworkClientSettings
     public let appNetworkClientSettings: AppNetworkClientSettings
+    public let appNetworkClientSettingsNoBodies: AppNetworkClientSettings
     public let appWithNoSessionNetworkClientSettings:
         AppWithNoSessionNetworkClientSettings
 
     public let authNetworkClient: NetworkClient<AuthErrorResponse>
     public let appNetworkClient: NetworkClient<VivaErrorResponse>
+    public let appNetworkClientNoBodies: NetworkClient<VivaErrorResponse>
     public let appNetworkClientWithNoSession: NetworkClient<VivaErrorResponse>
 
     public let authService: AuthService
@@ -19,6 +21,7 @@ class VivaAppObjects: ObservableObject {
     public let userProfileService: UserProfileService
     public let friendService: FriendService
     public let matchupService: MatchupService
+    public let userMeasurementService: UserMeasurementService
     public let userService: UserService
     public let healthService: HealthService
 
@@ -26,9 +29,9 @@ class VivaAppObjects: ObservableObject {
         userSession = UserSession()
 
         // Settings with no session
-        authNetworkClientSettings = AuthNetworkClientSettings()
+        authNetworkClientSettings = AuthNetworkClientSettings(shouldLogBodies: true)
         appWithNoSessionNetworkClientSettings =
-            AppWithNoSessionNetworkClientSettings()
+            AppWithNoSessionNetworkClientSettings(shouldLogBodies: true)
 
         // Clients with no session
         authNetworkClient = NetworkClient<AuthErrorResponse>(
@@ -44,11 +47,17 @@ class VivaAppObjects: ObservableObject {
             networkClient: appNetworkClientWithNoSession)
 
         // Settings with session
-        appNetworkClientSettings = AppNetworkClientSettings(userSession)
+        appNetworkClientSettings = AppNetworkClientSettings(userSession, shouldLogBodies: true)
+        appNetworkClientSettingsNoBodies = AppNetworkClientSettings(userSession, shouldLogBodies: false)
 
         // Client with session
         appNetworkClient = NetworkClient(
             settings: appNetworkClientSettings,
+            tokenRefreshHandler: TokenRefreshHandler(
+                sessionService: sessionService, userSession: userSession))
+
+        appNetworkClientNoBodies = NetworkClient(
+            settings: appNetworkClientSettingsNoBodies,
             tokenRefreshHandler: TokenRefreshHandler(
                 sessionService: sessionService, userSession: userSession))
 
@@ -58,6 +67,7 @@ class VivaAppObjects: ObservableObject {
         friendService = FriendService(
             networkClient: appNetworkClient)
         matchupService = MatchupService(networkClient: appNetworkClient)
+        userMeasurementService = UserMeasurementService(networkClient: appNetworkClientNoBodies)
         userService = UserService(networkClient: appNetworkClient)
 
         // Other

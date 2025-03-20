@@ -10,6 +10,7 @@ struct MatchupCard: View {
     init(
         matchupId: String,
         matchupService: MatchupService,
+        userMeasurementService: UserMeasurementService,
         healthKitDataManager: HealthKitDataManager,
         userSession: UserSession,
         lastRefreshTime: Date? = nil
@@ -19,6 +20,7 @@ struct MatchupCard: View {
             wrappedValue: MatchupCardViewModel(
                 matchupId: matchupId,
                 matchupService: matchupService,
+                userMeasurementService: userMeasurementService,
                 healthKitDataManager: healthKitDataManager,
                 userSession: userSession,
                 lastRefreshTime: lastRefreshTime

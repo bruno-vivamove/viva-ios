@@ -21,6 +21,7 @@ struct VivaApp: App {
                 .environmentObject(vivaAppObjects.matchupService)
                 .environmentObject(vivaAppObjects.userService)
                 .environmentObject(vivaAppObjects.healthKitDataManager)
+                .environmentObject(vivaAppObjects.userMeasurementService)
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             print("App state changed: \(oldPhase) -> \(newPhase)")

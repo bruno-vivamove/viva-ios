@@ -1,98 +1,9 @@
 import Alamofire
 import Foundation
 
-// MARK: - NetworkClientProtocol
-
-protocol NetworkClientProtocol {
-    func get<T: Decodable>(
-        path: String,
-        queryParams: [String: Any]?,
-        headers: [String: String]?
-    ) async throws -> T
-    
-    func post<T: Decodable, E: Encodable>(
-        path: String,
-        headers: [String: String]?,
-        queryParams: [String: Any]?,
-        body: E
-    ) async throws -> T
-    
-    func post<T: Decodable>(
-        path: String,
-        queryParams: [String: Any]?,
-        headers: [String: String]?
-    ) async throws -> T
-    
-    func put<T: Decodable>(
-        path: String,
-        headers: [String: String]?
-    ) async throws -> T
-    
-    func put<T: Decodable, E: Encodable>(
-        path: String,
-        body: E,
-        headers: [String: String]?
-    ) async throws -> T
-    
-    // Methods without response
-    func post(
-        path: String,
-        headers: [String: String]?
-    ) async throws
-    
-    func post<E: Encodable>(
-        path: String,
-        body: E,
-        headers: [String: String]?
-    ) async throws
-    
-    func put(
-        path: String,
-        headers: [String: String]?
-    ) async throws
-    
-    func put<E: Encodable>(
-        path: String,
-        body: E,
-        headers: [String: String]?
-    ) async throws
-    
-    func patch(
-        path: String,
-        headers: [String: String]?
-    ) async throws
-    
-    func patch<E: Encodable>(
-        path: String,
-        body: E,
-        headers: [String: String]?
-    ) async throws
-    
-    func delete(
-        path: String,
-        headers: [String: String]?
-    ) async throws
-    
-    // Upload methods
-    func upload<T: Decodable>(
-        path: String,
-        headers: [String: String]?,
-        data: [MultipartData]
-    ) async throws -> T
-    
-    func upload(
-        path: String,
-        headers: [String: String]?,
-        data: [MultipartData]
-    ) async throws
-    
-    // New property for token refresh handling
-    var tokenRefreshHandler: TokenRefreshHandler? { get set }
-}
-
 // MARK: - Refactored NetworkClient
 
-final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, @unchecked Sendable {
+final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
     private let session: Session
     private let decoder: JSONDecoder
     private let requestBuilder: RequestBuilder
@@ -112,7 +23,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
         self.session = session
         self.decoder = decoder
         self.requestBuilder = RequestBuilder(settings: settings)
-        self.responseHandler = ResponseHandler<ErrorType>(decoder: decoder)
+        self.responseHandler = ResponseHandler<ErrorType>(decoder: decoder, shouldLogBodies: settings.shouldLogBodies)
         self.tokenRefreshHandler = tokenRefreshHandler
         
         AppLogger.info("NetworkClient initialized with baseURL: \(settings.baseUrl)", category: .network)
@@ -467,7 +378,10 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
     ) async throws -> T {
         AppLogger.debug("\(method.rawValue) Request: \(url.absoluteString)", category: .network)
         AppLogger.debug("Headers: \(headers.filter { $0.name != "Authorization" })", category: .network)
-        AppLogger.debug("Body: \(body)", category: .network)
+        
+        if settings.shouldLogBodies {
+            AppLogger.debug("Body: \(body)", category: .network)
+        }
         
         return try await withCheckedThrowingContinuation { continuation in
             session.request(
@@ -561,7 +475,10 @@ final class NetworkClient<ErrorType: Decodable & Error>: NetworkClientProtocol, 
     ) async throws {
         AppLogger.debug("\(method.rawValue) Request: \(url.absoluteString)", category: .network)
         AppLogger.debug("Headers: \(headers.filter { $0.name != "Authorization" })", category: .network)
-        AppLogger.debug("Body: \(body)", category: .network)
+        
+        if settings.shouldLogBodies {
+            AppLogger.debug("Body: \(body)", category: .network)
+        }
         
         try await withCheckedThrowingContinuation { continuation in
             session.request(

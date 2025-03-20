@@ -1,13 +1,14 @@
 import Combine
 import Foundation
 
-class MatchupCardViewModel: ObservableObject {
+class MatchupCardViewModel: ObservableObject, Identifiable {
     @Published var matchupDetails: MatchupDetails?
     @Published var isLoading: Bool = false
     @Published var error: Error?
 
     private let matchupId: String
     private let matchupService: MatchupService
+    private let userMeasurementService: UserMeasurementService
     private let healthKitDataManager: HealthKitDataManager
     private let userSession: UserSession
     private var cancellables = Set<AnyCancellable>()
@@ -18,12 +19,14 @@ class MatchupCardViewModel: ObservableObject {
     init(
         matchupId: String,
         matchupService: MatchupService,
+        userMeasurementService: UserMeasurementService,
         healthKitDataManager: HealthKitDataManager,
         userSession: UserSession,
         lastRefreshTime: Date? = nil
     ) {
         self.matchupId = matchupId
         self.matchupService = matchupService
+        self.userMeasurementService = userMeasurementService
         self.healthKitDataManager = healthKitDataManager
         self.userSession = userSession
         self.lastRefreshTime = lastRefreshTime
@@ -78,7 +81,7 @@ class MatchupCardViewModel: ObservableObject {
                             do {
                                 // Send all measurements in a single call
                                 let savedMatchupDetails =
-                                    try await self.matchupService
+                                    try await self.userMeasurementService
                                     .saveUserMeasurements(
                                         matchupId: self.matchupId,
                                         measurements: userMeasurements

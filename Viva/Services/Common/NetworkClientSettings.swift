@@ -3,6 +3,7 @@ import Foundation
 protocol NetworkClientSettings {
     var baseUrl: String { get }
     var headers: [String: String] { get }
+    var shouldLogBodies: Bool { get }
 }
 
 final class AuthNetworkClientSettings: NetworkClientSettings {
@@ -10,6 +11,11 @@ final class AuthNetworkClientSettings: NetworkClientSettings {
     let headers = [
         "referer": "https://dev.vivamove.io",
     ]
+    let shouldLogBodies: Bool
+    
+    init(shouldLogBodies: Bool = false) {
+        self.shouldLogBodies = shouldLogBodies
+    }
 }
 
 final class AppWithNoSessionNetworkClientSettings: NetworkClientSettings {
@@ -17,11 +23,17 @@ final class AppWithNoSessionNetworkClientSettings: NetworkClientSettings {
     let headers = [
         "referer": "https://dev.vivamove.io",
     ]
+    let shouldLogBodies: Bool
+    
+    init(shouldLogBodies: Bool = false) {
+        self.shouldLogBodies = shouldLogBodies
+    }
 }
 
 final class AppNetworkClientSettings: NetworkClientSettings {
     let baseUrl = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as! String
     let userSession: UserSession
+    let shouldLogBodies: Bool
     
     var headers: [String: String]{
         get {
@@ -36,7 +48,8 @@ final class AppNetworkClientSettings: NetworkClientSettings {
         }
     }
     
-    init(_ userSession: UserSession) {
+    init(_ userSession: UserSession, shouldLogBodies: Bool = false) {
         self.userSession = userSession
+        self.shouldLogBodies = shouldLogBodies
     }
 }

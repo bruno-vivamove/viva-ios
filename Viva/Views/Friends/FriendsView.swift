@@ -6,6 +6,7 @@ struct FriendsView: View {
     @EnvironmentObject var matchupService: MatchupService
     @EnvironmentObject var userService: UserService
     @EnvironmentObject var healthKitDataManager: HealthKitDataManager
+    @EnvironmentObject var userMeasurementService: UserMeasurementService
 
     private let headerInsets = EdgeInsets(
         top: 0,
@@ -166,12 +167,13 @@ struct FriendsView: View {
             NavigationView {
                 MatchupDetailView(
                     viewModel: MatchupDetailViewModel(
+                        matchupId: matchup.id,
                         matchupService: matchupService,
+                        userMeasurementService: userMeasurementService,
                         friendService: friendService,
                         userService: userService,
                         userSession: userSession,
-                        healthKitDataManager: healthKitDataManager,
-                        matchupId: matchup.id
+                        healthKitDataManager: healthKitDataManager
                     )
                 )
             }

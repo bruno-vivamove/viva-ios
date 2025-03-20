@@ -7,6 +7,7 @@ struct HomeView: View {
     @EnvironmentObject var matchupService: MatchupService
     @EnvironmentObject var userService: UserService
     @EnvironmentObject var healthKitDataManager: HealthKitDataManager
+    @EnvironmentObject var userMeasurementService: UserMeasurementService
 
     @StateObject private var viewModel: HomeViewModel
 
@@ -46,7 +47,8 @@ struct HomeView: View {
                     viewModel: viewModel,
                     matchupService: matchupService,
                     healthKitDataManager: healthKitDataManager,
-                    userSession: userSession
+                    userSession: userSession,
+                    userMeasurementService: userMeasurementService
                 )
                 .listRowInsets(EdgeInsets())
                 .listStyle(PlainListStyle())
@@ -63,12 +65,13 @@ struct HomeView: View {
             NavigationView {
                 MatchupDetailView(
                     viewModel: MatchupDetailViewModel(
+                        matchupId: matchup.id,
                         matchupService: matchupService,
+                        userMeasurementService: userMeasurementService,
                         friendService: friendService,
                         userService: userService,
                         userSession: userSession,
-                        healthKitDataManager: healthKitDataManager,
-                        matchupId: matchup.id
+                        healthKitDataManager: healthKitDataManager
                     )
                 )
             }
@@ -156,6 +159,7 @@ struct HomeContentList: View {
     let matchupService: MatchupService
     let healthKitDataManager: HealthKitDataManager
     let userSession: UserSession
+    let userMeasurementService: UserMeasurementService
 
     private let rowInsets = EdgeInsets(
         top: 0,
@@ -173,6 +177,7 @@ struct HomeContentList: View {
                     matchupService: matchupService,
                     healthKitDataManager: healthKitDataManager,
                     userSession: userSession,
+                    userMeasurementService: userMeasurementService,
                     rowInsets: rowInsets
                 )
             }
@@ -184,6 +189,7 @@ struct HomeContentList: View {
                     matchupService: matchupService,
                     healthKitDataManager: healthKitDataManager,
                     userSession: userSession,
+                    userMeasurementService: userMeasurementService,
                     rowInsets: rowInsets
                 )
             }
@@ -206,6 +212,7 @@ struct ActiveMatchupsSection: View {
     let matchupService: MatchupService
     let healthKitDataManager: HealthKitDataManager
     let userSession: UserSession
+    let userMeasurementService: UserMeasurementService
     let rowInsets: EdgeInsets
 
     var body: some View {
@@ -214,6 +221,7 @@ struct ActiveMatchupsSection: View {
                 MatchupCard(
                     matchupId: matchup.id,
                     matchupService: matchupService,
+                    userMeasurementService: userMeasurementService,
                     healthKitDataManager: healthKitDataManager,
                     userSession: userSession,
                     lastRefreshTime: viewModel.dataRefreshedTime
@@ -237,6 +245,7 @@ struct PendingMatchupsSection: View {
     let matchupService: MatchupService
     let healthKitDataManager: HealthKitDataManager
     let userSession: UserSession
+    let userMeasurementService: UserMeasurementService
     let rowInsets: EdgeInsets
 
     var body: some View {
@@ -245,9 +254,10 @@ struct PendingMatchupsSection: View {
                 MatchupCard(
                     matchupId: matchup.id,
                     matchupService: matchupService,
+                    userMeasurementService: userMeasurementService,
                     healthKitDataManager: healthKitDataManager,
                     userSession: userSession,
-                    lastRefreshTime: viewModel.dataRefreshedTime  // Add this parameter
+                    lastRefreshTime: viewModel.dataRefreshedTime
                 )
                 .id(matchup.id)
                 .onTapGesture {

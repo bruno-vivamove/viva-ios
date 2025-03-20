@@ -5,6 +5,7 @@ import Combine
 @MainActor
 class MatchupDetailViewModel: ObservableObject {
     let matchupService: MatchupService
+    let userMeasurementService: UserMeasurementService
     let friendService: FriendService
     let userService: UserService
     let userSession: UserSession
@@ -23,18 +24,20 @@ class MatchupDetailViewModel: ObservableObject {
     @Published var error: Error?
 
     init(
+        matchupId: String,
         matchupService: MatchupService,
+        userMeasurementService: UserMeasurementService,
         friendService: FriendService,
         userService: UserService,
         userSession: UserSession,
-        healthKitDataManager: HealthKitDataManager,
-        matchupId: String
+        healthKitDataManager: HealthKitDataManager
     ) {
+        self.matchupId = matchupId
         self.matchupService = matchupService
+        self.userMeasurementService = userMeasurementService
         self.friendService = friendService
         self.userService = userService
         self.userSession = userSession
-        self.matchupId = matchupId
         self.healthKitDataManager = healthKitDataManager
 
         setupNotificationObservers()
@@ -111,7 +114,7 @@ class MatchupDetailViewModel: ObservableObject {
                         do {
                             // Send all measurements in a single call
                             let savedMatchupDetails =
-                                try await self.matchupService
+                                try await self.userMeasurementService
                                 .saveUserMeasurements(
                                     matchupId: self.matchupId,
                                     measurements: userMeasurements

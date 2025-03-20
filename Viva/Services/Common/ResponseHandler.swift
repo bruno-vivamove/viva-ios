@@ -3,9 +3,11 @@ import Foundation
 
 final class ResponseHandler<ErrorType: Decodable & Error> {
     private let decoder: JSONDecoder
+    private let shouldLogBodies: Bool
     
-    init(decoder: JSONDecoder) {
+    init(decoder: JSONDecoder, shouldLogBodies: Bool = false) {
         self.decoder = decoder
+        self.shouldLogBodies = shouldLogBodies
     }
     
     func handleError<T>(
@@ -187,7 +189,7 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         
         if let data = response.data {
             AppLogger.debug("Response size: \(data.count) bytes", category: .network)
-            if let rawString = String(data: data, encoding: .utf8) {
+            if shouldLogBodies, let rawString = String(data: data, encoding: .utf8) {
                 AppLogger.debug("Raw Response string: \(rawString)", category: .network)
             }
         }
@@ -199,7 +201,7 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         
         if let data = response.data {
             AppLogger.debug("Response size: \(data.count) bytes", category: .network)
-            if let rawString = String(data: data, encoding: .utf8) {
+            if shouldLogBodies, let rawString = String(data: data, encoding: .utf8) {
                 AppLogger.debug("Raw Response string: \(rawString)", category: .network)
             }
         }
