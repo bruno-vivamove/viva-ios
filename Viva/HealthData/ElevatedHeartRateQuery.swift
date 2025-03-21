@@ -9,8 +9,8 @@ class ElevatedHeartRateQuery: BaseHealthQuery {
         matchupId: String,
         completion: @escaping ([MatchupUserMeasurement]) -> Void
     ) {
-        let heartRateType = HKObjectType.categoryType(
-            forIdentifier: .highHeartRateEvent)!
+        let exerciseType = HKQuantityType.quantityType(
+            forIdentifier: .appleExerciseTime)!
         var measurements: [MatchupUserMeasurement] = []
         let queryGroup = DispatchGroup()
 
@@ -22,27 +22,24 @@ class ElevatedHeartRateQuery: BaseHealthQuery {
                 dayNumber: dayNumber
             )
 
-            // Create and execute query for high heart rate events
+            // Create and execute query for exercise minutes
             let predicate = HKQuery.predicateForSamples(
                 withStart: dayStart,
                 end: dayEnd,
                 options: .strictStartDate
             )
-            let query = HKSampleQuery(
-                sampleType: heartRateType,
-                predicate: predicate,
-                limit: HKObjectQueryNoLimit,
-                sortDescriptors: nil
-            ) { _, samples, error in
+            let query = HKStatisticsQuery(
+                quantityType: exerciseType,
+                quantitySamplePredicate: predicate,
+                options: .cumulativeSum
+            ) { _, statistics, error in
                 defer { queryGroup.leave() }
 
-                if let events = samples as? [HKCategorySample] {
-                    // Calculate total minutes of elevated heart rate
-                    let totalMinutes = Int(
-                        events.reduce(0.0) {
-                            $0 + $1.endDate.timeIntervalSince($1.startDate)
-                        } / 60.0
-                    )
+                if let statistics = statistics,
+                   let sum = statistics.sumQuantity() {
+                    // Get total minutes of exercise
+                    let totalMinutes = Int(sum.doubleValue(for: HKUnit.minute()))
+                    
                     let measurement = MatchupUserMeasurement(
                         matchupId: matchupId,
                         dayNumber: dayNumber,
@@ -62,4 +59,4 @@ class ElevatedHeartRateQuery: BaseHealthQuery {
             completion(measurements)
         }
     }
-} 
+}
