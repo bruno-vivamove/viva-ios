@@ -25,7 +25,6 @@ class SleepQuery: BaseHealthQuery {
             // Create and execute query for sleep samples
             AppLogger.debug("Day Start: \(dayStart)")
             AppLogger.debug("Day End: \(dayEnd)")
-
             
             let predicate = HKQuery.predicateForSamples(
                 withStart: dayStart,
@@ -41,9 +40,26 @@ class SleepQuery: BaseHealthQuery {
                 defer { queryGroup.leave() }
 
                 if let sleepSamples = samples as? [HKCategorySample] {
+                    // Filter only for asleep samples - use all asleep-related values
+                    let asleepSamples = sleepSamples.filter { sample in
+                        // Filter for any sleep state that indicates the user is actually asleep
+                        // rather than just in bed
+                        if #available(iOS 16.0, *) {
+                            return [
+                                HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue,
+                                HKCategoryValueSleepAnalysis.asleepCore.rawValue,
+                                HKCategoryValueSleepAnalysis.asleepDeep.rawValue,
+                                HKCategoryValueSleepAnalysis.asleepREM.rawValue
+                            ].contains(sample.value)
+                        } else {
+                            // For backward compatibility with older iOS versions
+                            return sample.value == HKCategoryValueSleepAnalysis.asleep.rawValue
+                        }
+                    }
+                    
                     // Calculate total minutes of sleep
                     let totalMinutes = Int(
-                        sleepSamples.reduce(0.0) {
+                        asleepSamples.reduce(0.0) {
                             $0 + $1.endDate.timeIntervalSince($1.startDate)
                         } / 60.0
                     )
@@ -66,4 +82,4 @@ class SleepQuery: BaseHealthQuery {
             completion(measurements)
         }
     }
-} 
+}
