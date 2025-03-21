@@ -2,6 +2,21 @@ import Foundation
 import OrderedCollections
 import Combine
 
+// Add the ComparisonRowModel struct
+struct ComparisonRowModel: Identifiable {
+    let id: String
+    let type: MeasurementType
+    let leftValue: Int
+    let leftPoints: Int
+    let rightValue: Int
+    let rightPoints: Int
+    
+    // Derived values
+    let formattedLeftValue: String
+    let formattedRightValue: String
+    let displayName: String
+}
+
 @MainActor
 class MatchupDetailViewModel: ObservableObject {
     let matchupService: MatchupService
@@ -19,6 +34,10 @@ class MatchupDetailViewModel: ObservableObject {
         OrderedDictionary<MeasurementType, MatchupMeasurementPair>?
     @Published var matchupMeasurementPairsByDay:
         [OrderedDictionary<MeasurementType, MatchupMeasurementPair>]?
+
+    // Add the published arrays of ComparisonRowModel
+    @Published var totalComparisonRows: [ComparisonRowModel] = []
+    @Published var dailyComparisonRows: [ComparisonRowModel] = []
 
     @Published var isLoading = false
     @Published var error: Error?
@@ -136,10 +155,99 @@ class MatchupDetailViewModel: ObservableObject {
     }
 
     func updateMeasuerments(matchup: MatchupDetails) {
-        // Create set of left user IDs first
+        // Create set of left user IDs
         let leftUserIds = Set(matchup.leftUsers.map { $0.id })
-
-        // Initialize dictionaries with empty pairs
+        
+        // Create a map of measurement types
+        let measurementTypes = matchup.measurements.map { $0.measurementType }
+        
+        // Initialize empty values for all measurement types
+        var totalValues: [MeasurementType: (leftValue: Int, leftPoints: Int, rightValue: Int, rightPoints: Int)] = [:]
+        var dailyValues: [[MeasurementType: (leftValue: Int, leftPoints: Int, rightValue: Int, rightPoints: Int)]] = []
+        
+        // Calculate days elapsed (current day is included, so add 1)
+        let numberOfDays = (matchup.currentDayNumber ?? 0) + 1
+        
+        // Initialize empty values for all days and measurement types
+        for _ in 0..<numberOfDays {
+            var dayValues: [MeasurementType: (leftValue: Int, leftPoints: Int, rightValue: Int, rightPoints: Int)] = [:]
+            for type in measurementTypes {
+                dayValues[type] = (0, 0, 0, 0)
+            }
+            dailyValues.append(dayValues)
+        }
+        
+        // Initialize total values
+        for type in measurementTypes {
+            totalValues[type] = (0, 0, 0, 0)
+        }
+        
+        // Process measurements
+        for measurement in matchup.userMeasurements {
+            if let dayValues = dailyValues[safe: measurement.dayNumber],
+               var dayValue = dayValues[measurement.measurementType],
+               var totalValue = totalValues[measurement.measurementType] {
+                
+                // Update daily values
+                if leftUserIds.contains(measurement.userId) {
+                    dayValue.leftValue += measurement.value
+                    dayValue.leftPoints += measurement.points
+                    totalValue.leftValue += measurement.value
+                    totalValue.leftPoints += measurement.points
+                } else {
+                    dayValue.rightValue += measurement.value
+                    dayValue.rightPoints += measurement.points
+                    totalValue.rightValue += measurement.value
+                    totalValue.rightPoints += measurement.points
+                }
+                
+                // Store updated values
+                dailyValues[measurement.dayNumber][measurement.measurementType] = dayValue
+                totalValues[measurement.measurementType] = totalValue
+            }
+        }
+        
+        // Convert directly to ComparisonRowModel arrays
+        self.totalComparisonRows = measurementTypes.compactMap { type in
+            guard let values = totalValues[type] else { return nil }
+            
+            return ComparisonRowModel(
+                id: "\(type.rawValue)-\(values.leftValue)-\(values.rightValue)-\(values.leftPoints)-\(values.rightPoints)",
+                type: type,
+                leftValue: values.leftValue,
+                leftPoints: values.leftPoints,
+                rightValue: values.rightValue,
+                rightPoints: values.rightPoints,
+                formattedLeftValue: formatValue(values.leftValue, for: type),
+                formattedRightValue: formatValue(values.rightValue, for: type),
+                displayName: displayName(for: type)
+            )
+        }
+        
+        // Also update the daily rows with the last day if available
+        if let lastDayValues = dailyValues.last {
+            self.dailyComparisonRows = measurementTypes.compactMap { type in
+                guard let values = lastDayValues[type] else { return nil }
+                
+                return ComparisonRowModel(
+                    id: "\(type.rawValue)-day-\(values.leftValue)-\(values.rightValue)-\(values.leftPoints)-\(values.rightPoints)",
+                    type: type,
+                    leftValue: values.leftValue,
+                    leftPoints: values.leftPoints,
+                    rightValue: values.rightValue,
+                    rightPoints: values.rightPoints,
+                    formattedLeftValue: formatValue(values.leftValue, for: type),
+                    formattedRightValue: formatValue(values.rightValue, for: type),
+                    displayName: displayName(for: type)
+                )
+            }
+        }
+        
+        // Update the model
+        self.matchup = matchup
+        
+        // For backward compatibility, still update the dictionaries
+        // Can be removed later when all code is refactored
         let emptyPair = { (type: MeasurementType) in
             MatchupMeasurementPair(
                 measurementType: type,
@@ -147,55 +255,37 @@ class MatchupDetailViewModel: ObservableObject {
                 rightValue: 0, rightPoints: 0
             )
         }
-
-        let totalMatchupMeasurementPairs = OrderedDictionary(
-            uniqueKeysWithValues: matchup.measurements.map {
-                ($0.measurementType, emptyPair($0.measurementType))
+        
+        var totalPairs = OrderedDictionary<MeasurementType, MatchupMeasurementPair>(
+            uniqueKeysWithValues: measurementTypes.map {
+                ($0, emptyPair($0))
             }
         )
-
-        // Calculate days elapsed (current day is included, so add 1)
-        let numberOfDays = (matchup.currentDayNumber ?? 0) + 1
-        let matchupMeasurementPairsByDay = Array(
-            repeating: totalMatchupMeasurementPairs, count: numberOfDays)
-
-        // Process measurements
-        let (
-            updatedPairs, updatedDailyPairs
-        ) = matchup.userMeasurements.reduce(
-            (totalMatchupMeasurementPairs, matchupMeasurementPairsByDay)
-        ) { accumulator, measurement in
-            var (pairs, dailyPairs) = accumulator
-
-            if var pair = pairs[measurement.measurementType],
-                var dailyPair = dailyPairs[measurement.dayNumber][
-                    measurement.measurementType]
-            {
-
-                if leftUserIds.contains(measurement.userId) {
-                    pair.leftValue += measurement.value
-                    pair.leftPoints += measurement.points
-                    dailyPair.leftValue += measurement.value
-                    dailyPair.leftPoints += measurement.points
-                } else {
-                    pair.rightValue += measurement.value
-                    pair.rightPoints += measurement.points
-                    dailyPair.rightValue += measurement.value
-                    dailyPair.rightPoints += measurement.points
-                }
-
-                pairs[measurement.measurementType] = pair
-                dailyPairs[measurement.dayNumber][measurement.measurementType] =
-                    dailyPair
-            }
-
-            return (pairs, dailyPairs)
+        
+        var dailyPairs = Array(repeating: totalPairs, count: numberOfDays)
+        
+        for (type, values) in totalValues {
+            var pair = totalPairs[type]!
+            pair.leftValue = values.leftValue
+            pair.leftPoints = values.leftPoints
+            pair.rightValue = values.rightValue
+            pair.rightPoints = values.rightPoints
+            totalPairs[type] = pair
         }
-
-        // Update the view model
-        self.matchup = matchup
-        self.totalMatchupMeasurementPairs = updatedPairs
-        self.matchupMeasurementPairsByDay = updatedDailyPairs
+        
+        for (day, dayValues) in dailyValues.enumerated() {
+            for (type, values) in dayValues {
+                var pair = dailyPairs[day][type]!
+                pair.leftValue = values.leftValue
+                pair.leftPoints = values.leftPoints
+                pair.rightValue = values.rightValue
+                pair.rightPoints = values.rightPoints
+                dailyPairs[day][type] = pair
+            }
+        }
+        
+        self.totalMatchupMeasurementPairs = totalPairs
+        self.matchupMeasurementPairsByDay = dailyPairs
     }
 
     // Helper function to get display name for measurement type
@@ -226,8 +316,8 @@ class MatchupDetailViewModel: ObservableObject {
         case .walking, .running, .cycling, .swimming,
             .yoga, .strengthTraining, .elevatedHeartRate,
             .asleep, .standing:
-            let hours = value / 3600
-            let minutes = (value % 3600) / 60
+            let hours = value / 60
+            let minutes = value % 60
 
             if hours > 0 {
                 return "\(hours)h \(minutes)m"
@@ -280,5 +370,12 @@ class MatchupDetailViewModel: ObservableObject {
         guard let matchup = matchup else { return false }
         let users = side == .left ? matchup.leftUsers : matchup.rightUsers
         return users.count < matchup.usersPerSide
+    }
+}
+
+// Add this extension for safe array access
+extension Array {
+    subscript(safe index: Index) -> Element? {
+        return indices.contains(index) ? self[index] : nil
     }
 }

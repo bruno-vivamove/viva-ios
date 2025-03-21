@@ -48,26 +48,17 @@ struct MatchupDetailView: View {
                     ViewToggle(isShowingTotal: $isShowingTotal)
 
                     // Comparison rows
-                    let totalMatchupMeasurementPairs =
-                        isShowingTotal
-                        ? viewModel.totalMatchupMeasurementPairs
-                        : viewModel.matchupMeasurementPairsByDay?.last
-
                     VStack(spacing: VivaDesign.Spacing.medium) {
                         ForEach(
-                            Array(totalMatchupMeasurementPairs ?? [:]),
-                            id: \.key
-                        ) { type, measurementPair in
+                            isShowingTotal ? viewModel.totalComparisonRows : viewModel.dailyComparisonRows
+                        ) { row in
                             ComparisonRow(
-                                leftValue: viewModel.formatValue(
-                                    measurementPair.leftValue, for: type),
-                                leftPoints:
-                                    "\(measurementPair.leftPoints) pts",
-                                title: viewModel.displayName(for: type),
-                                rightValue: viewModel.formatValue(
-                                    measurementPair.rightValue, for: type),
-                                rightPoints:
-                                    "\(measurementPair.rightPoints) pts"
+                                id: row.id,
+                                leftValue: row.formattedLeftValue,
+                                leftPoints: "\(row.leftPoints) pts",
+                                title: row.displayName,
+                                rightValue: row.formattedRightValue,
+                                rightPoints: "\(row.rightPoints) pts"
                             )
                         }
                     }
@@ -336,6 +327,7 @@ struct ViewToggle: View {
 }
 
 struct ComparisonRow: View {
+    let id: String
     let leftValue: String
     let leftPoints: String
     let title: String
