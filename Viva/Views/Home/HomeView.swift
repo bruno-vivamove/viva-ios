@@ -194,6 +194,18 @@ struct HomeContentList: View {
                 )
             }
 
+            // Completed Matchups
+            if !viewModel.pendingMatchups.isEmpty {
+                CompletedMatchupsSection(
+                    viewModel: viewModel,
+                    matchupService: matchupService,
+                    healthKitDataManager: healthKitDataManager,
+                    userSession: userSession,
+                    userMeasurementService: userMeasurementService,
+                    rowInsets: rowInsets
+                )
+            }
+
             if !viewModel.receivedInvites.isEmpty
                 || !viewModel.sentInvites.isEmpty
             {
@@ -271,6 +283,40 @@ struct PendingMatchupsSection: View {
         }
     }
 }
+
+// MARK: - Completed Matchups Section
+struct CompletedMatchupsSection: View {
+    @ObservedObject var viewModel: HomeViewModel
+    let matchupService: MatchupService
+    let healthKitDataManager: HealthKitDataManager
+    let userSession: UserSession
+    let userMeasurementService: UserMeasurementService
+    let rowInsets: EdgeInsets
+
+    var body: some View {
+        Section {
+            ForEach(viewModel.completedMatchups) { matchup in
+                MatchupCard(
+                    matchupId: matchup.id,
+                    matchupService: matchupService,
+                    userMeasurementService: userMeasurementService,
+                    healthKitDataManager: healthKitDataManager,
+                    userSession: userSession,
+                    lastRefreshTime: viewModel.dataRefreshedTime
+                )
+                .id(matchup.id)
+                .onTapGesture {
+                    viewModel.selectedMatchup = matchup
+                }
+                .listRowSeparator(.hidden)
+                .listRowInsets(rowInsets)
+            }
+        } header: {
+            SectionHeaderView(title: "Completed Matchups")
+        }
+    }
+}
+
 
 // MARK: - Pending Invites Section
 struct PendingInvitesSection: View {

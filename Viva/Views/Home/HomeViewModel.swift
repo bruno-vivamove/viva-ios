@@ -282,6 +282,10 @@ class HomeViewModel: ObservableObject {
         matchups.filter { $0.status == .pending }
     }
 
+    var completedMatchups: [Matchup] {
+        matchups.filter { $0.status == .completed }
+    }
+
     var allInvites: [MatchupInvite] {
         receivedInvites + sentInvites
     }
