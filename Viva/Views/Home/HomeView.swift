@@ -194,6 +194,15 @@ struct HomeContentList: View {
                 )
             }
 
+            if !viewModel.receivedInvites.isEmpty
+                || !viewModel.sentInvites.isEmpty
+            {
+                PendingInvitesSection(
+                    viewModel: viewModel,
+                    rowInsets: rowInsets
+                )
+            }
+            
             // Completed Matchups
             if !viewModel.pendingMatchups.isEmpty {
                 CompletedMatchupsSection(
@@ -202,15 +211,6 @@ struct HomeContentList: View {
                     healthKitDataManager: healthKitDataManager,
                     userSession: userSession,
                     userMeasurementService: userMeasurementService,
-                    rowInsets: rowInsets
-                )
-            }
-
-            if !viewModel.receivedInvites.isEmpty
-                || !viewModel.sentInvites.isEmpty
-            {
-                PendingInvitesSection(
-                    viewModel: viewModel,
                     rowInsets: rowInsets
                 )
             }
