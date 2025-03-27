@@ -16,53 +16,53 @@ struct HomeView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            HomeHeader(
-                userSession: userSession,
-                viewModel: viewModel,
-                matchupService: matchupService,
-                friendService: friendService,
-                userService: userService
-            )
-            .padding(VivaDesign.Spacing.outerPadding)
-            .padding(.bottom, 0)
-
-            if viewModel.isLoading && viewModel.isEmpty {
-                LoadingView()
-            } else if viewModel.isEmpty {
-                // Empty state with refreshable list
-                List {
-                    HomeEmptyStateView()
-                        .listRowBackground(Color.black)
-                        .listRowSeparator(.hidden)
-                        .listRowInsets(EdgeInsets())
-                }
-                .listStyle(PlainListStyle())
-                .scrollContentBackground(.hidden)
-                .refreshable {
-                    await viewModel.loadData()
-                }
-            } else {
-                HomeContentList(
+        NavigationStack {
+            VStack(spacing: 0) {
+                HomeHeader(
+                    userSession: userSession,
                     viewModel: viewModel,
                     matchupService: matchupService,
-                    healthKitDataManager: healthKitDataManager,
-                    userSession: userSession,
-                    userMeasurementService: userMeasurementService
+                    friendService: friendService,
+                    userService: userService
                 )
-                .listRowInsets(EdgeInsets())
-                .listStyle(PlainListStyle())
-                .scrollContentBackground(.hidden)
-                .refreshable {
-                    await viewModel.loadData()
+                .padding(VivaDesign.Spacing.outerPadding)
+                .padding(.bottom, 0)
+
+                if viewModel.isLoading && viewModel.isEmpty {
+                    LoadingView()
+                } else if viewModel.isEmpty {
+                    // Empty state with refreshable list
+                    List {
+                        HomeEmptyStateView()
+                            .listRowBackground(Color.black)
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets())
+                    }
+                    .listStyle(PlainListStyle())
+                    .scrollContentBackground(.hidden)
+                    .refreshable {
+                        await viewModel.loadData()
+                    }
+                } else {
+                    HomeContentList(
+                        viewModel: viewModel,
+                        matchupService: matchupService,
+                        healthKitDataManager: healthKitDataManager,
+                        userSession: userSession,
+                        userMeasurementService: userMeasurementService
+                    )
+                    .listRowInsets(EdgeInsets())
+                    .listStyle(PlainListStyle())
+                    .scrollContentBackground(.hidden)
+                    .refreshable {
+                        await viewModel.loadData()
+                    }
+                    .listSectionSpacing(0)
                 }
-                .listSectionSpacing(0)
             }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black)
-        .sheet(item: $viewModel.selectedMatchup) { matchup in
-            NavigationView {
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.black)
+            .navigationDestination(item: $viewModel.selectedMatchup) { matchup in
                 MatchupDetailView(
                     viewModel: MatchupDetailViewModel(
                         matchupId: matchup.id,
@@ -75,19 +75,19 @@ struct HomeView: View {
                     )
                 )
             }
-        }
-        .alert("Error", isPresented: .constant(viewModel.error != nil)) {
-            Button("OK") {
-                viewModel.error = nil
+            .alert("Error", isPresented: .constant(viewModel.error != nil)) {
+                Button("OK") {
+                    viewModel.error = nil
+                }
+            } message: {
+                if let error = viewModel.error {
+                    Text(error.localizedDescription)
+                }
             }
-        } message: {
-            if let error = viewModel.error {
-                Text(error.localizedDescription)
-            }
-        }
-        .onAppear {
-            Task {
-                await viewModel.loadInitialDataIfNeeded()
+            .onAppear {
+                Task {
+                    await viewModel.loadInitialDataIfNeeded()
+                }
             }
         }
     }

@@ -20,6 +20,7 @@ struct MatchupDetailView: View {
     @State private var isShowingTotal = true
     @State private var showUnInviteSheet = false
     @State private var selectedInvite: MatchupInvite? = nil
+    @Environment(\.dismiss) private var dismiss
 
     init(
         viewModel: MatchupDetailViewModel
@@ -29,80 +30,127 @@ struct MatchupDetailView: View {
 
     var body: some View {
         ZStack {
+            // Background color
+            Color.black.edgesIgnoringSafeArea(.all)
+
             // Main content
             if viewModel.isLoading {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(.black)
             } else if let matchup = viewModel.matchup {
-                VStack(spacing: VivaDesign.Spacing.medium) {
-                    // Show MATCHUP RECAP title if completed
-                    if matchup.status == .completed {
-                        Text("MATCHUP RECAP")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundColor(VivaDesign.Colors.primaryText)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.top, VivaDesign.Spacing.small)
-                    }
-                    
-                    // Matchup Header
-                    MatchupHeader(
-                        viewModel: viewModel,
-                        selectedInvite: $selectedInvite,
-                        showUnInviteSheet: $showUnInviteSheet
-                    )
-                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
-                    
-                    // Show reward indicator if completed
-                    if matchup.status == .completed {
-                        Spacer()
-                            .frame(height: VivaDesign.Spacing.small)
-                            
-                        // Determine if current user is on winning side
-                        let currentUserId = viewModel.userSession.userId
-                        let isUserOnLeftSide = matchup.leftUsers.contains(where: { $0.id == currentUserId })
-                        let leftWon = matchup.leftSidePoints > matchup.rightSidePoints
-                        let userWon = (isUserOnLeftSide && leftWon) || (!isUserOnLeftSide && !leftWon)
-                        
-                        RewardIndicator(
-                            userWon: userWon,
-                            opponentName: userWon ? 
-                                         (isUserOnLeftSide ? matchup.rightUsers.first?.displayName ?? "Opponent" : matchup.leftUsers.first?.displayName ?? "Opponent") :
-                                         (isUserOnLeftSide ? matchup.leftUsers.first?.displayName ?? "You" : matchup.rightUsers.first?.displayName ?? "You"),
-                            rewardCoins: 125
-                        )
-                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
-                        
-                        Spacer()
-                            .frame(height: VivaDesign.Spacing.small)
-                    }
+                VStack(spacing: 0) {
+                    // Scrollable content
+                    List {
+                        VStack(spacing: VivaDesign.Spacing.medium) {
+                            // Show MATCHUP RECAP title if completed
+                            if matchup.status == .completed {
+                                Text("MATCHUP RECAP")
+                                    .font(.title)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(
+                                        VivaDesign.Colors.primaryText
+                                    )
+                                    .frame(
+                                        maxWidth: .infinity, alignment: .center
+                                    )
+                                    .padding(.top, VivaDesign.Spacing.small)
+                            }
 
-                    // Toggle - only show for active matchups
-                    if matchup.status != .completed {
-                        ViewToggle(isShowingTotal: $isShowingTotal, isCompleted: false)
-                    }
-
-                    // Comparison rows
-                    VStack(spacing: VivaDesign.Spacing.medium) {
-                        ForEach(
-                            isShowingTotal ? viewModel.totalComparisonRows : viewModel.dailyComparisonRows
-                        ) { row in
-                            ComparisonRow(
-                                id: row.id,
-                                leftValue: row.formattedLeftValue,
-                                leftPoints: "\(row.leftPoints) pts",
-                                title: row.displayName,
-                                rightValue: row.formattedRightValue,
-                                rightPoints: "\(row.rightPoints) pts"
+                            // Matchup Header
+                            MatchupHeader(
+                                viewModel: viewModel,
+                                selectedInvite: $selectedInvite,
+                                showUnInviteSheet: $showUnInviteSheet
                             )
+                            .padding(
+                                .horizontal, VivaDesign.Spacing.outerPadding)
+
+                            // Show reward indicator if completed
+                            if matchup.status == .completed {
+                                Spacer()
+                                    .frame(height: VivaDesign.Spacing.small)
+
+                                // Determine if current user is on winning side
+                                let currentUserId = viewModel.userSession.userId
+                                let isUserOnLeftSide = matchup.leftUsers
+                                    .contains(where: { $0.id == currentUserId })
+                                let leftWon =
+                                    matchup.leftSidePoints
+                                    > matchup.rightSidePoints
+                                let userWon =
+                                    (isUserOnLeftSide && leftWon)
+                                    || (!isUserOnLeftSide && !leftWon)
+
+                                RewardIndicator(
+                                    userWon: userWon,
+                                    opponentName: userWon
+                                        ? (isUserOnLeftSide
+                                            ? matchup.rightUsers.first?
+                                                .displayName ?? "Opponent"
+                                            : matchup.leftUsers.first?
+                                                .displayName ?? "Opponent")
+                                        : (isUserOnLeftSide
+                                            ? matchup.leftUsers.first?
+                                                .displayName ?? "You"
+                                            : matchup.rightUsers.first?
+                                                .displayName ?? "You"),
+                                    rewardCoins: 125
+                                )
+                                .padding(
+                                    .horizontal, VivaDesign.Spacing.outerPadding
+                                )
+
+                                Spacer()
+                                    .frame(height: VivaDesign.Spacing.small)
+                            }
+
+                            // Toggle - only show for active matchups
+                            if matchup.status != .completed {
+                                ViewToggle(
+                                    isShowingTotal: $isShowingTotal,
+                                    isCompleted: false)
+                            }
+
+                            // Comparison rows
+                            VStack(spacing: VivaDesign.Spacing.medium) {
+                                ForEach(
+                                    isShowingTotal
+                                        ? viewModel.totalComparisonRows
+                                        : viewModel.dailyComparisonRows
+                                ) { row in
+                                    ComparisonRow(
+                                        id: row.id,
+                                        leftValue: row.formattedLeftValue,
+                                        leftPoints: "\(row.leftPoints) pts",
+                                        title: row.displayName,
+                                        rightValue: row.formattedRightValue,
+                                        rightPoints: "\(row.rightPoints) pts"
+                                    )
+                                }
+                            }
+                            .padding(
+                                .horizontal, VivaDesign.Spacing.outerPadding)
                         }
+                        .padding(.top, VivaDesign.Spacing.medium)
+                        .listRowBackground(Color.black)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(EdgeInsets())
                     }
-                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                    .listStyle(PlainListStyle())
+                    .scrollContentBackground(.hidden)
+                    .refreshable {
+                        await viewModel.loadData()
+                    }
+                    .gesture(
+                        DragGesture()
+                            .onEnded { gesture in
+                                if gesture.translation.width > 100 {
+                                    dismiss()
+                                }
+                            }
+                    )
 
-                    Spacer()
-
-                    // Footer
+                    // Fixed footer
                     MatchupFooter(
                         endTime: matchup.endTime,
                         leftUser: matchup.leftUsers.first,
@@ -111,9 +159,9 @@ struct MatchupDetailView: View {
                         isCompleted: matchup.status == .completed
                     )
                     .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                    .padding(.vertical, VivaDesign.Spacing.medium)
+                    .background(.black)
                 }
-                .padding(.vertical, VivaDesign.Spacing.medium)
-                .background(.black)
             }
 
             // Overlay
@@ -518,8 +566,8 @@ struct MatchupFooter: View {
         if isCompleted {
             // Completed matchup layout
             VStack(spacing: 0) {
-                Spacer() // Push content down
-                
+                Spacer()  // Push content down
+
                 // All-Time Wins with record
                 VStack(spacing: VivaDesign.Spacing.small) {
                     // All-Time Wins label
@@ -528,7 +576,7 @@ struct MatchupFooter: View {
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .foregroundColor(VivaDesign.Colors.primaryText)
-                    
+
                     // Record display
                     RecordDisplay(
                         leftUser: leftUser,
@@ -537,9 +585,9 @@ struct MatchupFooter: View {
                         losses: record.losses
                     )
                 }
-                
-                Spacer() // Space between record and button
-                
+
+                Spacer()  // Space between record and button
+
                 // Rematch button
                 Button {
                     // Handle rematch action
@@ -561,43 +609,42 @@ struct MatchupFooter: View {
             .frame(maxWidth: .infinity)
         } else {
             // Active matchup layout
-            VStack {
-                Spacer() // Push content to bottom
-                
-                HStack {
-                    // Left section
-                    VStack(spacing: VivaDesign.Spacing.small) {
-                        Text("Matchup Ends")
-                            .font(VivaDesign.Typography.caption)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                            .foregroundColor(VivaDesign.Colors.primaryText)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .opacity(endTime != nil && endTime! > Date() ? 1 : 0)  // Hide when waiting for data
-                        TimeRemainingDisplay(endTime: endTime, isCompleted: isCompleted)
-                    }
-                    .frame(maxWidth: .infinity)
 
-                    Spacer()
-
-                    // Right section
-                    VStack(spacing: VivaDesign.Spacing.small) {
-                        Text("All-Time Wins")
-                            .font(VivaDesign.Typography.caption)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                            .foregroundColor(VivaDesign.Colors.primaryText)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                        RecordDisplay(
-                            leftUser: leftUser,
-                            rightUser: rightUser,
-                            wins: record.wins,
-                            losses: record.losses
-                        )
-                    }
-                    .frame(maxWidth: .infinity)
+            HStack {
+                // Left section
+                VStack(spacing: VivaDesign.Spacing.small) {
+                    Text("Matchup Ends")
+                        .font(VivaDesign.Typography.caption)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .foregroundColor(VivaDesign.Colors.primaryText)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .opacity(endTime != nil && endTime! > Date() ? 1 : 0)  // Hide when waiting for data
+                    TimeRemainingDisplay(
+                        endTime: endTime, isCompleted: isCompleted)
                 }
+                .frame(maxWidth: .infinity)
+
+                Spacer()
+
+                // Right section
+                VStack(spacing: VivaDesign.Spacing.small) {
+                    Text("All-Time Wins")
+                        .font(VivaDesign.Typography.caption)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .foregroundColor(VivaDesign.Colors.primaryText)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    RecordDisplay(
+                        leftUser: leftUser,
+                        rightUser: rightUser,
+                        wins: record.wins,
+                        losses: record.losses
+                    )
+                }
+                .frame(maxWidth: .infinity)
             }
+
         }
     }
 }
@@ -617,7 +664,7 @@ struct TimeRemainingDisplay: View {
             countdownView
         }
     }
-    
+
     private var completedView: some View {
         HStack(spacing: VivaDesign.Spacing.xsmall) {
             Text("Complete")
@@ -695,14 +742,17 @@ struct RecordDisplay: View {
 
     var body: some View {
         HStack(spacing: VivaDesign.Spacing.medium) {
-            VivaProfileImage(userId: leftUser?.id, imageUrl: leftUser?.imageUrl, size: .mini)
+            VivaProfileImage(
+                userId: leftUser?.id, imageUrl: leftUser?.imageUrl, size: .mini)
             Text("\(wins)")
                 .font(.system(size: 30, weight: .bold))
                 .lineLimit(1)
             Text("\(losses)")
                 .font(.system(size: 30, weight: .bold))
                 .lineLimit(1)
-            VivaProfileImage(userId: rightUser?.id, imageUrl: rightUser?.imageUrl, size: .mini)
+            VivaProfileImage(
+                userId: rightUser?.id, imageUrl: rightUser?.imageUrl,
+                size: .mini)
         }
         .foregroundColor(VivaDesign.Colors.primaryText)
     }
@@ -712,7 +762,7 @@ struct InviteDialog: View {
     @ObservedObject var viewModel: MatchupDetailViewModel
     @Binding var showUnInviteSheet: Bool
     @Binding var selectedInvite: MatchupInvite?
-    
+
     let user: User
     let inviteCode: String
 
@@ -789,28 +839,28 @@ struct RewardIndicator: View {
     let userWon: Bool
     let opponentName: String
     let rewardCoins: Int
-    
+
     var body: some View {
         HStack {
             Spacer()
             if userWon {
                 Text("You won this one and earned ")
                     .foregroundColor(VivaDesign.Colors.primaryText)
-                    .font(VivaDesign.Typography.body) +
-                Text("\(rewardCoins) reward coins")
+                    .font(VivaDesign.Typography.body)
+                    + Text("\(rewardCoins) reward coins")
                     .foregroundColor(VivaDesign.Colors.vivaGreen)
-                    .font(VivaDesign.Typography.body.bold()) +
-                Text(" for staying active. Nice work!")
+                    .font(VivaDesign.Typography.body.bold())
+                    + Text(" for staying active. Nice work!")
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .font(VivaDesign.Typography.body)
             } else {
                 Text("\(opponentName) took this one, but you earned ")
                     .foregroundColor(VivaDesign.Colors.primaryText)
-                    .font(VivaDesign.Typography.body) +
-                Text("\(rewardCoins) reward coins")
+                    .font(VivaDesign.Typography.body)
+                    + Text("\(rewardCoins) reward coins")
                     .foregroundColor(VivaDesign.Colors.vivaGreen)
-                    .font(VivaDesign.Typography.body.bold()) +
-                Text(" for staying active. Nice work!")
+                    .font(VivaDesign.Typography.body.bold())
+                    + Text(" for staying active. Nice work!")
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .font(VivaDesign.Typography.body)
             }

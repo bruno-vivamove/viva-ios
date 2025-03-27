@@ -16,7 +16,7 @@ struct MatchupsResponse: Codable {
     let matchups: [Matchup]
 }
 
-struct Matchup: Codable, Identifiable, Equatable {
+struct Matchup: Codable, Identifiable, Equatable, Hashable {
     let id: String
     let matchupHash: String?
     let displayName: String
@@ -32,6 +32,14 @@ struct Matchup: Codable, Identifiable, Equatable {
     let leftUsers: [User]
     let rightUsers: [User]
     var invites: [MatchupInvite]
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: Matchup, rhs: Matchup) -> Bool {
+        lhs.id == rhs.id
+    }
 }
 
 struct MatchupDetails: Codable, Equatable {
