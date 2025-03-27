@@ -561,39 +561,42 @@ struct MatchupFooter: View {
             .frame(maxWidth: .infinity)
         } else {
             // Active matchup layout
-            HStack {
-                // Left section
-                VStack(spacing: VivaDesign.Spacing.small) {
-                    Spacer()
-                    Text("Matchup Ends")
-                        .font(VivaDesign.Typography.caption)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .foregroundColor(VivaDesign.Colors.primaryText)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                    TimeRemainingDisplay(endTime: endTime, isCompleted: isCompleted)
-                }
-                .frame(maxWidth: .infinity)
+            VStack {
+                Spacer() // Push content to bottom
+                
+                HStack {
+                    // Left section
+                    VStack(spacing: VivaDesign.Spacing.small) {
+                        Text("Matchup Ends")
+                            .font(VivaDesign.Typography.caption)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                            .foregroundColor(VivaDesign.Colors.primaryText)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .opacity(endTime != nil && endTime! > Date() ? 1 : 0)  // Hide when waiting for data
+                        TimeRemainingDisplay(endTime: endTime, isCompleted: isCompleted)
+                    }
+                    .frame(maxWidth: .infinity)
 
-                Spacer()
-
-                // Right section
-                VStack(spacing: VivaDesign.Spacing.small) {
                     Spacer()
-                    Text("All-Time Wins")
-                        .font(VivaDesign.Typography.caption)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .foregroundColor(VivaDesign.Colors.primaryText)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                    RecordDisplay(
-                        leftUser: leftUser,
-                        rightUser: rightUser,
-                        wins: record.wins,
-                        losses: record.losses
-                    )
+
+                    // Right section
+                    VStack(spacing: VivaDesign.Spacing.small) {
+                        Text("All-Time Wins")
+                            .font(VivaDesign.Typography.caption)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                            .foregroundColor(VivaDesign.Colors.primaryText)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        RecordDisplay(
+                            leftUser: leftUser,
+                            rightUser: rightUser,
+                            wins: record.wins,
+                            losses: record.losses
+                        )
+                    }
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
             }
         }
     }
@@ -608,6 +611,8 @@ struct TimeRemainingDisplay: View {
             completedView
         } else if endTime == nil {
             notStartedView
+        } else if endTime! <= Date() {
+            waitingView
         } else {
             countdownView
         }
@@ -631,6 +636,15 @@ struct TimeRemainingDisplay: View {
                 .truncationMode(.tail)
         }
         .foregroundColor(VivaDesign.Colors.primaryText)
+    }
+
+    private var waitingView: some View {
+        Text("Waiting for final data")
+            .font(.title3)
+            .minimumScaleFactor(0.2)
+            .lineLimit(1)
+            .foregroundColor(VivaDesign.Colors.vivaGreen)
+            .padding(.horizontal, VivaDesign.Spacing.small)
     }
 
     private var countdownView: some View {
