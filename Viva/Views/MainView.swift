@@ -13,7 +13,13 @@ struct MainView: View {
     private let inactiveTabColor: UIColor = .white
 
     init() {
-        UITabBar.appearance().unselectedItemTintColor = .white
+        let tabBarAppearance = UITabBarAppearance()
+        tabBarAppearance.configureWithOpaqueBackground() // Makes it fully opaque
+        tabBarAppearance.backgroundColor = UIColor.init(VivaDesign.Colors.background)
+        
+        UITabBar.appearance().standardAppearance = tabBarAppearance
+        UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance // Applies when scrolled to the bottom
+        UITabBar.appearance().unselectedItemTintColor = UIColor.init(VivaDesign.Colors.primaryText)
     }
     
     var body: some View {
@@ -24,7 +30,6 @@ struct MainView: View {
                     userSession: userSession, matchupService: matchupService)
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
             .tabItem {
                 Image(systemName: "house.fill")
                 Text("Home")
@@ -33,7 +38,6 @@ struct MainView: View {
             // Rewards Tab
             RewardsView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
                 .tabItem {
                     Image(systemName: "dollarsign.circle.fill")
                     Text("Rewards")
@@ -42,7 +46,6 @@ struct MainView: View {
             // Profile Tab - Updated to use our new ProfileView
             ProfileView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
                 .tabItem {
                     Image(systemName: "person.fill")
                     Text("Profile")
@@ -51,7 +54,6 @@ struct MainView: View {
             // Trophies Tab
             TrophiesView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
                 .tabItem {
                     Image(systemName: "trophy.fill")
                     Text("Trophies")
@@ -66,7 +68,6 @@ struct MainView: View {
                 )
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .toolbarBackground(VivaDesign.Colors.background, for: .tabBar)
             .tabItem {
                 Image(systemName: "person.2.fill")
                 Text("Friends")

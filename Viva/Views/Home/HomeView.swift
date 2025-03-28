@@ -204,7 +204,7 @@ struct HomeContentList: View {
             }
             
             // Completed Matchups
-            if !viewModel.pendingMatchups.isEmpty {
+            if !viewModel.completedMatchups.isEmpty {
                 CompletedMatchupsSection(
                     viewModel: viewModel,
                     matchupService: matchupService,
