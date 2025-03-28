@@ -1,6 +1,7 @@
 import Foundation
 import OrderedCollections
 import Combine
+import SwiftUI
 
 // Add the ComparisonRowModel struct
 struct ComparisonRowModel: Identifiable {

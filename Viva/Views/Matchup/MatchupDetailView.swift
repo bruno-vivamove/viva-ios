@@ -16,6 +16,9 @@ struct DailyActivity: Identifiable {
 }
 
 struct MatchupDetailView: View {
+    // Add skeleton opacity constant
+    private let skeletonOpacity: Double = 1.0
+    
     @StateObject private var viewModel: MatchupDetailViewModel
     @State private var isShowingTotal = true
     @State private var showUnInviteSheet = false
@@ -34,7 +37,9 @@ struct MatchupDetailView: View {
             Color.black.edgesIgnoringSafeArea(.all)
 
             // Main content
-            if let matchup = viewModel.matchup {
+            if viewModel.isLoading && viewModel.matchup == nil {
+                skeletonView
+            } else if let matchup = viewModel.matchup {
                 VStack(spacing: 0) {
                     // Scrollable content
                     List {
@@ -160,8 +165,26 @@ struct MatchupDetailView: View {
                     .background(.black)
                 }
             } else {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                // Error state
+                VStack {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.system(size: 50))
+                        .foregroundColor(VivaDesign.Colors.secondaryText)
+                        .padding(.bottom, VivaDesign.Spacing.medium)
+                    
+                    Text("Failed to load matchup")
+                        .font(VivaDesign.Typography.title3)
+                        .foregroundColor(VivaDesign.Colors.primaryText)
+                    
+                    Button("Try Again") {
+                        Task {
+                            await viewModel.loadData()
+                        }
+                    }
+                    .padding(.top, VivaDesign.Spacing.medium)
+                    .foregroundColor(VivaDesign.Colors.vivaGreen)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
 
             // Overlay
@@ -199,6 +222,228 @@ struct MatchupDetailView: View {
                     .lineLimit(1)
                     .truncationMode(.tail)
             }
+        }
+    }
+    
+    // MARK: - Skeleton Loading View
+    
+    private var skeletonView: some View {
+        VStack(spacing: 0) {
+            // Scrollable skeleton content
+            List {
+                VStack(spacing: VivaDesign.Spacing.medium) {
+                    // Header skeleton
+                    skeletonHeader
+                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                        .padding(.top, VivaDesign.Spacing.medium)
+                    
+                    // Toggle skeleton
+                    skeletonToggle
+                    
+                    // Comparison rows skeleton
+                    VStack(spacing: VivaDesign.Spacing.medium) {
+                        ForEach(0..<5, id: \.self) { _ in
+                            skeletonComparisonRow
+                        }
+                    }
+                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                }
+                .listRowBackground(Color.black)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets())
+            }
+            .listStyle(PlainListStyle())
+            .scrollContentBackground(.hidden)
+            
+            // Footer skeleton
+            skeletonFooter
+                .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                .padding(.vertical, VivaDesign.Spacing.medium)
+                .background(Color.black)
+        }
+        .shimmering(animation: VivaDesign.AnimationStyle.loadingShimmer)
+    }
+    
+    private var skeletonHeader: some View {
+        let placeholderColor = Color.gray.opacity(skeletonOpacity)
+        
+        return HStack(spacing: 0) {
+            // Left user
+            HStack(alignment: .center, spacing: 0) {
+                // Profile image placeholder
+                Circle()
+                    .fill(placeholderColor)
+                    .frame(width: VivaDesign.Sizing.ProfileImage.large.rawValue,
+                           height: VivaDesign.Sizing.ProfileImage.large.rawValue)
+                
+                // Username and points placeholders
+                VStack(alignment: .center) {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(placeholderColor)
+                        .frame(width: 60, height: 10)
+                    
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(placeholderColor)
+                        .frame(width: 40, height: 18)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .frame(maxWidth: .infinity)
+            
+            // Right user
+            HStack(alignment: .center, spacing: 0) {
+                // Username and points placeholders
+                VStack(alignment: .center) {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(placeholderColor)
+                        .frame(width: 60, height: 10)
+                    
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(placeholderColor)
+                        .frame(width: 40, height: 18)
+                }
+                .frame(maxWidth: .infinity)
+                
+                // Profile image placeholder
+                Circle()
+                    .fill(placeholderColor)
+                    .frame(width: VivaDesign.Sizing.ProfileImage.large.rawValue,
+                           height: VivaDesign.Sizing.ProfileImage.large.rawValue)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .frame(height: 60)
+    }
+    
+    private var skeletonToggle: some View {
+        let placeholderColor = Color.gray.opacity(skeletonOpacity)
+        
+        return HStack(spacing: VivaDesign.Spacing.medium) {
+            // Left line
+            Rectangle()
+                .fill(placeholderColor)
+                .frame(height: 1)
+                .padding(.leading, VivaDesign.Spacing.small)
+            
+            // Toggle placeholder
+            RoundedRectangle(cornerRadius: 2)
+                .fill(placeholderColor)
+                .frame(width: 120, height: 20)
+            
+            // Right line
+            Rectangle()
+                .fill(placeholderColor)
+                .frame(height: 1)
+                .padding(.trailing, VivaDesign.Spacing.small)
+        }
+    }
+    
+    private var skeletonComparisonRow: some View {
+        let placeholderColor = Color.gray.opacity(skeletonOpacity)
+        
+        return VStack {
+            HStack {
+                Spacer()
+                    .frame(width: VivaDesign.Spacing.medium)
+                
+                // Left side placeholders
+                VStack(alignment: .center) {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(placeholderColor)
+                        .frame(width: 40, height: 24)
+                    
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(placeholderColor)
+                        .frame(width: 60, height: 12)
+                }
+                .frame(width: 80, alignment: .center)
+                
+                Spacer()
+                
+                // Center title placeholder
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(placeholderColor)
+                    .frame(width: 100, height: 14)
+                    .frame(width: 140, alignment: .center)
+                
+                Spacer()
+                
+                // Right side placeholders
+                VStack(alignment: .center) {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(placeholderColor)
+                        .frame(width: 40, height: 24)
+                    
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(placeholderColor)
+                        .frame(width: 60, height: 12)
+                }
+                .frame(width: 80, alignment: .center)
+                
+                Spacer()
+                    .frame(width: VivaDesign.Spacing.medium)
+            }
+            
+            // Divider placeholder
+            Rectangle()
+                .fill(placeholderColor)
+                .frame(height: 1)
+                .padding(.top, VivaDesign.Spacing.small)
+        }
+    }
+    
+    private var skeletonFooter: some View {
+        let placeholderColor = Color.gray.opacity(skeletonOpacity)
+        
+        return HStack {
+            // Left section
+            VStack(spacing: VivaDesign.Spacing.small) {
+                // "Matchup Ends" label placeholder
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(placeholderColor)
+                    .frame(width: 80, height: 10)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                
+                // Time remaining placeholder
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(placeholderColor)
+                    .frame(width: 120, height: 24)
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
+            .frame(maxWidth: .infinity)
+            
+            Spacer()
+            
+            // Right section
+            VStack(spacing: VivaDesign.Spacing.small) {
+                // "All-Time Wins" label placeholder
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(placeholderColor)
+                    .frame(width: 80, height: 10)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                
+                // Record display placeholder
+                HStack(spacing: VivaDesign.Spacing.medium) {
+                    Circle()
+                        .fill(placeholderColor)
+                        .frame(width: VivaDesign.Sizing.ProfileImage.mini.rawValue,
+                               height: VivaDesign.Sizing.ProfileImage.mini.rawValue)
+                    
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(placeholderColor)
+                        .frame(width: 20, height: 30)
+                    
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(placeholderColor)
+                        .frame(width: 20, height: 30)
+                    
+                    Circle()
+                        .fill(placeholderColor)
+                        .frame(width: VivaDesign.Sizing.ProfileImage.mini.rawValue,
+                               height: VivaDesign.Sizing.ProfileImage.mini.rawValue)
+                }
+            }
+            .frame(maxWidth: .infinity)
         }
     }
 }
