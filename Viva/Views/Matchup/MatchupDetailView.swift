@@ -34,10 +34,7 @@ struct MatchupDetailView: View {
             Color.black.edgesIgnoringSafeArea(.all)
 
             // Main content
-            if viewModel.isLoading {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let matchup = viewModel.matchup {
+            if let matchup = viewModel.matchup {
                 VStack(spacing: 0) {
                     // Scrollable content
                     List {
@@ -162,6 +159,9 @@ struct MatchupDetailView: View {
                     .padding(.vertical, VivaDesign.Spacing.medium)
                     .background(.black)
                 }
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
 
             // Overlay
