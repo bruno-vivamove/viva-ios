@@ -25,21 +25,25 @@ final class AuthenticationManager: ObservableObject {
             let authResponse = try await authService.signIn(email, password)
             AppLogger.debug("Authentication successful, obtaining session", category: .auth)
             
-            let sessionResponse = try await sessionService.createSession(
-                authResponse.idToken)
+            try await createSession(idToken: authResponse.idToken)
             
             AppLogger.info("User signed in successfully", category: .auth)
-            
-            await MainActor.run {
-                userSession.setLoggedIn(
-                    userProfile: sessionResponse.userProfile,
-                    accessToken: sessionResponse.accessToken,
-                    refreshToken: sessionResponse.refreshToken
-                )
-            }
         } catch {
             AppLogger.error("Sign in failed: \(error.localizedDescription)", category: .auth)
             throw error
+        }
+    }
+
+    func createSession(idToken: String) async throws {
+        AppLogger.debug("Creating session with idToken", category: .auth)
+        let sessionResponse = try await sessionService.createSession(idToken)
+        
+        await MainActor.run {
+            userSession.setLoggedIn(
+                userProfile: sessionResponse.userProfile,
+                accessToken: sessionResponse.accessToken,
+                refreshToken: sessionResponse.refreshToken
+            )
         }
     }
 
@@ -50,18 +54,9 @@ final class AuthenticationManager: ObservableObject {
             let authResponse = try await authService.signUp(email, password)
             AppLogger.debug("Registration successful, obtaining session", category: .auth)
             
-            let sessionResponse = try await sessionService.createSession(
-                authResponse.idToken)
+            try await createSession(idToken: authResponse.idToken)
             
             AppLogger.info("User registered and signed in successfully", category: .auth)
-            
-            await MainActor.run {
-                userSession.setLoggedIn(
-                    userProfile: sessionResponse.userProfile,
-                    accessToken: sessionResponse.accessToken,
-                    refreshToken: sessionResponse.refreshToken
-                )
-            }
         } catch {
             AppLogger.error("Registration failed: \(error.localizedDescription)", category: .auth)
             throw error

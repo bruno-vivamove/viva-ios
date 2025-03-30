@@ -13,5 +13,16 @@
 		<string>fetch</string>
 		<string>processing</string>
 	</array>
+	<key>GIDClientID</key>
+	<string>186325173541-c2qrng58cosmsbg1rtpfb0o2i1nd4365.apps.googleusercontent.com</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.186325173541-c2qrng58cosmsbg1rtpfb0o2i1nd4365</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

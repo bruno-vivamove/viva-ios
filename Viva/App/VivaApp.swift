@@ -1,4 +1,5 @@
 import SwiftUI
+import GoogleSignIn
 
 @main
 struct VivaApp: App {
@@ -22,6 +23,9 @@ struct VivaApp: App {
                 .environmentObject(vivaAppObjects.userService)
                 .environmentObject(vivaAppObjects.healthKitDataManager)
                 .environmentObject(vivaAppObjects.userMeasurementService)
+                .onOpenURL { url in
+                    GIDSignIn.sharedInstance.handle(url)
+                }
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             AppLogger.info("App state changed: \(oldPhase) -> \(newPhase)", category: .general)
