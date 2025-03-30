@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import GoogleSignIn
 
 class SignUpViewModel: ObservableObject {
     @ObservedObject var userSession: UserSession
@@ -169,7 +170,7 @@ struct SignUpFormView: View {
                                 style: .secondary,
                                 image: Image("google_logo"),
                                 action: {
-                                    // Add Google sign up action
+                                    viewModel.authManager.signInWithGoogle()
                                 }
                             )
                             
@@ -178,7 +179,7 @@ struct SignUpFormView: View {
                                 style: .white,
                                 image: Image(systemName: "applelogo"),
                                 action: {
-                                    // Add Apple sign up action
+                                    viewModel.authManager.signInWithApple()
                                 }
                             )
                         }

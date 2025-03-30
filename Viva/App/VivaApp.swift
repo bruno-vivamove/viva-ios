@@ -1,5 +1,6 @@
 import SwiftUI
 import GoogleSignIn
+import AuthenticationServices
 
 @main
 struct VivaApp: App {
@@ -24,7 +25,13 @@ struct VivaApp: App {
                 .environmentObject(vivaAppObjects.healthKitDataManager)
                 .environmentObject(vivaAppObjects.userMeasurementService)
                 .onOpenURL { url in
-                    GIDSignIn.sharedInstance.handle(url)
+                    if url.absoluteString.contains("google") {
+                        GIDSignIn.sharedInstance.handle(url)
+                    }
+                }
+                .onAppear {
+                    // Check for existing Apple sign-in session on app launch
+                    checkAppleSignInState()
                 }
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
@@ -49,6 +56,36 @@ struct VivaApp: App {
                 
             @unknown default:
                 AppLogger.warning("Unknown scene phase: \(newPhase)", category: .general)
+            }
+        }
+    }
+    
+    // Check for existing Apple sign-in state
+    private func checkAppleSignInState() {
+        // This checks if the user has previously signed in with Apple
+        let appleIDProvider = ASAuthorizationAppleIDProvider()
+        let appleIdKeychain = UserDefaults.standard.string(forKey: "appleAuthorizedUserIdKey")
+        
+        if let userId = appleIdKeychain {
+            appleIDProvider.getCredentialState(forUserID: userId) { (credentialState, error) in
+                switch credentialState {
+                case .authorized:
+                    // The Apple ID credential is valid
+                    AppLogger.info("Apple ID credential is still valid", category: .auth)
+                    
+                case .revoked:
+                    // The Apple ID credential was revoked, sign out
+                    AppLogger.warning("Apple ID credential was revoked", category: .auth)
+                    UserDefaults.standard.removeObject(forKey: "appleAuthorizedUserIdKey")
+                    
+                case .notFound:
+                    // No Apple ID credential was found, sign out if needed
+                    AppLogger.warning("No Apple ID credential was found", category: .auth)
+                    UserDefaults.standard.removeObject(forKey: "appleAuthorizedUserIdKey")
+                    
+                default:
+                    break
+                }
             }
         }
     }

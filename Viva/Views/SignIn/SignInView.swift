@@ -100,48 +100,7 @@ struct AuthButtonStack: View {
                 style: .secondary,
                 image: Image("google_logo"),
                 action: {
-                    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                          let rootViewController = windowScene.windows.first?.rootViewController else {
-                        AppLogger.error("Unable to find root view controller", category: .auth)
-                        return
-                    }
-
-                    // Start the sign-in flow.
-                    GIDSignIn.sharedInstance.signIn(
-                        withPresenting: rootViewController
-                    ) { signInResult, error in
-                        if let error = error {
-                            AppLogger.error("Error signing in with Google: \(error.localizedDescription)", category: .auth)
-                            return
-                        }
-
-                        guard let signInResult = signInResult else {
-                            AppLogger.error("Missing authentication object", category: .auth)
-                            return
-                        }
-
-                        signInResult.user.refreshTokensIfNeeded { user, error in
-                            if let error = error {
-                                AppLogger.error("Error refreshing tokens: \(error.localizedDescription)", category: .auth)
-                                return
-                            }
-
-                            guard let user = user, let idToken = user.idToken else {
-                                AppLogger.error("Missing user or ID token after refreshing tokens", category: .auth)
-                                return
-                            }
-
-                            // Use createSession method to handle session creation
-                            Task {
-                                do {
-                                    try await authenticationManager.createSession(idToken: idToken.tokenString)
-                                    AppLogger.info("User signed in with Google successfully", category: .auth)
-                                } catch {
-                                    AppLogger.error("Failed to create session: \(error.localizedDescription)", category: .auth)
-                                }
-                            }
-                        }
-                    }
+                    authenticationManager.signInWithGoogle()
                 }
             )
 
@@ -151,7 +110,7 @@ struct AuthButtonStack: View {
                 style: .white,
                 image: Image(systemName: "applelogo"),
                 action: {
-                    // Add Apple sign in action
+                    authenticationManager.signInWithApple()
                 }
             )
         }
