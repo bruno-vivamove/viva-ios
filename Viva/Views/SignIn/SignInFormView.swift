@@ -78,6 +78,8 @@ struct SignInFormView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: SignInViewModel
     @FocusState private var focusedField: FormField?
+    @State private var showForgotPassword = false
+    @State private var passwordResetMessage: String?
 
     init(authManager: AuthenticationManager, userSession: UserSession) {
         _viewModel = StateObject(
@@ -128,7 +130,7 @@ struct SignInFormView: View {
                         HStack {
                             Spacer()
                             Button("Forgot Password?") {
-                                // Add forgot password action
+                                showForgotPassword = true
                             }
                             .foregroundColor(VivaDesign.Colors.vivaGreen)
                             .font(VivaDesign.Typography.caption)
@@ -138,7 +140,16 @@ struct SignInFormView: View {
 
                     Spacer()
 
-                    ErrorMessageView(message: viewModel.errorMessage)
+                    // Error message or password reset success message
+                    if let resetMessage = passwordResetMessage {
+                        Text(resetMessage)
+                            .foregroundColor(VivaDesign.Colors.vivaGreen)
+                            .font(VivaDesign.Typography.body)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, VivaDesign.Spacing.large)
+                    } else {
+                        ErrorMessageView(message: viewModel.errorMessage)
+                    }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -146,6 +157,12 @@ struct SignInFormView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     DismissButton(action: { dismiss() })
                 }
+            }
+            .sheet(isPresented: $showForgotPassword) {
+                ForgotPasswordView(authManager: viewModel.authManager, onSuccess: { message in
+                    passwordResetMessage = message
+                })
+                    .presentationBackground(.clear)
             }
         }
     }

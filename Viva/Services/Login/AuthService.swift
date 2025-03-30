@@ -38,4 +38,22 @@ final class AuthService {
             )
         )
     }
+    
+    private struct ResetPasswordRequest: Encodable {
+        let email: String
+        let requestType = "PASSWORD_RESET"
+    }
+    
+    struct ResetPasswordResponse: Decodable {
+        let kind: String
+        let email: String
+    }
+    
+    func resetPassword(email: String) async throws -> ResetPasswordResponse {
+        return try await networkClient.post(
+            path: ":sendOobCode",
+            queryParams: ["key" : apiKey],
+            body: ResetPasswordRequest(email: email)
+        )
+    }
 }

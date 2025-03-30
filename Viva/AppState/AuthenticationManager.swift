@@ -159,6 +159,19 @@ final class AuthenticationManager: ObservableObject {
             }
         }
     }
+    
+    func resetPassword(email: String) async throws -> AuthService.ResetPasswordResponse {
+        AppLogger.info("Requesting password reset for email: \(email.logPrivate())", category: .auth)
+        
+        do {
+            let resetResponse = try await authService.resetPassword(email: email)
+            AppLogger.info("Password reset email sent successfully to: \(resetResponse.email)", category: .auth)
+            return resetResponse
+        } catch {
+            AppLogger.error("Password reset failed: \(error.localizedDescription)", category: .auth)
+            throw error
+        }
+    }
 }
 
 // Delegate to handle Apple Sign In responses
