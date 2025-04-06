@@ -21,6 +21,7 @@ struct MatchupTeam: Codable, Identifiable, Equatable, Hashable {
     let teamHash: String?
     let side: Side
     let points: Int
+    let winCount: Int
     let users: [User]
     
     enum Side: String, Codable {
@@ -100,28 +101,12 @@ struct MatchupDetails: Codable, Equatable {
     var userMeasurements: [MatchupUserMeasurement]
     var invites: [MatchupInvite]
     
-    var leftTeam: MatchupTeam? {
-        teams.first { $0.side == .left }
+    var leftTeam: MatchupTeam {
+        teams.first { $0.side == .left }!
     }
     
-    var rightTeam: MatchupTeam? {
-        teams.first { $0.side == .right }
-    }
-    
-    var leftUsers: [User] {
-        leftTeam?.users ?? []
-    }
-    
-    var rightUsers: [User] {
-        rightTeam?.users ?? []
-    }
-    
-    var leftSidePoints: Int {
-        leftTeam?.points ?? 0
-    }
-    
-    var rightSidePoints: Int {
-        rightTeam?.points ?? 0
+    var rightTeam: MatchupTeam {
+        teams.first { $0.side == .right }!
     }
 
     var currentDayNumber: Int? {
@@ -225,4 +210,28 @@ struct MatchupMeasurementPair: Codable, Equatable {
     var leftPoints: Int
     var rightValue: Int
     var rightPoints: Int
+}
+
+struct MatchupStats: Codable, Equatable {
+    let matchupHash: String?
+    let displayName: String
+    let numberOfMatchups: Int
+    let userTeamWins: Int
+    let opponentTeamWins: Int
+    let userTeamUsers: [User]
+    let opponentTeamUsers: [User]
+}
+
+struct UserStats: Codable, Equatable {
+    let userId: String
+    let displayName: String
+    let totalMatchups: Int
+    let wins: Int
+    let losses: Int
+    let ties: Int
+}
+
+struct MatchupStatsResponse: Codable {
+    let userStats: UserStats
+    let matchupStats: [MatchupStats]
 }

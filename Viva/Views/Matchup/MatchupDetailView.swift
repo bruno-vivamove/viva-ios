@@ -18,7 +18,7 @@ struct DailyActivity: Identifiable {
 struct MatchupDetailView: View {
     // Add skeleton opacity constant
     private let skeletonOpacity: Double = 1.0
-    
+
     @StateObject private var viewModel: MatchupDetailViewModel
     @State private var isShowingTotal = true
     @State private var showUnInviteSheet = false
@@ -53,7 +53,8 @@ struct MatchupDetailView: View {
                                         VivaDesign.Colors.primaryText
                                     )
                                     .frame(
-                                        maxWidth: .infinity, alignment: .center
+                                        maxWidth: .infinity,
+                                        alignment: .center
                                     )
                                     .padding(.top, VivaDesign.Spacing.small)
                             }
@@ -65,7 +66,9 @@ struct MatchupDetailView: View {
                                 showUnInviteSheet: $showUnInviteSheet
                             )
                             .padding(
-                                .horizontal, VivaDesign.Spacing.outerPadding)
+                                .horizontal,
+                                VivaDesign.Spacing.outerPadding
+                            )
 
                             // Show reward indicator if completed
                             if matchup.status == .completed {
@@ -74,11 +77,11 @@ struct MatchupDetailView: View {
 
                                 // Determine if current user is on winning side
                                 let currentUserId = viewModel.userSession.userId
-                                let isUserOnLeftSide = matchup.leftUsers
+                                let isUserOnLeftSide = matchup.leftTeam.users
                                     .contains(where: { $0.id == currentUserId })
                                 let leftWon =
-                                    matchup.leftSidePoints
-                                    > matchup.rightSidePoints
+                                    matchup.leftTeam.points
+                                    > matchup.rightTeam.points
                                 let userWon =
                                     (isUserOnLeftSide && leftWon)
                                     || (!isUserOnLeftSide && !leftWon)
@@ -87,19 +90,20 @@ struct MatchupDetailView: View {
                                     userWon: userWon,
                                     opponentName: userWon
                                         ? (isUserOnLeftSide
-                                            ? matchup.rightUsers.first?
+                                            ? matchup.rightTeam.users.first?
                                                 .displayName ?? "Opponent"
-                                            : matchup.leftUsers.first?
+                                            : matchup.leftTeam.users.first?
                                                 .displayName ?? "Opponent")
                                         : (isUserOnLeftSide
-                                            ? matchup.leftUsers.first?
+                                            ? matchup.leftTeam.users.first?
                                                 .displayName ?? "You"
-                                            : matchup.rightUsers.first?
+                                            : matchup.rightTeam.users.first?
                                                 .displayName ?? "You"),
                                     rewardCoins: 125
                                 )
                                 .padding(
-                                    .horizontal, VivaDesign.Spacing.outerPadding
+                                    .horizontal,
+                                    VivaDesign.Spacing.outerPadding
                                 )
 
                                 Spacer()
@@ -110,7 +114,8 @@ struct MatchupDetailView: View {
                             if matchup.status != .completed {
                                 ViewToggle(
                                     isShowingTotal: $isShowingTotal,
-                                    isCompleted: false)
+                                    isCompleted: false
+                                )
                             }
 
                             // Comparison rows
@@ -131,7 +136,9 @@ struct MatchupDetailView: View {
                                 }
                             }
                             .padding(
-                                .horizontal, VivaDesign.Spacing.outerPadding)
+                                .horizontal,
+                                VivaDesign.Spacing.outerPadding
+                            )
                         }
                         .padding(.top, VivaDesign.Spacing.medium)
                         .listRowBackground(Color.black)
@@ -155,9 +162,12 @@ struct MatchupDetailView: View {
                     // Fixed footer
                     MatchupFooter(
                         endTime: matchup.endTime,
-                        leftUser: matchup.leftUsers.first,
-                        rightUser: matchup.rightUsers.first,
-                        record: (wins: 0, losses: 0),
+                        leftUser: matchup.leftTeam.users.first,
+                        rightUser: matchup.rightTeam.users.first,
+                        record: (
+                            leftWins: matchup.leftTeam.winCount,
+                            rightWins: matchup.rightTeam.winCount
+                        ),
                         isCompleted: matchup.status == .completed
                     )
                     .padding(.horizontal, VivaDesign.Spacing.outerPadding)
@@ -171,11 +181,11 @@ struct MatchupDetailView: View {
                         .font(.system(size: 50))
                         .foregroundColor(VivaDesign.Colors.secondaryText)
                         .padding(.bottom, VivaDesign.Spacing.medium)
-                    
+
                     Text("Failed to load matchup")
                         .font(VivaDesign.Typography.title3)
                         .foregroundColor(VivaDesign.Colors.primaryText)
-                    
+
                     Button("Try Again") {
                         Task {
                             await viewModel.loadData()
@@ -224,9 +234,9 @@ struct MatchupDetailView: View {
             }
         }
     }
-    
+
     // MARK: - Skeleton Loading View
-    
+
     private var skeletonView: some View {
         VStack(spacing: 0) {
             // Scrollable skeleton content
@@ -236,10 +246,10 @@ struct MatchupDetailView: View {
                     skeletonHeader
                         .padding(.horizontal, VivaDesign.Spacing.outerPadding)
                         .padding(.top, VivaDesign.Spacing.medium)
-                    
+
                     // Toggle skeleton
                     skeletonToggle
-                    
+
                     // Comparison rows skeleton
                     VStack(spacing: VivaDesign.Spacing.medium) {
                         ForEach(0..<5, id: \.self) { _ in
@@ -254,7 +264,7 @@ struct MatchupDetailView: View {
             }
             .listStyle(PlainListStyle())
             .scrollContentBackground(.hidden)
-            
+
             // Footer skeleton
             skeletonFooter
                 .padding(.horizontal, VivaDesign.Spacing.outerPadding)
@@ -263,25 +273,27 @@ struct MatchupDetailView: View {
         }
         .shimmering(animation: VivaDesign.AnimationStyle.loadingShimmer)
     }
-    
+
     private var skeletonHeader: some View {
         let placeholderColor = Color.gray.opacity(skeletonOpacity)
-        
+
         return HStack(spacing: 0) {
             // Left user
             HStack(alignment: .center, spacing: 0) {
                 // Profile image placeholder
                 Circle()
                     .fill(placeholderColor)
-                    .frame(width: VivaDesign.Sizing.ProfileImage.large.rawValue,
-                           height: VivaDesign.Sizing.ProfileImage.large.rawValue)
-                
+                    .frame(
+                        width: VivaDesign.Sizing.ProfileImage.large.rawValue,
+                        height: VivaDesign.Sizing.ProfileImage.large.rawValue
+                    )
+
                 // Username and points placeholders
                 VStack(alignment: .center) {
                     RoundedRectangle(cornerRadius: 2)
                         .fill(placeholderColor)
                         .frame(width: 60, height: 10)
-                    
+
                     RoundedRectangle(cornerRadius: 2)
                         .fill(placeholderColor)
                         .frame(width: 40, height: 18)
@@ -289,7 +301,7 @@ struct MatchupDetailView: View {
                 .frame(maxWidth: .infinity)
             }
             .frame(maxWidth: .infinity)
-            
+
             // Right user
             HStack(alignment: .center, spacing: 0) {
                 // Username and points placeholders
@@ -297,39 +309,41 @@ struct MatchupDetailView: View {
                     RoundedRectangle(cornerRadius: 2)
                         .fill(placeholderColor)
                         .frame(width: 60, height: 10)
-                    
+
                     RoundedRectangle(cornerRadius: 2)
                         .fill(placeholderColor)
                         .frame(width: 40, height: 18)
                 }
                 .frame(maxWidth: .infinity)
-                
+
                 // Profile image placeholder
                 Circle()
                     .fill(placeholderColor)
-                    .frame(width: VivaDesign.Sizing.ProfileImage.large.rawValue,
-                           height: VivaDesign.Sizing.ProfileImage.large.rawValue)
+                    .frame(
+                        width: VivaDesign.Sizing.ProfileImage.large.rawValue,
+                        height: VivaDesign.Sizing.ProfileImage.large.rawValue
+                    )
             }
             .frame(maxWidth: .infinity)
         }
         .frame(height: 60)
     }
-    
+
     private var skeletonToggle: some View {
         let placeholderColor = Color.gray.opacity(skeletonOpacity)
-        
+
         return HStack(spacing: VivaDesign.Spacing.medium) {
             // Left line
             Rectangle()
                 .fill(placeholderColor)
                 .frame(height: 1)
                 .padding(.leading, VivaDesign.Spacing.small)
-            
+
             // Toggle placeholder
             RoundedRectangle(cornerRadius: 2)
                 .fill(placeholderColor)
                 .frame(width: 120, height: 20)
-            
+
             // Right line
             Rectangle()
                 .fill(placeholderColor)
@@ -337,53 +351,53 @@ struct MatchupDetailView: View {
                 .padding(.trailing, VivaDesign.Spacing.small)
         }
     }
-    
+
     private var skeletonComparisonRow: some View {
         let placeholderColor = Color.gray.opacity(skeletonOpacity)
-        
+
         return VStack {
             HStack {
                 Spacer()
                     .frame(width: VivaDesign.Spacing.medium)
-                
+
                 // Left side placeholders
                 VStack(alignment: .center) {
                     RoundedRectangle(cornerRadius: 2)
                         .fill(placeholderColor)
                         .frame(width: 40, height: 24)
-                    
+
                     RoundedRectangle(cornerRadius: 2)
                         .fill(placeholderColor)
                         .frame(width: 60, height: 12)
                 }
                 .frame(width: 80, alignment: .center)
-                
+
                 Spacer()
-                
+
                 // Center title placeholder
                 RoundedRectangle(cornerRadius: 2)
                     .fill(placeholderColor)
                     .frame(width: 100, height: 14)
                     .frame(width: 140, alignment: .center)
-                
+
                 Spacer()
-                
+
                 // Right side placeholders
                 VStack(alignment: .center) {
                     RoundedRectangle(cornerRadius: 2)
                         .fill(placeholderColor)
                         .frame(width: 40, height: 24)
-                    
+
                     RoundedRectangle(cornerRadius: 2)
                         .fill(placeholderColor)
                         .frame(width: 60, height: 12)
                 }
                 .frame(width: 80, alignment: .center)
-                
+
                 Spacer()
                     .frame(width: VivaDesign.Spacing.medium)
             }
-            
+
             // Divider placeholder
             Rectangle()
                 .fill(placeholderColor)
@@ -391,10 +405,10 @@ struct MatchupDetailView: View {
                 .padding(.top, VivaDesign.Spacing.small)
         }
     }
-    
+
     private var skeletonFooter: some View {
         let placeholderColor = Color.gray.opacity(skeletonOpacity)
-        
+
         return HStack {
             // Left section
             VStack(spacing: VivaDesign.Spacing.small) {
@@ -403,7 +417,7 @@ struct MatchupDetailView: View {
                     .fill(placeholderColor)
                     .frame(width: 80, height: 10)
                     .frame(maxWidth: .infinity, alignment: .center)
-                
+
                 // Time remaining placeholder
                 RoundedRectangle(cornerRadius: 2)
                     .fill(placeholderColor)
@@ -411,9 +425,9 @@ struct MatchupDetailView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
             }
             .frame(maxWidth: .infinity)
-            
+
             Spacer()
-            
+
             // Right section
             VStack(spacing: VivaDesign.Spacing.small) {
                 // "All-Time Wins" label placeholder
@@ -421,26 +435,30 @@ struct MatchupDetailView: View {
                     .fill(placeholderColor)
                     .frame(width: 80, height: 10)
                     .frame(maxWidth: .infinity, alignment: .center)
-                
+
                 // Record display placeholder
                 HStack(spacing: VivaDesign.Spacing.medium) {
                     Circle()
                         .fill(placeholderColor)
-                        .frame(width: VivaDesign.Sizing.ProfileImage.mini.rawValue,
-                               height: VivaDesign.Sizing.ProfileImage.mini.rawValue)
-                    
+                        .frame(
+                            width: VivaDesign.Sizing.ProfileImage.mini.rawValue,
+                            height: VivaDesign.Sizing.ProfileImage.mini.rawValue
+                        )
+
                     RoundedRectangle(cornerRadius: 2)
                         .fill(placeholderColor)
                         .frame(width: 20, height: 30)
-                    
+
                     RoundedRectangle(cornerRadius: 2)
                         .fill(placeholderColor)
                         .frame(width: 20, height: 30)
-                    
+
                     Circle()
                         .fill(placeholderColor)
-                        .frame(width: VivaDesign.Sizing.ProfileImage.mini.rawValue,
-                               height: VivaDesign.Sizing.ProfileImage.mini.rawValue)
+                        .frame(
+                            width: VivaDesign.Sizing.ProfileImage.mini.rawValue,
+                            height: VivaDesign.Sizing.ProfileImage.mini.rawValue
+                        )
                 }
             }
             .frame(maxWidth: .infinity)
@@ -487,14 +505,14 @@ struct MatchupHeader: View {
     }
 
     private var leftUserView: some View {
-        let leftTeamId = viewModel.matchup?.leftTeam?.id
-        let leftUser = viewModel.matchup?.leftUsers.first
+        let leftTeamId = viewModel.matchup?.leftTeam.id
+        let leftUser = viewModel.matchup?.leftTeam.users.first
         let leftInvite = viewModel.matchup?.invites.first(where: {
             $0.matchupTeamId == leftTeamId
         })
         let isCompleted = viewModel.matchup?.status == .completed
-        let leftPoints = viewModel.matchup?.leftSidePoints ?? 0
-        let rightPoints = viewModel.matchup?.rightSidePoints ?? 0
+        let leftPoints = viewModel.matchup?.leftTeam.points ?? 0
+        let rightPoints = viewModel.matchup?.rightTeam.points ?? 0
         let isLeftWinner = isCompleted && leftPoints > rightPoints
 
         return UserScoreView(
@@ -518,14 +536,14 @@ struct MatchupHeader: View {
     }
 
     private var rightUserView: some View {
-        let rightTeamId = viewModel.matchup?.rightTeam?.id
-        let rightUser = viewModel.matchup?.rightUsers.first
+        let rightTeamId = viewModel.matchup?.rightTeam.id
+        let rightUser = viewModel.matchup?.rightTeam.users.first
         let rightInvite = viewModel.matchup?.invites.first(where: {
             $0.matchupTeamId == rightTeamId
         })
         let isCompleted = viewModel.matchup?.status == .completed
-        let leftPoints = viewModel.matchup?.leftSidePoints ?? 0
-        let rightPoints = viewModel.matchup?.rightSidePoints ?? 0
+        let leftPoints = viewModel.matchup?.leftTeam.points ?? 0
+        let rightPoints = viewModel.matchup?.rightTeam.points ?? 0
         let isRightWinner = isCompleted && rightPoints > leftPoints
 
         return UserScoreView(
@@ -665,7 +683,8 @@ struct ViewToggle: View {
                     .foregroundColor(
                         isShowingTotal
                             ? VivaDesign.Colors.secondaryText
-                            : VivaDesign.Colors.vivaGreen)
+                            : VivaDesign.Colors.vivaGreen
+                    )
 
                 Text("|")
                     .foregroundColor(VivaDesign.Colors.vivaGreen)
@@ -677,7 +696,8 @@ struct ViewToggle: View {
                     .foregroundColor(
                         isShowingTotal
                             ? VivaDesign.Colors.vivaGreen
-                            : VivaDesign.Colors.secondaryText)
+                            : VivaDesign.Colors.secondaryText
+                    )
             }
             .padding(.vertical, 4)
 
@@ -806,7 +826,7 @@ struct MatchupFooter: View {
     let endTime: Date?
     let leftUser: User?
     let rightUser: User?
-    let record: (wins: Int, losses: Int)
+    let record: (leftWins: Int, rightWins: Int)
     let isCompleted: Bool
 
     var body: some View {
@@ -828,8 +848,7 @@ struct MatchupFooter: View {
                     RecordDisplay(
                         leftUser: leftUser,
                         rightUser: rightUser,
-                        wins: record.wins,
-                        losses: record.losses
+                        record: record
                     )
                 }
 
@@ -868,7 +887,9 @@ struct MatchupFooter: View {
                         .frame(maxWidth: .infinity, alignment: .center)
                         .opacity(endTime != nil && endTime! > Date() ? 1 : 0)  // Hide when waiting for data
                     TimeRemainingDisplay(
-                        endTime: endTime, isCompleted: isCompleted)
+                        endTime: endTime,
+                        isCompleted: isCompleted
+                    )
                 }
                 .frame(maxWidth: .infinity)
 
@@ -885,8 +906,7 @@ struct MatchupFooter: View {
                     RecordDisplay(
                         leftUser: leftUser,
                         rightUser: rightUser,
-                        wins: record.wins,
-                        losses: record.losses
+                        record: record
                     )
                 }
                 .frame(maxWidth: .infinity)
@@ -984,22 +1004,26 @@ struct TimeRemainingDisplay: View {
 struct RecordDisplay: View {
     let leftUser: User?
     let rightUser: User?
-    let wins: Int
-    let losses: Int
+    let record: (leftWins: Int, rightWins: Int)
 
     var body: some View {
         HStack(spacing: VivaDesign.Spacing.medium) {
             VivaProfileImage(
-                userId: leftUser?.id, imageUrl: leftUser?.imageUrl, size: .mini)
-            Text("\(wins)")
+                userId: leftUser?.id,
+                imageUrl: leftUser?.imageUrl,
+                size: .mini
+            )
+            Text("\(record.leftWins)")
                 .font(.system(size: 30, weight: .bold))
                 .lineLimit(1)
-            Text("\(losses)")
+            Text("\(record.rightWins)")
                 .font(.system(size: 30, weight: .bold))
                 .lineLimit(1)
             VivaProfileImage(
-                userId: rightUser?.id, imageUrl: rightUser?.imageUrl,
-                size: .mini)
+                userId: rightUser?.id,
+                imageUrl: rightUser?.imageUrl,
+                size: .mini
+            )
         }
         .foregroundColor(VivaDesign.Colors.primaryText)
     }

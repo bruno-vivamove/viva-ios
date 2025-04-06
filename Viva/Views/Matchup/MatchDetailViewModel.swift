@@ -157,7 +157,7 @@ class MatchupDetailViewModel: ObservableObject {
 
     func updateMeasuerments(matchup: MatchupDetails) {
         // Create set of left user IDs
-        let leftUserIds = Set(matchup.leftUsers.map { $0.id })
+        let leftUserIds = Set(matchup.leftTeam.users.map { $0.id })
         
         // Create a map of measurement types
         let measurementTypes = matchup.measurements.map { $0.measurementType }

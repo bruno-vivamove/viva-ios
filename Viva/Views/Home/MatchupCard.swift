@@ -49,10 +49,9 @@ struct MatchupCard: View {
             HStack(spacing: 0) {
                 // Left side container - aligned to left edge
                 HStack(spacing: VivaDesign.Spacing.small) {
-                    let leftTeam = details.leftTeam
-                    let user = details.leftUsers.first
+                    let user = details.leftTeam.users.first
                     let invite = details.invites.first { invite in
-                        invite.matchupTeamId == leftTeam?.id
+                        invite.matchupTeamId == details.leftTeam.id
                     }
 
                     VivaProfileImage(
@@ -67,7 +66,7 @@ struct MatchupCard: View {
                             .foregroundColor(VivaDesign.Colors.vivaGreen)
                             .font(VivaDesign.Typography.caption)
                             .lineLimit(1)
-                        Text("\(details.leftSidePoints)")
+                        Text("\(details.leftTeam.points)")
                             .foregroundColor(VivaDesign.Colors.primaryText)
                             .font(VivaDesign.Typography.value)
                             .lineLimit(1)
@@ -88,10 +87,9 @@ struct MatchupCard: View {
                 HStack(spacing: VivaDesign.Spacing.small) {
                     Spacer(minLength: 0)  // Push content to right edge
 
-                    let rightTeam = details.rightTeam
-                    let user = details.rightUsers.first
+                    let user = details.rightTeam.users.first
                     let invite = details.invites.first { invite in
-                        invite.matchupTeamId == rightTeam?.id
+                        invite.matchupTeamId == details.rightTeam.id
                     }
 
                     VStack(alignment: .trailing) {
@@ -99,7 +97,7 @@ struct MatchupCard: View {
                             .foregroundColor(VivaDesign.Colors.vivaGreen)
                             .font(VivaDesign.Typography.caption)
                             .lineLimit(1)
-                        Text("\(details.rightSidePoints)")
+                        Text("\(details.rightTeam.points)")
                             .foregroundColor(VivaDesign.Colors.primaryText)
                             .font(VivaDesign.Typography.value)
                             .lineLimit(1)

@@ -40,10 +40,10 @@ class MatchupCreationCoordinator: ObservableObject {
             let matchup = try await matchupService.createMatchup(request)
             
             // If this is a direct challenge, send the invite immediately
-            if let challengedUser = challengedUser, let rightTeamId = matchup.rightTeam?.id {
+            if let challengedUser = challengedUser {
                 let _ = try await matchupService.createInvite(
                     matchupId: matchup.id,
-                    matchupTeamId: rightTeamId,  // Challenge opponent to right team
+                    matchupTeamId: matchup.rightTeam.id,  // Challenge opponent to right team
                     userId: challengedUser.id
                 )
             }

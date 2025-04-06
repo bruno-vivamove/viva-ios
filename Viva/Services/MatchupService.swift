@@ -142,4 +142,12 @@ final class MatchupService: ObservableObject {
             object: invite
         )
     }
+    
+    // MARK: - Matchup Stats
+    
+    func getMatchupStats() async throws -> MatchupStatsResponse {
+        return try await networkClient.get(
+            path: "/viva/matchups/stats"
+        )
+    }
 }

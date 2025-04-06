@@ -101,18 +101,14 @@ class MatchupInviteCoordinator: ObservableObject {
     func hasOpenPosition(side: MatchupTeam.Side) -> Bool {
         guard let matchup = matchup else { return false }
         let usersPerSide = matchup.usersPerSide
-        
         let team = side == .left ? matchup.leftTeam : matchup.rightTeam
-        guard let teamId = team?.id else { return false }
+        let teamInviteCount = matchup.invites.filter { $0.matchupTeamId == team.id }.count
         
-        let teamUserCount = team?.users.count ?? 0
-        let teamInviteCount = matchup.invites.filter { $0.matchupTeamId == teamId }.count
-        
-        return teamUserCount + teamInviteCount < usersPerSide
+        return team.users.count + teamInviteCount < usersPerSide
     }
     
     func getTeamId(for side: MatchupTeam.Side) -> String? {
-        return side == .left ? matchup?.leftTeam?.id : matchup?.rightTeam?.id
+        return side == .left ? matchup?.leftTeam.id : matchup?.rightTeam.id
     }
 
     func setPreferredTeamId(_ teamId: String) {
