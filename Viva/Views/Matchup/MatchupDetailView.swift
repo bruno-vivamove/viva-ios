@@ -456,7 +456,7 @@ struct MatchupHeader: View {
     @Binding var showUnInviteSheet: Bool
 
     @State private var showInviteView = false
-    @State private var inviteSide: MatchupUser.Side?
+    @State private var inviteMatchupTeamId: String?
 
     var body: some View {
         HStack(spacing: 0) {
@@ -480,16 +480,17 @@ struct MatchupHeader: View {
                     usersPerSide: matchup.usersPerSide,
                     showCreationFlow: $showInviteView,
                     isInvitingFromDetails: true,
-                    preferredSide: inviteSide
+                    preferredTeamId: inviteMatchupTeamId
                 )
             }
         }
     }
 
     private var leftUserView: some View {
+        let leftTeamId = viewModel.matchup?.leftTeam?.id
         let leftUser = viewModel.matchup?.leftUsers.first
         let leftInvite = viewModel.matchup?.invites.first(where: {
-            $0.side == .left
+            $0.matchupTeamId == leftTeamId
         })
         let isCompleted = viewModel.matchup?.status == .completed
         let leftPoints = viewModel.matchup?.leftSidePoints ?? 0
@@ -508,7 +509,7 @@ struct MatchupHeader: View {
                 }
             },
             onOpenPositionTap: {
-                inviteSide = .left
+                inviteMatchupTeamId = leftTeamId
                 showInviteView = true
             },
             isCompleted: isCompleted,
@@ -517,9 +518,10 @@ struct MatchupHeader: View {
     }
 
     private var rightUserView: some View {
+        let rightTeamId = viewModel.matchup?.rightTeam?.id
         let rightUser = viewModel.matchup?.rightUsers.first
         let rightInvite = viewModel.matchup?.invites.first(where: {
-            $0.side == .right
+            $0.matchupTeamId == rightTeamId
         })
         let isCompleted = viewModel.matchup?.status == .completed
         let leftPoints = viewModel.matchup?.leftSidePoints ?? 0
@@ -538,7 +540,7 @@ struct MatchupHeader: View {
                 }
             },
             onOpenPositionTap: {
-                inviteSide = .right
+                inviteMatchupTeamId = rightTeamId
                 showInviteView = true
             },
             isCompleted: isCompleted,

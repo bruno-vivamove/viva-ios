@@ -7,8 +7,9 @@ struct MatchupInviteView: View {
     @State private var searchText = ""
     @State private var showHeader = true // New state to control header visibility
     @FocusState private var isSearchFieldFocused: Bool
+    
     let isInvitingFromDetails: Bool
-    let preferredSide: MatchupUser.Side?
+    let preferredTeamId: String?
     let matchup: MatchupDetails
     let usersPerSide: Int
 
@@ -21,7 +22,7 @@ struct MatchupInviteView: View {
         usersPerSide: Int,
         showCreationFlow: Binding<Bool>,
         isInvitingFromDetails: Bool = false,
-        preferredSide: MatchupUser.Side? = nil
+        preferredTeamId: String? = nil
     ) {
         self._coordinator = StateObject(
             wrappedValue: MatchupInviteCoordinator(
@@ -34,7 +35,9 @@ struct MatchupInviteView: View {
         self.usersPerSide = usersPerSide
         self._showCreationFlow = showCreationFlow
         self.isInvitingFromDetails = isInvitingFromDetails
-        self.preferredSide = preferredSide
+        
+        // Convert preferred side to team ID if provided
+        self.preferredTeamId = preferredTeamId
     }
 
     var body: some View {
@@ -100,8 +103,8 @@ struct MatchupInviteView: View {
         .navigationBarBackButtonHidden(true)
         .task {
             await coordinator.loadData(matchupId: matchup.id)
-            if let side = preferredSide {
-                coordinator.setPreferredSide(side)
+            if let teamId = preferredTeamId {
+                coordinator.setPreferredTeamId(teamId)
             }
         }
         .onChange(of: isSearchFieldFocused) { oldValue, newValue in

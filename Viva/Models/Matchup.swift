@@ -16,6 +16,27 @@ struct MatchupsResponse: Codable {
     let matchups: [Matchup]
 }
 
+struct MatchupTeam: Codable, Identifiable, Equatable, Hashable {
+    let id: String
+    let teamHash: String?
+    let side: Side
+    let points: Int
+    let users: [User]
+    
+    enum Side: String, Codable {
+        case left = "LEFT"
+        case right = "RIGHT"
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: MatchupTeam, rhs: MatchupTeam) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
 struct Matchup: Codable, Identifiable, Equatable, Hashable {
     let id: String
     let matchupHash: String?
@@ -27,10 +48,7 @@ struct Matchup: Codable, Identifiable, Equatable, Hashable {
     let endTime: Date?
     let usersPerSide: Int
     let lengthInDays: Int
-    let leftSidePoints: Int
-    let rightSidePoints: Int
-    let leftUsers: [User]
-    let rightUsers: [User]
+    let teams: [MatchupTeam]
     var invites: [MatchupInvite]
     
     func hash(into hasher: inout Hasher) {
@@ -39,6 +57,30 @@ struct Matchup: Codable, Identifiable, Equatable, Hashable {
     
     static func == (lhs: Matchup, rhs: Matchup) -> Bool {
         lhs.id == rhs.id
+    }
+    
+    var leftTeam: MatchupTeam? {
+        teams.first { $0.side == .left }
+    }
+    
+    var rightTeam: MatchupTeam? {
+        teams.first { $0.side == .right }
+    }
+    
+    var leftUsers: [User] {
+        leftTeam?.users ?? []
+    }
+    
+    var rightUsers: [User] {
+        rightTeam?.users ?? []
+    }
+    
+    var leftSidePoints: Int {
+        leftTeam?.points ?? 0
+    }
+    
+    var rightSidePoints: Int {
+        rightTeam?.points ?? 0
     }
 }
 
@@ -53,19 +95,34 @@ struct MatchupDetails: Codable, Equatable {
     let endTime: Date?
     let usersPerSide: Int
     let lengthInDays: Int
-    var leftSidePoints: Int
-    var rightSidePoints: Int
-    let leftUsers: [User]
-    let rightUsers: [User]
-
+    let teams: [MatchupTeam]
     let measurements: [MatchupMeasurement]
     var userMeasurements: [MatchupUserMeasurement]
     var invites: [MatchupInvite]
-
-    func getInvites() -> [MatchupInvite] {
-        return invites
+    
+    var leftTeam: MatchupTeam? {
+        teams.first { $0.side == .left }
     }
     
+    var rightTeam: MatchupTeam? {
+        teams.first { $0.side == .right }
+    }
+    
+    var leftUsers: [User] {
+        leftTeam?.users ?? []
+    }
+    
+    var rightUsers: [User] {
+        rightTeam?.users ?? []
+    }
+    
+    var leftSidePoints: Int {
+        leftTeam?.points ?? 0
+    }
+    
+    var rightSidePoints: Int {
+        rightTeam?.points ?? 0
+    }
 
     var currentDayNumber: Int? {
         guard let startTime = self.startTime else {
@@ -100,10 +157,7 @@ struct MatchupDetails: Codable, Equatable {
             endTime: endTime,
             usersPerSide: usersPerSide,
             lengthInDays: lengthInDays,
-            leftSidePoints: leftSidePoints,
-            rightSidePoints: rightSidePoints,
-            leftUsers: leftUsers,
-            rightUsers: rightUsers,
+            teams: teams,
             invites: invites
         )
     }
@@ -119,15 +173,10 @@ enum MatchupStatus: String, Codable {
 struct MatchupUser: Codable {
     let userId: String
     let matchupId: String
-    let side: Side
+    let side: MatchupTeam.Side
     let userOrder: Int
     let createTime: Date?
     let userInfo: User?
-    
-    enum Side: String, Codable {
-        case left = "LEFT"
-        case right = "RIGHT"
-    }
 }
 
 struct MatchupMeasurement: Codable, Equatable {

@@ -81,10 +81,10 @@ class HomeViewModel: ObservableObject {
                 guard let self = self else { return }
 
                 self.receivedInvites.removeAll(where: {
-                    $0.matchupId == matchupInvite.matchupId
+                    $0.inviteCode == matchupInvite.inviteCode
                 })
                 self.sentInvites.removeAll(where: {
-                    $0.matchupId == matchupInvite.matchupId
+                    $0.inviteCode == matchupInvite.inviteCode
                 })
 
                 Task {

@@ -13,7 +13,7 @@ class MatchupInviteCoordinator: ObservableObject {
     @Published var searchQuery: String?
     @Published var isLoading = false
     @Published var error: String?
-    @Published var preferredSide: MatchupUser.Side?
+    @Published var preferredTeamId: String?
     @Published var matchup: MatchupDetails?
 
     init(
@@ -71,13 +71,12 @@ class MatchupInviteCoordinator: ObservableObject {
     }
 
     func inviteFriend(
-        userId: String, matchupId: String, side: MatchupUser.Side
+        userId: String, matchupId: String, teamId: String
     ) async {
         do {
-            // Convert the side enum to string for the API
             let matchupInvite = try await matchupService.createInvite(
                 matchupId: matchupId,
-                side: side,
+                matchupTeamId: teamId,
                 userId: userId
             )
             matchup?.invites.append(matchupInvite)
@@ -99,23 +98,31 @@ class MatchupInviteCoordinator: ObservableObject {
         }
     }
 
-    func hasOpenPosition(side: MatchupUser.Side) -> Bool {
-        let usersPerSide = matchup?.usersPerSide ?? 0
+    func hasOpenPosition(side: MatchupTeam.Side) -> Bool {
+        guard let matchup = matchup else { return false }
+        let usersPerSide = matchup.usersPerSide
         
-        switch side {
-        case .left:
-            let leftUserCount = matchup?.leftUsers.count ?? 0
-            let leftInviteCount = matchup?.invites.filter({$0.side == .left}).count ?? 0
-            return leftUserCount + leftInviteCount < usersPerSide
-        case .right:
-            let rightUserCount = matchup?.rightUsers.count ?? 0
-            let rightInviteCount = matchup?.invites.filter({$0.side == .right}).count ?? 0
-            return rightUserCount + rightInviteCount < usersPerSide
-        }
+        let team = side == .left ? matchup.leftTeam : matchup.rightTeam
+        guard let teamId = team?.id else { return false }
+        
+        let teamUserCount = team?.users.count ?? 0
+        let teamInviteCount = matchup.invites.filter { $0.matchupTeamId == teamId }.count
+        
+        return teamUserCount + teamInviteCount < usersPerSide
+    }
+    
+    func getTeamId(for side: MatchupTeam.Side) -> String? {
+        return side == .left ? matchup?.leftTeam?.id : matchup?.rightTeam?.id
     }
 
-    func setPreferredSide(_ side: MatchupUser.Side) {
-        preferredSide = side
+    func setPreferredTeamId(_ teamId: String) {
+        preferredTeamId = teamId
+    }
+    
+    func setPreferredSide(_ side: MatchupTeam.Side) {
+        if let teamId = getTeamId(for: side) {
+            preferredTeamId = teamId
+        }
     }
 
     func sendFriendRequest(userId: String) async {

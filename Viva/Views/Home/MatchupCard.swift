@@ -49,9 +49,10 @@ struct MatchupCard: View {
             HStack(spacing: 0) {
                 // Left side container - aligned to left edge
                 HStack(spacing: VivaDesign.Spacing.small) {
+                    let leftTeam = details.leftTeam
                     let user = details.leftUsers.first
                     let invite = details.invites.first { invite in
-                        invite.side == .left
+                        invite.matchupTeamId == leftTeam?.id
                     }
 
                     VivaProfileImage(
@@ -87,9 +88,10 @@ struct MatchupCard: View {
                 HStack(spacing: VivaDesign.Spacing.small) {
                     Spacer(minLength: 0)  // Push content to right edge
 
+                    let rightTeam = details.rightTeam
                     let user = details.rightUsers.first
-                    let invite = details.getInvites().first { invite in
-                        invite.side == .right
+                    let invite = details.invites.first { invite in
+                        invite.matchupTeamId == rightTeam?.id
                     }
 
                     VStack(alignment: .trailing) {

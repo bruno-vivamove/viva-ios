@@ -75,7 +75,7 @@ struct MatchupInviteCard: View {
                         )
                     }
                     
-                    if canJoinLeftTeam {
+                    if canJoinLeftTeam, let teamId = coordinator.getTeamId(for: .left) {
                         actions.append(
                             UserActionCard.UserAction(
                                 title: "Invite Teammate"
@@ -84,14 +84,14 @@ struct MatchupInviteCard: View {
                                     await coordinator.inviteFriend(
                                         userId: user.id,
                                         matchupId: matchup.id,
-                                        side: .left
+                                        teamId: teamId
                                     )
                                 }
                             }
                         )
                     }
                     
-                    if canJoinRightTeam {
+                    if canJoinRightTeam, let teamId = coordinator.getTeamId(for: .right) {
                         actions.append(
                             UserActionCard.UserAction(
                                 title: "Invite"
@@ -100,7 +100,7 @@ struct MatchupInviteCard: View {
                                     await coordinator.inviteFriend(
                                         userId: user.id,
                                         matchupId: matchup.id,
-                                        side: .right
+                                        teamId: teamId
                                     )
                                 }
                             }

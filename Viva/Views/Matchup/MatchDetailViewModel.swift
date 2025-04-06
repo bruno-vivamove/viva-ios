@@ -365,13 +365,6 @@ class MatchupDetailViewModel: ObservableObject {
             self.error = error
         }
     }
-
-    // Helper to check if a position is open
-    func hasOpenPosition(side: MatchupUser.Side) -> Bool {
-        guard let matchup = matchup else { return false }
-        let users = side == .left ? matchup.leftUsers : matchup.rightUsers
-        return users.count < matchup.usersPerSide
-    }
 }
 
 // Add this extension for safe array access
