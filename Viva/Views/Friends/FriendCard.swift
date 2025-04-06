@@ -26,7 +26,8 @@ struct FriendCard: View {
                 userService: userService,
                 userSession: userSession,
                 showCreationFlow: $showMatchupCreation,
-                challengedUser: user
+                challengedUser: user,
+                source: "friends"
             )
         }
     }

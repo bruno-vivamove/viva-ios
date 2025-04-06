@@ -128,7 +128,8 @@ struct HomeHeader: View {
                 friendService: friendService,
                 userService: userService,
                 userSession: userSession,
-                showCreationFlow: $showMatchupCreation
+                showCreationFlow: $showMatchupCreation,
+                source: "home"
             )
             .presentationBackground(.clear)
         }

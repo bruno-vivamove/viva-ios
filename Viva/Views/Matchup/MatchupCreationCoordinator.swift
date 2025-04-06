@@ -6,6 +6,7 @@ class MatchupCreationCoordinator: ObservableObject {
     let friendService: FriendService
     let userSession: UserSession
     let challengedUser: User?  // Optional challenged user
+    let source: String // Source identifier for navigation
     
     @Published var isCreatingMatchup = false
     @Published var error: Error?
@@ -14,12 +15,14 @@ class MatchupCreationCoordinator: ObservableObject {
         matchupService: MatchupService,
         friendService: FriendService,
         userSession: UserSession,
-        challengedUser: User? = nil  // Add optional parameter
+        challengedUser: User? = nil,  // Add optional parameter
+        source: String = "default"
     ) {
         self.matchupService = matchupService
         self.friendService = friendService
         self.userSession = userSession
         self.challengedUser = challengedUser
+        self.source = source
     }
     
     func createMatchup(selectedCategories: [MatchupCategory], usersPerSide: Int) async -> MatchupDetails? {

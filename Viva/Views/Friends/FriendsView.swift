@@ -33,59 +33,27 @@ struct FriendsView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Search Header
-            FriendsHeader(
-                searchText: $searchText, viewModel: viewModel,
-                isSearchFieldFocused: _isSearchFieldFocused
-            )
-            .padding(VivaDesign.Spacing.medium)
-            .padding(.bottom, 0)
+        NavigationStack {
+            VStack(spacing: 0) {
+                // Search Header
+                FriendsHeader(
+                    searchText: $searchText, viewModel: viewModel,
+                    isSearchFieldFocused: _isSearchFieldFocused
+                )
+                .padding(VivaDesign.Spacing.medium)
+                .padding(.bottom, 0)
 
-            if viewModel.isSearchMode {
-                // SEARCH RESULTS MODE
-                if viewModel.searchResults.isEmpty {
-                    // Empty search results - use similar layout to HomeEmptyStateView
-                    FriendsEmptySearchView()
-                        .padding(VivaDesign.Spacing.medium)
-                } else {
-                    // Display search results in a List for consistency
-                    List {
-                        Section {
-                            ForEach(viewModel.searchResults) { user in
-                                FriendRequestCard(
-                                    viewModel: viewModel, user: user
-                                )
-                                .listRowSeparator(.hidden)
-                                .listRowInsets(rowInsets)
-                            }
-                        } header: {
-                            SectionHeaderView(title: "Search Results")
-                        }
-                    }
-                    .listStyle(PlainListStyle())
-                    .scrollContentBackground(.hidden)
-                }
-            } else {
-                // FRIENDS LIST MODE
-                let isViewEmpty =
-                    viewModel.friends.isEmpty
-                    && viewModel.friendInvites.isEmpty
-                    && viewModel.sentInvites.isEmpty
-
-                if viewModel.isLoading && isViewEmpty {
-                    ProgressView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if isViewEmpty {
-                    // Empty friends state - use similar layout to HomeEmptyStateView
-                    FriendsEmptyStateView()
-                        .padding(VivaDesign.Spacing.medium)
-                } else {
-                    List {
-                        // Received Friend Invites Section
-                        if !viewModel.friendInvites.isEmpty {
+                if viewModel.isSearchMode {
+                    // SEARCH RESULTS MODE
+                    if viewModel.searchResults.isEmpty {
+                        // Empty search results - use similar layout to HomeEmptyStateView
+                        FriendsEmptySearchView()
+                            .padding(VivaDesign.Spacing.medium)
+                    } else {
+                        // Display search results in a List for consistency
+                        List {
                             Section {
-                                ForEach(viewModel.friendInvites) { user in
+                                ForEach(viewModel.searchResults) { user in
                                     FriendRequestCard(
                                         viewModel: viewModel, user: user
                                     )
@@ -93,78 +61,110 @@ struct FriendsView: View {
                                     .listRowInsets(rowInsets)
                                 }
                             } header: {
-                                SectionHeaderView(
-                                    title: "Requests Received",
-                                    subtitle:
-                                        "(\(viewModel.friendInvites.count))"
-                                )
+                                SectionHeaderView(title: "Search Results")
                             }
                         }
-
-                        // Sent Friend Invites Section
-                        if !viewModel.sentInvites.isEmpty {
-                            Section {
-                                ForEach(viewModel.sentInvites) { user in
-                                    FriendRequestCard(
-                                        viewModel: viewModel, user: user
-                                    )
-                                    .listRowSeparator(.hidden)
-                                    .listRowInsets(rowInsets)
-                                }
-                            } header: {
-                                SectionHeaderView(
-                                    title: "Requests Sent",
-                                    subtitle: "(\(viewModel.sentInvites.count))"
-                                )
-                            }
-                        }
-
-                        // Current Friends Section
-                        if !viewModel.friends.isEmpty {
-                            Section {
-                                ForEach(viewModel.friends) { user in
-                                    FriendCard(
-                                        user: user,
-                                        matchupService: matchupService,
-                                        friendService: friendService,
-                                        userService: userService,
-                                        healthKitDataManager:
-                                            healthKitDataManager,
-                                        userSession: viewModel.userSession
-                                    )
-                                    .listRowSeparator(.hidden)
-                                    .listRowInsets(rowInsets)
-                                }
-                            } header: {
-                                SectionHeaderView(
-                                    title: "Current Friends",
-                                    subtitle: "(\(viewModel.friends.count))"
-                                )
-                            }
-                        }
+                        .listStyle(PlainListStyle())
+                        .scrollContentBackground(.hidden)
                     }
-                    .listRowInsets(EdgeInsets())
-                    .listStyle(PlainListStyle())
-                    .scrollContentBackground(.hidden)
-                    .refreshable {
-                        await viewModel.loadFriendsData()
-                    }
-                    .listSectionSpacing(0)
+                } else {
+                    // FRIENDS LIST MODE
+                    let isViewEmpty =
+                        viewModel.friends.isEmpty
+                        && viewModel.friendInvites.isEmpty
+                        && viewModel.sentInvites.isEmpty
 
+                    if viewModel.isLoading && isViewEmpty {
+                        ProgressView()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else if isViewEmpty {
+                        // Empty friends state - use similar layout to HomeEmptyStateView
+                        FriendsEmptyStateView()
+                            .padding(VivaDesign.Spacing.medium)
+                    } else {
+                        List {
+                            // Received Friend Invites Section
+                            if !viewModel.friendInvites.isEmpty {
+                                Section {
+                                    ForEach(viewModel.friendInvites) { user in
+                                        FriendRequestCard(
+                                            viewModel: viewModel, user: user
+                                        )
+                                        .listRowSeparator(.hidden)
+                                        .listRowInsets(rowInsets)
+                                    }
+                                } header: {
+                                    SectionHeaderView(
+                                        title: "Requests Received",
+                                        subtitle:
+                                            "(\(viewModel.friendInvites.count))"
+                                    )
+                                }
+                            }
+
+                            // Sent Friend Invites Section
+                            if !viewModel.sentInvites.isEmpty {
+                                Section {
+                                    ForEach(viewModel.sentInvites) { user in
+                                        FriendRequestCard(
+                                            viewModel: viewModel, user: user
+                                        )
+                                        .listRowSeparator(.hidden)
+                                        .listRowInsets(rowInsets)
+                                    }
+                                } header: {
+                                    SectionHeaderView(
+                                        title: "Requests Sent",
+                                        subtitle: "(\(viewModel.sentInvites.count))"
+                                    )
+                                }
+                            }
+
+                            // Current Friends Section
+                            if !viewModel.friends.isEmpty {
+                                Section {
+                                    ForEach(viewModel.friends) { user in
+                                        FriendCard(
+                                            user: user,
+                                            matchupService: matchupService,
+                                            friendService: friendService,
+                                            userService: userService,
+                                            healthKitDataManager:
+                                                healthKitDataManager,
+                                            userSession: viewModel.userSession
+                                        )
+                                        .listRowSeparator(.hidden)
+                                        .listRowInsets(rowInsets)
+                                    }
+                                } header: {
+                                    SectionHeaderView(
+                                        title: "Current Friends",
+                                        subtitle: "(\(viewModel.friends.count))"
+                                    )
+                                }
+                            }
+                        }
+                        .listRowInsets(EdgeInsets())
+                        .listStyle(PlainListStyle())
+                        .scrollContentBackground(.hidden)
+                        .refreshable {
+                            await viewModel.loadFriendsData()
+                        }
+                        .listSectionSpacing(0)
+
+                    }
+                }
+
+                if let error = viewModel.error {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .font(VivaDesign.Typography.caption)
+                        .padding()
                 }
             }
-
-            if let error = viewModel.error {
-                Text(error)
-                    .foregroundColor(.red)
-                    .font(VivaDesign.Typography.caption)
-                    .padding()
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black)
-        .sheet(item: $selectedMatchup) { matchup in
-            NavigationView {
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.black)
+            .navigationDestination(item: $selectedMatchup) { matchup in
                 MatchupDetailView(
                     viewModel: MatchupDetailViewModel(
                         matchupId: matchup.id,
@@ -177,50 +177,53 @@ struct FriendsView: View {
                     )
                 )
             }
-        }
-        .onAppear {
-            if !hasLoaded {
-                hasLoaded = true
-                Task {
-                    await viewModel.loadFriendsData()
-                }
-            }
-
-            // Observe friend request sent notifications
-            NotificationCenter.default.addObserver(
-                forName: .friendRequestSent,
-                object: nil,
-                queue: .main
-            ) { notification in
-                if let sentUser = notification.object as? User {
-                    Task { @MainActor in
-                        // Add the user to sent invites if not already present
-                        if !viewModel.sentInvites.contains(where: {
-                            $0.id == sentUser.id
-                        }) {
-                            viewModel.sentInvites.append(sentUser)
-                        }
-                    }
-                }
-            }
-
-            // Observe matchup creation notifications
-            NotificationCenter.default.addObserver(
-                forName: .friendScreenMatchupCreationCompleted,
-                object: nil,
-                queue: .main
-            ) { notification in
-                if let matchupDetails = notification.object as? MatchupDetails {
+            .onAppear {
+                if !hasLoaded {
+                    hasLoaded = true
                     Task {
-                        await MainActor.run {
-                            selectedMatchup = matchupDetails.asMatchup
+                        await viewModel.loadFriendsData()
+                    }
+                }
+
+                // Observe friend request sent notifications
+                NotificationCenter.default.addObserver(
+                    forName: .friendRequestSent,
+                    object: nil,
+                    queue: .main
+                ) { notification in
+                    if let sentUser = notification.object as? User {
+                        Task { @MainActor in
+                            // Add the user to sent invites if not already present
+                            if !viewModel.sentInvites.contains(where: {
+                                $0.id == sentUser.id
+                            }) {
+                                viewModel.sentInvites.append(sentUser)
+                            }
+                        }
+                    }
+                }
+
+                // Observe matchup creation notifications
+                NotificationCenter.default.addObserver(
+                    forName: .friendScreenMatchupCreationCompleted,
+                    object: nil,
+                    queue: .main
+                ) { notification in
+                    if let matchupDetails = notification.object as? MatchupDetails,
+                       let userInfo = notification.userInfo,
+                       let source = userInfo["source"] as? String,
+                       source == "friends" {
+                        Task {
+                            await MainActor.run {
+                                selectedMatchup = matchupDetails.asMatchup
+                            }
                         }
                     }
                 }
             }
-        }
-        .onDisappear {
-            viewModel.cleanup()
+            .onDisappear {
+                viewModel.cleanup()
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ struct MatchupTypeView: View {
     @State private var navigateToInvite = false
     let selectedCategories: [MatchupCategory]
     let userService: UserService
+    let source: String
 
     var body: some View {
         ZStack {
@@ -79,7 +80,8 @@ struct MatchupTypeView: View {
                     userSession: coordinator.userSession,
                     matchup: matchup,
                     usersPerSide: matchup.usersPerSide,
-                    showCreationFlow: $showCreationFlow
+                    showCreationFlow: $showCreationFlow,
+                    source: source
                 )
             }
         }
@@ -100,7 +102,8 @@ struct MatchupTypeView: View {
                     if let matchupCreated = self.matchupCreated {
                         NotificationCenter.default.post(
                             name: .friendScreenMatchupCreationCompleted,
-                            object: matchupCreated
+                            object: matchupCreated,
+                            userInfo: ["source": source]
                         )
                     }
                 } else {

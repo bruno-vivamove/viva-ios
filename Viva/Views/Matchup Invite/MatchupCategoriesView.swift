@@ -24,6 +24,7 @@ struct MatchupCategoriesView: View {
     }
 
     let userService: UserService
+    let source: String
 
     init(
         matchupService: MatchupService,
@@ -31,18 +32,21 @@ struct MatchupCategoriesView: View {
         userService: UserService,
         userSession: UserSession,
         showCreationFlow: Binding<Bool>,
-        challengedUser: User? = nil
+        challengedUser: User? = nil,
+        source: String = "default"
     ) {
         self._coordinator = StateObject(
             wrappedValue: MatchupCreationCoordinator(
                 matchupService: matchupService,
                 friendService: friendService,
                 userSession: userSession,
-                challengedUser: challengedUser
+                challengedUser: challengedUser,
+                source: source
             )
         )
         self._showCreationFlow = showCreationFlow
         self.userService = userService
+        self.source = source
     }
 
     var body: some View {
@@ -109,7 +113,8 @@ struct MatchupCategoriesView: View {
                     coordinator: coordinator,
                     showCreationFlow: $showCreationFlow,
                     selectedCategories: categories,
-                    userService: userService
+                    userService: userService,
+                    source: source
                 )
             }
             .navigationBarBackButtonHidden(true)

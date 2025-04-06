@@ -104,10 +104,24 @@ class HomeViewModel: ObservableObject {
         NotificationCenter.default.publisher(
             for: .homeScreenMatchupCreationCompleted
         )
-        .compactMap { $0.object as? MatchupDetails }
         .receive(on: DispatchQueue.main)
-        .sink { [weak self] matchupDetails in
-            self?.selectedMatchup = matchupDetails.asMatchup
+        .sink { [weak self] notification in
+            guard let matchupDetails = notification.object as? MatchupDetails else {
+                return
+            }
+            
+            // Get the source from userInfo if available
+            if let userInfo = notification.userInfo,
+               let source = userInfo["source"] as? String,
+               source == "home" {
+                self?.selectedMatchup = matchupDetails.asMatchup
+            } else {
+                // If source is not "home", don't navigate
+                Task {
+                    // Refresh data instead
+                    await self?.loadData()
+                }
+            }
         }
         .store(in: &cancellables)
     }

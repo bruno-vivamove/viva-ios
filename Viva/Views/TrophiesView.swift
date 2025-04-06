@@ -10,6 +10,7 @@ struct TrophiesView: View {
     
     @StateObject private var viewModel: TrophiesViewModel
     @State private var showMatchupCreation = false
+    @State private var selectedMatchup: Matchup?
 
     // Default initializer for use with SwiftUI previews and testing
     init() {
@@ -99,9 +100,23 @@ struct TrophiesView: View {
                     friendService: friendService,
                     userService: userService,
                     userSession: userSession,
-                    showCreationFlow: $showMatchupCreation
+                    showCreationFlow: $showMatchupCreation,
+                    source: "trophies"
                 )
                 .presentationBackground(.clear)
+            }
+            .navigationDestination(item: $selectedMatchup) { matchup in
+                MatchupDetailView(
+                    viewModel: MatchupDetailViewModel(
+                        matchupId: matchup.id,
+                        matchupService: matchupService,
+                        userMeasurementService: userMeasurementService,
+                        friendService: friendService,
+                        userService: userService,
+                        userSession: userSession,
+                        healthKitDataManager: healthKitDataManager
+                    )
+                )
             }
             .alert("Error", isPresented: .constant(viewModel.error != nil)) {
                 Button("OK") {
@@ -115,8 +130,28 @@ struct TrophiesView: View {
             .onAppear {
                 Task {
                     await viewModel.loadMatchupStats(using: matchupService)
+                    setupNotificationObservers()
                 }
             }
+        }
+    }
+    
+    func setupNotificationObservers() {
+        // Home screen matchup creation completed observer
+        NotificationCenter.default.removeObserver(self, name: .homeScreenMatchupCreationCompleted, object: nil)
+        NotificationCenter.default.addObserver(
+            forName: .homeScreenMatchupCreationCompleted,
+            object: nil,
+            queue: .main
+        ) { notification in
+            guard let matchupDetails = notification.object as? MatchupDetails,
+                  let userInfo = notification.userInfo,
+                  let source = userInfo["source"] as? String,
+                  source == "trophies" else {
+                return
+            }
+            
+            selectedMatchup = matchupDetails.asMatchup
         }
     }
 }

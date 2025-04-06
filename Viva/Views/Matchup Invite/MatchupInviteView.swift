@@ -12,6 +12,7 @@ struct MatchupInviteView: View {
     let preferredTeamId: String?
     let matchup: MatchupDetails
     let usersPerSide: Int
+    let source: String
 
     init(
         matchupService: MatchupService,
@@ -22,7 +23,8 @@ struct MatchupInviteView: View {
         usersPerSide: Int,
         showCreationFlow: Binding<Bool>,
         isInvitingFromDetails: Bool = false,
-        preferredTeamId: String? = nil
+        preferredTeamId: String? = nil,
+        source: String = "default"
     ) {
         self._coordinator = StateObject(
             wrappedValue: MatchupInviteCoordinator(
@@ -38,6 +40,7 @@ struct MatchupInviteView: View {
         
         // Convert preferred side to team ID if provided
         self.preferredTeamId = preferredTeamId
+        self.source = source
     }
 
     var body: some View {
@@ -116,7 +119,8 @@ struct MatchupInviteView: View {
             coordinator.cleanup()
             NotificationCenter.default.post(
                 name: .homeScreenMatchupCreationCompleted,
-                object: self.matchup
+                object: self.matchup,
+                userInfo: ["source": source]
             )
         }
     }
