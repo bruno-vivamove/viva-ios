@@ -58,6 +58,7 @@ struct HomeView: View {
                         await viewModel.loadData()
                     }
                     .listSectionSpacing(0)
+                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -113,7 +114,10 @@ struct HomeHeader: View {
 
     var body: some View {
         HStack(spacing: VivaDesign.Spacing.medium) {
-            StreakCounter(streakDays: userSession.userProfile?.streakDays ?? 0)
+            Image("crown_logo")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 40)
             Spacer(minLength: 1)
             CardButton(
                 title: "Create Matchup",
@@ -121,6 +125,7 @@ struct HomeHeader: View {
             ) {
                 showMatchupCreation = true
             }
+            .padding(.top, VivaDesign.Spacing.small)
         }
         .sheet(isPresented: $showMatchupCreation) {
             MatchupCategoriesView(
@@ -136,24 +141,6 @@ struct HomeHeader: View {
     }
 }
 
-// MARK: - Streak Counter
-struct StreakCounter: View {
-    let streakDays: Int
-
-    var body: some View {
-        VStack(alignment: .center) {
-            Text("\(streakDays)")
-                .foregroundColor(VivaDesign.Colors.primaryText)
-                .font(VivaDesign.Typography.value)
-                .lineLimit(1)
-            Text("Week Streak")
-                .foregroundColor(VivaDesign.Colors.vivaGreen)
-                .font(VivaDesign.Typography.caption)
-                .lineLimit(1)
-        }
-    }
-}
-
 // MARK: - Home Content List
 struct HomeContentList: View {
     @ObservedObject var viewModel: HomeViewModel
@@ -164,34 +151,52 @@ struct HomeContentList: View {
 
     private let rowInsets = EdgeInsets(
         top: 0,
-        leading: VivaDesign.Spacing.outerPadding,
-        bottom: VivaDesign.Spacing.small,
-        trailing: VivaDesign.Spacing.outerPadding
+        leading: 0,
+        bottom: 0,
+        trailing: 0
     )
 
     var body: some View {
         List {
-            // Active Matchups
-            if !viewModel.activeMatchups.isEmpty {
-                ActiveMatchupsSection(
+            // Completed Matchups
+            if !viewModel.completedMatchups.isEmpty {
+                MatchupSection(
                     viewModel: viewModel,
                     matchupService: matchupService,
                     healthKitDataManager: healthKitDataManager,
                     userSession: userSession,
                     userMeasurementService: userMeasurementService,
-                    rowInsets: rowInsets
+                    rowInsets: rowInsets,
+                    title: "Completed Matchups",
+                    matchups: viewModel.completedMatchups
+                )
+            }
+            
+            // Active Matchups
+            if !viewModel.activeMatchups.isEmpty {
+                MatchupSection(
+                    viewModel: viewModel,
+                    matchupService: matchupService,
+                    healthKitDataManager: healthKitDataManager,
+                    userSession: userSession,
+                    userMeasurementService: userMeasurementService,
+                    rowInsets: rowInsets,
+                    title: "Active Matchups",
+                    matchups: viewModel.activeMatchups
                 )
             }
 
             // Pending Matchups
             if !viewModel.pendingMatchups.isEmpty {
-                PendingMatchupsSection(
+                MatchupSection(
                     viewModel: viewModel,
                     matchupService: matchupService,
                     healthKitDataManager: healthKitDataManager,
                     userSession: userSession,
                     userMeasurementService: userMeasurementService,
-                    rowInsets: rowInsets
+                    rowInsets: rowInsets,
+                    title: "Pending Matchups",
+                    matchups: viewModel.pendingMatchups
                 )
             }
 
@@ -203,34 +208,24 @@ struct HomeContentList: View {
                     rowInsets: rowInsets
                 )
             }
-            
-            // Completed Matchups
-            if !viewModel.completedMatchups.isEmpty {
-                CompletedMatchupsSection(
-                    viewModel: viewModel,
-                    matchupService: matchupService,
-                    healthKitDataManager: healthKitDataManager,
-                    userSession: userSession,
-                    userMeasurementService: userMeasurementService,
-                    rowInsets: rowInsets
-                )
-            }
         }
     }
 }
 
-// MARK: - Active Matchups Section
-struct ActiveMatchupsSection: View {
+// MARK: - Matchup Section
+struct MatchupSection: View {
     @ObservedObject var viewModel: HomeViewModel
     let matchupService: MatchupService
     let healthKitDataManager: HealthKitDataManager
     let userSession: UserSession
     let userMeasurementService: UserMeasurementService
     let rowInsets: EdgeInsets
+    let title: String
+    let matchups: [Matchup]
 
     var body: some View {
         Section {
-            ForEach(viewModel.activeMatchups) { matchup in
+            ForEach(matchups) { matchup in
                 MatchupCard(
                     matchupId: matchup.id,
                     matchupService: matchupService,
@@ -245,79 +240,13 @@ struct ActiveMatchupsSection: View {
                 }
                 .listRowSeparator(.hidden)
                 .listRowInsets(rowInsets)
+                .padding(.bottom, VivaDesign.Spacing.cardSpacing)
             }
         } header: {
-            SectionHeaderView(title: "Active Matchups")
+            SectionHeaderView(title: title)
         }
     }
 }
-
-// MARK: - Pending Matchups Section
-struct PendingMatchupsSection: View {
-    @ObservedObject var viewModel: HomeViewModel
-    let matchupService: MatchupService
-    let healthKitDataManager: HealthKitDataManager
-    let userSession: UserSession
-    let userMeasurementService: UserMeasurementService
-    let rowInsets: EdgeInsets
-
-    var body: some View {
-        Section {
-            ForEach(viewModel.pendingMatchups) { matchup in
-                MatchupCard(
-                    matchupId: matchup.id,
-                    matchupService: matchupService,
-                    userMeasurementService: userMeasurementService,
-                    healthKitDataManager: healthKitDataManager,
-                    userSession: userSession,
-                    lastRefreshTime: viewModel.dataRefreshedTime
-                )
-                .id(matchup.id)
-                .onTapGesture {
-                    viewModel.selectedMatchup = matchup
-                }
-                .listRowSeparator(.hidden)
-                .listRowInsets(rowInsets)
-            }
-        } header: {
-            SectionHeaderView(title: "Pending Matchups")
-        }
-    }
-}
-
-// MARK: - Completed Matchups Section
-struct CompletedMatchupsSection: View {
-    @ObservedObject var viewModel: HomeViewModel
-    let matchupService: MatchupService
-    let healthKitDataManager: HealthKitDataManager
-    let userSession: UserSession
-    let userMeasurementService: UserMeasurementService
-    let rowInsets: EdgeInsets
-
-    var body: some View {
-        Section {
-            ForEach(viewModel.completedMatchups) { matchup in
-                MatchupCard(
-                    matchupId: matchup.id,
-                    matchupService: matchupService,
-                    userMeasurementService: userMeasurementService,
-                    healthKitDataManager: healthKitDataManager,
-                    userSession: userSession,
-                    lastRefreshTime: viewModel.dataRefreshedTime
-                )
-                .id(matchup.id)
-                .onTapGesture {
-                    viewModel.selectedMatchup = matchup
-                }
-                .listRowSeparator(.hidden)
-                .listRowInsets(rowInsets)
-            }
-        } header: {
-            SectionHeaderView(title: "Completed Matchups")
-        }
-    }
-}
-
 
 // MARK: - Pending Invites Section
 struct PendingInvitesSection: View {
@@ -393,6 +322,7 @@ struct ReceivedInvitesView: View {
             .buttonStyle(PlainButtonStyle())
             .listRowSeparator(.hidden)
             .listRowInsets(rowInsets)
+            .padding(.bottom, VivaDesign.Spacing.cardSpacing)
         }
     }
 }
@@ -432,6 +362,7 @@ struct SentInvitesView: View {
             .buttonStyle(PlainButtonStyle())
             .listRowSeparator(.hidden)
             .listRowInsets(rowInsets)
+            .padding(.bottom, VivaDesign.Spacing.cardSpacing)
         }
     }
 }

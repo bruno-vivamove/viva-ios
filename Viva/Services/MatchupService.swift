@@ -9,11 +9,15 @@ final class MatchupService: ObservableObject {
     
     // MARK: - Matchups
     
-    func getMyMatchups() async throws -> [Matchup] {
-        let response: MatchupsResponse = try await networkClient.get(
-            path: "/viva/matchups"
+    func getMyMatchups(filter: MatchupFilter = .ALL, page: Int = 0, pageSize: Int = 100) async throws -> MatchupsResponse {
+        return try await networkClient.get(
+            path: "/viva/matchups",
+            queryParams: [
+                "filter": filter.rawValue,
+                "page": String(page),
+                "pageSize": String(pageSize)
+            ]
         )
-        return response.matchups
     }
     
     func getMatchup(matchupId: String) async throws -> MatchupDetails {
@@ -73,6 +77,19 @@ final class MatchupService: ObservableObject {
             name: .matchupUserRemoved,
             object: matchupId
         )
+    }
+    
+    func finalizeMatchupUser(matchupId: String, userId: String) async throws -> MatchupDetails {
+        let matchupDetails: MatchupDetails = try await networkClient.put(
+            path: "/viva/matchups/\(matchupId)/users/\(userId)/finalize"
+        )
+        
+        NotificationCenter.default.post(
+            name: .matchupUpdated,
+            object: matchupDetails
+        )
+        
+        return matchupDetails
     }
     
     // MARK: - Matchup Invites

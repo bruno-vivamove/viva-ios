@@ -51,7 +51,7 @@ class HomeViewModel: ObservableObject {
             .compactMap { $0.object as? MatchupDetails }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] matchupDetails in
-                self?.handleMatchupUpdated(matchupDetails.asMatchup)
+                self?.handleMatchupUpdated(matchupDetails)
             }
             .store(in: &cancellables)
 
@@ -143,16 +143,16 @@ class HomeViewModel: ObservableObject {
 
         do {
             // Load matchups and both types of invites concurrently
-            async let matchupsTask = matchupService.getMyMatchups()
+            async let matchupsTask = matchupService.getMyMatchups(filter: .ACTIVE_AND_UNFINALIZED)
             async let receivedInvitesTask = matchupService.getMyInvites()
             async let sentInvitesTask = matchupService.getSentInvites()
 
             // Await all results
-            let (fetchedMatchups, fetchedReceivedInvites, fetchedSentInvites) =
+            let (fetchedMatchupsResponse, fetchedReceivedInvites, fetchedSentInvites) =
                 try await (matchupsTask, receivedInvitesTask, sentInvitesTask)
 
             // Update the published properties
-            self.matchups = fetchedMatchups
+            self.matchups = fetchedMatchupsResponse.matchups
             self.receivedInvites = fetchedReceivedInvites
             self.sentInvites = fetchedSentInvites
 
@@ -181,9 +181,16 @@ class HomeViewModel: ObservableObject {
         sentInvites.removeAll { $0.matchupId == matchup.id }
     }
 
-    func handleMatchupUpdated(_ updatedMatchup: Matchup) {
-        if let index = matchups.firstIndex(where: { $0.id == updatedMatchup.id }
-        ) {
+    func handleMatchupUpdated(_ matchupDetails: MatchupDetails) {
+        // If the matchup is finalized and completed, remove it from the list
+        if matchupDetails.status == .completed && matchupDetails.finalized {
+            matchups.removeAll(where: { $0.id == matchupDetails.id })
+            return
+        }
+        
+        // Otherwise, update the matchup in the list
+        let updatedMatchup = matchupDetails.asMatchup
+        if let index = matchups.firstIndex(where: { $0.id == updatedMatchup.id }) {
             matchups[index] = updatedMatchup
         }
     }

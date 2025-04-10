@@ -14,6 +14,14 @@ struct MatchupRequest: Codable {
 
 struct MatchupsResponse: Codable {
     let matchups: [Matchup]
+    let pagination: Pagination
+}
+
+struct Pagination: Codable {
+    let page: Int
+    let pageSize: Int
+    let total: Int
+    let totalPages: Int
 }
 
 struct MatchupTeam: Codable, Identifiable, Equatable, Hashable {
@@ -51,7 +59,7 @@ struct Matchup: Codable, Identifiable, Equatable, Hashable {
     let lengthInDays: Int
     let teams: [MatchupTeam]
     var invites: [MatchupInvite]
-    
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
@@ -100,6 +108,7 @@ struct MatchupDetails: Codable, Equatable {
     let measurements: [MatchupMeasurement]
     var userMeasurements: [MatchupUserMeasurement]
     var invites: [MatchupInvite]
+    var finalized: Bool
     
     var leftTeam: MatchupTeam {
         teams.first { $0.side == .left }!
@@ -234,4 +243,10 @@ struct UserStats: Codable, Equatable {
 struct MatchupStatsResponse: Codable {
     let userStats: UserStats
     let matchupStats: [MatchupStats]
+}
+
+enum MatchupFilter: String, Codable {
+    case ALL = "ALL"
+    case COMPLETED_ONLY = "COMPLETED_ONLY"
+    case ACTIVE_AND_UNFINALIZED = "ACTIVE_AND_UNFINALIZED"
 }

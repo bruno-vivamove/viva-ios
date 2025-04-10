@@ -65,10 +65,6 @@ struct MatchupDetailView: View {
                                 selectedInvite: $selectedInvite,
                                 showUnInviteSheet: $showUnInviteSheet
                             )
-                            .padding(
-                                .horizontal,
-                                VivaDesign.Spacing.outerPadding
-                            )
 
                             // Show reward indicator if completed
                             if matchup.status == .completed {
@@ -101,10 +97,6 @@ struct MatchupDetailView: View {
                                                 .displayName ?? "You"),
                                     rewardCoins: 125
                                 )
-                                .padding(
-                                    .horizontal,
-                                    VivaDesign.Spacing.outerPadding
-                                )
 
                                 Spacer()
                                     .frame(height: VivaDesign.Spacing.small)
@@ -135,10 +127,6 @@ struct MatchupDetailView: View {
                                     )
                                 }
                             }
-                            .padding(
-                                .horizontal,
-                                VivaDesign.Spacing.outerPadding
-                            )
                         }
                         .padding(.top, VivaDesign.Spacing.medium)
                         .listRowBackground(Color.black)
@@ -170,10 +158,10 @@ struct MatchupDetailView: View {
                         ),
                         isCompleted: matchup.status == .completed
                     )
-                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
                     .padding(.vertical, VivaDesign.Spacing.medium)
                     .background(.black)
                 }
+                .padding(.horizontal, VivaDesign.Spacing.outerPadding)
             } else {
                 // Error state
                 VStack {
@@ -672,7 +660,6 @@ struct ViewToggle: View {
         HStack(spacing: VivaDesign.Spacing.medium) {
             // Left line
             VivaDivider()
-                .padding(.leading, VivaDesign.Spacing.small)
 
             // Toggle text with vertical separator
             HStack(spacing: VivaDesign.Spacing.xsmall) {
@@ -703,7 +690,6 @@ struct ViewToggle: View {
 
             // Right line
             VivaDivider()
-                .padding(.trailing, VivaDesign.Spacing.small)
         }
         .onTapGesture {
             withAnimation {

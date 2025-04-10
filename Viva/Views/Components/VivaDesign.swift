@@ -22,6 +22,7 @@ enum VivaDesign {
 
     enum Spacing {
         static let outerPadding: CGFloat = 12
+        static let cardSpacing: CGFloat = 12
 
         static let xlarge: CGFloat = 44
         static let large: CGFloat = 32
