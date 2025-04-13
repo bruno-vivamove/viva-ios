@@ -42,6 +42,7 @@ class MatchupDetailViewModel: ObservableObject {
 
     @Published var isLoading = false
     @Published var error: Error?
+    @Published var isCompletedButNotFinalized = false
 
     init(
         matchupId: String,
@@ -119,7 +120,11 @@ class MatchupDetailViewModel: ObservableObject {
             self.updateMeasuerments(matchup: matchup)
 
             // Finalize if matchup is completed
-            if matchup.status == .completed {
+            withAnimation(.easeInOut(duration: 0.5)) {
+                self.isCompletedButNotFinalized = matchup.status == .completed && !matchup.finalized
+            }
+            
+            if self.isCompletedButNotFinalized {
                 try await finalizeUserParticipation(matchup: matchup)
             } else if matchup.status == .active {
                 healthKitDataManager.updateMatchupData(matchupDetail: matchup) {

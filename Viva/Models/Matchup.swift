@@ -250,3 +250,13 @@ enum MatchupFilter: String, Codable {
     case COMPLETED_ONLY = "COMPLETED_ONLY"
     case ACTIVE_AND_UNFINALIZED = "ACTIVE_AND_UNFINALIZED"
 }
+
+struct RematchRequest: Codable {
+    let displayName: String
+    private let measurementTypes: [String]
+    
+    init(displayName: String, measurementTypes: [MeasurementType]) {
+        self.displayName = displayName
+        self.measurementTypes = measurementTypes.map { $0.rawValue }
+    }
+}

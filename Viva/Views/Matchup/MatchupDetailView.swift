@@ -1,5 +1,6 @@
 import Charts
 import SwiftUI
+import Lottie
 
 struct WorkoutEntry: Identifiable {
     let id = UUID()
@@ -66,7 +67,7 @@ struct MatchupDetailView: View {
                                 showUnInviteSheet: $showUnInviteSheet
                             )
 
-                            // Show reward indicator if completed
+                            // Show matchup result message if completed
                             if matchup.status == .completed {
                                 Spacer()
                                     .frame(height: VivaDesign.Spacing.small)
@@ -82,7 +83,7 @@ struct MatchupDetailView: View {
                                     (isUserOnLeftSide && leftWon)
                                     || (!isUserOnLeftSide && !leftWon)
 
-                                RewardIndicator(
+                                MatchupResultMessage(
                                     userWon: userWon,
                                     opponentName: userWon
                                         ? (isUserOnLeftSide
@@ -94,8 +95,7 @@ struct MatchupDetailView: View {
                                             ? matchup.leftTeam.users.first?
                                                 .displayName ?? "You"
                                             : matchup.rightTeam.users.first?
-                                                .displayName ?? "You"),
-                                    rewardCoins: 125
+                                                .displayName ?? "You")
                                 )
 
                                 Spacer()
@@ -127,6 +127,23 @@ struct MatchupDetailView: View {
                                     )
                                 }
                             }
+                            
+                            MatchupFooter(
+                                endTime: matchup.endTime,
+                                leftUser: matchup.leftTeam.users.first,
+                                rightUser: matchup.rightTeam.users.first,
+                                record: (
+                                    leftWins: matchup.leftTeam.winCount,
+                                    rightWins: matchup.rightTeam.winCount
+                                ),
+                                isCompleted: matchup.status == .completed,
+                                matchupService: viewModel.matchupService,
+                                friendService: viewModel.friendService,
+                                userService: viewModel.userService,
+                                userSession: viewModel.userSession,
+                                matchupId: matchup.id
+                            )
+                            .padding(.vertical, VivaDesign.Spacing.medium)
                         }
                         .padding(.top, VivaDesign.Spacing.medium)
                         .listRowBackground(Color.black)
@@ -146,20 +163,6 @@ struct MatchupDetailView: View {
                                 }
                             }
                     )
-
-                    // Fixed footer
-                    MatchupFooter(
-                        endTime: matchup.endTime,
-                        leftUser: matchup.leftTeam.users.first,
-                        rightUser: matchup.rightTeam.users.first,
-                        record: (
-                            leftWins: matchup.leftTeam.winCount,
-                            rightWins: matchup.rightTeam.winCount
-                        ),
-                        isCompleted: matchup.status == .completed
-                    )
-                    .padding(.vertical, VivaDesign.Spacing.medium)
-                    .background(.black)
                 }
                 .padding(.horizontal, VivaDesign.Spacing.outerPadding)
             } else {
@@ -185,7 +188,43 @@ struct MatchupDetailView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
 
-            // Overlay
+            // Overlay for trophy animation when completed but not finalized
+            if viewModel.isCompletedButNotFinalized {
+                Color.black.opacity(0.85)
+                    .edgesIgnoringSafeArea(.all)
+                
+                VStack(spacing: VivaDesign.Spacing.large) {
+                    LottieView(animation: .named("trophy_plain"))
+                        .playing(.fromProgress(0, toProgress: 0.9, loopMode: .playOnce))
+                        .frame(width: 200, height: 200)
+                    
+                    Text("Congratulations!")
+                        .font(.title.bold())
+                        .foregroundColor(VivaDesign.Colors.vivaGreen)
+                    
+                    Text("Matchup Completed")
+                        .font(.title3)
+                        .foregroundColor(VivaDesign.Colors.primaryText)
+                        
+                    Button {
+                        // Dismiss the overlay by setting isCompletedButNotFinalized to false
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            viewModel.isCompletedButNotFinalized = false
+                        }
+                    } label: {
+                        Text("See Results")
+                            .font(.headline)
+                            .foregroundColor(.black)
+                            .padding(.horizontal, 40)
+                            .padding(.vertical, 12)
+                            .background(VivaDesign.Colors.vivaGreen)
+                            .cornerRadius(8)
+                    }
+                    .padding(.top, VivaDesign.Spacing.medium)
+                }
+            }
+
+            // Overlay for uninvite dialog
             if showUnInviteSheet, let user = selectedInvite?.user,
                 let invite = selectedInvite
             {
@@ -221,6 +260,9 @@ struct MatchupDetailView: View {
                     .truncationMode(.tail)
             }
         }
+        .toolbarBackground(Color.black, for: .navigationBar)
+        .toolbarBackground(.visible, for:.navigationBar)
+        .toolbarColorScheme(.dark)
     }
 
     // MARK: - Skeleton Loading View
@@ -814,13 +856,17 @@ struct MatchupFooter: View {
     let rightUser: User?
     let record: (leftWins: Int, rightWins: Int)
     let isCompleted: Bool
+    let matchupService: MatchupService
+    let friendService: FriendService
+    let userService: UserService
+    let userSession: UserSession
+    @State private var showRematchCategories = false
+    let matchupId: String?
 
     var body: some View {
         if isCompleted {
             // Completed matchup layout
             VStack(spacing: 0) {
-                Spacer()  // Push content down
-
                 // All-Time Wins with record
                 VStack(spacing: VivaDesign.Spacing.small) {
                     // All-Time Wins label
@@ -836,19 +882,16 @@ struct MatchupFooter: View {
                         rightUser: rightUser,
                         record: record
                     )
-                }
-
-                Spacer()  // Space between record and button
+                }.padding(.bottom, VivaDesign.Spacing.small)
 
                 // Rematch button
                 Button {
-                    // Handle rematch action
-                    print("Rematch requested")
+                    showRematchCategories = true
                 } label: {
                     Text("Rematch")
                         .font(.system(size: 24, weight: .semibold))
                         .padding(.horizontal, 60)
-                        .padding(.vertical, VivaDesign.Spacing.medium)
+                        .padding(.vertical, VivaDesign.Spacing.small)
                         .foregroundColor(.white)
                         .overlay(
                             RoundedRectangle(cornerRadius: 8)
@@ -857,6 +900,20 @@ struct MatchupFooter: View {
                 }
                 .padding(.horizontal, VivaDesign.Spacing.large)
                 .padding(.bottom, VivaDesign.Spacing.medium)
+                .sheet(isPresented: $showRematchCategories) {
+                    if let matchupId = matchupId {
+                        MatchupCategoriesView(
+                            matchupService: matchupService,
+                            friendService: friendService,
+                            userService: userService,
+                            userSession: userSession,
+                            showCreationFlow: $showRematchCategories,
+                            source: "rematch",
+                            rematchMatchupId: matchupId
+                        )
+                        .presentationBackground(.clear)
+                    }
+                }
             }
             .frame(maxWidth: .infinity)
         } else {
@@ -1092,32 +1149,19 @@ struct InviteDialog: View {
     }
 }
 
-struct RewardIndicator: View {
+struct MatchupResultMessage: View {
     let userWon: Bool
     let opponentName: String
-    let rewardCoins: Int
 
     var body: some View {
         HStack {
             Spacer()
             if userWon {
-                Text("You won this one and earned ")
-                    .foregroundColor(VivaDesign.Colors.primaryText)
-                    .font(VivaDesign.Typography.body)
-                    + Text("\(rewardCoins) reward coins")
-                    .foregroundColor(VivaDesign.Colors.vivaGreen)
-                    .font(VivaDesign.Typography.body.bold())
-                    + Text(" for staying active. Nice work!")
+                Text("You won this one! Nice work staying active.")
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .font(VivaDesign.Typography.body)
             } else {
-                Text("\(opponentName) took this one, but you earned ")
-                    .foregroundColor(VivaDesign.Colors.primaryText)
-                    .font(VivaDesign.Typography.body)
-                    + Text("\(rewardCoins) reward coins")
-                    .foregroundColor(VivaDesign.Colors.vivaGreen)
-                    .font(VivaDesign.Typography.body.bold())
-                    + Text(" for staying active. Nice work!")
+                Text("\(opponentName) took this one. Nice work staying active!")
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .font(VivaDesign.Typography.body)
             }

@@ -66,6 +66,20 @@ final class MatchupService: ObservableObject {
         return matchup
     }
     
+    func rematchMatchup(matchupId: String, rematchRequest: RematchRequest) async throws -> MatchupDetails {
+        let matchupDetails: MatchupDetails = try await networkClient.post(
+            path: "/viva/matchups/\(matchupId)/rematch",
+            body: rematchRequest
+        )
+        
+        NotificationCenter.default.post(
+            name: .matchupCreated,
+            object: matchupDetails
+        )
+        
+        return matchupDetails
+    }
+    
     // MARK: - Matchup Users
     
     func removeMatchupUser(matchupId: String, userId: String) async throws {

@@ -35,9 +35,12 @@ struct VivaProfileImage: View {
                         .modifier(InvitedModifier(isInvited: isInvited))
                         .shimmering(
                             animation: VivaDesign.AnimationStyle.loadingShimmer)
-                case .failure:
+                case .failure(let error):
                     defaultImage
                         .modifier(InvitedModifier(isInvited: isInvited))
+                        .onAppear {
+                            AppLogger.error("Image load failed for URL: \(url) - \(error)")
+                        }
                 @unknown default:
                     defaultImage
                         .modifier(InvitedModifier(isInvited: isInvited))

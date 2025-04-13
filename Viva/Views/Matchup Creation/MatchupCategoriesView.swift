@@ -18,6 +18,7 @@ struct MatchupCategoriesView: View {
         MatchupCategory(id: "strength", name: "Strength Training Mins", isSelected: false),
         MatchupCategory(id: "sleep", name: "Sleep Mins", isSelected: false),
     ]
+    @State private var isCreatingRematch = false
     
     private var isCategorySelected: Bool {
         return categories.contains(where: { $0.isSelected })
@@ -25,6 +26,7 @@ struct MatchupCategoriesView: View {
 
     let userService: UserService
     let source: String
+    let rematchMatchupId: String?
 
     init(
         matchupService: MatchupService,
@@ -33,7 +35,8 @@ struct MatchupCategoriesView: View {
         userSession: UserSession,
         showCreationFlow: Binding<Bool>,
         challengedUser: User? = nil,
-        source: String = "default"
+        source: String = "default",
+        rematchMatchupId: String? = nil
     ) {
         self._coordinator = StateObject(
             wrappedValue: MatchupCreationCoordinator(
@@ -47,6 +50,7 @@ struct MatchupCategoriesView: View {
         self._showCreationFlow = showCreationFlow
         self.userService = userService
         self.source = source
+        self.rematchMatchupId = rematchMatchupId
     }
 
     var body: some View {
@@ -127,13 +131,96 @@ struct MatchupCategoriesView: View {
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Next") {
-                        navigateToMatchupType = true
+                    if rematchMatchupId != nil {
+                        Button("Rematch") {
+                            createRematch()
+                        }
+                        .foregroundColor(isCategorySelected ? .white : Color.gray.opacity(0.5))
+                        .disabled(!isCategorySelected || isCreatingRematch)
+                    } else {
+                        Button("Next") {
+                            navigateToMatchupType = true
+                        }
+                        .foregroundColor(isCategorySelected ? .white : Color.gray.opacity(0.5))
+                        .disabled(!isCategorySelected)
                     }
-                    .foregroundColor(isCategorySelected ? .white : Color.gray.opacity(0.5))
-                    .disabled(!isCategorySelected)
                 }
             }
+            .overlay(
+                Group {
+                    if isCreatingRematch {
+                        VStack {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                .scaleEffect(1.5)
+                            Text("Creating rematch...")
+                                .foregroundColor(.white)
+                                .padding(.top)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.black.opacity(0.7))
+                    }
+                }
+            )
+        }
+    }
+    
+    private func createRematch() {
+        guard let matchupId = rematchMatchupId, isCategorySelected, !isCreatingRematch else { return }
+        
+        let selectedMeasurementTypes = categories
+            .filter { $0.isSelected }
+            .compactMap { categoryToMeasurementType($0.id) }
+        
+        guard !selectedMeasurementTypes.isEmpty else { return }
+        
+        isCreatingRematch = true
+        
+        let rematchRequest = RematchRequest(
+            displayName: "Rematch Challenge",
+            measurementTypes: selectedMeasurementTypes
+        )
+        
+        Task {
+            do {
+                let matchupDetails = try await coordinator.matchupService.rematchMatchup(
+                    matchupId: matchupId,
+                    rematchRequest: rematchRequest
+                )
+                await MainActor.run {
+                    isCreatingRematch = false
+                    showCreationFlow = false
+                    
+                    // Send a navigation notification with the source
+                    NotificationCenter.default.post(
+                        name: .homeScreenMatchupCreationCompleted,
+                        object: matchupDetails,
+                        userInfo: ["source": source]
+                    )
+                }
+            } catch {
+                await MainActor.run {
+                    isCreatingRematch = false
+                    AppLogger.error("Error creating rematch: \(error)")
+                }
+            }
+        }
+    }
+    
+    private func categoryToMeasurementType(_ categoryId: String) -> MeasurementType? {
+        switch categoryId {
+        case "calories":
+            return .energyBurned
+        case "steps":
+            return .steps
+        case "ehr":
+            return .elevatedHeartRate
+        case "strength":
+            return .strengthTraining
+        case "sleep":
+            return .asleep
+        default:
+            return nil
         }
     }
 }

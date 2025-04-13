@@ -1,0 +1,12 @@
+{
+  "data" : [
+    {
+      "filename" : "trophy_plain.json",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

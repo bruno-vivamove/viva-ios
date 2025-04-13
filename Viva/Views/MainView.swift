@@ -1,4 +1,5 @@
 import SwiftUI
+import Lottie
 
 struct MainView: View {
     @EnvironmentObject var userSession: UserSession

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		C04B469A2D98B7B200C06E09 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = C04B46992D98B7B200C06E09 /* GoogleSignIn */; };
 		C04B469C2D98B88E00C06E09 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C04B469B2D98B88E00C06E09 /* GoogleSignInSwift */; };
+		C060A29D2DA75D89005367BB /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = C060A29C2DA75D89005367BB /* Lottie */; };
 		C0C51AE62D792E4D002CC61A /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = C0C51AE52D792E4D002CC61A /* Alamofire */; };
 		C0C51AE82D792E6D002CC61A /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = C0C51AE72D792E6D002CC61A /* OrderedCollections */; };
 /* End PBXBuildFile section */
@@ -74,6 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C060A29D2DA75D89005367BB /* Lottie in Frameworks */,
 				C0C51AE82D792E6D002CC61A /* OrderedCollections in Frameworks */,
 				C0C51AE62D792E4D002CC61A /* Alamofire in Frameworks */,
 				C04B469A2D98B7B200C06E09 /* GoogleSignIn in Frameworks */,
@@ -152,6 +154,7 @@
 				C0C51AE72D792E6D002CC61A /* OrderedCollections */,
 				C04B46992D98B7B200C06E09 /* GoogleSignIn */,
 				C04B469B2D98B88E00C06E09 /* GoogleSignInSwift */,
+				C060A29C2DA75D89005367BB /* Lottie */,
 			);
 			productName = Viva;
 			productReference = C03975A62D2F83CE00BCE78F /* Viva.app */;
@@ -239,6 +242,7 @@
 				C0C51AE32D792E3C002CC61A /* XCRemoteSwiftPackageReference "swift-collections" */,
 				C0C51AE42D792E4D002CC61A /* XCRemoteSwiftPackageReference "Alamofire" */,
 				C04B46982D98B7B200C06E09 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				C060A29B2DA75D88005367BB /* XCRemoteSwiftPackageReference "lottie-spm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C03975A72D2F83CE00BCE78F /* Products */;
@@ -776,6 +780,14 @@
 				minimumVersion = 8.0.0;
 			};
 		};
+		C060A29B2DA75D88005367BB /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.1;
+			};
+		};
 		C0C51AE32D792E3C002CC61A /* XCRemoteSwiftPackageReference "swift-collections" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-collections.git";
@@ -804,6 +816,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C04B46982D98B7B200C06E09 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignInSwift;
+		};
+		C060A29C2DA75D89005367BB /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C060A29B2DA75D88005367BB /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
 		};
 		C0C51AE52D792E4D002CC61A /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -113,10 +113,10 @@ class HomeViewModel: ObservableObject {
             // Get the source from userInfo if available
             if let userInfo = notification.userInfo,
                let source = userInfo["source"] as? String,
-               source == "home" {
+               (source == "home" || source == "rematch") {
                 self?.selectedMatchup = matchupDetails.asMatchup
             } else {
-                // If source is not "home", don't navigate
+                // If source is not "home" or "rematch", don't navigate
                 Task {
                     // Refresh data instead
                     await self?.loadData()
