@@ -6,11 +6,11 @@ class MatchupCreationCoordinator: ObservableObject {
     let friendService: FriendService
     let userSession: UserSession
     let challengedUser: User?  // Optional challenged user
-    let source: String // Source identifier for navigation
-    
+    let source: String  // Source identifier for navigation
+
     @Published var isCreatingMatchup = false
     @Published var error: Error?
-    
+
     init(
         matchupService: MatchupService,
         friendService: FriendService,
@@ -24,24 +24,59 @@ class MatchupCreationCoordinator: ObservableObject {
         self.challengedUser = challengedUser
         self.source = source
     }
-    
-    func createMatchup(selectedCategories: [MatchupCategory], usersPerSide: Int) async -> MatchupDetails? {
+
+    func createRematchup(
+        rematchMatchupId: String,
+        selectedCategories: [MatchupCategory]
+    ) async
+        -> MatchupDetails?
+    {
         isCreatingMatchup = true
         defer { isCreatingMatchup = false }
-        
-        let measurementTypes = selectedCategories
+
+        let measurementTypes =
+            selectedCategories
             .filter { $0.isSelected }
             .compactMap { categoryToMeasurementType($0.id) }
-        
+
+        let rematchRequest = RematchRequest(
+            displayName: "Rematch Challenge",
+            measurementTypes: measurementTypes
+        )
+
+        do {
+            return
+                try await matchupService
+                .rematchMatchup(
+                    matchupId: rematchMatchupId,
+                    rematchRequest: rematchRequest
+                )
+        } catch {
+            self.error = error
+            return nil
+        }
+    }
+
+    func createMatchup(selectedCategories: [MatchupCategory], usersPerSide: Int)
+        async -> MatchupDetails?
+    {
+        isCreatingMatchup = true
+        defer { isCreatingMatchup = false }
+
+        let measurementTypes =
+            selectedCategories
+            .filter { $0.isSelected }
+            .compactMap { categoryToMeasurementType($0.id) }
+
         let request = MatchupRequest(
             displayName: "New Challenge",
             usersPerSide: usersPerSide,
             measurementTypes: measurementTypes
         )
-        
+
         do {
             let matchup = try await matchupService.createMatchup(request)
-            
+
             // If this is a direct challenge, send the invite immediately
             if let challengedUser = challengedUser {
                 let _ = try await matchupService.createInvite(
@@ -50,15 +85,17 @@ class MatchupCreationCoordinator: ObservableObject {
                     userId: challengedUser.id
                 )
             }
-            
+
             return matchup
         } catch {
             self.error = error
             return nil
         }
     }
-    
-    private func categoryToMeasurementType(_ categoryId: String) -> MeasurementType {
+
+    private func categoryToMeasurementType(_ categoryId: String)
+        -> MeasurementType
+    {
         switch categoryId {
         case "calories":
             return .energyBurned

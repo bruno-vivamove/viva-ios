@@ -52,12 +52,12 @@ struct MainView: View {
                     Text("Profile")
                 }
 
-            // Trophies Tab
-            TrophiesView()
+            // Matchup History Tab
+            MatchupHistoryView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .tabItem {
                     Image(systemName: "trophy.fill")
-                    Text("Trophies")
+                    Text("History")
                 }
 
             // Matchups Tab

@@ -101,7 +101,7 @@ struct MatchupTypeView: View {
                     showCreationFlow = false
                     if let matchupCreated = self.matchupCreated {
                         NotificationCenter.default.post(
-                            name: .friendScreenMatchupCreationCompleted,
+                            name: .matchupCreationFlowCompleted,
                             object: matchupCreated,
                             userInfo: ["source": source]
                         )

@@ -34,12 +34,15 @@ struct VivaProfileImage: View {
                     defaultImage
                         .modifier(InvitedModifier(isInvited: isInvited))
                         .shimmering(
-                            animation: VivaDesign.AnimationStyle.loadingShimmer)
+                            animation: VivaDesign.AnimationStyle.loadingShimmer
+                        )
                 case .failure(let error):
                     defaultImage
                         .modifier(InvitedModifier(isInvited: isInvited))
                         .onAppear {
-                            AppLogger.error("Image load failed for URL: \(url) - \(error)")
+                            AppLogger.error(
+                                "Image load failed for URL: \(url) - \(error)"
+                            )
                         }
                 @unknown default:
                     defaultImage
@@ -82,10 +85,20 @@ struct CachedAsyncImage<Content: View>: View {
 
         // Create a URL request with cache policy
         let request = URLRequest(
-            url: url, cachePolicy: .returnCacheDataElseLoad)
+            url: url,
+            cachePolicy: .returnCacheDataElseLoad
+        )
 
-        // Check if the image is already cached, and if so, prefetch it
-        URLSession.shared.dataTask(with: request) { _, _, _ in }.resume()
+        // Only cache successful responses
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            // Remove failed responses from cache
+            if let httpResponse = response as? HTTPURLResponse, 
+               !(200...299).contains(httpResponse.statusCode)
+            {
+                // For failed responses, remove from cache
+                URLCache.shared.removeCachedResponse(for: request)
+            }
+        }.resume()
     }
 
     var body: some View {

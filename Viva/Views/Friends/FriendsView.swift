@@ -205,7 +205,7 @@ struct FriendsView: View {
 
                 // Observe matchup creation notifications
                 NotificationCenter.default.addObserver(
-                    forName: .friendScreenMatchupCreationCompleted,
+                    forName: .matchupCreationFlowCompleted,
                     object: nil,
                     queue: .main
                 ) { notification in

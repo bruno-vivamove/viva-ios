@@ -118,7 +118,7 @@ struct MatchupInviteView: View {
         .onDisappear {
             coordinator.cleanup()
             NotificationCenter.default.post(
-                name: .homeScreenMatchupCreationCompleted,
+                name: .matchupCreationFlowCompleted,
                 object: self.matchup,
                 userInfo: ["source": source]
             )

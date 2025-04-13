@@ -1,7 +1,7 @@
 import Combine
 import SwiftUI
 
-struct TrophiesView: View {
+struct MatchupHistoryView: View {
     @EnvironmentObject var userSession: UserSession
     @EnvironmentObject var friendService: FriendService
     @EnvironmentObject var matchupService: MatchupService
@@ -9,21 +9,20 @@ struct TrophiesView: View {
     @EnvironmentObject var healthKitDataManager: HealthKitDataManager
     @EnvironmentObject var userMeasurementService: UserMeasurementService
 
-    @StateObject private var viewModel: TrophiesViewModel
-    @State private var selectedMatchup: Matchup?
+    @StateObject private var viewModel: MatchupHistoryViewModel
     @State private var showTimeFilter = false
 
     // Default initializer for use with SwiftUI previews and testing
     init() {
         // Will be overridden in onAppear with the actual matchupService from EnvironmentObject
-        self._viewModel = StateObject(wrappedValue: TrophiesViewModel())
+        self._viewModel = StateObject(wrappedValue: MatchupHistoryViewModel())
     }
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 // Pinned Header with Total Matchups
-                TrophiesHeaderBar(
+                MatchupHistoryHeaderBar(
                     userStats: viewModel.userStats,
                     showTimeFilter: $showTimeFilter
                 )
@@ -55,13 +54,12 @@ struct TrophiesView: View {
 
                         // Completed Matchups Section
                         if !viewModel.completedMatchups.isEmpty {
-                            TrophyCompletedMatchupsSection(
-                                matchups: viewModel.completedMatchups,
+                            MatchupHistoryCompletedMatchupsSection(
+                                viewModel: viewModel,
                                 matchupService: matchupService,
                                 healthKitDataManager: healthKitDataManager,
                                 userSession: userSession,
-                                userMeasurementService: userMeasurementService,
-                                selectedMatchup: $selectedMatchup
+                                userMeasurementService: userMeasurementService
                             )
                         }
                     }
@@ -85,7 +83,7 @@ struct TrophiesView: View {
                     .presentationDetents([.height(250)])
                     .presentationBackground(.clear)
             }
-            .navigationDestination(item: $selectedMatchup) { matchup in
+            .navigationDestination(item: $viewModel.selectedMatchup) { matchup in
                 MatchupDetailView(
                     viewModel: MatchupDetailViewModel(
                         matchupId: matchup.id,
@@ -110,38 +108,13 @@ struct TrophiesView: View {
             .onAppear {
                 Task {
                     await viewModel.loadMatchupStats(using: matchupService)
-                    setupNotificationObservers()
                 }
             }
         }
     }
-
-    func setupNotificationObservers() {
-        // Home screen matchup creation completed observer
-        NotificationCenter.default.removeObserver(
-            self,
-            name: .homeScreenMatchupCreationCompleted,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            forName: .homeScreenMatchupCreationCompleted,
-            object: nil,
-            queue: .main
-        ) { notification in
-            guard let matchupDetails = notification.object as? MatchupDetails,
-                let userInfo = notification.userInfo,
-                let source = userInfo["source"] as? String,
-                source == "trophies"
-            else {
-                return
-            }
-
-            selectedMatchup = matchupDetails.asMatchup
-        }
-    }
 }
 
-struct TrophiesHeaderBar: View {
+struct MatchupHistoryHeaderBar: View {
     let userStats: UserStats?
     @Binding var showTimeFilter: Bool
 
@@ -263,17 +236,16 @@ struct MatchupStatsSection: View {
 }
 
 // MARK: - Completed Matchups Section
-struct TrophyCompletedMatchupsSection: View {
-    let matchups: [Matchup]
+struct MatchupHistoryCompletedMatchupsSection: View {
+    @ObservedObject var viewModel: MatchupHistoryViewModel
     let matchupService: MatchupService
     let healthKitDataManager: HealthKitDataManager
     let userSession: UserSession
     let userMeasurementService: UserMeasurementService
-    @Binding var selectedMatchup: Matchup?
 
     var body: some View {
         Section {
-            ForEach(matchups) { matchup in
+            ForEach(viewModel.completedMatchups) { matchup in
                 MatchupCard(
                     matchupId: matchup.id,
                     matchupService: matchupService,
@@ -284,7 +256,7 @@ struct TrophyCompletedMatchupsSection: View {
                 )
                 .id(matchup.id)
                 .onTapGesture {
-                    selectedMatchup = matchup
+                    viewModel.selectedMatchup = matchup
                 }
                 .listRowBackground(Color.black)
                 .listRowSeparator(.hidden)
@@ -454,12 +426,13 @@ struct EmptyStateSection: View {
 }
 
 // ViewModel
-final class TrophiesViewModel: ObservableObject {
+final class MatchupHistoryViewModel: ObservableObject {
     @Published var matchupStats: [MatchupStats] = []
     @Published var userStats: UserStats?
     @Published var completedMatchups: [Matchup] = []
     @Published var isLoading: Bool = false
     @Published var error: String?
+    @Published var selectedMatchup: Matchup?
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -490,6 +463,24 @@ final class TrophiesViewModel: ObservableObject {
                 self?.handleMatchupCanceled(matchup)
             }
             .store(in: &cancellables)
+        
+        // Observe matchup creation notifications
+        NotificationCenter.default.addObserver(
+            forName: .matchupCreationFlowCompleted,
+            object: nil,
+            queue: .main
+        ) { notification in
+            if let matchupDetails = notification.object as? MatchupDetails,
+               let userInfo = notification.userInfo,
+               let source = userInfo["source"] as? String,
+               source == "history" {
+                Task {
+                    await MainActor.run {
+                        self.selectedMatchup = matchupDetails.asMatchup
+                    }
+                }
+            }
+        }
     }
 
     private func handleMatchupStatusChanged(_ updatedMatchup: Matchup) {

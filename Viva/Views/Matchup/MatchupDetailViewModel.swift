@@ -27,7 +27,7 @@ class MatchupDetailViewModel: ObservableObject {
     let userSession: UserSession
     let healthKitDataManager: HealthKitDataManager
 
-    private let matchupId: String
+    private var matchupId: String
     private var cancellables = Set<AnyCancellable>()
 
     @Published var matchup: MatchupDetails?
@@ -69,6 +69,30 @@ class MatchupDetailViewModel: ObservableObject {
     }
 
     private func setupNotificationObservers() {
+        // Matchup creation flow completed observer
+        NotificationCenter.default.publisher(
+            for: .matchupCreationFlowCompleted
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] notification in
+            guard let matchupDetails = notification.object as? MatchupDetails else {
+                return
+            }
+            
+            // Get the source from userInfo if available
+            if let userInfo = notification.userInfo,
+               let source = userInfo["source"] as? String {
+               
+                // Navigate if source is 'home'
+                if source == "matchupDetailView" {
+                    self?.matchupId = matchupDetails.id
+                    self?.matchup = matchupDetails
+                    self?.updateMeasurements(matchup: matchupDetails)
+                }
+            }
+        }
+        .store(in: &cancellables)
+
         // Matchup invite sent observer
         NotificationCenter.default.publisher(for: .matchupInviteSent)
             .compactMap { $0.object as? MatchupInvite }
@@ -117,7 +141,7 @@ class MatchupDetailViewModel: ObservableObject {
                 matchupId: matchupId
             )
             self.matchup = matchup
-            self.updateMeasuerments(matchup: matchup)
+            self.updateMeasurements(matchup: matchup)
 
             // Finalize if matchup is completed
             withAnimation(.easeInOut(duration: 0.5)) {
@@ -149,7 +173,7 @@ class MatchupDetailViewModel: ObservableObject {
                                     measurements: userMeasurements
                                 )
 
-                            self.updateMeasuerments(
+                            self.updateMeasurements(
                                 matchup: savedMatchupDetails
                             )
                         } catch {
@@ -187,10 +211,10 @@ class MatchupDetailViewModel: ObservableObject {
             userId: currentUserId
         )
         self.matchup = finalizedMatchup
-        self.updateMeasuerments(matchup: finalizedMatchup)
+        self.updateMeasurements(matchup: finalizedMatchup)
     }
 
-    func updateMeasuerments(matchup: MatchupDetails) {
+    func updateMeasurements(matchup: MatchupDetails) {
         // Create set of left user IDs
         let leftUserIds = Set(matchup.leftTeam.users.map { $0.id })
 

@@ -908,7 +908,7 @@ struct MatchupFooter: View {
                             userService: userService,
                             userSession: userSession,
                             showCreationFlow: $showRematchCategories,
-                            source: "rematch",
+                            source: "matchupDetailView",
                             rematchMatchupId: matchupId
                         )
                         .presentationBackground(.clear)

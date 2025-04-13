@@ -12,21 +12,30 @@ struct MatchupCategoriesView: View {
     @State private var navigateToMatchupType = false
     @Binding var showCreationFlow: Bool
     @State private var categories: [MatchupCategory] = [
-        MatchupCategory(id: "calories", name: "Active Calories", isSelected: false),
+        MatchupCategory(
+            id: "calories",
+            name: "Active Calories",
+            isSelected: false
+        ),
         MatchupCategory(id: "steps", name: "Steps", isSelected: false),
         MatchupCategory(id: "ehr", name: "eHR Mins", isSelected: false),
-        MatchupCategory(id: "strength", name: "Strength Training Mins", isSelected: false),
+        MatchupCategory(
+            id: "strength",
+            name: "Strength Training Mins",
+            isSelected: false
+        ),
         MatchupCategory(id: "sleep", name: "Sleep Mins", isSelected: false),
     ]
     @State private var isCreatingRematch = false
-    
-    private var isCategorySelected: Bool {
-        return categories.contains(where: { $0.isSelected })
-    }
+    @State private var matchupCreated: MatchupDetails?
 
     let userService: UserService
     let source: String
     let rematchMatchupId: String?
+
+    private var isCategorySelected: Bool {
+        return categories.contains(where: { $0.isSelected })
+    }
 
     init(
         matchupService: MatchupService,
@@ -63,7 +72,7 @@ struct MatchupCategoriesView: View {
                     + Text("categories")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(VivaDesign.Colors.vivaGreen)
-                
+
                 // Category List
                 ScrollView {
                     VStack(spacing: VivaDesign.Spacing.small) {
@@ -77,12 +86,22 @@ struct MatchupCategoriesView: View {
                                     .padding()
                                     .background(
                                         RoundedRectangle(cornerRadius: 8)
-                                            .fill(category.isSelected ? VivaDesign.Colors.vivaGreen : Color.clear)
+                                            .fill(
+                                                category.isSelected
+                                                    ? VivaDesign.Colors
+                                                        .vivaGreen : Color.clear
+                                            )
                                     )
-                                    .foregroundColor(category.isSelected ? Color.black : Color.white)
+                                    .foregroundColor(
+                                        category.isSelected
+                                            ? Color.black : Color.white
+                                    )
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 8)
-                                            .stroke(VivaDesign.Colors.vivaGreen, lineWidth: 1)
+                                            .stroke(
+                                                VivaDesign.Colors.vivaGreen,
+                                                lineWidth: 1
+                                            )
                                     )
                             }
                         }
@@ -96,18 +115,21 @@ struct MatchupCategoriesView: View {
                         categories[i].isSelected = !allSelected
                     }
                 }) {
-                    Text(categories.allSatisfy { $0.isSelected } ? "Deselect All" : "Select All")
-                        .font(.system(size: 16, weight: .semibold))
-                        .padding(.horizontal, VivaDesign.Spacing.medium)
-                        .padding(.vertical, VivaDesign.Spacing.small)
-                        .background(Color.clear)
-                        .foregroundColor(VivaDesign.Colors.vivaGreen)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(VivaDesign.Colors.vivaGreen, lineWidth: 1)
-                        )
+                    Text(
+                        categories.allSatisfy { $0.isSelected }
+                            ? "Deselect All" : "Select All"
+                    )
+                    .font(.system(size: 16, weight: .semibold))
+                    .padding(.horizontal, VivaDesign.Spacing.medium)
+                    .padding(.vertical, VivaDesign.Spacing.small)
+                    .background(Color.clear)
+                    .foregroundColor(VivaDesign.Colors.vivaGreen)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(VivaDesign.Colors.vivaGreen, lineWidth: 1)
+                    )
                 }
-                
+
                 Spacer()
             }
             .padding()
@@ -133,15 +155,30 @@ struct MatchupCategoriesView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if rematchMatchupId != nil {
                         Button("Rematch") {
-                            createRematch()
+                            Task {
+                                if let matchupId = rematchMatchupId {
+                                    matchupCreated = await coordinator.createRematchup(
+                                        rematchMatchupId: matchupId,
+                                        selectedCategories: categories
+                                    )
+                                }
+                            }
                         }
-                        .foregroundColor(isCategorySelected ? .white : Color.gray.opacity(0.5))
-                        .disabled(!isCategorySelected || isCreatingRematch)
+                        .foregroundColor(
+                            isCategorySelected
+                                ? .white : Color.gray.opacity(0.5)
+                        )
+                        .disabled(
+                            !isCategorySelected || coordinator.isCreatingMatchup
+                        )
                     } else {
                         Button("Next") {
                             navigateToMatchupType = true
                         }
-                        .foregroundColor(isCategorySelected ? .white : Color.gray.opacity(0.5))
+                        .foregroundColor(
+                            isCategorySelected
+                                ? .white : Color.gray.opacity(0.5)
+                        )
                         .disabled(!isCategorySelected)
                     }
                 }
@@ -151,7 +188,9 @@ struct MatchupCategoriesView: View {
                     if isCreatingRematch {
                         VStack {
                             ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                .progressViewStyle(
+                                    CircularProgressViewStyle(tint: .white)
+                                )
                                 .scaleEffect(1.5)
                             Text("Creating rematch...")
                                 .foregroundColor(.white)
@@ -163,51 +202,26 @@ struct MatchupCategoriesView: View {
                 }
             )
         }
-    }
-    
-    private func createRematch() {
-        guard let matchupId = rematchMatchupId, isCategorySelected, !isCreatingRematch else { return }
-        
-        let selectedMeasurementTypes = categories
-            .filter { $0.isSelected }
-            .compactMap { categoryToMeasurementType($0.id) }
-        
-        guard !selectedMeasurementTypes.isEmpty else { return }
-        
-        isCreatingRematch = true
-        
-        let rematchRequest = RematchRequest(
-            displayName: "Rematch Challenge",
-            measurementTypes: selectedMeasurementTypes
-        )
-        
-        Task {
-            do {
-                let matchupDetails = try await coordinator.matchupService.rematchMatchup(
-                    matchupId: matchupId,
-                    rematchRequest: rematchRequest
-                )
-                await MainActor.run {
-                    isCreatingRematch = false
+        .onChange(of: matchupCreated != nil) { wasCreated, isCreated in
+            if isCreated {
+                if rematchMatchupId != nil {
+                    // If there's a challenged user, close the flow and notify
                     showCreationFlow = false
-                    
-                    // Send a navigation notification with the source
-                    NotificationCenter.default.post(
-                        name: .homeScreenMatchupCreationCompleted,
-                        object: matchupDetails,
-                        userInfo: ["source": source]
-                    )
-                }
-            } catch {
-                await MainActor.run {
-                    isCreatingRematch = false
-                    AppLogger.error("Error creating rematch: \(error)")
+                    if let matchupCreated = self.matchupCreated {
+                        NotificationCenter.default.post(
+                            name: .matchupCreationFlowCompleted,
+                            object: matchupCreated,
+                            userInfo: ["source": source]
+                        )
+                    }
                 }
             }
         }
     }
-    
-    private func categoryToMeasurementType(_ categoryId: String) -> MeasurementType? {
+
+    private func categoryToMeasurementType(_ categoryId: String)
+        -> MeasurementType?
+    {
         switch categoryId {
         case "calories":
             return .energyBurned
