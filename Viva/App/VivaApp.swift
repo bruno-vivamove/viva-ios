@@ -1,6 +1,7 @@
 import SwiftUI
 import GoogleSignIn
 import AuthenticationServices
+import Nuke
 
 @main
 struct VivaApp: App {
@@ -112,8 +113,33 @@ struct AppContainerView: View {
 
 // Configure the shared URLCache for image caching
 func configureVivaImageCache() {
-    let memoryCapacity = 50 * 1024 * 1024 // 50 MB
-    let diskCapacity = 100 * 1024 * 1024 // 100 MB
-    let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: "vivaImages")
-    URLCache.shared = cache
+    // Configure memory cache
+    ImageCache.shared.costLimit = 50 * 1024 * 1024 // 50 MB
+    ImageCache.shared.countLimit = 500 // Limit number of items in memory cache
+    ImageCache.shared.ttl = 120 // Invalidate images after 120 seconds
+    
+    // Configure disk cache
+    let dataCache = try? DataCache(name: "vivaImages")
+    dataCache?.sizeLimit = 100 * 1024 * 1024 // 100 MB
+    
+    // Create custom pipeline with data cache
+    let pipeline = ImagePipeline {
+        $0.dataCache = dataCache
+        $0.imageCache = ImageCache.shared
+        
+        // Use custom data loader to disable default URLCache
+        let config = URLSessionConfiguration.default
+        config.urlCache = nil // Disable URLCache since we're using DataCache
+        $0.dataLoader = DataLoader(configuration: config)
+        
+        // Additional performance configurations
+        $0.isProgressiveDecodingEnabled = true
+        $0.isRateLimiterEnabled = true
+        
+        // Configure caching behavior
+        $0.dataCachePolicy = .storeOriginalData // Store only original image data
+    }
+    
+    // Set as the shared pipeline
+    ImagePipeline.shared = pipeline
 }

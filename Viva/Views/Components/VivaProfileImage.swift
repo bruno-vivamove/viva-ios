@@ -1,4 +1,6 @@
 import SwiftUI
+import NukeUI
+import Nuke
 
 struct VivaProfileImage: View {
     let userId: String?
@@ -21,34 +23,34 @@ struct VivaProfileImage: View {
 
     var body: some View {
         if let urlString = imageUrl, let url = URL(string: urlString) {
-            CachedAsyncImage(url: url) { phase in
-                switch phase {
-                case .success(let image):
+            LazyImage(url: url) { state in
+                if let image = state.image {
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: size.rawValue, height: size.rawValue)
                         .modifier(InvitedModifier(isInvited: isInvited))
                         .clipShape(Circle())
-                case .empty:
+                } else if state.error != nil {
+                    defaultImage
+                        .modifier(InvitedModifier(isInvited: isInvited))
+                        .onAppear {
+                            if let error = state.error {
+                                AppLogger.error(
+                                    "Image load failed for URL: \(url) - \(error)"
+                                )
+                            }
+                        }
+                } else {
                     defaultImage
                         .modifier(InvitedModifier(isInvited: isInvited))
                         .shimmering(
                             animation: VivaDesign.AnimationStyle.loadingShimmer
                         )
-                case .failure(let error):
-                    defaultImage
-                        .modifier(InvitedModifier(isInvited: isInvited))
-                        .onAppear {
-                            AppLogger.error(
-                                "Image load failed for URL: \(url) - \(error)"
-                            )
-                        }
-                @unknown default:
-                    defaultImage
-                        .modifier(InvitedModifier(isInvited: isInvited))
                 }
             }
+            .priority(.normal)
+            .processors([ImageProcessors.Resize(size: CGSize(width: size.rawValue, height: size.rawValue))])
             .clipShape(Circle())
         } else {
             defaultImage
@@ -62,52 +64,6 @@ struct VivaProfileImage: View {
             .resizable()
             .foregroundColor(.gray)
             .frame(width: size.rawValue, height: size.rawValue)
-    }
-}
-
-// Custom CachedAsyncImage wrapper for enhanced caching
-struct CachedAsyncImage<Content: View>: View {
-    private let url: URL
-    private let scale: CGFloat
-    private let transaction: Transaction
-    private let content: (AsyncImagePhase) -> Content
-
-    init(
-        url: URL,
-        scale: CGFloat = 1.0,
-        transaction: Transaction = Transaction(),
-        @ViewBuilder content: @escaping (AsyncImagePhase) -> Content
-    ) {
-        self.url = url
-        self.scale = scale
-        self.transaction = transaction
-        self.content = content
-
-        // Create a URL request with cache policy
-        let request = URLRequest(
-            url: url,
-            cachePolicy: .returnCacheDataElseLoad
-        )
-
-        // Only cache successful responses
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            // Remove failed responses from cache
-            if let httpResponse = response as? HTTPURLResponse, 
-               !(200...299).contains(httpResponse.statusCode)
-            {
-                // For failed responses, remove from cache
-                URLCache.shared.removeCachedResponse(for: request)
-            }
-        }.resume()
-    }
-
-    var body: some View {
-        AsyncImage(
-            url: url,
-            scale: scale,
-            transaction: transaction,
-            content: content
-        )
     }
 }
 
