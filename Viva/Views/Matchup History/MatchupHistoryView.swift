@@ -2,6 +2,7 @@ import Combine
 import SwiftUI
 
 struct MatchupHistoryView: View {
+    @Environment(\.dismiss) var dismiss
     @EnvironmentObject var userSession: UserSession
     @EnvironmentObject var friendService: FriendService
     @EnvironmentObject var matchupService: MatchupService
@@ -13,9 +14,9 @@ struct MatchupHistoryView: View {
     @State private var showTimeFilter = false
 
     // Default initializer for use with SwiftUI previews and testing
-    init() {
+    init(viewModel: MatchupHistoryViewModel) {
         // Will be overridden in onAppear with the actual matchupService from EnvironmentObject
-        self._viewModel = StateObject(wrappedValue: MatchupHistoryViewModel())
+        self._viewModel = StateObject(wrappedValue: viewModel)
     }
 
     var body: some View {
@@ -70,7 +71,7 @@ struct MatchupHistoryView: View {
                     .scrollContentBackground(.hidden)
                     .environment(\.defaultMinListRowHeight, 0)
                     .refreshable {
-                        await viewModel.loadMatchupStats(using: matchupService)
+                        await viewModel.loadMatchupStats()
                     }
                 }
 
@@ -79,11 +80,12 @@ struct MatchupHistoryView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
             .sheet(isPresented: $showTimeFilter) {
-                TimeFilterView(isPresented: $showTimeFilter)
+                MatchupHistoryTimeFilterView(isPresented: $showTimeFilter)
                     .presentationDetents([.height(250)])
                     .presentationBackground(.clear)
             }
-            .navigationDestination(item: $viewModel.selectedMatchup) { matchup in
+            .navigationDestination(item: $viewModel.selectedMatchup) {
+                matchup in
                 MatchupDetailView(
                     viewModel: MatchupDetailViewModel(
                         matchupId: matchup.id,
@@ -92,8 +94,9 @@ struct MatchupHistoryView: View {
                         friendService: friendService,
                         userService: userService,
                         userSession: userSession,
-                        healthKitDataManager: healthKitDataManager
-                    )
+                        healthKitDataManager: healthKitDataManager,
+                    ),
+                    source: "history"
                 )
             }
             .alert("Error", isPresented: .constant(viewModel.error != nil)) {
@@ -107,7 +110,12 @@ struct MatchupHistoryView: View {
             }
             .onAppear {
                 Task {
-                    await viewModel.loadMatchupStats(using: matchupService)
+                    await viewModel.loadMatchupStats()
+                }
+            }
+            .onChange(of: viewModel.selectedMatchup) { oldValue, newValue in
+                if oldValue != nil && newValue == nil {
+                    dismiss()
                 }
             }
         }
@@ -330,7 +338,7 @@ struct MatchupStatsCard: View {
     }
 }
 
-struct EmptyStateView: View {
+struct MatchupHistoryEmptyStateView: View {
     let message: String
 
     var body: some View {
@@ -348,7 +356,7 @@ struct EmptyStateView: View {
     }
 }
 
-struct TimeFilterView: View {
+struct MatchupHistoryTimeFilterView: View {
     @Binding var isPresented: Bool
 
     let timeOptions = ["All-Time", "This Year", "This Month", "This Week"]
@@ -415,139 +423,11 @@ struct TimeFilterView: View {
     }
 }
 
-
 // MARK: - Empty State Section
 struct EmptyStateSection: View {
     let message: String
 
     var body: some View {
-        EmptyStateView(message: message)
-    }
-}
-
-// ViewModel
-final class MatchupHistoryViewModel: ObservableObject {
-    @Published var matchupStats: [MatchupStats] = []
-    @Published var userStats: UserStats?
-    @Published var completedMatchups: [Matchup] = []
-    @Published var isLoading: Bool = false
-    @Published var error: String?
-    @Published var selectedMatchup: Matchup?
-
-    private var cancellables = Set<AnyCancellable>()
-
-    init() {
-        setupNotificationObservers()
-    }
-
-    private func setupNotificationObservers() {
-        // Matchup updated observer
-        NotificationCenter.default.publisher(for: .matchupUpdated)
-            .compactMap { $0.object as? MatchupDetails }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] matchupDetails in
-                let updatedMatchup = matchupDetails.asMatchup
-
-                // Update completed matchups if status changed to completed
-                if updatedMatchup.status == .completed {
-                    self?.handleMatchupStatusChanged(updatedMatchup)
-                }
-            }
-            .store(in: &cancellables)
-
-        // Matchup canceled observer
-        NotificationCenter.default.publisher(for: .matchupCanceled)
-            .compactMap { $0.object as? Matchup }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] matchup in
-                self?.handleMatchupCanceled(matchup)
-            }
-            .store(in: &cancellables)
-        
-        // Observe matchup creation notifications
-        NotificationCenter.default.addObserver(
-            forName: .matchupCreationFlowCompleted,
-            object: nil,
-            queue: .main
-        ) { notification in
-            if let matchupDetails = notification.object as? MatchupDetails,
-               let userInfo = notification.userInfo,
-               let source = userInfo["source"] as? String,
-               source == "history" {
-                Task {
-                    await MainActor.run {
-                        self.selectedMatchup = matchupDetails.asMatchup
-                    }
-                }
-            }
-        }
-    }
-
-    private func handleMatchupStatusChanged(_ updatedMatchup: Matchup) {
-        // If the matchup status changed to completed, add it to completedMatchups
-        if updatedMatchup.status == .completed {
-            if !completedMatchups.contains(where: { $0.id == updatedMatchup.id }
-            ) {
-                completedMatchups.append(updatedMatchup)
-            } else {
-                // Update existing matchup
-                if let index = completedMatchups.firstIndex(where: {
-                    $0.id == updatedMatchup.id
-                }) {
-                    completedMatchups[index] = updatedMatchup
-                }
-            }
-
-            // Also refresh stats since they may have changed
-            Task {
-                if let matchupService = matchupService {
-                    do {
-                        let response =
-                            try await matchupService.getMatchupStats()
-                        self.userStats = response.userStats
-                        self.matchupStats = response.matchupStats
-                    } catch {
-                        // Ignore errors when refreshing in background
-                    }
-                }
-            }
-        }
-    }
-
-    private func handleMatchupCanceled(_ matchup: Matchup) {
-        // Remove from completed matchups if it exists
-        completedMatchups.removeAll { $0.id == matchup.id }
-    }
-
-    private var matchupService: MatchupService?
-
-    @MainActor
-    func loadMatchupStats(using matchupService: MatchupService) async {
-        isLoading = true
-        error = nil
-        self.matchupService = matchupService
-
-        do {
-            // Load matchup stats and all matchups concurrently
-            async let statsTask = matchupService.getMatchupStats()
-            async let matchupsTask = matchupService.getMyMatchups(filter: .COMPLETED_ONLY)
-
-            // Await all results
-            let (statsResponse, matchupsResponse) = try await (
-                statsTask, matchupsTask
-            )
-
-            // Update the published properties
-            userStats = statsResponse.userStats
-            matchupStats = statsResponse.matchupStats
-
-            // Use the completed matchups from the response
-            completedMatchups = matchupsResponse.matchups
-
-            isLoading = false
-        } catch {
-            self.error = error.localizedDescription
-            isLoading = false
-        }
+        MatchupHistoryEmptyStateView(message: message)
     }
 }

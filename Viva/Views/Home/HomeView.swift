@@ -73,7 +73,8 @@ struct HomeView: View {
                         userService: userService,
                         userSession: userSession,
                         healthKitDataManager: healthKitDataManager
-                    )
+                    ),
+                    source: "home"
                 )
             }
             .alert("Error", isPresented: .constant(viewModel.error != nil)) {
@@ -160,43 +161,49 @@ struct HomeContentList: View {
         List {
             // Completed Matchups
             if !viewModel.completedMatchups.isEmpty {
-                MatchupSection(
-                    viewModel: viewModel,
+                MatchupSectionView(
+                    title: "Completed Matchups",
+                    matchups: viewModel.completedMatchups,
+                    lastRefreshTime: viewModel.dataRefreshedTime,
+                    onMatchupSelected: { matchup in
+                        viewModel.selectedMatchup = matchup
+                    },
                     matchupService: matchupService,
                     healthKitDataManager: healthKitDataManager,
                     userSession: userSession,
-                    userMeasurementService: userMeasurementService,
-                    rowInsets: rowInsets,
-                    title: "Completed Matchups",
-                    matchups: viewModel.completedMatchups
+                    userMeasurementService: userMeasurementService
                 )
             }
             
             // Active Matchups
             if !viewModel.activeMatchups.isEmpty {
-                MatchupSection(
-                    viewModel: viewModel,
+                MatchupSectionView(
+                    title: "Active Matchups",
+                    matchups: viewModel.activeMatchups,
+                    lastRefreshTime: viewModel.dataRefreshedTime,
+                    onMatchupSelected: { matchup in
+                        viewModel.selectedMatchup = matchup
+                    },
                     matchupService: matchupService,
                     healthKitDataManager: healthKitDataManager,
                     userSession: userSession,
-                    userMeasurementService: userMeasurementService,
-                    rowInsets: rowInsets,
-                    title: "Active Matchups",
-                    matchups: viewModel.activeMatchups
+                    userMeasurementService: userMeasurementService
                 )
             }
 
             // Pending Matchups
             if !viewModel.pendingMatchups.isEmpty {
-                MatchupSection(
-                    viewModel: viewModel,
+                MatchupSectionView(
+                    title: "Pending Matchups",
+                    matchups: viewModel.pendingMatchups,
+                    lastRefreshTime: viewModel.dataRefreshedTime,
+                    onMatchupSelected: { matchup in
+                        viewModel.selectedMatchup = matchup
+                    },
                     matchupService: matchupService,
                     healthKitDataManager: healthKitDataManager,
                     userSession: userSession,
-                    userMeasurementService: userMeasurementService,
-                    rowInsets: rowInsets,
-                    title: "Pending Matchups",
-                    matchups: viewModel.pendingMatchups
+                    userMeasurementService: userMeasurementService
                 )
             }
 
@@ -208,42 +215,6 @@ struct HomeContentList: View {
                     rowInsets: rowInsets
                 )
             }
-        }
-    }
-}
-
-// MARK: - Matchup Section
-struct MatchupSection: View {
-    @ObservedObject var viewModel: HomeViewModel
-    let matchupService: MatchupService
-    let healthKitDataManager: HealthKitDataManager
-    let userSession: UserSession
-    let userMeasurementService: UserMeasurementService
-    let rowInsets: EdgeInsets
-    let title: String
-    let matchups: [Matchup]
-
-    var body: some View {
-        Section {
-            ForEach(matchups) { matchup in
-                MatchupCard(
-                    matchupId: matchup.id,
-                    matchupService: matchupService,
-                    userMeasurementService: userMeasurementService,
-                    healthKitDataManager: healthKitDataManager,
-                    userSession: userSession,
-                    lastRefreshTime: viewModel.dataRefreshedTime
-                )
-                .id(matchup.id)
-                .onTapGesture {
-                    viewModel.selectedMatchup = matchup
-                }
-                .listRowSeparator(.hidden)
-                .listRowInsets(rowInsets)
-                .padding(.bottom, VivaDesign.Spacing.cardSpacing)
-            }
-        } header: {
-            SectionHeaderView(title: title)
         }
     }
 }

@@ -77,6 +77,14 @@ final class MatchupService: ObservableObject {
             object: matchupDetails
         )
         
+        // Fire events for each invite that was created
+        for invite in matchupDetails.invites {
+            NotificationCenter.default.post(
+                name: .matchupInviteSent,
+                object: invite
+            )
+        }
+        
         return matchupDetails
     }
     

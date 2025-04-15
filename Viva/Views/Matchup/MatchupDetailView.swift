@@ -1,6 +1,6 @@
 import Charts
-import SwiftUI
 import Lottie
+import SwiftUI
 
 struct WorkoutEntry: Identifiable {
     let id = UUID()
@@ -24,12 +24,15 @@ struct MatchupDetailView: View {
     @State private var isShowingTotal = true
     @State private var showUnInviteSheet = false
     @State private var selectedInvite: MatchupInvite? = nil
+    private let source: String
     @Environment(\.dismiss) private var dismiss
 
     init(
-        viewModel: MatchupDetailViewModel
+        viewModel: MatchupDetailViewModel,
+        source: String
     ) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.source = source
     }
 
     var body: some View {
@@ -64,7 +67,8 @@ struct MatchupDetailView: View {
                             MatchupHeader(
                                 viewModel: viewModel,
                                 selectedInvite: $selectedInvite,
-                                showUnInviteSheet: $showUnInviteSheet
+                                showUnInviteSheet: $showUnInviteSheet,
+                                source: source
                             )
 
                             // Show matchup result message if completed
@@ -72,30 +76,26 @@ struct MatchupDetailView: View {
                                 Spacer()
                                     .frame(height: VivaDesign.Spacing.small)
 
-                                // Determine if current user is on winning side
+                                // Winning and losing teams
                                 let currentUserId = viewModel.userSession.userId
-                                let isUserOnLeftSide = matchup.leftTeam.users
-                                    .contains(where: { $0.id == currentUserId })
-                                let leftWon =
-                                    matchup.leftTeam.points
-                                    > matchup.rightTeam.points
-                                let userWon =
-                                    (isUserOnLeftSide && leftWon)
-                                    || (!isUserOnLeftSide && !leftWon)
+                                let userTeam =
+                                    matchup.leftTeam.users
+                                        .contains(where: {
+                                            $0.id == currentUserId
+                                        })
+                                    ? matchup.leftTeam : matchup.rightTeam
+                                let opponentTeam =
+                                    userTeam == matchup.leftTeam
+                                    ? matchup.rightTeam : matchup.leftTeam
+                                let userIsWinner =
+                                    userTeam.points > opponentTeam.points
+                                let oppopnentName =
+                                    opponentTeam.users.first?
+                                    .displayName ?? "Opponent"
 
                                 MatchupResultMessage(
-                                    userWon: userWon,
-                                    opponentName: userWon
-                                        ? (isUserOnLeftSide
-                                            ? matchup.rightTeam.users.first?
-                                                .displayName ?? "Opponent"
-                                            : matchup.leftTeam.users.first?
-                                                .displayName ?? "Opponent")
-                                        : (isUserOnLeftSide
-                                            ? matchup.leftTeam.users.first?
-                                                .displayName ?? "You"
-                                            : matchup.rightTeam.users.first?
-                                                .displayName ?? "You")
+                                    userIsWinner: userIsWinner,
+                                    opponentName: oppopnentName
                                 )
 
                                 Spacer()
@@ -127,7 +127,7 @@ struct MatchupDetailView: View {
                                     )
                                 }
                             }
-                            
+
                             MatchupFooter(
                                 endTime: matchup.endTime,
                                 leftUser: matchup.leftTeam.users.first,
@@ -141,7 +141,8 @@ struct MatchupDetailView: View {
                                 friendService: viewModel.friendService,
                                 userService: viewModel.userService,
                                 userSession: viewModel.userSession,
-                                matchupId: matchup.id
+                                matchupId: matchup.id,
+                                source: source
                             )
                             .padding(.vertical, VivaDesign.Spacing.medium)
                         }
@@ -192,20 +193,26 @@ struct MatchupDetailView: View {
             if viewModel.isCompletedButNotFinalized {
                 Color.black.opacity(0.85)
                     .edgesIgnoringSafeArea(.all)
-                
+
                 VStack(spacing: VivaDesign.Spacing.large) {
                     LottieView(animation: .named("trophy_plain"))
-                        .playing(.fromProgress(0, toProgress: 0.9, loopMode: .playOnce))
+                        .playing(
+                            .fromProgress(
+                                0,
+                                toProgress: 0.9,
+                                loopMode: .playOnce
+                            )
+                        )
                         .frame(width: 200, height: 200)
-                    
+
                     Text("Congratulations!")
                         .font(.title.bold())
                         .foregroundColor(VivaDesign.Colors.vivaGreen)
-                    
+
                     Text("Matchup Completed")
                         .font(.title3)
                         .foregroundColor(VivaDesign.Colors.primaryText)
-                        
+
                     Button {
                         // Dismiss the overlay by setting isCompletedButNotFinalized to false
                         withAnimation(.easeInOut(duration: 0.5)) {
@@ -261,7 +268,7 @@ struct MatchupDetailView: View {
             }
         }
         .toolbarBackground(Color.black, for: .navigationBar)
-        .toolbarBackground(.visible, for:.navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.dark)
     }
 
@@ -502,6 +509,7 @@ struct MatchupHeader: View {
     @ObservedObject var viewModel: MatchupDetailViewModel
     @Binding var selectedInvite: MatchupInvite?
     @Binding var showUnInviteSheet: Bool
+    let source: String
 
     @State private var showInviteView = false
     @State private var inviteMatchupTeamId: String?
@@ -528,7 +536,8 @@ struct MatchupHeader: View {
                     usersPerSide: matchup.usersPerSide,
                     showCreationFlow: $showInviteView,
                     isInvitingFromDetails: true,
-                    preferredTeamId: inviteMatchupTeamId
+                    preferredTeamId: inviteMatchupTeamId,
+                    source: source
                 )
             }
         }
@@ -862,6 +871,7 @@ struct MatchupFooter: View {
     let userSession: UserSession
     @State private var showRematchCategories = false
     let matchupId: String?
+    let source: String
 
     var body: some View {
         if isCompleted {
@@ -908,7 +918,7 @@ struct MatchupFooter: View {
                             userService: userService,
                             userSession: userSession,
                             showCreationFlow: $showRematchCategories,
-                            source: "matchupDetailView",
+                            source: source,
                             rematchMatchupId: matchupId
                         )
                         .presentationBackground(.clear)
@@ -1150,13 +1160,13 @@ struct InviteDialog: View {
 }
 
 struct MatchupResultMessage: View {
-    let userWon: Bool
+    let userIsWinner: Bool
     let opponentName: String
 
     var body: some View {
         HStack {
             Spacer()
-            if userWon {
+            if userIsWinner {
                 Text("You won this one! Nice work staying active.")
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .font(VivaDesign.Typography.body)

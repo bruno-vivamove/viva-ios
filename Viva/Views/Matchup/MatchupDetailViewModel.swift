@@ -84,7 +84,7 @@ class MatchupDetailViewModel: ObservableObject {
                let source = userInfo["source"] as? String {
                
                 // Navigate if source is 'home'
-                if source == "matchupDetailView" {
+                if source == "history" {
                     self?.matchupId = matchupDetails.id
                     self?.matchup = matchupDetails
                     self?.updateMeasurements(matchup: matchupDetails)

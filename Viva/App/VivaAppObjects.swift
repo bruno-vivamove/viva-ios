@@ -66,7 +66,7 @@ class VivaAppObjects: ObservableObject {
             networkClient: appNetworkClient, userSession: userSession)
         friendService = FriendService(
             networkClient: appNetworkClient)
-        matchupService = MatchupService(networkClient: appNetworkClient)
+        matchupService = MatchupService(networkClient: appNetworkClientNoBodies)
         userMeasurementService = UserMeasurementService(networkClient: appNetworkClientNoBodies)
         userService = UserService(networkClient: appNetworkClient)
 

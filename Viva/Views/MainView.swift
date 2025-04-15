@@ -1,9 +1,8 @@
-import SwiftUI
 import Lottie
+import SwiftUI
 
 struct MainView: View {
     @EnvironmentObject var userSession: UserSession
-    @EnvironmentObject var authenticationManager: AuthenticationManager
     @EnvironmentObject var userProfileService: UserProfileService
     @EnvironmentObject var friendService: FriendService
     @EnvironmentObject var matchupService: MatchupService
@@ -15,20 +14,26 @@ struct MainView: View {
 
     init() {
         let tabBarAppearance = UITabBarAppearance()
-        tabBarAppearance.configureWithOpaqueBackground() // Makes it fully opaque
-        tabBarAppearance.backgroundColor = UIColor.init(VivaDesign.Colors.background)
-        
+        tabBarAppearance.configureWithOpaqueBackground()  // Makes it fully opaque
+        tabBarAppearance.backgroundColor = UIColor.init(
+            VivaDesign.Colors.background
+        )
+
         UITabBar.appearance().standardAppearance = tabBarAppearance
-        UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance // Applies when scrolled to the bottom
-        UITabBar.appearance().unselectedItemTintColor = UIColor.init(VivaDesign.Colors.primaryText)
+        UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance  // Applies when scrolled to the bottom
+        UITabBar.appearance().unselectedItemTintColor = UIColor.init(
+            VivaDesign.Colors.primaryText
+        )
     }
-    
+
     var body: some View {
         TabView {
             // Home Tab
             HomeView(
                 viewModel: HomeViewModel(
-                    userSession: userSession, matchupService: matchupService)
+                    userSession: userSession,
+                    matchupService: matchupService
+                )
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .tabItem {
@@ -44,21 +49,31 @@ struct MainView: View {
                     Text("Rewards")
                 }
 
-            // Profile Tab - Updated to use our new ProfileView
-            ProfileView()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .tabItem {
-                    Image(systemName: "person.fill")
-                    Text("Profile")
-                }
+            // Profile Tab
+            ProfileView(
+                viewModel: ProfileViewModel(
+                    userSession: userSession,
+                    userProfileService: userProfileService,
+                    matchupService: matchupService
+                )
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .tabItem {
+                Image(systemName: "person.fill")
+                Text("Profile")
+            }
 
             // Matchup History Tab
-            MatchupHistoryView()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .tabItem {
-                    Image(systemName: "trophy.fill")
-                    Text("History")
-                }
+            MatchupHistoryView(
+                viewModel: MatchupHistoryViewModel(
+                    matchupService: matchupService
+                )
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .tabItem {
+                Image(systemName: "trophy.fill")
+                Text("History")
+            }
 
             // Matchups Tab
             FriendsView(

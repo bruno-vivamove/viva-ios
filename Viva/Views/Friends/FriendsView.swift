@@ -174,7 +174,8 @@ struct FriendsView: View {
                         userService: userService,
                         userSession: userSession,
                         healthKitDataManager: healthKitDataManager
-                    )
+                    ),
+                    source: "friends"
                 )
             }
             .onAppear {

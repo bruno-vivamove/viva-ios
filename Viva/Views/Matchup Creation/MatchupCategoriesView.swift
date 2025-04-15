@@ -99,7 +99,11 @@ struct MatchupCategoriesView: View {
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 8)
                                             .stroke(
-                                                VivaDesign.Colors.vivaGreen,
+                                                category.isSelected
+                                                    ? VivaDesign.Colors
+                                                        .vivaGreen
+                                                    : VivaDesign.Colors
+                                                        .primaryText,
                                                 lineWidth: 1
                                             )
                                     )
@@ -157,10 +161,11 @@ struct MatchupCategoriesView: View {
                         Button("Rematch") {
                             Task {
                                 if let matchupId = rematchMatchupId {
-                                    matchupCreated = await coordinator.createRematchup(
-                                        rematchMatchupId: matchupId,
-                                        selectedCategories: categories
-                                    )
+                                    matchupCreated =
+                                        await coordinator.createRematchup(
+                                            rematchMatchupId: matchupId,
+                                            selectedCategories: categories
+                                        )
                                 }
                             }
                         }
