@@ -247,8 +247,9 @@ struct MatchupStatsResponse: Codable {
 
 enum MatchupFilter: String, Codable {
     case ALL = "ALL"
-    case COMPLETED_ONLY = "COMPLETED_ONLY"
-    case ACTIVE_AND_UNFINALIZED = "ACTIVE_AND_UNFINALIZED"
+    case ACTIVE = "ACTIVE"
+    case COMPLETED = "COMPLETED"
+    case UNFINALIZED = "UNFINALIZED"
 }
 
 struct RematchRequest: Codable {

@@ -140,7 +140,7 @@ class HomeViewModel: ObservableObject {
 
         do {
             // Load matchups and both types of invites concurrently
-            async let matchupsTask = matchupService.getMyMatchups(filter: .ACTIVE_AND_UNFINALIZED)
+            async let matchupsTask = matchupService.getMyMatchups(filter: .UNFINALIZED)
             async let receivedInvitesTask = matchupService.getMyInvites()
             async let sentInvitesTask = matchupService.getSentInvites()
 

@@ -20,7 +20,7 @@ class ProfileViewModel: ObservableObject {
     
     func loadActiveMatchups() async {
         do {
-            let response = try await matchupService.getMyMatchups(filter: .ACTIVE_AND_UNFINALIZED)
+            let response = try await matchupService.getMyMatchups(filter: .ACTIVE)
             self.activeMatchups = response.matchups
         } catch {
             self.errorMessage = "Failed to load matchups: \(error.localizedDescription)"

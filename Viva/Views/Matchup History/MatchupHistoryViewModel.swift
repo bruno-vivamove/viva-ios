@@ -114,7 +114,7 @@ final class MatchupHistoryViewModel: ObservableObject {
             // Load matchup stats and all matchups concurrently
             async let statsTask = matchupService.getMatchupStats()
             async let matchupsTask = matchupService.getMyMatchups(
-                filter: .COMPLETED_ONLY
+                filter: .COMPLETED
             )
 
             // Await all results
