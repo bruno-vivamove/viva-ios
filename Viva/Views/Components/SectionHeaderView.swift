@@ -32,9 +32,9 @@ struct SectionHeaderView: View {
             }
             .padding(EdgeInsets(
                 top: 0,
-                leading: VivaDesign.Spacing.medium,
+                leading: VivaDesign.Spacing.xsmall,
                 bottom: VivaDesign.Spacing.small,
-                trailing: VivaDesign.Spacing.medium
+                trailing: VivaDesign.Spacing.xsmall
             ))
         }
         .listRowInsets(EdgeInsets())

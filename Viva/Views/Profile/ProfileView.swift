@@ -32,7 +32,8 @@ struct ProfileView: View {
                     GeometryReader { geometry in
                         Color.clear.preference(
                             key: ViewOffsetKey.self,
-                            value: geometry.frame(in: .named("scroll")).origin)
+                            value: geometry.frame(in: .named("scroll")).origin
+                        )
                     }
                     .frame(height: 0)
 
@@ -46,8 +47,10 @@ struct ProfileView: View {
                                 .frame(height: 200)
                                 .background(
                                     Color(
-                                        red: 35 / 255, green: 35 / 255,
-                                        blue: 35 / 255)
+                                        red: 35 / 255,
+                                        green: 35 / 255,
+                                        blue: 35 / 255
+                                    )
                                 )
                                 .offset(y: 0)
 
@@ -63,11 +66,14 @@ struct ProfileView: View {
                                         // Profile image with skeleton loading built in
                                         VivaProfileImage(
                                             userId: userSession.userProfile?.id,
-                                            imageUrl: userSession.userProfile?.imageUrl,
+                                            imageUrl: userSession.userProfile?
+                                                .imageUrl,
                                             size: .xlarge
                                         )
                                         .padding(.top, 16)
-                                        .opacity(viewModel.isImageLoading ? 0.6 : 1)
+                                        .opacity(
+                                            viewModel.isImageLoading ? 0.6 : 1
+                                        )
 
                                         // Plus button for editing profile picture
                                         Button(action: {
@@ -82,7 +88,9 @@ struct ProfileView: View {
                                                         .font(
                                                             .system(
                                                                 size: 24,
-                                                                weight: .bold))
+                                                                weight: .bold
+                                                            )
+                                                        )
                                                 )
                                         }
                                         .offset(x: -4, y: -4)
@@ -99,7 +107,9 @@ struct ProfileView: View {
                                             .frame(width: 44, height: 44)
 
                                         Text("9")
-                                            .font(.system(size: 20, weight: .bold))
+                                            .font(
+                                                .system(size: 20, weight: .bold)
+                                            )
                                             .foregroundColor(.white)
                                             .offset(y: -10)
 
@@ -146,7 +156,8 @@ struct ProfileView: View {
                                     Text("New York, NY")
                                         .font(.system(size: 16))
                                         .foregroundColor(
-                                            VivaDesign.Colors.vivaGreen)
+                                            VivaDesign.Colors.vivaGreen
+                                        )
                                 }
                                 .padding(.top, 2)
                                 .padding(.horizontal, 16)
@@ -169,7 +180,8 @@ struct ProfileView: View {
                                 .padding(.horizontal, 16)
 
                                 // User caption
-                                if let caption = userSession.userProfile?.caption, !caption.isEmpty
+                                if let caption = userSession.userProfile?
+                                    .caption, !caption.isEmpty
                                 {
                                     Text(caption)
                                         .font(.system(size: 16))
@@ -181,46 +193,59 @@ struct ProfileView: View {
                                 }
 
                                 // Stats row
-                                HStack(alignment: .top, spacing: 0) {
-                                    Spacer()
+                                GeometryReader { geo in
+                                    HStack(alignment: .top, spacing: 0) {
+                                        Spacer()
 
-                                    StatItem(
-                                        value: "90", label: "Matchups",
-                                        iconName: "person.2.fill")
+                                        StatItem(
+                                            value: "221",
+                                            label: "Wins",
+                                            iconName: "medal.fill",
+                                            size: min(
+                                                geo.size.width * 0.25,
+                                                100
+                                            )
+                                        )
 
-                                    Spacer()
+                                        Spacer()
 
-                                    StatItem(
-                                        value: "221", label: "Workouts",
-                                        iconName: "figure.run")
+                                        StatItem(
+                                            value: "3.9K",
+                                            label: "Move Mins",
+                                            iconName: "figure.run",
+                                            size: min(
+                                                geo.size.width * 0.25,
+                                                100
+                                            )
+                                        )
 
-                                    Spacer()
+                                        Spacer()
 
-                                    StatItem(
-                                        value: "3.9K", label: "Minutes",
-                                        iconName: "clock.fill")
+                                        StatItem(
+                                            value: "11.3k",
+                                            label: "Active Cals",
+                                            iconName: "flame.fill",
+                                            size: min(
+                                                geo.size.width * 0.25,
+                                                100
+                                            )
+                                        )
 
-                                    Spacer()
-
-                                    StatItem(
-                                        value: "11.3k", label: "Calories",
-                                        iconName: "flame.fill")
-
-                                    Spacer()
-
-                                    StatItem(
-                                        value: "2.1K", label: "Cheers",
-                                        iconName: "hand.thumbsup.fill")
-
-                                    Spacer()
+                                        Spacer()
+                                    }
+                                    .frame(width: geo.size.width)
                                 }
-                                .padding(.top, 32)
+                                .frame(height: 120)
+                                .padding(.bottom, VivaDesign.Spacing.large)
                             }
                         }
 
-                        Divider()
-                            .background(Color.gray.opacity(0.6))
-                            .padding(VivaDesign.Spacing.medium)
+                        VivaDivider()
+                            .padding(.bottom, VivaDesign.Spacing.small)
+                            .padding(
+                                .horizontal,
+                                VivaDesign.Spacing.outerPadding
+                            )
 
                         // Active Matchups section
                         if !viewModel.activeMatchups.isEmpty {
@@ -236,15 +261,19 @@ struct ProfileView: View {
                                 userSession: userSession,
                                 userMeasurementService: userMeasurementService
                             )
-                            .padding(.horizontal, 16)
+                            .padding(
+                                .horizontal,
+                                VivaDesign.Spacing.outerPadding
+                            )
                         } else {
-                            VStack {
-                                Text("No Active Matchups")
-                                    .font(VivaDesign.Typography.title3)
-                                    .foregroundColor(.gray)
-                                    .padding(.vertical, 20)
-                            }
-                            .padding(.horizontal, 16)
+                            Text("No Active Matchups")
+                                .font(VivaDesign.Typography.title3)
+                                .foregroundColor(.gray)
+                                .padding(.vertical, 20)
+                                .padding(
+                                    .horizontal,
+                                    VivaDesign.Spacing.outerPadding
+                                )
                         }
 
                         // Add some padding at the bottom for scrolling
@@ -258,17 +287,22 @@ struct ProfileView: View {
             }
             .sheet(isPresented: $showEditProfile) {
                 EditProfileView(
-                    userSession: userSession, userProfileService: userProfileService
+                    userSession: userSession,
+                    userProfileService: userProfileService
                 )
             }
-            .sheet(isPresented: $showImagePicker, onDismiss: {
-                if let selectedImage = selectedImage {
-                    viewModel.saveProfileImage(selectedImage)
+            .sheet(
+                isPresented: $showImagePicker,
+                onDismiss: {
+                    if let selectedImage = selectedImage {
+                        viewModel.saveProfileImage(selectedImage)
+                    }
                 }
-            }) {
+            ) {
                 ImagePicker(selectedImage: $selectedImage)
             }
-            .navigationDestination(item: $viewModel.selectedMatchup) { matchup in
+            .navigationDestination(item: $viewModel.selectedMatchup) {
+                matchup in
                 MatchupDetailView(
                     viewModel: MatchupDetailViewModel(
                         matchupId: matchup.id,
@@ -297,13 +331,13 @@ struct ProfileView: View {
             }
         }
     }
-    
+
     // Helper struct to wrap error messages for the alert API
     struct ErrorMessage: Identifiable {
         let id = UUID()
         let text: String
     }
-    
+
     private var errorMessageBinding: Binding<ErrorMessage?> {
         Binding<ErrorMessage?>(
             get: {
@@ -328,14 +362,52 @@ struct StatItem: View {
     let value: String
     let label: String
     let iconName: String
+    let size: CGFloat
+
+    init(value: String, label: String, iconName: String, size: CGFloat = 60) {
+        self.value = value
+        self.label = label
+        self.iconName = iconName
+        self.size = size
+    }
 
     var body: some View {
         VStack(spacing: 0) {
-            // Circled value
+            // Concentric circles
             ZStack {
+                // Outer circle with glow
                 Circle()
-                    .stroke(VivaDesign.Colors.vivaGreen, lineWidth: 1)
-                    .frame(width: 60, height: 60)
+                    .stroke(
+                        VivaDesign.Colors.primaryText.opacity(0.3),
+                        lineWidth: 5
+                    )
+                    .frame(width: size, height: size)
+                    .blur(radius: 3)
+
+                // Outer circle (crisp version on top of glow)
+                Circle()
+                    .stroke(
+                        VivaDesign.Colors.primaryText.opacity(0.3),
+                        lineWidth: 1
+                    )
+                    .fill(.black)
+                    .frame(width: size, height: size)
+
+                // Middle circle
+                Circle()
+                    .stroke(
+                        VivaDesign.Colors.primaryText.opacity(0.3),
+                        lineWidth: 1
+                    )
+                    .frame(width: size - 10, height: size - 10)
+
+                // Inner circle
+                Circle()
+                    .stroke(
+                        VivaDesign.Colors.primaryText.opacity(0.3),
+                        lineWidth: 1
+                    )
+                    .frame(width: size - 20, height: size - 20)
 
                 Text(value)
                     .font(.system(size: 18, weight: .bold))
@@ -345,15 +417,15 @@ struct StatItem: View {
             // Icon and label positioned to overlap with bottom of circle
             VStack(spacing: 4) {
                 Image(systemName: iconName)
-                    .font(.system(size: 16))
+                    .font(.system(size: 24))
                     .foregroundColor(.white)
 
                 Text(label)
-                    .font(.system(size: 12))
+                    .font(.system(size: 14))
                     .foregroundColor(.white)
             }
-            .offset(y: -10)
+            .offset(y: -20)
         }
-        .frame(width: 60)
+        .frame(width: size)
     }
 }
