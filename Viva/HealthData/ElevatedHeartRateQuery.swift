@@ -45,7 +45,6 @@ class ElevatedHeartRateQuery: BaseHealthQuery {
                         dayNumber: dayNumber,
                         measurementType: .elevatedHeartRate,
                         userId: userId,
-                        completeDay: dayNumber < currentDayNumber,
                         value: totalMinutes,
                         points: 0
                     )

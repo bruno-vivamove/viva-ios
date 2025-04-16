@@ -204,7 +204,6 @@ struct MatchupUserMeasurement: Codable, Equatable {
     let dayNumber: Int
     let measurementType: MeasurementType
     let userId: String
-    let completeDay: Bool
     let value: Int
     let points: Int
 }

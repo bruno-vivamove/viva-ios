@@ -41,7 +41,6 @@ class StepsQuery: BaseHealthQuery {
                         dayNumber: dayNumber,
                         measurementType: .steps,
                         userId: userId,
-                        completeDay: dayNumber < currentDayNumber,
                         value: steps,
                         points: 0
                     )

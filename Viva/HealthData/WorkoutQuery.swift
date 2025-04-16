@@ -73,7 +73,6 @@ class WorkoutQuery: BaseHealthQuery {
                         dayNumber: dayNumber,
                         measurementType: self.workoutType,
                         userId: userId,
-                        completeDay: dayNumber < currentDayNumber,
                         value: totalMinutes,
                         points: 0
                     )

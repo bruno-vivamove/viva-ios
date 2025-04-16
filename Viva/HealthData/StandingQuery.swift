@@ -42,7 +42,6 @@ class StandingQuery: BaseHealthQuery {
                         dayNumber: dayNumber,
                         measurementType: .standing,
                         userId: userId,
-                        completeDay: dayNumber < currentDayNumber,
                         value: minutes,
                         points: 0
                     )

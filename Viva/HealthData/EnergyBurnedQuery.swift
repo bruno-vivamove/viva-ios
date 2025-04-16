@@ -43,7 +43,6 @@ class EnergyBurnedQuery: BaseHealthQuery {
                         dayNumber: dayNumber,
                         measurementType: .energyBurned,
                         userId: userId,
-                        completeDay: dayNumber < currentDayNumber,
                         value: calories,
                         points: 0
                     )
