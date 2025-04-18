@@ -9,11 +9,11 @@ class EditProfileViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     let userSession: UserSession
-    let userProfileService: UserProfileService
+    let userService: UserService
 
-    init(userSession: UserSession, userProfileService: UserProfileService) {
+    init(userSession: UserSession, userService: UserService) {
         self.userSession = userSession
-        self.userProfileService = userProfileService
+        self.userService = userService
 
         self.displayName = userSession.userProfile?.displayName ?? ""
         self.email = userSession.userProfile?.emailAddress ?? ""
@@ -31,7 +31,7 @@ class EditProfileViewModel: ObservableObject {
                 displayName: self.displayName,
                 caption: self.caption)
             let savedUserProfile =
-                try await userProfileService.saveCurrentUserProfile(
+                try await userService.saveCurrentUserProfile(
                     updateRequest, selectedImage)
 
             self.userSession.setUserProfile(savedUserProfile)
@@ -53,14 +53,14 @@ struct EditProfileView: View {
     @StateObject private var viewModel: EditProfileViewModel
     @State private var showImagePicker = false
 
-    private let userProfileService: UserProfileService
+    private let userService: UserService
 
-    init(userSession: UserSession, userProfileService: UserProfileService) {
+    init(userSession: UserSession, userService: UserService) {
         _viewModel = StateObject(
             wrappedValue: EditProfileViewModel(
-                userSession: userSession, userProfileService: userProfileService
+                userSession: userSession, userService: userService
             ))
-        self.userProfileService = userProfileService
+        self.userService = userService
     }
 
     private var limitedCaption: Binding<String> {

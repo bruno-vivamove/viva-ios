@@ -5,6 +5,7 @@ struct MainView: View {
     @EnvironmentObject var userSession: UserSession
     @EnvironmentObject var userProfileService: UserProfileService
     @EnvironmentObject var friendService: FriendService
+    @EnvironmentObject var statsService: StatsService
     @EnvironmentObject var matchupService: MatchupService
     @EnvironmentObject var userService: UserService
     @EnvironmentObject var healthKitDataManager: HealthKitDataManager
@@ -53,6 +54,7 @@ struct MainView: View {
             ProfileView(
                 viewModel: ProfileViewModel(
                     userSession: userSession,
+                    userService: userService,
                     userProfileService: userProfileService,
                     matchupService: matchupService
                 )
@@ -66,6 +68,7 @@ struct MainView: View {
             // Matchup History Tab
             MatchupHistoryView(
                 viewModel: MatchupHistoryViewModel(
+                    statsService: statsService,
                     matchupService: matchupService
                 )
             )

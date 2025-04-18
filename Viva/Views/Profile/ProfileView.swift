@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var userSession: UserSession
-    @EnvironmentObject var userProfileService: UserProfileService
     @EnvironmentObject var matchupService: MatchupService
     @EnvironmentObject var userMeasurementService: UserMeasurementService
     @EnvironmentObject var healthKitDataManager: HealthKitDataManager
@@ -194,11 +193,12 @@ struct ProfileView: View {
 
                                 // Stats row
                                 GeometryReader { geo in
+                                    let userStats = viewModel.userProfile?.userStats
                                     HStack(alignment: .top, spacing: 0) {
                                         Spacer()
 
                                         StatItem(
-                                            value: "221",
+                                            value: "\(userStats?.wins ?? 0)",
                                             label: "Wins",
                                             iconName: "medal.fill",
                                             size: min(
@@ -210,7 +210,7 @@ struct ProfileView: View {
                                         Spacer()
 
                                         StatItem(
-                                            value: "3.9K",
+                                            value: "\(userStats?.totalElevatedHeartRate ?? 0)",
                                             label: "Move Mins",
                                             iconName: "figure.run",
                                             size: min(
@@ -222,7 +222,7 @@ struct ProfileView: View {
                                         Spacer()
 
                                         StatItem(
-                                            value: "11.3k",
+                                            value: "\(userStats?.totalEnergyBurned ?? 0)",
                                             label: "Active Cals",
                                             iconName: "flame.fill",
                                             size: min(
@@ -281,6 +281,9 @@ struct ProfileView: View {
                             .frame(height: 40)
                     }
                 }
+                .refreshable {
+                    await viewModel.loadData()
+                }
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
@@ -288,7 +291,7 @@ struct ProfileView: View {
             .sheet(isPresented: $showEditProfile) {
                 EditProfileView(
                     userSession: userSession,
-                    userProfileService: userProfileService
+                    userService: userService
                 )
             }
             .sheet(
@@ -326,7 +329,7 @@ struct ProfileView: View {
             }
             .onAppear {
                 Task {
-                    await viewModel.loadActiveMatchups()
+                    await viewModel.loadData()
                 }
             }
         }

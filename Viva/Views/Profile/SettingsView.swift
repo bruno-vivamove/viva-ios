@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var userSession: UserSession
     @EnvironmentObject var authManager: AuthenticationManager
+    @EnvironmentObject var userService: UserService
     @EnvironmentObject var userProfileService: UserProfileService
     @Environment(\.presentationMode) var presentationMode
 
@@ -46,7 +47,9 @@ struct SettingsView: View {
             // Profile Header
             ProfileHeader(
                 userSession: userSession,
-                userProfileService: userProfileService)
+                userService: userService,
+                userProfileService: userProfileService
+            )
 
             // Menu Items
             VStack(spacing: VivaDesign.Spacing.xsmall) {
@@ -79,13 +82,16 @@ struct ProfileHeader: View {
     @ObservedObject var userSession: UserSession
     @State private var showEditProfile = false
 
+    private let userService: UserService
     private let userProfileService: UserProfileService
 
     init(
         userSession: UserSession,
+        userService: UserService,
         userProfileService: UserProfileService
     ) {
         self.userSession = userSession
+        self.userService = userService
         self.userProfileService = userProfileService
     }
 
@@ -128,7 +134,7 @@ struct ProfileHeader: View {
         .padding(.top)
         .sheet(isPresented: $showEditProfile) {
             EditProfileView(
-                userSession: userSession, userProfileService: userProfileService
+                userSession: userSession, userService: userService
             )
         }
     }

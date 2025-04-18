@@ -9,10 +9,12 @@ final class MatchupHistoryViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var error: String?
 
+    private let statsService: StatsService
     private let matchupService: MatchupService
     private var cancellables = Set<AnyCancellable>()
 
-    init(matchupService: MatchupService) {
+    init(statsService: StatsService, matchupService: MatchupService) {
+        self.statsService = statsService
         self.matchupService = matchupService
         setupNotificationObservers()
     }
@@ -86,7 +88,7 @@ final class MatchupHistoryViewModel: ObservableObject {
             Task {
                 do {
                     let response =
-                        try await matchupService.getMatchupStats()
+                        try await statsService.getUserMatchupStats()
                     self.userStats = response.userStats
                     self.matchupStats = response.matchupStats
                 } catch {
@@ -112,7 +114,7 @@ final class MatchupHistoryViewModel: ObservableObject {
 
         do {
             // Load matchup stats and all matchups concurrently
-            async let statsTask = matchupService.getMatchupStats()
+            async let statsTask = statsService.getUserMatchupStats()
             async let matchupsTask = matchupService.getMyMatchups(
                 filter: .COMPLETED
             )

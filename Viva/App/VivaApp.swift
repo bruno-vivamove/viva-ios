@@ -21,6 +21,7 @@ struct VivaApp: App {
                 .environmentObject(vivaAppObjects.authManager)
                 .environmentObject(vivaAppObjects.userProfileService)
                 .environmentObject(vivaAppObjects.friendService)
+                .environmentObject(vivaAppObjects.statsService)
                 .environmentObject(vivaAppObjects.matchupService)
                 .environmentObject(vivaAppObjects.userService)
                 .environmentObject(vivaAppObjects.healthKitDataManager)

@@ -220,30 +220,6 @@ struct MatchupMeasurementPair: Codable, Equatable {
     var rightPoints: Int
 }
 
-struct MatchupStats: Codable, Equatable {
-    let matchupHash: String?
-    let displayName: String
-    let numberOfMatchups: Int
-    let userTeamWins: Int
-    let opponentTeamWins: Int
-    let userTeamUsers: [User]
-    let opponentTeamUsers: [User]
-}
-
-struct UserStats: Codable, Equatable {
-    let userId: String
-    let displayName: String
-    let totalMatchups: Int
-    let wins: Int
-    let losses: Int
-    let ties: Int
-}
-
-struct MatchupStatsResponse: Codable {
-    let userStats: UserStats
-    let matchupStats: [MatchupStats]
-}
-
 enum MatchupFilter: String, Codable {
     case ALL = "ALL"
     case ACTIVE = "ACTIVE"

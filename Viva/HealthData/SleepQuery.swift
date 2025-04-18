@@ -68,7 +68,6 @@ class SleepQuery: BaseHealthQuery {
                         dayNumber: dayNumber,
                         measurementType: .asleep,
                         userId: userId,
-                        completeDay: dayNumber < currentDayNumber,
                         value: totalMinutes,
                         points: 0
                     )

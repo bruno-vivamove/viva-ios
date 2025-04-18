@@ -5,23 +5,30 @@ import SwiftUI
 class ProfileViewModel: ObservableObject {
     @Published var isImageLoading = false
     @Published var errorMessage: String?
+    @Published var userProfile: UserProfile?
     @Published var activeMatchups: [Matchup] = []
     @Published var selectedMatchup: Matchup?
     
     private let userSession: UserSession
+    private let userService: UserService
     private let userProfileService: UserProfileService
     private let matchupService: MatchupService
     
-    init(userSession: UserSession, userProfileService: UserProfileService, matchupService: MatchupService) {
+    init(userSession: UserSession, userService: UserService, userProfileService: UserProfileService, matchupService: MatchupService) {
         self.userSession = userSession
+        self.userService = userService
         self.userProfileService = userProfileService
         self.matchupService = matchupService
+        
+        // TODO listen for user update events to update the user profile
     }
     
-    func loadActiveMatchups() async {
+    func loadData() async {
         do {
-            let response = try await matchupService.getMyMatchups(filter: .ACTIVE)
-            self.activeMatchups = response.matchups
+            self.userProfile = try await userProfileService.getCurrentUserProfile()
+            
+            let matchupsResponse = try await matchupService.getMyMatchups(filter: .ACTIVE)
+            self.activeMatchups = matchupsResponse.matchups
         } catch {
             self.errorMessage = "Failed to load matchups: \(error.localizedDescription)"
         }
@@ -32,7 +39,7 @@ class ProfileViewModel: ObservableObject {
         
         Task {
             do {
-                let _ = try await userProfileService.saveCurrentUserProfile(nil, image)
+                let _ = try await userService.saveCurrentUserProfile(nil, image)
                 await MainActor.run {
                     isImageLoading = false
                 }
