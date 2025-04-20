@@ -18,7 +18,7 @@ final class UserMeasurementService: ObservableObject {
         let request = MatchupUserMeasurements(matchupUserMeasurements: measurements)
         
         let matchupDetails: MatchupDetails = try await networkClient.put(
-            path: "/viva/matchups/\(matchupId)/user-measurements",
+            path: "/matchups/\(matchupId)/user-measurements",
             body: request
         )
         

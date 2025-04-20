@@ -1,20 +1,15 @@
-struct UserProfile: Encodable, Decodable {
-    let id: String
-    let emailAddress: String
-    let displayName: String
-    let imageUrl: String?
-    let caption: String?
-    let rewardPoints: Int
+struct UserProfile: Codable {
+    let userSummary: UserSummaryDto
     let userStats: UserStats?
 }
 
-struct UserProfileUpdateRequest: Encodable, Decodable {
+struct UserProfileUpdateRequest: Codable {
     let emailAddress: String
     let displayName: String
     let caption: String?
 }
 
-struct UserStats: Encodable, Decodable {
+struct UserStats: Codable {
     let userId: String
     let displayName: String
     let totalMatchups: Int

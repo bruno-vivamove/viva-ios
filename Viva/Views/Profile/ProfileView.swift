@@ -64,9 +64,8 @@ struct ProfileView: View {
                                     ZStack(alignment: .bottomTrailing) {
                                         // Profile image with skeleton loading built in
                                         VivaProfileImage(
-                                            userId: userSession.userProfile?.id,
-                                            imageUrl: userSession.userProfile?
-                                                .imageUrl,
+                                            userId: userSession.userProfile?.userSummary.id,
+                                            imageUrl: userSession.userProfile?.userSummary.imageUrl,
                                             size: .xlarge
                                         )
                                         .padding(.top, 16)
@@ -139,7 +138,7 @@ struct ProfileView: View {
                                 .padding(.horizontal, 16)
 
                                 // User name (left aligned)
-                                Text(userSession.userProfile?.displayName ?? "")
+                                Text(userSession.userProfile?.userSummary.displayName ?? "")
                                     .font(.system(size: 28, weight: .bold))
                                     .foregroundColor(.white)
                                     .padding(.horizontal, 16)
@@ -179,8 +178,7 @@ struct ProfileView: View {
                                 .padding(.horizontal, 16)
 
                                 // User caption
-                                if let caption = userSession.userProfile?
-                                    .caption, !caption.isEmpty
+                                if let caption = userSession.userProfile?.userSummary.caption, !caption.isEmpty
                                 {
                                     Text(caption)
                                         .font(.system(size: 16))

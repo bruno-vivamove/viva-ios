@@ -13,9 +13,9 @@ final class UserService: ObservableObject {
         self.userSession = userSession
     }
 
-    func searchUsers(query: String, page: Int = 1, pageSize: Int = 20) async throws -> [User] {
-        let response: PaginatedUserResponse = try await networkClient.get(
-            path: "/viva/users/search",
+    func searchUsers(query: String, page: Int = 1, pageSize: Int = 20) async throws -> [UserSummaryDto] {
+        let response: PaginatedUserSummaryResponse = try await networkClient.get(
+            path: "/users/search",
             queryParams: [
                 "q": query,
                 "page": page,
@@ -68,7 +68,7 @@ final class UserService: ObservableObject {
         }
 
         let savedUserProfile: UserProfile = try await networkClient.upload(
-            path: "/viva/me",
+            path: "/users/me/profile",
             headers: nil,
             data: multipartData
         )

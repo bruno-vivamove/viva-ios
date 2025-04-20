@@ -5,9 +5,22 @@ enum FriendStatus: String, Codable {
     case notFriend = "NOT_FRIEND"
 }
 
-struct User: Encodable, Decodable, Identifiable, Equatable {
+struct User: Codable, Identifiable, Equatable {
     let id: String
+    let authId: String
+    let emailAddress: String
     let displayName: String
-    let imageUrl: String?
-    let friendStatus: FriendStatus?
+    let imageId: String?
+    let caption: String?
+    let rewardPoints: Int
+    let lastStreakDay: String?
+    let streakDays: Int
+    let wins: Int
+    let losses: Int
+    let createTime: String
+    let updateTime: String
+}
+
+struct UserAccountResponse: Codable {
+    let user: User
 }

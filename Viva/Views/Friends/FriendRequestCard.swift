@@ -2,13 +2,13 @@ import SwiftUI
 
 struct FriendRequestCard: View {
     @ObservedObject private var viewModel: FriendsViewModel
-    let user: User
+    let user: UserSummaryDto
     let buttonWidth: CGFloat?
     
     @State private var showMatchupCreation = false
     @State private var selectedMatchup: Matchup?
 
-    init(viewModel: FriendsViewModel, user: User, buttonWidth: CGFloat? = nil) {
+    init(viewModel: FriendsViewModel, user: UserSummaryDto, buttonWidth: CGFloat? = nil) {
         self.viewModel = viewModel
         self.user = user
         self.buttonWidth = buttonWidth

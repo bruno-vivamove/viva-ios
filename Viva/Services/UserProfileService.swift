@@ -14,11 +14,11 @@ final class UserProfileService: ObservableObject {
     }
     
     func getCurrentUserProfile() async throws -> UserProfile {
-        return try await networkClient.get(path: "/users-profiles/me")
+        return try await networkClient.get(path: "/users/me/profile")
     }
 
     
     func getUserProfile(userId: String) async throws -> UserProfile {
-        return try await networkClient.get(path: "/user-profiles/\(userId)")
+        return try await networkClient.get(path: "/users/\(userId)/profile")
     }
 }

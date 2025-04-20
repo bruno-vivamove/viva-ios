@@ -5,7 +5,7 @@ class MatchupCreationCoordinator: ObservableObject {
     let matchupService: MatchupService
     let friendService: FriendService
     let userSession: UserSession
-    let challengedUser: User?  // Optional challenged user
+    let challengedUser: UserSummaryDto?  // Optional challenged user
     let source: String  // Source identifier for navigation
 
     @Published var isCreatingMatchup = false
@@ -15,7 +15,7 @@ class MatchupCreationCoordinator: ObservableObject {
         matchupService: MatchupService,
         friendService: FriendService,
         userSession: UserSession,
-        challengedUser: User? = nil,  // Add optional parameter
+        challengedUser: UserSummaryDto? = nil,  // Add optional parameter
         source: String = "default"
     ) {
         self.matchupService = matchupService

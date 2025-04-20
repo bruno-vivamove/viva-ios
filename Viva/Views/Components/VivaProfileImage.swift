@@ -7,7 +7,7 @@ struct VivaProfileImage: View {
     let imageUrl: String?
     let size: VivaDesign.Sizing.ProfileImage
     let isInvited: Bool
-
+    
     // Configure URL cache
     init(
         userId: String?,

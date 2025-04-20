@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct FriendCard: View {
-    let user: User
+    let user: UserSummaryDto
     let matchupService: MatchupService
     let friendService: FriendService
     let userService: UserService

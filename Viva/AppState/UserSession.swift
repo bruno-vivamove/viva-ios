@@ -13,7 +13,7 @@ final class UserSession: ObservableObject {
     
     // Add nonisolated to make the method callable from any isolation context
     nonisolated var userId: String? {
-        return userProfile?.id
+        return userProfile?.userSummary.id
     }
 
     init() {

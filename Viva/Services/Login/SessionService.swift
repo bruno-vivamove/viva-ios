@@ -13,7 +13,7 @@ final class SessionService {
         }
         
         return try await networkClient.post(
-            path: "/viva/session",
+            path: "/session",
             body: CreateSessionRequest(idToken: idToken)
         )
     }
@@ -24,7 +24,7 @@ final class SessionService {
         }
         
         return try await networkClient.post(
-            path: "/viva/session/refresh",
+            path: "/session/refresh",
             body: RefreshSessionRequest(refreshToken: refreshToken)
         )
     }

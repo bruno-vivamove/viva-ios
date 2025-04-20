@@ -307,9 +307,10 @@ struct SentInvitesView: View {
         ForEach(viewModel.sentInvites, id: \.inviteCode) { invite in
             UserActionCard(
                 user: invite.user
-                    ?? User(
+                    ?? UserSummaryDto(
                         id: "",
                         displayName: "Open Invite",
+                        caption: "",
                         imageUrl: nil,
                         friendStatus: .none),
                 actions: [

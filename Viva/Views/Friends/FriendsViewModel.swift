@@ -11,12 +11,12 @@ class FriendsViewModel: ObservableObject {
     let userSession: UserSession
     
     // State for friends list
-    @Published var friendInvites: [User] = []
-    @Published var sentInvites: [User] = []
-    @Published var friends: [User] = []
+    @Published var friendInvites: [UserSummaryDto] = []
+    @Published var sentInvites: [UserSummaryDto] = []
+    @Published var friends: [UserSummaryDto] = []
     
     // State for search
-    @Published var searchResults: [User] = []
+    @Published var searchResults: [UserSummaryDto] = []
     @Published var isSearchMode = false
     @Published var searchQuery: String?
     
@@ -71,9 +71,10 @@ class FriendsViewModel: ObservableObject {
             
             // Update the local state to reflect the sent request
             if let index = searchResults.firstIndex(where: { $0.id == userId }) {
-                let updatedUser = User(
+                let updatedUser = UserSummaryDto(
                     id: searchResults[index].id,
                     displayName: searchResults[index].displayName,
+                    caption: searchResults[index].caption,
                     imageUrl: searchResults[index].imageUrl,
                     friendStatus: .requestSent
                 )
@@ -164,9 +165,10 @@ class FriendsViewModel: ObservableObject {
             
             // If the user is in search results, update their status
             if let index = searchResults.firstIndex(where: { $0.id == userId }) {
-                searchResults[index] = User(
+                searchResults[index] = UserSummaryDto(
                     id: searchResults[index].id,
                     displayName: searchResults[index].displayName,
+                    caption: searchResults[index].caption,
                     imageUrl: searchResults[index].imageUrl,
                     friendStatus: .notFriend
                 )

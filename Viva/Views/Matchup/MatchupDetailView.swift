@@ -607,7 +607,7 @@ struct MatchupHeader: View {
 }
 
 struct UserScoreView: View {
-    let matchupUser: User?
+    let matchupUser: UserSummaryDto?
     let invite: MatchupInvite?
     let totalPoints: Int
     let imageOnLeft: Bool
@@ -617,7 +617,7 @@ struct UserScoreView: View {
     let isWinner: Bool
 
     init(
-        matchupUser: User?,
+        matchupUser: UserSummaryDto?,
         invite: MatchupInvite?,
         totalPoints: Int,
         imageOnLeft: Bool,
@@ -861,8 +861,8 @@ struct WorkoutsSection: View {
 
 struct MatchupFooter: View {
     let endTime: Date?
-    let leftUser: User?
-    let rightUser: User?
+    let leftUser: UserSummaryDto?
+    let rightUser: UserSummaryDto?
     let record: (leftWins: Int, rightWins: Int)
     let isCompleted: Bool
     let matchupService: MatchupService
@@ -1055,8 +1055,8 @@ struct TimeRemainingDisplay: View {
 }
 
 struct RecordDisplay: View {
-    let leftUser: User?
-    let rightUser: User?
+    let leftUser: UserSummaryDto?
+    let rightUser: UserSummaryDto?
     let record: (leftWins: Int, rightWins: Int)
 
     var body: some View {
@@ -1087,7 +1087,7 @@ struct InviteDialog: View {
     @Binding var showUnInviteSheet: Bool
     @Binding var selectedInvite: MatchupInvite?
 
-    let user: User
+    let user: UserSummaryDto
     let inviteCode: String
 
     var body: some View {

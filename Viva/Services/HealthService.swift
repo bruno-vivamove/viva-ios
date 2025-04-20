@@ -13,7 +13,7 @@ final class HealthService {
 
     func ping() async throws -> String {
         let response: PingResponse = try await networkClient.get(
-            path: "/viva/health/ping"
+            path: "/health/ping"
         )
         return response.response
     }

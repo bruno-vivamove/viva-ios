@@ -11,7 +11,7 @@ final class MatchupService: ObservableObject {
     
     func getMyMatchups(filter: MatchupFilter = .ALL, page: Int = 0, pageSize: Int = 100) async throws -> MatchupsResponse {
         return try await networkClient.get(
-            path: "/viva/matchups",
+            path: "/matchups",
             queryParams: [
                 "filter": filter.rawValue,
                 "page": String(page),
@@ -22,13 +22,13 @@ final class MatchupService: ObservableObject {
     
     func getMatchup(matchupId: String) async throws -> MatchupDetails {
         return try await networkClient.get(
-            path: "/viva/matchups/\(matchupId)"
+            path: "/matchups/\(matchupId)"
         )
     }
     
     func createMatchup(_ matchup: MatchupRequest) async throws -> MatchupDetails {
         let matchupDetails: MatchupDetails = try await networkClient.post(
-            path: "/viva/matchups",
+            path: "/matchups",
             body: matchup
         )
         
@@ -42,7 +42,7 @@ final class MatchupService: ObservableObject {
     
     func startMatchup(matchupId: String) async throws -> Matchup {
         let matchup: Matchup = try await networkClient.put(
-            path: "/viva/matchups/\(matchupId)/start"
+            path: "/matchups/\(matchupId)/start"
         )
 
         NotificationCenter.default.post(
@@ -55,7 +55,7 @@ final class MatchupService: ObservableObject {
     
     func cancelMatchup(matchupId: String) async throws -> Matchup {
         let matchup: Matchup = try await networkClient.put(
-            path: "/viva/matchups/\(matchupId)/cancel"
+            path: "/matchups/\(matchupId)/cancel"
         )
         
         NotificationCenter.default.post(
@@ -68,7 +68,7 @@ final class MatchupService: ObservableObject {
     
     func rematchMatchup(matchupId: String, rematchRequest: RematchRequest) async throws -> MatchupDetails {
         let matchupDetails: MatchupDetails = try await networkClient.post(
-            path: "/viva/matchups/\(matchupId)/rematch",
+            path: "/matchups/\(matchupId)/rematch",
             body: rematchRequest
         )
         
@@ -92,7 +92,7 @@ final class MatchupService: ObservableObject {
     
     func removeMatchupUser(matchupId: String, userId: String) async throws {
         try await networkClient.delete(
-            path: "/viva/matchups/\(matchupId)/users/\(userId)"
+            path: "/matchups/\(matchupId)/users/\(userId)"
         )
 
         NotificationCenter.default.post(
@@ -103,7 +103,7 @@ final class MatchupService: ObservableObject {
     
     func finalizeMatchupUser(matchupId: String, userId: String) async throws -> MatchupDetails {
         let matchupDetails: MatchupDetails = try await networkClient.put(
-            path: "/viva/matchups/\(matchupId)/users/\(userId)/finalize"
+            path: "/matchups/\(matchupId)/users/\(userId)/finalize"
         )
         
         NotificationCenter.default.post(
@@ -118,28 +118,28 @@ final class MatchupService: ObservableObject {
     
     func getMatchupInvites(matchupId: String) async throws -> [MatchupInvite] {
         let response: MatchupInvitesResponse = try await networkClient.get(
-            path: "/viva/matchups/\(matchupId)/invites"
+            path: "/matchups/\(matchupId)/invites"
         )
         return response.invites
     }
     
     func getMyInvites() async throws -> [MatchupInvite] {
         let response: MatchupInvitesResponse = try await networkClient.get(
-            path: "/viva/matchups/invites"
+            path: "/matchups/invites"
         )
         return response.invites
     }
     
     func getSentInvites() async throws -> [MatchupInvite] {
         let response: MatchupInvitesResponse = try await networkClient.get(
-            path: "/viva/matchups/invites/sent"
+            path: "/matchups/invites/sent"
         )
         return response.invites
     }
     
     func createInvite(matchupId: String, matchupTeamId: String, userId: String) async throws -> MatchupInvite {
         let matchupInvite: MatchupInvite = try await networkClient.post(
-            path: "/viva/matchups/\(matchupId)/invites",
+            path: "/matchups/\(matchupId)/invites",
             queryParams: [
                 "matchupTeamId": matchupTeamId,
                 "userId": userId
@@ -157,7 +157,7 @@ final class MatchupService: ObservableObject {
     func deleteInvite(_ matchupInvite: MatchupInvite) async throws {
         do {
             try await networkClient.delete(
-                path: "/viva/matchups/\(matchupInvite.matchupId)/invites/\(matchupInvite.inviteCode)"
+                path: "/matchups/\(matchupInvite.matchupId)/invites/\(matchupInvite.inviteCode)"
             )
         } catch let error as VivaErrorResponse {
             if(error.code != "MATCHUP_INVITE_NOT_FOUND") {
@@ -173,7 +173,7 @@ final class MatchupService: ObservableObject {
     
     func acceptInvite(_ invite: MatchupInvite) async throws {
         try await networkClient.put(
-            path: "/viva/matchups/invites/\(invite.inviteCode)/accept"
+            path: "/matchups/invites/\(invite.inviteCode)/accept"
         )
 
         NotificationCenter.default.post(

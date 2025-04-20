@@ -110,13 +110,13 @@ struct ProfileHeader: View {
                     }
                 }) {
                     VivaProfileImage(
-                        userId: userSession.userProfile?.id,
-                        imageUrl: userSession.userProfile?.imageUrl,
+                        userId: userSession.userProfile?.userSummary.id,
+                        imageUrl: userSession.userProfile?.userSummary.imageUrl,
                         size: .large
                     )
                 }
 
-                Text(userSession.userProfile?.displayName ?? "")
+                Text(userSession.userProfile?.userSummary.displayName ?? "")
                     .font(.title2)
                     .foregroundColor(VivaDesign.Colors.primaryText)
 
