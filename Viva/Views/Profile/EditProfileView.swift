@@ -15,9 +15,30 @@ class EditProfileViewModel: ObservableObject {
         self.userSession = userSession
         self.userService = userService
 
-        self.displayName = userSession.userProfile?.userSummary.displayName ?? ""
-        self.email = "" //userSession.userProfile?.userSummary.emailAddress ?? ""
-        self.caption = userSession.userProfile?.userSummary.caption ?? ""
+        self.displayName = ""
+        self.email = ""
+        self.caption = ""
+        
+        Task {
+            await loadUserAccount()
+        }
+    }
+    
+    @MainActor
+    func loadUserAccount() async {
+        isLoading = true
+        
+        do {
+            let userAccount = try await userService.getCurrentUserAccount()
+            
+            self.displayName = userAccount.user.displayName
+            self.caption = userAccount.user.caption ?? ""
+            self.email = userAccount.user.emailAddress
+            isLoading = false
+        } catch {
+            errorMessage = "Failed to load account information"
+            isLoading = false
+        }
     }
 
     @MainActor
@@ -31,7 +52,7 @@ class EditProfileViewModel: ObservableObject {
                 displayName: self.displayName,
                 caption: self.caption)
             let savedUserProfile =
-                try await userService.saveCurrentUserProfile(
+                try await userService.saveCurrentUserAccount(
                     updateRequest, selectedImage)
 
             self.userSession.setUserProfile(savedUserProfile)
@@ -178,6 +199,9 @@ struct EditProfileView: View {
                         .foregroundColor(VivaDesign.Colors.primaryText)
                 }
             }
+        }
+        .task {
+            await viewModel.loadUserAccount()
         }
     }
 

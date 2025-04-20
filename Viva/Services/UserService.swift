@@ -13,19 +13,19 @@ final class UserService: ObservableObject {
         self.userSession = userSession
     }
 
-    func searchUsers(query: String, page: Int = 1, pageSize: Int = 20) async throws -> [UserSummaryDto] {
-        let response: PaginatedUserSummaryResponse = try await networkClient.get(
-            path: "/users/search",
-            queryParams: [
-                "q": query,
-                "page": page,
-                "page_size": pageSize
-            ]
-        )
-        return response.users
+    func getCurrentUserProfile() async throws -> UserProfile {
+        return try await networkClient.get(path: "/users/me/profile")
     }
     
-    func saveCurrentUserProfile(
+    func getUserProfile(userId: String) async throws -> UserProfile {
+        return try await networkClient.get(path: "/users/\(userId)/profile")
+    }
+
+    func getCurrentUserAccount() async throws -> UserAccountResponse {
+        return try await networkClient.get(path: "/users/me/account")
+    }
+
+    func saveCurrentUserAccount(
         _ updateRequest: UserProfileUpdateRequest? = nil,
         _ selectedImage: UIImage? = nil
     ) async throws -> UserProfile {
@@ -68,7 +68,7 @@ final class UserService: ObservableObject {
         }
 
         let savedUserProfile: UserProfile = try await networkClient.upload(
-            path: "/users/me/profile",
+            path: "/users/me/account",
             headers: nil,
             data: multipartData
         )
@@ -83,5 +83,17 @@ final class UserService: ObservableObject {
         )
         
         return savedUserProfile
+    }
+    
+    func searchUsers(query: String, page: Int = 1, pageSize: Int = 20) async throws -> [UserSummaryDto] {
+        let response: PaginatedUserSummaryResponse = try await networkClient.get(
+            path: "/users/search",
+            queryParams: [
+                "q": query,
+                "page": page,
+                "page_size": pageSize
+            ]
+        )
+        return response.users
     }
 }

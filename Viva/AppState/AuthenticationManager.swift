@@ -8,16 +8,14 @@ final class AuthenticationManager: ObservableObject {
     let userSession: UserSession
     let authService: AuthService
     let sessionService: SessionService
-    let userProfileService: UserProfileService
 
     init(
         userSession: UserSession, authService: AuthService,
-        sessionService: SessionService, userProfileService: UserProfileService
+        sessionService: SessionService
     ) {
         self.userSession = userSession
         self.authService = authService
         self.sessionService = sessionService
-        self.userProfileService = userProfileService
     }
 
     func signIn(email: String, password: String) async throws {

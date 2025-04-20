@@ -18,7 +18,6 @@ class VivaAppObjects: ObservableObject {
 
     public let authService: AuthService
     public let sessionService: SessionService
-    public let userProfileService: UserProfileService
     public let friendService: FriendService
     public let statsService: StatsService
     public let matchupService: MatchupService
@@ -63,8 +62,6 @@ class VivaAppObjects: ObservableObject {
                 sessionService: sessionService, userSession: userSession))
 
         // Services with session
-        userProfileService = UserProfileService(
-            networkClient: appNetworkClient, userSession: userSession)
         friendService = FriendService(
             networkClient: appNetworkClient)
         statsService = StatsService(networkClient: appNetworkClient)
@@ -76,8 +73,7 @@ class VivaAppObjects: ObservableObject {
         authManager = AuthenticationManager(
             userSession: userSession,
             authService: authService,
-            sessionService: sessionService,
-            userProfileService: userProfileService
+            sessionService: sessionService
         )
 
         healthKitDataManager = HealthKitDataManager(userSession: userSession)

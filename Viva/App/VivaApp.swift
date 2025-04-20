@@ -19,7 +19,6 @@ struct VivaApp: App {
             AppContainerView()
                 .environmentObject(vivaAppObjects.userSession)
                 .environmentObject(vivaAppObjects.authManager)
-                .environmentObject(vivaAppObjects.userProfileService)
                 .environmentObject(vivaAppObjects.friendService)
                 .environmentObject(vivaAppObjects.statsService)
                 .environmentObject(vivaAppObjects.matchupService)

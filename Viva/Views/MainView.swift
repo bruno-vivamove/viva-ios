@@ -3,7 +3,6 @@ import SwiftUI
 
 struct MainView: View {
     @EnvironmentObject var userSession: UserSession
-    @EnvironmentObject var userProfileService: UserProfileService
     @EnvironmentObject var friendService: FriendService
     @EnvironmentObject var statsService: StatsService
     @EnvironmentObject var matchupService: MatchupService
@@ -55,7 +54,6 @@ struct MainView: View {
                 viewModel: ProfileViewModel(
                     userSession: userSession,
                     userService: userService,
-                    userProfileService: userProfileService,
                     matchupService: matchupService
                 )
             )

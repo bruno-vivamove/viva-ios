@@ -4,7 +4,6 @@ struct SettingsView: View {
     @EnvironmentObject var userSession: UserSession
     @EnvironmentObject var authManager: AuthenticationManager
     @EnvironmentObject var userService: UserService
-    @EnvironmentObject var userProfileService: UserProfileService
     @Environment(\.presentationMode) var presentationMode
 
     private let menuItems = [
@@ -47,8 +46,7 @@ struct SettingsView: View {
             // Profile Header
             ProfileHeader(
                 userSession: userSession,
-                userService: userService,
-                userProfileService: userProfileService
+                userService: userService
             )
 
             // Menu Items
@@ -83,16 +81,13 @@ struct ProfileHeader: View {
     @State private var showEditProfile = false
 
     private let userService: UserService
-    private let userProfileService: UserProfileService
 
     init(
         userSession: UserSession,
-        userService: UserService,
-        userProfileService: UserProfileService
+        userService: UserService
     ) {
         self.userSession = userSession
         self.userService = userService
-        self.userProfileService = userProfileService
     }
 
     var body: some View {
@@ -103,7 +98,7 @@ struct ProfileHeader: View {
             VStack(spacing: VivaDesign.Spacing.xsmall) {
                 Button(action: {
                     Task {
-                        let userProfile = try await userProfileService.getCurrentUserProfile()
+                        let userProfile = try await userService.getCurrentUserProfile()
                         await MainActor.run() {
                             userSession.setUserProfile(userProfile)
                         }

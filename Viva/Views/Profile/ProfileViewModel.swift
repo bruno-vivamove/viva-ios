@@ -11,13 +11,11 @@ class ProfileViewModel: ObservableObject {
     
     private let userSession: UserSession
     private let userService: UserService
-    private let userProfileService: UserProfileService
     private let matchupService: MatchupService
     
-    init(userSession: UserSession, userService: UserService, userProfileService: UserProfileService, matchupService: MatchupService) {
+    init(userSession: UserSession, userService: UserService, matchupService: MatchupService) {
         self.userSession = userSession
         self.userService = userService
-        self.userProfileService = userProfileService
         self.matchupService = matchupService
         
         // TODO listen for user update events to update the user profile
@@ -25,7 +23,7 @@ class ProfileViewModel: ObservableObject {
     
     func loadData() async {
         do {
-            self.userProfile = try await userProfileService.getCurrentUserProfile()
+            self.userProfile = try await userService.getCurrentUserProfile()
             
             let matchupsResponse = try await matchupService.getMyMatchups(filter: .ACTIVE)
             self.activeMatchups = matchupsResponse.matchups
@@ -39,7 +37,7 @@ class ProfileViewModel: ObservableObject {
         
         Task {
             do {
-                let _ = try await userService.saveCurrentUserProfile(nil, image)
+                let _ = try await userService.saveCurrentUserAccount(nil, image)
                 await MainActor.run {
                     isImageLoading = false
                 }
