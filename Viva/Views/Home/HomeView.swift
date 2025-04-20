@@ -307,7 +307,7 @@ struct SentInvitesView: View {
         ForEach(viewModel.sentInvites, id: \.inviteCode) { invite in
             UserActionCard(
                 user: invite.user
-                    ?? UserSummaryDto(
+                    ?? UserSummary(
                         id: "",
                         displayName: "Open Invite",
                         caption: "",

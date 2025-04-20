@@ -7,9 +7,9 @@ class MatchupInviteCoordinator: ObservableObject {
     private let userService: UserService
     private let searchDebouncer = SearchDebouncer()
 
-    @Published var searchResults: [UserSummaryDto] = []
-    @Published var friends: [UserSummaryDto] = []
-    @Published var usersToDisplay: [UserSummaryDto] = []
+    @Published var searchResults: [UserSummary] = []
+    @Published var friends: [UserSummary] = []
+    @Published var usersToDisplay: [UserSummary] = []
     @Published var searchQuery: String?
     @Published var isLoading = false
     @Published var error: String?
@@ -132,7 +132,7 @@ class MatchupInviteCoordinator: ObservableObject {
             if let user = searchResults.first(where: { $0.id == userId })
                 ?? friends.first(where: { $0.id == userId })
             {
-                let updatedUser = UserSummaryDto(
+                let updatedUser = UserSummary(
                     id: user.id,
                     displayName: user.displayName,
                     caption: user.caption,
@@ -154,7 +154,7 @@ class MatchupInviteCoordinator: ObservableObject {
     {
         // Update in search results
         if let index = searchResults.firstIndex(where: { $0.id == userId }) {
-            searchResults[index] = UserSummaryDto(
+            searchResults[index] = UserSummary(
                 id: searchResults[index].id,
                 displayName: searchResults[index].displayName,
                 caption: searchResults[index].caption,
@@ -165,7 +165,7 @@ class MatchupInviteCoordinator: ObservableObject {
 
         // Update in friends list
         if let index = friends.firstIndex(where: { $0.id == userId }) {
-            friends[index] = UserSummaryDto(
+            friends[index] = UserSummary(
                 id: friends[index].id,
                 displayName: friends[index].displayName,
                 caption: searchResults[index].caption,
@@ -175,7 +175,7 @@ class MatchupInviteCoordinator: ObservableObject {
         }
     }
 
-    func getUsersToDisplay() -> [UserSummaryDto] {
+    func getUsersToDisplay() -> [UserSummary] {
         let invitedUsers = matchup?.invites.compactMap({$0.user}) ?? []
         let unfilteredUsers = searchQuery?.isEmpty ?? true ? friends : searchResults        
         let nonInvitedUsers = unfilteredUsers.filter { user in

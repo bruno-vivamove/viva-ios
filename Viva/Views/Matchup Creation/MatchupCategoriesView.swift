@@ -43,7 +43,7 @@ struct MatchupCategoriesView: View {
         userService: UserService,
         userSession: UserSession,
         showCreationFlow: Binding<Bool>,
-        challengedUser: UserSummaryDto? = nil,
+        challengedUser: UserSummary? = nil,
         source: String = "default",
         rematchMatchupId: String? = nil
     ) {

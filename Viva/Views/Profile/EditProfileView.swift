@@ -47,7 +47,7 @@ class EditProfileViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            let updateRequest = UserProfileUpdateRequest(
+            let updateRequest = UserAccountUpdateRequest(
                 emailAddress: self.email,
                 displayName: self.displayName,
                 caption: self.caption)

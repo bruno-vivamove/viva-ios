@@ -1,5 +1,5 @@
 struct FriendRequestsResponse: Codable {
-    let requests: [UserSummaryDto]
+    let requests: [UserSummary]
     let page: Int
     let pageSize: Int
     let totalRequests: Int

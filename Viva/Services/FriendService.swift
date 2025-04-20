@@ -9,7 +9,7 @@ final class FriendService: ObservableObject {
 
     // MARK: - Friend Requests Sent
 
-    func getFriendRequestsSent(page: Int = 1, pageSize: Int = 10) async throws -> [UserSummaryDto] {
+    func getFriendRequestsSent(page: Int = 1, pageSize: Int = 10) async throws -> [UserSummary] {
         let response: PaginatedUserSummaryResponse = try await networkClient.get(
             path: "/friends/requests/sent",
             queryParams: [
@@ -34,7 +34,7 @@ final class FriendService: ObservableObject {
 
     // MARK: - Friend Requests Received
 
-    func getFriendRequestsReceived(page: Int = 1, pageSize: Int = 10) async throws -> [UserSummaryDto] {
+    func getFriendRequestsReceived(page: Int = 1, pageSize: Int = 10) async throws -> [UserSummary] {
         let response: PaginatedUserSummaryResponse = try await networkClient.get(
             path: "/friends/requests/received",
             queryParams: [
@@ -59,7 +59,7 @@ final class FriendService: ObservableObject {
 
     // MARK: - Friends
 
-    func getFriends(page: Int = 1, pageSize: Int = 10) async throws -> [UserSummaryDto] {
+    func getFriends(page: Int = 1, pageSize: Int = 10) async throws -> [UserSummary] {
         let response: PaginatedUserSummaryResponse = try await networkClient.get(
             path: "/friends",
             queryParams: [

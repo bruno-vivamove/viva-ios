@@ -26,7 +26,7 @@ final class UserService: ObservableObject {
     }
 
     func saveCurrentUserAccount(
-        _ updateRequest: UserProfileUpdateRequest? = nil,
+        _ updateRequest: UserAccountUpdateRequest? = nil,
         _ selectedImage: UIImage? = nil
     ) async throws -> UserProfile {
         var multipartData: [MultipartData] = []
@@ -50,7 +50,7 @@ final class UserService: ObservableObject {
             multipartData.append(
                 MultipartData(
                     data: profileData,
-                    name: "userProfileUpdateRequest",
+                    name: "userAccountUpdateRequest",
                     mimeType: "application/json"
                 ))
         }
@@ -85,7 +85,7 @@ final class UserService: ObservableObject {
         return savedUserProfile
     }
     
-    func searchUsers(query: String, page: Int = 1, pageSize: Int = 20) async throws -> [UserSummaryDto] {
+    func searchUsers(query: String, page: Int = 1, pageSize: Int = 20) async throws -> [UserSummary] {
         let response: PaginatedUserSummaryResponse = try await networkClient.get(
             path: "/users/search",
             queryParams: [

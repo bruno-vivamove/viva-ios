@@ -192,7 +192,7 @@ struct FriendsView: View {
                     object: nil,
                     queue: .main
                 ) { notification in
-                    if let sentUser = notification.object as? UserSummaryDto {
+                    if let sentUser = notification.object as? UserSummary {
                         Task { @MainActor in
                             // Add the user to sent invites if not already present
                             if !viewModel.sentInvites.contains(where: {

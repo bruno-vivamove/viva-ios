@@ -2,7 +2,7 @@ import SwiftUI
 
 struct MatchupInviteCard: View {
     @ObservedObject var coordinator: MatchupInviteCoordinator
-    let user: UserSummaryDto
+    let user: UserSummary
     let matchup: MatchupDetails
 
     private var isInvited: Bool {

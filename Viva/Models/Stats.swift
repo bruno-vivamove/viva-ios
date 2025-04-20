@@ -4,8 +4,8 @@ struct MatchupStats: Codable, Equatable {
     let numberOfMatchups: Int
     let userTeamWins: Int
     let opponentTeamWins: Int
-    let userTeamUsers: [UserSummaryDto]
-    let opponentTeamUsers: [UserSummaryDto]
+    let userTeamUsers: [UserSummary]
+    let opponentTeamUsers: [UserSummary]
 }
 
 struct UserMatchupStatsResponse: Codable {

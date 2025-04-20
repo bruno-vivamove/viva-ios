@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 struct UserActionCard: View {
-    let user: UserSummaryDto
+    let user: UserSummary
     let actions: [UserAction]
     
     enum Style {
