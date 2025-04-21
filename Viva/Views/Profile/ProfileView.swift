@@ -97,33 +97,6 @@ struct ProfileView: View {
                                         }
                                     }
 
-                                    // Streak counter next to profile image
-                                    ZStack(alignment: .bottom) {
-                                        Circle()
-                                            .stroke(
-                                                VivaDesign.Colors.vivaGreen,
-                                                lineWidth: 1
-                                            )
-                                            .frame(width: 44, height: 44)
-
-                                        Text("9")
-                                            .font(
-                                                .system(size: 20, weight: .bold)
-                                            )
-                                            .foregroundColor(.white)
-                                            .offset(y: -10)
-
-                                        Image(systemName: "bolt.fill")
-                                            .font(.system(size: 14))
-                                            .foregroundColor(.white)
-                                            .offset(x: 14, y: -30)
-
-                                        Text("Streak")
-                                            .font(.system(size: 12))
-                                            .foregroundColor(.white)
-                                            .offset(y: 20)
-                                    }
-
                                     Spacer()
 
                                     // Hamburger menu button - only for current user

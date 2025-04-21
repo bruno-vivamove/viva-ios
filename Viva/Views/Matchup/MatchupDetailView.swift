@@ -24,6 +24,8 @@ struct MatchupDetailView: View {
     @State private var isShowingTotal = true
     @State private var showUnInviteSheet = false
     @State private var selectedInvite: MatchupInvite? = nil
+    @State private var selectedUserId: String? = nil
+    @State private var navigateToProfile = false
     private let source: String
     @Environment(\.dismiss) private var dismiss
 
@@ -36,240 +38,270 @@ struct MatchupDetailView: View {
     }
 
     var body: some View {
-        ZStack {
-            // Background color
-            Color.black.edgesIgnoringSafeArea(.all)
+        NavigationStack {
+            ZStack {
+                // Background color
+                Color.black.edgesIgnoringSafeArea(.all)
 
-            // Main content
-            if viewModel.isLoading && viewModel.matchup == nil {
-                skeletonView
-            } else if let matchup = viewModel.matchup {
-                VStack(spacing: 0) {
-                    // Scrollable content
-                    List {
-                        VStack(spacing: VivaDesign.Spacing.medium) {
-                            // Show MATCHUP RECAP title if completed
-                            if matchup.status == .completed {
-                                Text("MATCHUP RECAP")
-                                    .font(.title)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(
-                                        VivaDesign.Colors.primaryText
-                                    )
-                                    .frame(
-                                        maxWidth: .infinity,
-                                        alignment: .center
-                                    )
-                                    .padding(.top, VivaDesign.Spacing.small)
-                            }
-
-                            // Matchup Header
-                            MatchupHeader(
-                                viewModel: viewModel,
-                                selectedInvite: $selectedInvite,
-                                showUnInviteSheet: $showUnInviteSheet,
-                                source: source
-                            )
-
-                            // Show matchup result message if completed
-                            if matchup.status == .completed {
-                                Spacer()
-                                    .frame(height: VivaDesign.Spacing.small)
-
-                                // Winning and losing teams
-                                let currentUserId = viewModel.userSession.userId
-                                let userTeam =
-                                    matchup.leftTeam.users
-                                        .contains(where: {
-                                            $0.id == currentUserId
-                                        })
-                                    ? matchup.leftTeam : matchup.rightTeam
-                                let opponentTeam =
-                                    userTeam == matchup.leftTeam
-                                    ? matchup.rightTeam : matchup.leftTeam
-                                let userIsWinner =
-                                    userTeam.points > opponentTeam.points
-                                let oppopnentName =
-                                    opponentTeam.users.first?
-                                    .displayName ?? "Opponent"
-
-                                MatchupResultMessage(
-                                    userIsWinner: userIsWinner,
-                                    opponentName: oppopnentName
-                                )
-
-                                Spacer()
-                                    .frame(height: VivaDesign.Spacing.small)
-                            }
-
-                            // Toggle - only show for active matchups
-                            if matchup.status != .completed {
-                                ViewToggle(
-                                    isShowingTotal: $isShowingTotal,
-                                    isCompleted: false
-                                )
-                            }
-
-                            // Comparison rows
+                // Main content
+                if viewModel.isLoading && viewModel.matchup == nil {
+                    skeletonView
+                } else if let matchup = viewModel.matchup {
+                    VStack(spacing: 0) {
+                        // Scrollable content
+                        List {
                             VStack(spacing: VivaDesign.Spacing.medium) {
-                                ForEach(
-                                    isShowingTotal
-                                        ? viewModel.totalComparisonRows
-                                        : viewModel.dailyComparisonRows
-                                ) { row in
-                                    ComparisonRow(
-                                        id: row.id,
-                                        leftValue: row.formattedLeftValue,
-                                        leftPoints: "\(row.leftPoints) pts",
-                                        title: row.displayName,
-                                        rightValue: row.formattedRightValue,
-                                        rightPoints: "\(row.rightPoints) pts"
+                                // Show MATCHUP RECAP title if completed
+                                if matchup.status == .completed {
+                                    Text("MATCHUP RECAP")
+                                        .font(.title)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(
+                                            VivaDesign.Colors.primaryText
+                                        )
+                                        .frame(
+                                            maxWidth: .infinity,
+                                            alignment: .center
+                                        )
+                                        .padding(.top, VivaDesign.Spacing.small)
+                                }
+
+                                // Matchup Header
+                                MatchupHeader(
+                                    viewModel: viewModel,
+                                    selectedInvite: $selectedInvite,
+                                    showUnInviteSheet: $showUnInviteSheet,
+                                    selectedUserId: $selectedUserId,
+                                    source: source
+                                )
+
+                                // Show matchup result message if completed
+                                if matchup.status == .completed {
+                                    Spacer()
+                                        .frame(height: VivaDesign.Spacing.small)
+
+                                    // Winning and losing teams
+                                    let currentUserId = viewModel.userSession.userId
+                                    let userTeam =
+                                        matchup.leftTeam.users
+                                            .contains(where: {
+                                                $0.id == currentUserId
+                                            })
+                                        ? matchup.leftTeam : matchup.rightTeam
+                                    let opponentTeam =
+                                        userTeam == matchup.leftTeam
+                                        ? matchup.rightTeam : matchup.leftTeam
+                                    let userIsWinner =
+                                        userTeam.points > opponentTeam.points
+                                    let oppopnentName =
+                                        opponentTeam.users.first?
+                                        .displayName ?? "Opponent"
+
+                                    MatchupResultMessage(
+                                        userIsWinner: userIsWinner,
+                                        opponentName: oppopnentName
+                                    )
+
+                                    Spacer()
+                                        .frame(height: VivaDesign.Spacing.small)
+                                }
+
+                                // Toggle - only show for active matchups
+                                if matchup.status != .completed {
+                                    ViewToggle(
+                                        isShowingTotal: $isShowingTotal,
+                                        isCompleted: false
                                     )
                                 }
-                            }
 
-                            MatchupFooter(
-                                endTime: matchup.endTime,
-                                leftUser: matchup.leftTeam.users.first,
-                                rightUser: matchup.rightTeam.users.first,
-                                record: (
-                                    leftWins: matchup.leftTeam.winCount,
-                                    rightWins: matchup.rightTeam.winCount
-                                ),
-                                isCompleted: matchup.status == .completed,
-                                matchupService: viewModel.matchupService,
-                                friendService: viewModel.friendService,
-                                userService: viewModel.userService,
-                                userSession: viewModel.userSession,
-                                matchupId: matchup.id,
-                                source: source
-                            )
-                            .padding(.vertical, VivaDesign.Spacing.medium)
-                        }
-                        .padding(.top, VivaDesign.Spacing.medium)
-                        .listRowBackground(Color.black)
-                        .listRowSeparator(.hidden)
-                        .listRowInsets(EdgeInsets())
-                    }
-                    .listStyle(PlainListStyle())
-                    .scrollContentBackground(.hidden)
-                    .refreshable {
-                        await viewModel.loadData()
-                    }
-                    .gesture(
-                        DragGesture()
-                            .onEnded { gesture in
-                                if gesture.translation.width > 100 {
-                                    dismiss()
+                                // Comparison rows
+                                VStack(spacing: VivaDesign.Spacing.medium) {
+                                    ForEach(
+                                        isShowingTotal
+                                            ? viewModel.totalComparisonRows
+                                            : viewModel.dailyComparisonRows
+                                    ) { row in
+                                        ComparisonRow(
+                                            id: row.id,
+                                            leftValue: row.formattedLeftValue,
+                                            leftPoints: "\(row.leftPoints) pts",
+                                            title: row.displayName,
+                                            rightValue: row.formattedRightValue,
+                                            rightPoints: "\(row.rightPoints) pts"
+                                        )
+                                    }
                                 }
+
+                                MatchupFooter(
+                                    endTime: matchup.endTime,
+                                    leftUser: matchup.leftTeam.users.first,
+                                    rightUser: matchup.rightTeam.users.first,
+                                    record: (
+                                        leftWins: matchup.leftTeam.winCount,
+                                        rightWins: matchup.rightTeam.winCount
+                                    ),
+                                    isCompleted: matchup.status == .completed,
+                                    matchupService: viewModel.matchupService,
+                                    friendService: viewModel.friendService,
+                                    userService: viewModel.userService,
+                                    userSession: viewModel.userSession,
+                                    matchupId: matchup.id,
+                                    selectedUserId: $selectedUserId,
+                                    source: source
+                                )
+                                .padding(.vertical, VivaDesign.Spacing.medium)
                             }
-                    )
-                }
-                .padding(.horizontal, VivaDesign.Spacing.outerPadding)
-            } else {
-                // Error state
-                VStack {
-                    Image(systemName: "exclamationmark.triangle")
-                        .font(.system(size: 50))
-                        .foregroundColor(VivaDesign.Colors.secondaryText)
-                        .padding(.bottom, VivaDesign.Spacing.medium)
-
-                    Text("Failed to load matchup")
-                        .font(VivaDesign.Typography.title3)
-                        .foregroundColor(VivaDesign.Colors.primaryText)
-
-                    Button("Try Again") {
-                        Task {
+                            .padding(.top, VivaDesign.Spacing.medium)
+                            .listRowBackground(Color.black)
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets())
+                        }
+                        .listStyle(PlainListStyle())
+                        .scrollContentBackground(.hidden)
+                        .refreshable {
                             await viewModel.loadData()
                         }
-                    }
-                    .padding(.top, VivaDesign.Spacing.medium)
-                    .foregroundColor(VivaDesign.Colors.vivaGreen)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-
-            // Overlay for trophy animation when completed but not finalized
-            if viewModel.isCompletedButNotFinalized {
-                Color.black.opacity(0.85)
-                    .edgesIgnoringSafeArea(.all)
-
-                VStack(spacing: VivaDesign.Spacing.large) {
-                    LottieView(animation: .named("trophy_plain"))
-                        .playing(
-                            .fromProgress(
-                                0,
-                                toProgress: 0.9,
-                                loopMode: .playOnce
-                            )
+                        .gesture(
+                            DragGesture()
+                                .onEnded { gesture in
+                                    if gesture.translation.width > 100 {
+                                        dismiss()
+                                    }
+                                }
                         )
-                        .frame(width: 200, height: 200)
-
-                    Text("Congratulations!")
-                        .font(.title.bold())
-                        .foregroundColor(VivaDesign.Colors.vivaGreen)
-
-                    Text("Matchup Completed")
-                        .font(.title3)
-                        .foregroundColor(VivaDesign.Colors.primaryText)
-
-                    Button {
-                        // Dismiss the overlay by setting isCompletedButNotFinalized to false
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            viewModel.isCompletedButNotFinalized = false
-                        }
-                    } label: {
-                        Text("See Results")
-                            .font(.headline)
-                            .foregroundColor(.black)
-                            .padding(.horizontal, 40)
-                            .padding(.vertical, 12)
-                            .background(VivaDesign.Colors.vivaGreen)
-                            .cornerRadius(8)
                     }
-                    .padding(.top, VivaDesign.Spacing.medium)
+                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                } else {
+                    // Error state
+                    VStack {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.system(size: 50))
+                            .foregroundColor(VivaDesign.Colors.secondaryText)
+                            .padding(.bottom, VivaDesign.Spacing.medium)
+
+                        Text("Failed to load matchup")
+                            .font(VivaDesign.Typography.title3)
+                            .foregroundColor(VivaDesign.Colors.primaryText)
+
+                        Button("Try Again") {
+                            Task {
+                                await viewModel.loadData()
+                            }
+                        }
+                        .padding(.top, VivaDesign.Spacing.medium)
+                        .foregroundColor(VivaDesign.Colors.vivaGreen)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+
+                // Overlay for trophy animation when completed but not finalized
+                if viewModel.isCompletedButNotFinalized {
+                    Color.black.opacity(0.85)
+                        .edgesIgnoringSafeArea(.all)
+
+                    VStack(spacing: VivaDesign.Spacing.large) {
+                        LottieView(animation: .named("trophy_plain"))
+                            .playing(
+                                .fromProgress(
+                                    0,
+                                    toProgress: 0.9,
+                                    loopMode: .playOnce
+                                )
+                            )
+                            .frame(width: 200, height: 200)
+
+                        Text("Congratulations!")
+                            .font(.title.bold())
+                            .foregroundColor(VivaDesign.Colors.vivaGreen)
+
+                        Text("Matchup Completed")
+                            .font(.title3)
+                            .foregroundColor(VivaDesign.Colors.primaryText)
+
+                        Button {
+                            // Dismiss the overlay by setting isCompletedButNotFinalized to false
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                viewModel.isCompletedButNotFinalized = false
+                            }
+                        } label: {
+                            Text("See Results")
+                                .font(.headline)
+                                .foregroundColor(.black)
+                                .padding(.horizontal, 40)
+                                .padding(.vertical, 12)
+                                .background(VivaDesign.Colors.vivaGreen)
+                                .cornerRadius(8)
+                        }
+                        .padding(.top, VivaDesign.Spacing.medium)
+                    }
+                }
+
+                // Overlay for uninvite dialog
+                if showUnInviteSheet, let user = selectedInvite?.user,
+                    let invite = selectedInvite
+                {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                showUnInviteSheet = false
+                            }
+                            selectedInvite = nil
+                        }
+
+                    InviteDialog(
+                        viewModel: viewModel,
+                        showUnInviteSheet: $showUnInviteSheet,
+                        selectedInvite: $selectedInvite,
+                        selectedUserId: $selectedUserId,
+                        user: user,
+                        inviteCode: invite.inviteCode
+                    )
+                }
+                
+                // Hidden NavigationLink that activates when selectedUserId changes
+                NavigationLink(
+                    destination: Group {
+                        if let userId = selectedUserId {
+                            ProfileView(
+                                viewModel: ProfileViewModel(
+                                    userId: userId,
+                                    userSession: viewModel.userSession,
+                                    userService: viewModel.userService,
+                                    matchupService: viewModel.matchupService
+                                )
+                            )
+                        }
+                    },
+                    isActive: Binding(
+                        get: { selectedUserId != nil },
+                        set: { if !$0 { selectedUserId = nil } }
+                    )
+                ) {
+                    EmptyView()
                 }
             }
-
-            // Overlay for uninvite dialog
-            if showUnInviteSheet, let user = selectedInvite?.user,
-                let invite = selectedInvite
-            {
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            showUnInviteSheet = false
-                        }
-                        selectedInvite = nil
-                    }
-
-                InviteDialog(
-                    viewModel: viewModel,
-                    showUnInviteSheet: $showUnInviteSheet,
-                    selectedInvite: $selectedInvite,
-                    user: user,
-                    inviteCode: invite.inviteCode
-                )
+            .task {
+                await viewModel.loadData()
+            }
+            .alert("Error", isPresented: .constant(viewModel.error != nil)) {
+                Button("OK") {
+                    viewModel.error = nil
+                }
+            } message: {
+                if let error = viewModel.error {
+                    Text(error.localizedDescription)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
+            }
+            .toolbarBackground(Color.black, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(.dark)
+            .onChange(of: selectedUserId) { newValue in
+                navigateToProfile = newValue != nil
             }
         }
-        .task {
-            await viewModel.loadData()
-        }
-        .alert("Error", isPresented: .constant(viewModel.error != nil)) {
-            Button("OK") {
-                viewModel.error = nil
-            }
-        } message: {
-            if let error = viewModel.error {
-                Text(error.localizedDescription)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-            }
-        }
-        .toolbarBackground(Color.black, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarColorScheme(.dark)
     }
 
     // MARK: - Skeleton Loading View
@@ -509,6 +541,7 @@ struct MatchupHeader: View {
     @ObservedObject var viewModel: MatchupDetailViewModel
     @Binding var selectedInvite: MatchupInvite?
     @Binding var showUnInviteSheet: Bool
+    @Binding var selectedUserId: String?
     let source: String
 
     @State private var showInviteView = false
@@ -569,6 +602,9 @@ struct MatchupHeader: View {
                 inviteMatchupTeamId = leftTeamId
                 showInviteView = true
             },
+            onUserProfileTap: { userId in
+                selectedUserId = userId
+            },
             isCompleted: isCompleted,
             isWinner: isLeftWinner
         )
@@ -600,6 +636,9 @@ struct MatchupHeader: View {
                 inviteMatchupTeamId = rightTeamId
                 showInviteView = true
             },
+            onUserProfileTap: { userId in
+                selectedUserId = userId
+            },
             isCompleted: isCompleted,
             isWinner: isRightWinner
         )
@@ -613,6 +652,7 @@ struct UserScoreView: View {
     let imageOnLeft: Bool
     let onInviteTap: ((MatchupInvite) -> Void)?
     let onOpenPositionTap: (() -> Void)?
+    let onUserProfileTap: ((String) -> Void)?
     let isCompleted: Bool
     let isWinner: Bool
 
@@ -623,6 +663,7 @@ struct UserScoreView: View {
         imageOnLeft: Bool,
         onInviteTap: ((MatchupInvite) -> Void)?,
         onOpenPositionTap: (() -> Void)?,
+        onUserProfileTap: ((String) -> Void)? = nil,
         isCompleted: Bool = false,
         isWinner: Bool = false
     ) {
@@ -632,6 +673,7 @@ struct UserScoreView: View {
         self.imageOnLeft = imageOnLeft
         self.onInviteTap = onInviteTap
         self.onOpenPositionTap = onOpenPositionTap
+        self.onUserProfileTap = onUserProfileTap
         self.isCompleted = isCompleted
         self.isWinner = isWinner
     }
@@ -654,8 +696,9 @@ struct UserScoreView: View {
     private var userImage: some View {
         Group {
             if invite != nil || matchupUser != nil {
+                let userId = invite?.user?.id ?? matchupUser?.id
                 VivaProfileImage(
-                    userId: invite?.user?.id ?? matchupUser?.id,
+                    userId: userId,
                     imageUrl: invite?.user?.imageUrl ?? matchupUser?.imageUrl,
                     size: .large,
                     isInvited: invite?.user != nil
@@ -663,6 +706,8 @@ struct UserScoreView: View {
                 .onTapGesture {
                     if let invite = invite {
                         onInviteTap?(invite)
+                    } else if let id = userId {
+                        onUserProfileTap?(id)
                     }
                 }
             } else {
@@ -871,6 +916,7 @@ struct MatchupFooter: View {
     let userSession: UserSession
     @State private var showRematchCategories = false
     let matchupId: String?
+    @Binding var selectedUserId: String?
     let source: String
 
     var body: some View {
@@ -890,7 +936,8 @@ struct MatchupFooter: View {
                     RecordDisplay(
                         leftUser: leftUser,
                         rightUser: rightUser,
-                        record: record
+                        record: record,
+                        selectedUserId: $selectedUserId
                     )
                 }.padding(.bottom, VivaDesign.Spacing.small)
 
@@ -959,12 +1006,12 @@ struct MatchupFooter: View {
                     RecordDisplay(
                         leftUser: leftUser,
                         rightUser: rightUser,
-                        record: record
+                        record: record,
+                        selectedUserId: $selectedUserId
                     )
                 }
                 .frame(maxWidth: .infinity)
             }
-
         }
     }
 }
@@ -1058,6 +1105,7 @@ struct RecordDisplay: View {
     let leftUser: UserSummary?
     let rightUser: UserSummary?
     let record: (leftWins: Int, rightWins: Int)
+    @Binding var selectedUserId: String?
 
     var body: some View {
         HStack(spacing: VivaDesign.Spacing.medium) {
@@ -1066,17 +1114,29 @@ struct RecordDisplay: View {
                 imageUrl: leftUser?.imageUrl,
                 size: .mini
             )
+            .onTapGesture {
+                if let id = leftUser?.id {
+                    selectedUserId = id
+                }
+            }
+            
             Text("\(record.leftWins)")
                 .font(.system(size: 30, weight: .bold))
                 .lineLimit(1)
             Text("\(record.rightWins)")
                 .font(.system(size: 30, weight: .bold))
                 .lineLimit(1)
+            
             VivaProfileImage(
                 userId: rightUser?.id,
                 imageUrl: rightUser?.imageUrl,
                 size: .mini
             )
+            .onTapGesture {
+                if let id = rightUser?.id {
+                    selectedUserId = id
+                }
+            }
         }
         .foregroundColor(VivaDesign.Colors.primaryText)
     }
@@ -1086,6 +1146,7 @@ struct InviteDialog: View {
     @ObservedObject var viewModel: MatchupDetailViewModel
     @Binding var showUnInviteSheet: Bool
     @Binding var selectedInvite: MatchupInvite?
+    @Binding var selectedUserId: String?
 
     let user: UserSummary
     let inviteCode: String
@@ -1100,7 +1161,13 @@ struct InviteDialog: View {
                     size: .medium,
                     isInvited: true
                 )
-
+                .onTapGesture {
+                    selectedUserId = user.id
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showUnInviteSheet = false
+                    }
+                }
+                
                 Text(user.displayName)
                     .font(VivaDesign.Typography.title2)
                     .foregroundColor(VivaDesign.Colors.primaryText)
