@@ -96,20 +96,11 @@ struct ProfileHeader: View {
 
             // Profile Image and Name
             VStack(spacing: VivaDesign.Spacing.xsmall) {
-                Button(action: {
-                    Task {
-                        let userProfile = try await userService.getCurrentUserProfile()
-                        await MainActor.run() {
-                            userSession.setUserProfile(userProfile)
-                        }
-                    }
-                }) {
-                    VivaProfileImage(
-                        userId: userSession.userProfile?.userSummary.id,
-                        imageUrl: userSession.userProfile?.userSummary.imageUrl,
-                        size: .large
-                    )
-                }
+                VivaProfileImage(
+                    userId: userSession.userProfile?.userSummary.id,
+                    imageUrl: userSession.userProfile?.userSummary.imageUrl,
+                    size: .large
+                )
 
                 Text(userSession.userProfile?.userSummary.displayName ?? "")
                     .font(.title2)

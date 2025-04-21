@@ -64,8 +64,8 @@ struct ProfileView: View {
                                     ZStack(alignment: .bottomTrailing) {
                                         // Profile image with skeleton loading built in
                                         VivaProfileImage(
-                                            userId: userSession.userProfile?.userSummary.id,
-                                            imageUrl: userSession.userProfile?.userSummary.imageUrl,
+                                            userId: viewModel.userProfile?.userSummary.id,
+                                            imageUrl: viewModel.userProfile?.userSummary.imageUrl,
                                             size: .xlarge
                                         )
                                         .padding(.top, 16)
@@ -73,26 +73,28 @@ struct ProfileView: View {
                                             viewModel.isImageLoading ? 0.6 : 1
                                         )
 
-                                        // Plus button for editing profile picture
-                                        Button(action: {
-                                            showImagePicker = true
-                                        }) {
-                                            Circle()
-                                                .fill(Color.white)
-                                                .frame(width: 30, height: 30)
-                                                .overlay(
-                                                    Image(systemName: "plus")
-                                                        .foregroundColor(.black)
-                                                        .font(
-                                                            .system(
-                                                                size: 24,
-                                                                weight: .bold
+                                        // Plus button for editing profile picture - only for current user
+                                        if viewModel.isCurrentUser {
+                                            Button(action: {
+                                                showImagePicker = true
+                                            }) {
+                                                Circle()
+                                                    .fill(Color.white)
+                                                    .frame(width: 30, height: 30)
+                                                    .overlay(
+                                                        Image(systemName: "plus")
+                                                            .foregroundColor(.black)
+                                                            .font(
+                                                                .system(
+                                                                    size: 24,
+                                                                    weight: .bold
+                                                                )
                                                             )
-                                                        )
-                                                )
+                                                    )
+                                            }
+                                            .offset(x: -4, y: -4)
+                                            .disabled(viewModel.isImageLoading)
                                         }
-                                        .offset(x: -4, y: -4)
-                                        .disabled(viewModel.isImageLoading)
                                     }
 
                                     // Streak counter next to profile image
@@ -124,21 +126,23 @@ struct ProfileView: View {
 
                                     Spacer()
 
-                                    // Hamburger menu button
-                                    Button(action: {
-                                        showSettings = true
-                                    }) {
-                                        Image(systemName: "line.3.horizontal")
-                                            .font(.system(size: 30))
-                                            .foregroundColor(.white)
-                                            .padding(.trailing, 16)
+                                    // Hamburger menu button - only for current user
+                                    if viewModel.isCurrentUser {
+                                        Button(action: {
+                                            showSettings = true
+                                        }) {
+                                            Image(systemName: "line.3.horizontal")
+                                                .font(.system(size: 30))
+                                                .foregroundColor(.white)
+                                                .padding(.trailing, 16)
+                                        }
                                     }
                                 }
                                 .padding(.top, 16)
                                 .padding(.horizontal, 16)
 
                                 // User name (left aligned)
-                                Text(userSession.userProfile?.userSummary.displayName ?? "")
+                                Text(viewModel.userProfile?.userSummary.displayName ?? "")
                                     .font(.system(size: 28, weight: .bold))
                                     .foregroundColor(.white)
                                     .padding(.horizontal, 16)
@@ -160,25 +164,27 @@ struct ProfileView: View {
                                 .padding(.top, 2)
                                 .padding(.horizontal, 16)
 
-                                // Edit Profile Button (left aligned)
-                                Button(action: {
-                                    showEditProfile = true
-                                }) {
-                                    HStack(spacing: 6) {
-                                        Text("Edit Profile")
-                                            .font(.system(size: 16))
-                                            .foregroundColor(.white)
+                                // Edit Profile Button (left aligned) - only for current user
+                                if viewModel.isCurrentUser {
+                                    Button(action: {
+                                        showEditProfile = true
+                                    }) {
+                                        HStack(spacing: 6) {
+                                            Text("Edit Profile")
+                                                .font(.system(size: 16))
+                                                .foregroundColor(.white)
 
-                                        Image(systemName: "pencil")
-                                            .font(.system(size: 14))
-                                            .foregroundColor(.white)
+                                            Image(systemName: "pencil")
+                                                .font(.system(size: 14))
+                                                .foregroundColor(.white)
+                                        }
+                                        .padding(.top, 8)
                                     }
-                                    .padding(.top, 8)
+                                    .padding(.horizontal, 16)
                                 }
-                                .padding(.horizontal, 16)
 
                                 // User caption
-                                if let caption = userSession.userProfile?.userSummary.caption, !caption.isEmpty
+                                if let caption = viewModel.userProfile?.userSummary.caption, !caption.isEmpty
                                 {
                                     Text(caption)
                                         .font(.system(size: 16))
@@ -245,8 +251,8 @@ struct ProfileView: View {
                                 VivaDesign.Spacing.outerPadding
                             )
 
-                        // Active Matchups section
-                        if !viewModel.activeMatchups.isEmpty {
+                        // Active Matchups section - only show for current user
+                        if viewModel.isCurrentUser && !viewModel.activeMatchups.isEmpty {
                             MatchupSectionView(
                                 title: "Active Matchups",
                                 matchups: viewModel.activeMatchups,
@@ -263,7 +269,7 @@ struct ProfileView: View {
                                 .horizontal,
                                 VivaDesign.Spacing.outerPadding
                             )
-                        } else {
+                        } else if viewModel.isCurrentUser {
                             Text("No Active Matchups")
                                 .font(VivaDesign.Typography.title3)
                                 .foregroundColor(.gray)

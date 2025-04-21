@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Combine
 
 @MainActor
 class ProfileViewModel: ObservableObject {
@@ -12,33 +13,69 @@ class ProfileViewModel: ObservableObject {
     private let userSession: UserSession
     private let userService: UserService
     private let matchupService: MatchupService
+    private let userId: String
+    private var cancellables = Set<AnyCancellable>()
     
-    init(userSession: UserSession, userService: UserService, matchupService: MatchupService) {
+    init(userId: String, userSession: UserSession, userService: UserService, matchupService: MatchupService) {
+        self.userId = userId
         self.userSession = userSession
         self.userService = userService
         self.matchupService = matchupService
         
-        // TODO listen for user update events to update the user profile
+        setupNotificationObservers()
+    }
+    
+    var isCurrentUser: Bool {
+        userId == userSession.userId
+    }
+    
+    private func setupNotificationObservers() {
+        // User profile updated observer
+        NotificationCenter.default.publisher(for: .userProfileUpdated)
+            .compactMap { $0.object as? UserProfile }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] updatedProfile in
+                self?.handleUserProfileUpdated(updatedProfile)
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func handleUserProfileUpdated(_ updatedProfile: UserProfile) {
+        // Only update if the profile matches our userId
+        if updatedProfile.userSummary.id == self.userId {
+            self.userProfile = updatedProfile
+        }
     }
     
     func loadData() async {
         do {
-            self.userProfile = try await userService.getCurrentUserProfile()
-            
-            let matchupsResponse = try await matchupService.getMyMatchups(filter: .ACTIVE)
-            self.activeMatchups = matchupsResponse.matchups
+            if self.isCurrentUser {
+                self.userProfile = try await userService.getCurrentUserProfile()
+                
+                let matchupsResponse = try await matchupService.getMyMatchups(filter: .ACTIVE)
+                self.activeMatchups = matchupsResponse.matchups
+            } else {
+                self.userProfile = try await userService.getUserProfile(userId: self.userId)
+                
+                // For other users, we might have a different endpoint to get their matchups
+                // or we might not show them at all depending on app requirements
+                self.activeMatchups = []
+            }
         } catch {
-            self.errorMessage = "Failed to load matchups: \(error.localizedDescription)"
+            self.errorMessage = "Failed to load profile: \(error.localizedDescription)"
         }
     }
     
     func saveProfileImage(_ image: UIImage) {
+        guard self.isCurrentUser else { return }
+        
         isImageLoading = true
         
         Task {
             do {
-                let _ = try await userService.saveCurrentUserAccount(nil, image)
+                let userProfile = try await userService.saveCurrentUserAccount(nil, image)
                 await MainActor.run {
+                    self.userProfile = userProfile
                     isImageLoading = false
                 }
             } catch {
@@ -53,4 +90,4 @@ class ProfileViewModel: ObservableObject {
     func selectMatchup(_ matchup: Matchup) {
         selectedMatchup = matchup
     }
-} 
+}

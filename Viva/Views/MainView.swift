@@ -52,6 +52,7 @@ struct MainView: View {
             // Profile Tab
             ProfileView(
                 viewModel: ProfileViewModel(
+                    userId: userSession.userId!,
                     userSession: userSession,
                     userService: userService,
                     matchupService: matchupService

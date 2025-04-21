@@ -73,10 +73,6 @@ final class UserService: ObservableObject {
             data: multipartData
         )
 
-        Task { @MainActor in
-            userSession.setUserProfile(savedUserProfile)
-        }
-        
         NotificationCenter.default.post(
             name: .userProfileUpdated,
             object: savedUserProfile

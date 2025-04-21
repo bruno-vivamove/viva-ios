@@ -42,7 +42,7 @@ class EditProfileViewModel: ObservableObject {
     }
 
     @MainActor
-    func saveProfile() async -> Bool {
+    func saveUserAccount() async -> Bool {
         isLoading = true
         errorMessage = nil
 
@@ -51,11 +51,10 @@ class EditProfileViewModel: ObservableObject {
                 emailAddress: self.email,
                 displayName: self.displayName,
                 caption: self.caption)
-            let savedUserProfile =
+            let _ =
                 try await userService.saveCurrentUserAccount(
                     updateRequest, selectedImage)
 
-            self.userSession.setUserProfile(savedUserProfile)
             // Update successful
             isLoading = false
             return true
@@ -252,7 +251,7 @@ struct EditProfileView: View {
     private var saveButton: some View {
         Button(action: {
             Task {
-                if await viewModel.saveProfile() {
+                if await viewModel.saveUserAccount() {
                     dismiss()
                 }
             }

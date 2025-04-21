@@ -1,6 +1,7 @@
 import Foundation
 import Security
 import SwiftUI
+import Combine
 
 final class UserSession: ObservableObject {
     private let sessionKey = "com.vivamove.userSession"
@@ -10,6 +11,7 @@ final class UserSession: ObservableObject {
     @Published private(set) var userProfile: UserProfile? = nil
     var accessToken: String? = nil
     var refreshToken: String? = nil
+    private var cancellables = Set<AnyCancellable>()
     
     // Add nonisolated to make the method callable from any isolation context
     nonisolated var userId: String? {
@@ -19,6 +21,22 @@ final class UserSession: ObservableObject {
     init() {
         AppLogger.info("Creating user session", category: .auth)
         restoreSessionFromKeychain()
+        setupNotificationObservers()
+    }
+    
+    private func setupNotificationObservers() {
+        // User profile updated observer
+        NotificationCenter.default.publisher(for: .userProfileUpdated)
+            .compactMap { $0.object as? UserProfile }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] updatedProfile in
+                guard let self = self else { return }
+                // Only update if this is the current user's profile
+                if updatedProfile.userSummary.id == self.userId {
+                    setUserProfile(updatedProfile)
+                }
+            }
+            .store(in: &cancellables)
     }
     
     func setUserProfile(_ userProfile: UserProfile) {
