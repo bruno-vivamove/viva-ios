@@ -40,15 +40,16 @@ struct FriendsView: View {
                     searchText: $searchText, viewModel: viewModel,
                     isSearchFieldFocused: _isSearchFieldFocused
                 )
-                .padding(VivaDesign.Spacing.medium)
+                .padding(.top, VivaDesign.Spacing.medium)
                 .padding(.bottom, 0)
+                .padding(.horizontal, VivaDesign.Spacing.outerPadding)
 
                 if viewModel.isSearchMode {
                     // SEARCH RESULTS MODE
                     if viewModel.searchResults.isEmpty {
                         // Empty search results - use similar layout to HomeEmptyStateView
                         FriendsEmptySearchView()
-                            .padding(VivaDesign.Spacing.medium)
+                            .padding(.vertical, VivaDesign.Spacing.medium)
                     } else {
                         // Display search results in a List for consistency
                         List {
@@ -58,7 +59,8 @@ struct FriendsView: View {
                                         viewModel: viewModel, user: user
                                     )
                                     .listRowSeparator(.hidden)
-                                    .listRowInsets(rowInsets)
+                                    .listRowInsets(EdgeInsets())
+                                    .padding(.bottom, VivaDesign.Spacing.cardSpacing)
                                 }
                             } header: {
                                 SectionHeaderView(title: "Search Results")
@@ -66,6 +68,7 @@ struct FriendsView: View {
                         }
                         .listStyle(PlainListStyle())
                         .scrollContentBackground(.hidden)
+                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
                     }
                 } else {
                     // FRIENDS LIST MODE
@@ -80,7 +83,7 @@ struct FriendsView: View {
                     } else if isViewEmpty {
                         // Empty friends state - use similar layout to HomeEmptyStateView
                         FriendsEmptyStateView()
-                            .padding(VivaDesign.Spacing.medium)
+                            .padding(.vertical, VivaDesign.Spacing.medium)
                     } else {
                         List {
                             // Received Friend Invites Section
@@ -91,7 +94,8 @@ struct FriendsView: View {
                                             viewModel: viewModel, user: user
                                         )
                                         .listRowSeparator(.hidden)
-                                        .listRowInsets(rowInsets)
+                                        .listRowInsets(EdgeInsets())
+                                        .padding(.bottom, VivaDesign.Spacing.cardSpacing)
                                     }
                                 } header: {
                                     SectionHeaderView(
@@ -110,7 +114,8 @@ struct FriendsView: View {
                                             viewModel: viewModel, user: user
                                         )
                                         .listRowSeparator(.hidden)
-                                        .listRowInsets(rowInsets)
+                                        .listRowInsets(EdgeInsets())
+                                        .padding(.bottom, VivaDesign.Spacing.cardSpacing)
                                     }
                                 } header: {
                                     SectionHeaderView(
@@ -134,7 +139,8 @@ struct FriendsView: View {
                                             userSession: viewModel.userSession
                                         )
                                         .listRowSeparator(.hidden)
-                                        .listRowInsets(rowInsets)
+                                        .listRowInsets(EdgeInsets())
+                                        .padding(.bottom, VivaDesign.Spacing.cardSpacing)
                                     }
                                 } header: {
                                     SectionHeaderView(
@@ -151,7 +157,7 @@ struct FriendsView: View {
                             await viewModel.loadFriendsData()
                         }
                         .listSectionSpacing(0)
-
+                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
                     }
                 }
 

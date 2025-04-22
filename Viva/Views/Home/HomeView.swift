@@ -24,8 +24,9 @@ struct HomeView: View {
                 friendService: friendService,
                 userService: userService
             )
-            .padding(VivaDesign.Spacing.outerPadding)
+            .padding(.top, VivaDesign.Spacing.medium)
             .padding(.bottom, 0)
+            .padding(.horizontal, VivaDesign.Spacing.outerPadding)
 
             if viewModel.isLoading && viewModel.isEmpty {
                 LoadingView()

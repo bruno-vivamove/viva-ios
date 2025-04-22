@@ -15,7 +15,7 @@ struct SectionHeaderView: View {
             Rectangle()
                 .fill(Color.black)
                 .frame(maxWidth: .infinity)
-            
+
             // Header content with title and optional subtitle
             HStack {
                 Text(title)
@@ -31,7 +31,7 @@ struct SectionHeaderView: View {
                 Spacer()
             }
             .padding(EdgeInsets(
-                top: 0,
+                top: VivaDesign.Spacing.small,
                 leading: VivaDesign.Spacing.xsmall,
                 bottom: VivaDesign.Spacing.small,
                 trailing: VivaDesign.Spacing.xsmall
