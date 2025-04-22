@@ -43,14 +43,6 @@ struct MainView: View {
                 Text("Home")
             }
 
-            // Rewards Tab
-            RewardsView()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .tabItem {
-                    Image(systemName: "dollarsign.circle.fill")
-                    Text("Rewards")
-                }
-
             // Profile Tab
             NavigationStack {
                 ProfileView(

@@ -18,7 +18,7 @@ struct MatchupCategoriesView: View {
             isSelected: false
         ),
         MatchupCategory(id: "steps", name: "Steps", isSelected: false),
-        MatchupCategory(id: "ehr", name: "eHR Mins", isSelected: false),
+        MatchupCategory(id: "ehr", name: "Move Mins", isSelected: false),
         MatchupCategory(
             id: "strength",
             name: "Strength Training Mins",

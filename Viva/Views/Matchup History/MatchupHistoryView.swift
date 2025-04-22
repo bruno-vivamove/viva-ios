@@ -49,7 +49,8 @@ struct MatchupHistoryView: View {
                         if !viewModel.matchupStats.isEmpty {
                             MatchupStatsSection(
                                 userStats: viewModel.userStats,
-                                matchupStats: viewModel.matchupStats
+                                matchupStats: viewModel.matchupStats,
+                                viewModel: viewModel
                             )
                         }
 
@@ -97,6 +98,16 @@ struct MatchupHistoryView: View {
                         healthKitDataManager: healthKitDataManager,
                     ),
                     source: "history"
+                )
+            }
+            .navigationDestination(item: $viewModel.selectedUserId) { userId in
+                ProfileView(
+                    viewModel: ProfileViewModel(
+                        userId: userId,
+                        userSession: userSession,
+                        userService: userService,
+                        matchupService: matchupService
+                    )
                 )
             }
             .alert("Error", isPresented: .constant(viewModel.error != nil)) {
@@ -194,6 +205,7 @@ struct MatchupStatsTableHeader: View {
 struct MatchupStatsSection: View {
     let userStats: UserStats?
     let matchupStats: [MatchupStats]
+    @ObservedObject var viewModel: MatchupHistoryViewModel
 
     var body: some View {
         Section {
@@ -229,7 +241,7 @@ struct MatchupStatsSection: View {
                 // Matchup rows
                 ForEach(matchupStats, id: \.matchupHash) { stats in
                     VStack(spacing: 0) {
-                        MatchupStatsCard(stats: stats)
+                        MatchupStatsCard(stats: stats, viewModel: viewModel)
                             .padding(.leading, VivaDesign.Spacing.large)
                             .padding(.vertical, VivaDesign.Spacing.small)
                         VivaDivider()
@@ -279,6 +291,7 @@ struct MatchupHistoryCompletedMatchupsSection: View {
 
 struct MatchupStatsCard: View {
     let stats: MatchupStats
+    @ObservedObject var viewModel: MatchupHistoryViewModel
 
     var body: some View {
         HStack(spacing: 0) {
@@ -308,6 +321,9 @@ struct MatchupStatsCard: View {
                     size: .mini
                 )
                 .frame(width: 60, alignment: .trailing)
+                .onTapGesture {
+                    viewModel.selectedUserId = opponent.id
+                }
 
                 Spacer()
                     .frame(width: VivaDesign.Spacing.small)

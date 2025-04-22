@@ -8,6 +8,7 @@ final class MatchupHistoryViewModel: ObservableObject {
     @Published var completedMatchups: [Matchup] = []
     @Published var isLoading: Bool = false
     @Published var error: String?
+    @Published var selectedUserId: String?
 
     private let statsService: StatsService
     private let matchupService: MatchupService

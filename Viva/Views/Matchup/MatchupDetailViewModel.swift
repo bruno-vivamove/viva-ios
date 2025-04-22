@@ -383,7 +383,7 @@ class MatchupDetailViewModel: ObservableObject {
         switch measurementType {
         case .steps: return "Steps"
         case .energyBurned: return "Active Cal"
-        case .elevatedHeartRate: return "eHR Mins"
+        case .elevatedHeartRate: return "Move Mins"
         case .asleep: return "Sleep"
         case .standing: return "Stand Time"
         case .walking: return "Walking"
