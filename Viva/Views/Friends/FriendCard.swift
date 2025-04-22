@@ -7,6 +7,7 @@ struct FriendCard: View {
     let userService: UserService
     let healthKitDataManager: HealthKitDataManager
     let userSession: UserSession
+    @Binding var selectedUserId: String?
     @State private var showMatchupCreation = false
 
     var body: some View {
@@ -16,7 +17,10 @@ struct FriendCard: View {
                 UserActionCard.UserAction(title: "Challenge") {
                     showMatchupCreation = true
                 }
-            ]
+            ],
+            onProfileTap: { userId in
+                selectedUserId = userId
+            }
         )
         .buttonStyle(PlainButtonStyle())
         .sheet(isPresented: $showMatchupCreation) {

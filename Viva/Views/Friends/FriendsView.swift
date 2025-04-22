@@ -26,6 +26,7 @@ struct FriendsView: View {
     @State private var searchText = ""
     @State private var hasLoaded = false
     @State private var selectedMatchup: Matchup?
+    @State private var selectedUserId: String? = nil
     @FocusState private var isSearchFieldFocused: Bool
 
     init(viewModel: FriendsViewModel) {
@@ -56,7 +57,8 @@ struct FriendsView: View {
                             Section {
                                 ForEach(viewModel.searchResults) { user in
                                     FriendRequestCard(
-                                        viewModel: viewModel, user: user
+                                        viewModel: viewModel, user: user,
+                                        selectedUserId: $selectedUserId
                                     )
                                     .listRowSeparator(.hidden)
                                     .listRowInsets(EdgeInsets())
@@ -91,7 +93,8 @@ struct FriendsView: View {
                                 Section {
                                     ForEach(viewModel.friendInvites) { user in
                                         FriendRequestCard(
-                                            viewModel: viewModel, user: user
+                                            viewModel: viewModel, user: user,
+                                            selectedUserId: $selectedUserId
                                         )
                                         .listRowSeparator(.hidden)
                                         .listRowInsets(EdgeInsets())
@@ -111,7 +114,8 @@ struct FriendsView: View {
                                 Section {
                                     ForEach(viewModel.sentInvites) { user in
                                         FriendRequestCard(
-                                            viewModel: viewModel, user: user
+                                            viewModel: viewModel, user: user,
+                                            selectedUserId: $selectedUserId
                                         )
                                         .listRowSeparator(.hidden)
                                         .listRowInsets(EdgeInsets())
@@ -136,7 +140,8 @@ struct FriendsView: View {
                                             userService: userService,
                                             healthKitDataManager:
                                                 healthKitDataManager,
-                                            userSession: viewModel.userSession
+                                            userSession: viewModel.userSession,
+                                            selectedUserId: $selectedUserId
                                         )
                                         .listRowSeparator(.hidden)
                                         .listRowInsets(EdgeInsets())
@@ -183,6 +188,22 @@ struct FriendsView: View {
                     ),
                     source: "friends"
                 )
+            }
+            // Add NavigationLink for profile navigation
+            .navigationDestination(isPresented: Binding(
+                get: { selectedUserId != nil },
+                set: { if !$0 { selectedUserId = nil } }
+            )) {
+                if let userId = selectedUserId {
+                    ProfileView(
+                        viewModel: ProfileViewModel(
+                            userId: userId,
+                            userSession: userSession,
+                            userService: userService,
+                            matchupService: matchupService
+                        )
+                    )
+                }
             }
             .onAppear {
                 if !hasLoaded {

@@ -4,14 +4,16 @@ struct FriendRequestCard: View {
     @ObservedObject private var viewModel: FriendsViewModel
     let user: UserSummary
     let buttonWidth: CGFloat?
+    @Binding var selectedUserId: String?
     
     @State private var showMatchupCreation = false
     @State private var selectedMatchup: Matchup?
 
-    init(viewModel: FriendsViewModel, user: UserSummary, buttonWidth: CGFloat? = nil) {
+    init(viewModel: FriendsViewModel, user: UserSummary, buttonWidth: CGFloat? = nil, selectedUserId: Binding<String?> = .constant(nil)) {
         self.viewModel = viewModel
         self.user = user
         self.buttonWidth = buttonWidth
+        self._selectedUserId = selectedUserId
     }
     
     var body: some View {
@@ -68,7 +70,10 @@ struct FriendRequestCard: View {
         
         UserActionCard(
             user: user,
-            actions: [action]
+            actions: [action],
+            onProfileTap: { userId in
+                selectedUserId = userId
+            }
         )
         .buttonStyle(PlainButtonStyle())
     }

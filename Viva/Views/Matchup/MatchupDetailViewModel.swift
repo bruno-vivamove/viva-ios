@@ -148,39 +148,42 @@ class MatchupDetailViewModel: ObservableObject {
                 self.isCompletedButNotFinalized = matchup.status == .completed && !matchup.finalized
             }
             
-            if self.isCompletedButNotFinalized {
-                try await finalizeUserParticipation(matchup: matchup)
-            } else if matchup.status == .active {
-                healthKitDataManager.updateMatchupData(matchupDetail: matchup) {
-                    updatedMatchup in
-                    Task {
-                        // Get only the current user's measurements
-                        let userMeasurements = updatedMatchup.userMeasurements
-                            .filter {
-                                $0.userId == self.userSession.userId
+            let isUserInMatchup = matchup.teams.flatMap { $0.users }.contains { $0.id == userSession.userId }
+            if isUserInMatchup {
+                if self.isCompletedButNotFinalized {
+                    try await finalizeUserParticipation(matchup: matchup)
+                } else if matchup.status == .active {
+                    healthKitDataManager.updateMatchupData(matchupDetail: matchup) {
+                        updatedMatchup in
+                        Task {
+                            // Get only the current user's measurements
+                            let userMeasurements = updatedMatchup.userMeasurements
+                                .filter {
+                                    $0.userId == self.userSession.userId
+                                }
+                            
+                            if userMeasurements.isEmpty {
+                                return
                             }
-
-                        if userMeasurements.isEmpty {
-                            return
-                        }
-
-                        do {
-                            // Send all measurements in a single call
-                            let savedMatchupDetails =
+                            
+                            do {
+                                // Send all measurements in a single call
+                                let savedMatchupDetails =
                                 try await self.userMeasurementService
-                                .saveUserMeasurements(
-                                    matchupId: self.matchupId,
-                                    measurements: userMeasurements
+                                    .saveUserMeasurements(
+                                        matchupId: self.matchupId,
+                                        measurements: userMeasurements
+                                    )
+                                
+                                self.updateMeasurements(
+                                    matchup: savedMatchupDetails
                                 )
-
-                            self.updateMeasurements(
-                                matchup: savedMatchupDetails
-                            )
-                        } catch {
-                            AppLogger.error(
-                                "Failed to save measurements: \(error)",
-                                category: .data
-                            )
+                            } catch {
+                                AppLogger.error(
+                                    "Failed to save measurements: \(error)",
+                                    category: .data
+                                )
+                            }
                         }
                     }
                 }

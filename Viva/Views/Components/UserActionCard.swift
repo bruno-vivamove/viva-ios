@@ -4,6 +4,17 @@ import SwiftUI
 struct UserActionCard: View {
     let user: UserSummary
     let actions: [UserAction]
+    let onProfileTap: ((String) -> Void)?
+    
+    init(
+        user: UserSummary,
+        actions: [UserAction],
+        onProfileTap: ((String) -> Void)? = nil
+    ) {
+        self.user = user
+        self.actions = actions
+        self.onProfileTap = onProfileTap
+    }
     
     enum Style {
         case primary
@@ -41,6 +52,11 @@ struct UserActionCard: View {
                         imageUrl: user.imageUrl,
                         size: .small
                     )
+                    .onTapGesture {
+                        if let onProfileTap = onProfileTap {
+                            onProfileTap(user.id)
+                        }
+                    }
 
                     Text(user.displayName)
                         .foregroundColor(VivaDesign.Colors.primaryText)
