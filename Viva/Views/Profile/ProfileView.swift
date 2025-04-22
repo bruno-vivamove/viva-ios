@@ -17,297 +17,311 @@ struct ProfileView: View {
     init(viewModel: ProfileViewModel) {
         // Note: This will be properly initialized when the view is created since the required services are provided as environment objects
         _viewModel = StateObject(wrappedValue: viewModel)
+        
+        // Make navigation bar transparent
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        appearance.backgroundColor = .clear
+        appearance.shadowColor = .clear
+        
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().compactAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                // Black background
-                Color.black
-                    .edgesIgnoringSafeArea(.all)
+        ZStack {
+            // Black background
+            Color.black
+                .edgesIgnoringSafeArea(.all)
 
-                // Scrollable content
-                ScrollView(.vertical, showsIndicators: false) {
-                    GeometryReader { geometry in
-                        Color.clear.preference(
-                            key: ViewOffsetKey.self,
-                            value: geometry.frame(in: .named("scroll")).origin
-                        )
-                    }
-                    .frame(height: 0)
+            // Scrollable content
+            ScrollView(.vertical, showsIndicators: false) {
+                GeometryReader { geometry in
+                    Color.clear.preference(
+                        key: ViewOffsetKey.self,
+                        value: geometry.frame(in: .named("scroll")).origin
+                    )
+                }
+                .frame(height: 0)
 
-                    VStack(spacing: 0) {
-                        // Top section with profile image and aligned elements
-                        // Using ZStack to position gray area behind content
-                        ZStack(alignment: .top) {
-                            // Gray area with warp_speed image
-                            Image("warp_speed")
-                                .resizable()
-                                .frame(height: 200)
-                                .background(
-                                    Color(
-                                        red: 35 / 255,
-                                        green: 35 / 255,
-                                        blue: 35 / 255
-                                    )
+                VStack(spacing: 0) {
+                    // Top section with profile image and aligned elements
+                    // Using ZStack to position gray area behind content
+                    ZStack(alignment: .top) {
+                        // Gray area with warp_speed image
+                        Image("warp_speed")
+                            .resizable()
+                            .frame(height: 200)
+                            .background(
+                                Color(
+                                    red: 35 / 255,
+                                    green: 35 / 255,
+                                    blue: 35 / 255
                                 )
-                                .offset(y: 0)
+                            )
+                            .offset(y: 0)
 
-                            VStack(alignment: .leading, spacing: 12) {
-                                // Add significant top padding to move content down
-                                Spacer()
-                                    .frame(height: 75)
+                        VStack(alignment: .leading, spacing: 12) {
+                            // Add significant top padding to move content down
+                            Spacer()
+                                .frame(height: 75)
 
-                                // Profile image and streak in same row
-                                HStack(alignment: .bottom, spacing: 32) {
-                                    // Profile image (left aligned)
-                                    ZStack(alignment: .bottomTrailing) {
-                                        // Profile image with skeleton loading built in
-                                        VivaProfileImage(
-                                            userId: viewModel.userProfile?.userSummary.id,
-                                            imageUrl: viewModel.userProfile?.userSummary.imageUrl,
-                                            size: .xlarge
-                                        )
-                                        .padding(.top, 16)
-                                        .opacity(
-                                            viewModel.isImageLoading ? 0.6 : 1
-                                        )
+                            // Profile image and streak in same row
+                            HStack(alignment: .bottom, spacing: 32) {
+                                // Profile image (left aligned)
+                                ZStack(alignment: .bottomTrailing) {
+                                    // Profile image with skeleton loading built in
+                                    VivaProfileImage(
+                                        userId: viewModel.userProfile?.userSummary.id,
+                                        imageUrl: viewModel.userProfile?.userSummary.imageUrl,
+                                        size: .xlarge
+                                    )
+                                    .padding(.top, 16)
+                                    .opacity(
+                                        viewModel.isImageLoading ? 0.6 : 1
+                                    )
 
-                                        // Plus button for editing profile picture - only for current user
-                                        if viewModel.isCurrentUser {
-                                            Button(action: {
-                                                showImagePicker = true
-                                            }) {
-                                                Circle()
-                                                    .fill(Color.white)
-                                                    .frame(width: 30, height: 30)
-                                                    .overlay(
-                                                        Image(systemName: "plus")
-                                                            .foregroundColor(.black)
-                                                            .font(
-                                                                .system(
-                                                                    size: 24,
-                                                                    weight: .bold
-                                                                )
+                                    // Plus button for editing profile picture - only for current user
+                                    if viewModel.isCurrentUser {
+                                        Button(action: {
+                                            showImagePicker = true
+                                        }) {
+                                            Circle()
+                                                .fill(Color.white)
+                                                .frame(width: 30, height: 30)
+                                                .overlay(
+                                                    Image(systemName: "plus")
+                                                        .foregroundColor(.black)
+                                                        .font(
+                                                            .system(
+                                                                size: 24,
+                                                                weight: .bold
                                                             )
-                                                    )
-                                            }
-                                            .offset(x: -4, y: -4)
-                                            .disabled(viewModel.isImageLoading)
+                                                        )
+                                                )
                                         }
+                                        .offset(x: -4, y: -4)
+                                        .disabled(viewModel.isImageLoading)
                                     }
+                                }
+
+                                Spacer()
+
+                                // Hamburger menu button - only for current user
+                                if viewModel.isCurrentUser {
+                                    Button(action: {
+                                        showSettings = true
+                                    }) {
+                                        Image(systemName: "line.3.horizontal")
+                                            .font(.system(size: 30))
+                                            .foregroundColor(.white)
+                                            .padding(.trailing, 16)
+                                    }
+                                }
+                            }
+                            .padding(.top, 16)
+                            .padding(.horizontal, 16)
+
+                            // User name (left aligned)
+                            Text(viewModel.userProfile?.userSummary.displayName ?? "")
+                                .font(.system(size: 28, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 16)
+
+                            // Location (left aligned)
+                            HStack(spacing: 6) {
+                                Image(systemName: "mappin.circle.fill")
+                                    .foregroundColor(
+                                        VivaDesign.Colors.vivaGreen
+                                    )
+                                    .font(.system(size: 14))
+
+                                Text("New York, NY")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(
+                                        VivaDesign.Colors.vivaGreen
+                                    )
+                            }
+                            .padding(.top, 2)
+                            .padding(.horizontal, 16)
+
+                            // Edit Profile Button (left aligned) - only for current user
+                            if viewModel.isCurrentUser {
+                                Button(action: {
+                                    showEditProfile = true
+                                }) {
+                                    HStack(spacing: 6) {
+                                        Text("Edit Profile")
+                                            .font(.system(size: 16))
+                                            .foregroundColor(.white)
+
+                                        Image(systemName: "pencil")
+                                            .font(.system(size: 14))
+                                            .foregroundColor(.white)
+                                    }
+                                    .padding(.top, 8)
+                                }
+                                .padding(.horizontal, 16)
+                            }
+
+                            // User caption
+                            if let caption = viewModel.userProfile?.userSummary.caption, !caption.isEmpty
+                            {
+                                Text(caption)
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.white)
+                                    .multilineTextAlignment(.leading)
+                                    .lineLimit(4)
+                                    .padding(.horizontal, 16)
+                                    .padding(.top, 8)
+                            }
+
+                            // Stats row
+                            GeometryReader { geo in
+                                let userStats = viewModel.userProfile?.userStats
+                                HStack(alignment: .top, spacing: 0) {
+                                    Spacer()
+
+                                    StatItem(
+                                        value: "\(userStats?.wins ?? 0)",
+                                        label: "Wins",
+                                        iconName: "medal.fill",
+                                        size: min(
+                                            geo.size.width * 0.25,
+                                            100
+                                        )
+                                    )
 
                                     Spacer()
 
-                                    // Hamburger menu button - only for current user
-                                    if viewModel.isCurrentUser {
-                                        Button(action: {
-                                            showSettings = true
-                                        }) {
-                                            Image(systemName: "line.3.horizontal")
-                                                .font(.system(size: 30))
-                                                .foregroundColor(.white)
-                                                .padding(.trailing, 16)
-                                        }
-                                    }
-                                }
-                                .padding(.top, 16)
-                                .padding(.horizontal, 16)
-
-                                // User name (left aligned)
-                                Text(viewModel.userProfile?.userSummary.displayName ?? "")
-                                    .font(.system(size: 28, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 16)
-
-                                // Location (left aligned)
-                                HStack(spacing: 6) {
-                                    Image(systemName: "mappin.circle.fill")
-                                        .foregroundColor(
-                                            VivaDesign.Colors.vivaGreen
+                                    StatItem(
+                                        value: "\(userStats?.totalElevatedHeartRate ?? 0)",
+                                        label: "Move Mins",
+                                        iconName: "figure.run",
+                                        size: min(
+                                            geo.size.width * 0.25,
+                                            100
                                         )
-                                        .font(.system(size: 14))
+                                    )
 
-                                    Text("New York, NY")
-                                        .font(.system(size: 16))
-                                        .foregroundColor(
-                                            VivaDesign.Colors.vivaGreen
+                                    Spacer()
+
+                                    StatItem(
+                                        value: "\(userStats?.totalEnergyBurned ?? 0)",
+                                        label: "Active Cals",
+                                        iconName: "flame.fill",
+                                        size: min(
+                                            geo.size.width * 0.25,
+                                            100
                                         )
+                                    )
+
+                                    Spacer()
                                 }
-                                .padding(.top, 2)
-                                .padding(.horizontal, 16)
-
-                                // Edit Profile Button (left aligned) - only for current user
-                                if viewModel.isCurrentUser {
-                                    Button(action: {
-                                        showEditProfile = true
-                                    }) {
-                                        HStack(spacing: 6) {
-                                            Text("Edit Profile")
-                                                .font(.system(size: 16))
-                                                .foregroundColor(.white)
-
-                                            Image(systemName: "pencil")
-                                                .font(.system(size: 14))
-                                                .foregroundColor(.white)
-                                        }
-                                        .padding(.top, 8)
-                                    }
-                                    .padding(.horizontal, 16)
-                                }
-
-                                // User caption
-                                if let caption = viewModel.userProfile?.userSummary.caption, !caption.isEmpty
-                                {
-                                    Text(caption)
-                                        .font(.system(size: 16))
-                                        .foregroundColor(.white)
-                                        .multilineTextAlignment(.leading)
-                                        .lineLimit(4)
-                                        .padding(.horizontal, 16)
-                                        .padding(.top, 8)
-                                }
-
-                                // Stats row
-                                GeometryReader { geo in
-                                    let userStats = viewModel.userProfile?.userStats
-                                    HStack(alignment: .top, spacing: 0) {
-                                        Spacer()
-
-                                        StatItem(
-                                            value: "\(userStats?.wins ?? 0)",
-                                            label: "Wins",
-                                            iconName: "medal.fill",
-                                            size: min(
-                                                geo.size.width * 0.25,
-                                                100
-                                            )
-                                        )
-
-                                        Spacer()
-
-                                        StatItem(
-                                            value: "\(userStats?.totalElevatedHeartRate ?? 0)",
-                                            label: "Move Mins",
-                                            iconName: "figure.run",
-                                            size: min(
-                                                geo.size.width * 0.25,
-                                                100
-                                            )
-                                        )
-
-                                        Spacer()
-
-                                        StatItem(
-                                            value: "\(userStats?.totalEnergyBurned ?? 0)",
-                                            label: "Active Cals",
-                                            iconName: "flame.fill",
-                                            size: min(
-                                                geo.size.width * 0.25,
-                                                100
-                                            )
-                                        )
-
-                                        Spacer()
-                                    }
-                                    .frame(width: geo.size.width)
-                                }
-                                .frame(height: 120)
-                                .padding(.bottom, VivaDesign.Spacing.large)
+                                .frame(width: geo.size.width)
                             }
+                            .frame(height: 120)
+                            .padding(.bottom, VivaDesign.Spacing.large)
                         }
-
-                        VivaDivider()
-                            .padding(.bottom, VivaDesign.Spacing.small)
-                            .padding(
-                                .horizontal,
-                                VivaDesign.Spacing.outerPadding
-                            )
-
-                        // Active Matchups section - only show for current user
-                        if viewModel.isCurrentUser && !viewModel.activeMatchups.isEmpty {
-                            MatchupSectionView(
-                                title: "Active Matchups",
-                                matchups: viewModel.activeMatchups,
-                                lastRefreshTime: nil,
-                                onMatchupSelected: { matchup in
-                                    viewModel.selectMatchup(matchup)
-                                },
-                                matchupService: matchupService,
-                                healthKitDataManager: healthKitDataManager,
-                                userSession: userSession,
-                                userMeasurementService: userMeasurementService
-                            )
-                            .padding(
-                                .horizontal,
-                                VivaDesign.Spacing.outerPadding
-                            )
-                        } else if viewModel.isCurrentUser {
-                            Text("No Active Matchups")
-                                .font(VivaDesign.Typography.title3)
-                                .foregroundColor(.gray)
-                                .padding(.vertical, 20)
-                                .padding(
-                                    .horizontal,
-                                    VivaDesign.Spacing.outerPadding
-                                )
-                        }
-
-                        // Add some padding at the bottom for scrolling
-                        Spacer()
-                            .frame(height: 40)
                     }
-                }
-                .refreshable {
-                    await viewModel.loadData()
+
+                    VivaDivider()
+                        .padding(.bottom, VivaDesign.Spacing.small)
+                        .padding(
+                            .horizontal,
+                            VivaDesign.Spacing.outerPadding
+                        )
+
+                    // Active Matchups section - only show for current user
+                    if !viewModel.activeMatchups.isEmpty {
+                        MatchupSectionView(
+                            title: "Active Matchups",
+                            matchups: viewModel.activeMatchups,
+                            lastRefreshTime: nil,
+                            onMatchupSelected: { matchup in
+                                viewModel.selectMatchup(matchup)
+                            },
+                            matchupService: matchupService,
+                            healthKitDataManager: healthKitDataManager,
+                            userSession: userSession,
+                            userMeasurementService: userMeasurementService
+                        )
+                        .padding(
+                            .horizontal,
+                            VivaDesign.Spacing.outerPadding
+                        )
+                    } else {
+                        Text("No Active Matchups")
+                            .font(VivaDesign.Typography.title3)
+                            .foregroundColor(.gray)
+                            .padding(.vertical, 20)
+                            .padding(
+                                .horizontal,
+                                VivaDesign.Spacing.outerPadding
+                            )
+                    }
+
+                    // Add some padding at the bottom for scrolling
+                    Spacer()
+                        .frame(height: 40)
                 }
             }
-            .sheet(isPresented: $showSettings) {
-                SettingsView()
+            .ignoresSafeArea(edges: .top)
+            .refreshable {
+                await viewModel.loadData()
             }
-            .sheet(isPresented: $showEditProfile) {
-                EditProfileView(
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                EmptyView()
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
+        .sheet(isPresented: $showEditProfile) {
+            EditProfileView(
+                userSession: userSession,
+                userService: userService
+            )
+        }
+        .sheet(
+            isPresented: $showImagePicker,
+            onDismiss: {
+                if let selectedImage = selectedImage {
+                    viewModel.saveProfileImage(selectedImage)
+                }
+            }
+        ) {
+            ImagePicker(selectedImage: $selectedImage)
+        }
+        .navigationDestination(item: $viewModel.selectedMatchup) {
+            matchup in
+            MatchupDetailView(
+                viewModel: MatchupDetailViewModel(
+                    matchupId: matchup.id,
+                    matchupService: matchupService,
+                    userMeasurementService: userMeasurementService,
+                    friendService: friendService,
+                    userService: userService,
                     userSession: userSession,
-                    userService: userService
-                )
-            }
-            .sheet(
-                isPresented: $showImagePicker,
-                onDismiss: {
-                    if let selectedImage = selectedImage {
-                        viewModel.saveProfileImage(selectedImage)
-                    }
-                }
-            ) {
-                ImagePicker(selectedImage: $selectedImage)
-            }
-            .navigationDestination(item: $viewModel.selectedMatchup) {
-                matchup in
-                MatchupDetailView(
-                    viewModel: MatchupDetailViewModel(
-                        matchupId: matchup.id,
-                        matchupService: matchupService,
-                        userMeasurementService: userMeasurementService,
-                        friendService: friendService,
-                        userService: userService,
-                        userSession: userSession,
-                        healthKitDataManager: healthKitDataManager
-                    ),
-                    source: "profile"
-                )
-            }
-            .edgesIgnoringSafeArea(.top)
-            .alert(item: errorMessageBinding) { message in
-                Alert(
-                    title: Text("Error"),
-                    message: Text(message.text),
-                    dismissButton: .default(Text("OK"))
-                )
-            }
-            .onAppear {
-                Task {
-                    await viewModel.loadData()
-                }
+                    healthKitDataManager: healthKitDataManager
+                ),
+                source: "profile"
+            )
+        }
+        .alert(item: errorMessageBinding) { message in
+            Alert(
+                title: Text("Error"),
+                message: Text(message.text),
+                dismissButton: .default(Text("OK"))
+            )
+        }
+        .onAppear {
+            Task {
+                await viewModel.loadData()
             }
         }
     }

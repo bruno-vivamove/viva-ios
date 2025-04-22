@@ -20,6 +20,18 @@ final class MatchupService: ObservableObject {
         )
     }
     
+    func getUserMatchups(userId: String, filter: MatchupFilter = .ALL, page: Int = 0, pageSize: Int = 100) async throws -> MatchupsResponse {
+        return try await networkClient.get(
+            path: "/matchups",
+            queryParams: [
+                "userId": "\(userId)",
+                "filter": filter.rawValue,
+                "page": String(page),
+                "pageSize": String(pageSize)
+            ]
+        )
+    }
+    
     func getMatchup(matchupId: String) async throws -> MatchupDetails {
         return try await networkClient.get(
             path: "/matchups/\(matchupId)"

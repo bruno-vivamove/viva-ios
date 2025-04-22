@@ -51,16 +51,12 @@ class ProfileViewModel: ObservableObject {
         do {
             if self.isCurrentUser {
                 self.userProfile = try await userService.getCurrentUserProfile()
-                
-                let matchupsResponse = try await matchupService.getMyMatchups(filter: .ACTIVE)
-                self.activeMatchups = matchupsResponse.matchups
             } else {
                 self.userProfile = try await userService.getUserProfile(userId: self.userId)
-                
-                // For other users, we might have a different endpoint to get their matchups
-                // or we might not show them at all depending on app requirements
-                self.activeMatchups = []
             }
+            
+            let matchupsResponse = try await matchupService.getUserMatchups(userId: self.userId, filter: .ACTIVE)
+            self.activeMatchups = matchupsResponse.matchups
         } catch {
             self.errorMessage = "Failed to load profile: \(error.localizedDescription)"
         }

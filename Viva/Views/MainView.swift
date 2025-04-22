@@ -29,12 +29,14 @@ struct MainView: View {
     var body: some View {
         TabView {
             // Home Tab
-            HomeView(
-                viewModel: HomeViewModel(
-                    userSession: userSession,
-                    matchupService: matchupService
+            NavigationStack {
+                HomeView(
+                    viewModel: HomeViewModel(
+                        userSession: userSession,
+                        matchupService: matchupService
+                    )
                 )
-            )
+            }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .tabItem {
                 Image(systemName: "house.fill")
@@ -50,14 +52,16 @@ struct MainView: View {
                 }
 
             // Profile Tab
-            ProfileView(
-                viewModel: ProfileViewModel(
-                    userId: userSession.userId!,
-                    userSession: userSession,
-                    userService: userService,
-                    matchupService: matchupService
+            NavigationStack {
+                ProfileView(
+                    viewModel: ProfileViewModel(
+                        userId: userSession.userId!,
+                        userSession: userSession,
+                        userService: userService,
+                        matchupService: matchupService
+                    )
                 )
-            )
+            }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .tabItem {
                 Image(systemName: "person.fill")
@@ -65,12 +69,14 @@ struct MainView: View {
             }
 
             // Matchup History Tab
-            MatchupHistoryView(
-                viewModel: MatchupHistoryViewModel(
-                    statsService: statsService,
-                    matchupService: matchupService
+            NavigationStack {
+                MatchupHistoryView(
+                    viewModel: MatchupHistoryViewModel(
+                        statsService: statsService,
+                        matchupService: matchupService
+                    )
                 )
-            )
+            }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .tabItem {
                 Image(systemName: "trophy.fill")
@@ -78,13 +84,15 @@ struct MainView: View {
             }
 
             // Matchups Tab
-            FriendsView(
-                viewModel: FriendsViewModel(
-                    friendService: friendService,
-                    userService: userService,
-                    userSession: userSession
+            NavigationStack {
+                FriendsView(
+                    viewModel: FriendsViewModel(
+                        friendService: friendService,
+                        userService: userService,
+                        userSession: userSession
+                    )
                 )
-            )
+            }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .tabItem {
                 Image(systemName: "person.2.fill")

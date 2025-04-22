@@ -16,80 +16,78 @@ struct HomeView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                HomeHeader(
-                    userSession: userSession,
+        VStack(spacing: 0) {
+            HomeHeader(
+                userSession: userSession,
+                viewModel: viewModel,
+                matchupService: matchupService,
+                friendService: friendService,
+                userService: userService
+            )
+            .padding(VivaDesign.Spacing.outerPadding)
+            .padding(.bottom, 0)
+
+            if viewModel.isLoading && viewModel.isEmpty {
+                LoadingView()
+            } else if viewModel.isEmpty {
+                // Empty state with refreshable list
+                List {
+                    HomeEmptyStateView()
+                        .listRowBackground(Color.black)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(EdgeInsets())
+                }
+                .listStyle(PlainListStyle())
+                .scrollContentBackground(.hidden)
+                .refreshable {
+                    await viewModel.loadData()
+                }
+            } else {
+                HomeContentList(
                     viewModel: viewModel,
                     matchupService: matchupService,
+                    healthKitDataManager: healthKitDataManager,
+                    userSession: userSession,
+                    userMeasurementService: userMeasurementService
+                )
+                .listRowInsets(EdgeInsets())
+                .listStyle(PlainListStyle())
+                .scrollContentBackground(.hidden)
+                .refreshable {
+                    await viewModel.loadData()
+                }
+                .listSectionSpacing(0)
+                .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.black)
+        .navigationDestination(item: $viewModel.selectedMatchup) { matchup in
+            MatchupDetailView(
+                viewModel: MatchupDetailViewModel(
+                    matchupId: matchup.id,
+                    matchupService: matchupService,
+                    userMeasurementService: userMeasurementService,
                     friendService: friendService,
-                    userService: userService
-                )
-                .padding(VivaDesign.Spacing.outerPadding)
-                .padding(.bottom, 0)
-
-                if viewModel.isLoading && viewModel.isEmpty {
-                    LoadingView()
-                } else if viewModel.isEmpty {
-                    // Empty state with refreshable list
-                    List {
-                        HomeEmptyStateView()
-                            .listRowBackground(Color.black)
-                            .listRowSeparator(.hidden)
-                            .listRowInsets(EdgeInsets())
-                    }
-                    .listStyle(PlainListStyle())
-                    .scrollContentBackground(.hidden)
-                    .refreshable {
-                        await viewModel.loadData()
-                    }
-                } else {
-                    HomeContentList(
-                        viewModel: viewModel,
-                        matchupService: matchupService,
-                        healthKitDataManager: healthKitDataManager,
-                        userSession: userSession,
-                        userMeasurementService: userMeasurementService
-                    )
-                    .listRowInsets(EdgeInsets())
-                    .listStyle(PlainListStyle())
-                    .scrollContentBackground(.hidden)
-                    .refreshable {
-                        await viewModel.loadData()
-                    }
-                    .listSectionSpacing(0)
-                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
-                }
+                    userService: userService,
+                    userSession: userSession,
+                    healthKitDataManager: healthKitDataManager
+                ),
+                source: "home"
+            )
+        }
+        .alert("Error", isPresented: .constant(viewModel.error != nil)) {
+            Button("OK") {
+                viewModel.error = nil
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.black)
-            .navigationDestination(item: $viewModel.selectedMatchup) { matchup in
-                MatchupDetailView(
-                    viewModel: MatchupDetailViewModel(
-                        matchupId: matchup.id,
-                        matchupService: matchupService,
-                        userMeasurementService: userMeasurementService,
-                        friendService: friendService,
-                        userService: userService,
-                        userSession: userSession,
-                        healthKitDataManager: healthKitDataManager
-                    ),
-                    source: "home"
-                )
+        } message: {
+            if let error = viewModel.error {
+                Text(error.localizedDescription)
             }
-            .alert("Error", isPresented: .constant(viewModel.error != nil)) {
-                Button("OK") {
-                    viewModel.error = nil
-                }
-            } message: {
-                if let error = viewModel.error {
-                    Text(error.localizedDescription)
-                }
-            }
-            .onAppear {
-                Task {
-                    await viewModel.loadInitialDataIfNeeded()
-                }
+        }
+        .onAppear {
+            Task {
+                await viewModel.loadInitialDataIfNeeded()
             }
         }
     }
@@ -174,7 +172,7 @@ struct HomeContentList: View {
                     userMeasurementService: userMeasurementService
                 )
             }
-            
+
             // Active Matchups
             if !viewModel.activeMatchups.isEmpty {
                 MatchupSectionView(
@@ -312,7 +310,8 @@ struct SentInvitesView: View {
                         displayName: "Open Invite",
                         caption: "",
                         imageUrl: nil,
-                        friendStatus: .none),
+                        friendStatus: .none
+                    ),
                 actions: [
                     UserActionCard.UserAction(
                         title: "Remind",
