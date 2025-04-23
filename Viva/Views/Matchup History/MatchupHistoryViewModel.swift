@@ -7,7 +7,7 @@ final class MatchupHistoryViewModel: ObservableObject {
     @Published var matchupStats: [MatchupStats] = []
     @Published var completedMatchups: [Matchup] = []
     @Published var isLoading: Bool = false
-    @Published var error: String?
+    @Published var error: Error?
     @Published var selectedUserId: String?
 
     private let statsService: StatsService
@@ -17,6 +17,14 @@ final class MatchupHistoryViewModel: ObservableObject {
     // Data tracking properties
     private var dataLoadedTime: Date?
     private var dataRequestedTime: Date?
+
+    // Set error only if it's not a network error
+    func setError(_ error: Error) {
+        // Only store the error if it's not a NetworkClientError
+        if !(error is NetworkClientError) {
+            self.error = error
+        }
+    }
 
     init(statsService: StatsService, matchupService: MatchupService) {
         self.statsService = statsService
@@ -159,7 +167,7 @@ final class MatchupHistoryViewModel: ObservableObject {
 
             isLoading = false
         } catch {
-            self.error = error.localizedDescription
+            self.setError(error)
             isLoading = false
         }
     }

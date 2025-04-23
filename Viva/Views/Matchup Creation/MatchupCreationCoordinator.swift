@@ -11,6 +11,14 @@ class MatchupCreationCoordinator: ObservableObject {
     @Published var isCreatingMatchup = false
     @Published var error: Error?
 
+    // Set error only if it's not a network error
+    func setError(_ error: Error) {
+        // Only store the error if it's not a NetworkClientError
+        if !(error is NetworkClientError) {
+            self.error = error
+        }
+    }
+
     init(
         matchupService: MatchupService,
         friendService: FriendService,
@@ -52,7 +60,7 @@ class MatchupCreationCoordinator: ObservableObject {
                     rematchRequest: rematchRequest
                 )
         } catch {
-            self.error = error
+            self.setError(error)
             return nil
         }
     }
@@ -88,7 +96,7 @@ class MatchupCreationCoordinator: ObservableObject {
 
             return matchup
         } catch {
-            self.error = error
+            self.setError(error)
             return nil
         }
     }

@@ -28,13 +28,21 @@ class FriendsViewModel: ObservableObject {
     
     // Shared state
     @Published var isLoading = false
-    @Published var error: String?
+    @Published var error: Error?
     @Published var selectedMatchup: Matchup?
     
     // Data tracking properties
     private var dataLoadedTime: Date?
     private var dataRequestedTime: Date?
     private var cancellables = Set<AnyCancellable>()
+    
+    // Set error only if it's not a network error
+    func setError(_ error: Error) {
+        // Only store the error if it's not a NetworkClientError
+        if !(error is NetworkClientError) {
+            self.error = error
+        }
+    }
     
     init(friendService: FriendService, userService: UserService, matchupService: MatchupService, userSession: UserSession) {
         self.friendService = friendService
@@ -123,7 +131,7 @@ class FriendsViewModel: ObservableObject {
             searchQuery = query
             isSearchMode = true
         } catch {
-            self.error = "Failed to search users. Please try again."
+            self.setError(NSError(domain: "FriendsViewModel", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to search users. Please try again."]))
         }
         
         isLoading = false
@@ -163,7 +171,7 @@ class FriendsViewModel: ObservableObject {
                 )
             }
         } catch {
-            self.error = "Failed to send friend request. Please try again."
+            self.setError(NSError(domain: "FriendsViewModel", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to send friend request. Please try again."]))
         }
     }
     
@@ -193,7 +201,7 @@ class FriendsViewModel: ObservableObject {
             // Update the time when data was successfully loaded
             self.dataLoadedTime = Date()
         } catch {
-            self.error = "Failed to load friends. Please try again."
+            self.setError(error)
         }
         
         isLoading = false
@@ -204,7 +212,7 @@ class FriendsViewModel: ObservableObject {
             try await friendService.acceptFriendRequest(userId: userId)
             await loadFriendsData() // Reload after accepting since it affects multiple lists
         } catch {
-            self.error = "Failed to accept friend request. Please try again."
+            self.setError(NSError(domain: "FriendsViewModel", code: 3, userInfo: [NSLocalizedDescriptionKey: "Failed to accept friend request. Please try again."]))
         }
     }
     
@@ -214,7 +222,7 @@ class FriendsViewModel: ObservableObject {
             // Remove the invite locally
             friendInvites.removeAll { $0.id == userId }
         } catch {
-            self.error = "Failed to decline friend request. Please try again."
+            self.setError(NSError(domain: "FriendsViewModel", code: 4, userInfo: [NSLocalizedDescriptionKey: "Failed to decline friend request. Please try again."]))
             await loadFriendsData() // Reload on error to ensure consistency
         }
     }
@@ -225,7 +233,7 @@ class FriendsViewModel: ObservableObject {
             // Remove the friend locally
             friends.removeAll { $0.id == userId }
         } catch {
-            self.error = "Failed to delete friend. Please try again."
+            self.setError(NSError(domain: "FriendsViewModel", code: 5, userInfo: [NSLocalizedDescriptionKey: "Failed to delete friend. Please try again."]))
             await loadFriendsData() // Reload on error to ensure consistency
         }
     }
@@ -248,7 +256,7 @@ class FriendsViewModel: ObservableObject {
                 )
             }
         } catch {
-            self.error = "Failed to cancel friend request. Please try again."
+            self.setError(NSError(domain: "FriendsViewModel", code: 6, userInfo: [NSLocalizedDescriptionKey: "Failed to cancel friend request. Please try again."]))
             await loadFriendsData() // Reload on error to ensure consistency
         }
     }

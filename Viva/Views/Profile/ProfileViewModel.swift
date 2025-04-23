@@ -5,7 +5,7 @@ import Combine
 @MainActor
 class ProfileViewModel: ObservableObject {
     @Published var isImageLoading = false
-    @Published var errorMessage: String?
+    @Published var errorMessage: Error?
     @Published var userProfile: UserProfile?
     @Published var activeMatchups: [Matchup] = []
     @Published var selectedMatchup: Matchup?
@@ -19,6 +19,14 @@ class ProfileViewModel: ObservableObject {
     // Data tracking properties
     private var dataLoadedTime: Date?
     private var dataRequestedTime: Date?
+    
+    // Set error only if it's not a network error
+    func setError(_ error: Error) {
+        // Only store the error if it's not a NetworkClientError
+        if !(error is NetworkClientError) {
+            self.errorMessage = error
+        }
+    }
     
     init(userId: String, userSession: UserSession, userService: UserService, matchupService: MatchupService) {
         self.userId = userId
@@ -82,7 +90,7 @@ class ProfileViewModel: ObservableObject {
             // Update the time when data was successfully loaded
             self.dataLoadedTime = Date()
         } catch {
-            self.errorMessage = "Failed to load profile: \(error.localizedDescription)"
+            self.setError(error)
         }
     }
     
@@ -101,7 +109,7 @@ class ProfileViewModel: ObservableObject {
             } catch {
                 await MainActor.run {
                     isImageLoading = false
-                    errorMessage = "Failed to save image: \(error.localizedDescription)"
+                    self.setError(error)
                 }
             }
         }

@@ -290,8 +290,6 @@ struct MatchupDetailView: View {
         } message: {
             if let error = viewModel.error {
                 Text(error.localizedDescription)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
             }
         }
         .toolbarBackground(Color.black, for: .navigationBar)

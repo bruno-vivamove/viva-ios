@@ -170,13 +170,6 @@ struct FriendsView: View {
                         .padding(.horizontal, VivaDesign.Spacing.outerPadding)
                     }
                 }
-
-                if let error = viewModel.error {
-                    Text(error)
-                        .foregroundColor(.red)
-                        .font(VivaDesign.Typography.caption)
-                        .padding()
-                }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
@@ -208,6 +201,15 @@ struct FriendsView: View {
                             matchupService: matchupService
                         )
                     )
+                }
+            }
+            .alert("Error", isPresented: .constant(viewModel.error != nil)) {
+                Button("OK") {
+                    viewModel.error = nil
+                }
+            } message: {
+                if let error = viewModel.error {
+                    Text(error.localizedDescription)
                 }
             }
             .onAppear {

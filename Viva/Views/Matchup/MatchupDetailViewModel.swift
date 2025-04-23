@@ -44,6 +44,14 @@ class MatchupDetailViewModel: ObservableObject {
     @Published var error: Error?
     @Published var isCompletedButNotFinalized = false
 
+    // Set error only if it's not a network error
+    func setError(_ error: Error) {
+        // Only store the error if it's not a NetworkClientError
+        if !(error is NetworkClientError) {
+            self.error = error
+        }
+    }
+
     init(
         matchupId: String,
         matchupService: MatchupService,
@@ -189,7 +197,7 @@ class MatchupDetailViewModel: ObservableObject {
                 }
             }
         } catch {
-            self.error = error
+            self.setError(error)
         }
 
         isLoading = false
@@ -451,7 +459,7 @@ class MatchupDetailViewModel: ObservableObject {
                 self.matchup = updatedMatchup
             }
         } catch {
-            self.error = error
+            self.setError(error)
         }
     }
 }

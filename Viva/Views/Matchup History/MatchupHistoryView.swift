@@ -129,7 +129,7 @@ struct MatchupHistoryView: View {
                 }
             } message: {
                 if let error = viewModel.error {
-                    Text(error)
+                    Text(error.localizedDescription)
                 }
             }
             .onAppear {

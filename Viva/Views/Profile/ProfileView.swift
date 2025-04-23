@@ -312,35 +312,20 @@ struct ProfileView: View {
                 source: "profile"
             )
         }
-        .alert(item: errorMessageBinding) { message in
-            Alert(
-                title: Text("Error"),
-                message: Text(message.text),
-                dismissButton: .default(Text("OK"))
-            )
+        .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
+            Button("OK") {
+                viewModel.errorMessage = nil
+            }
+        } message: {
+            if let error = viewModel.errorMessage {
+                Text(error.localizedDescription)
+            }
         }
         .onAppear {
             Task {
                 await viewModel.loadInitialDataIfNeeded()
             }
         }
-    }
-
-    // Helper struct to wrap error messages for the alert API
-    struct ErrorMessage: Identifiable {
-        let id = UUID()
-        let text: String
-    }
-
-    private var errorMessageBinding: Binding<ErrorMessage?> {
-        Binding<ErrorMessage?>(
-            get: {
-                viewModel.errorMessage.map { ErrorMessage(text: $0) }
-            },
-            set: { _ in
-                viewModel.errorMessage = nil
-            }
-        )
     }
 }
 
