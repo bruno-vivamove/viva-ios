@@ -38,10 +38,23 @@ struct MatchupHistoryView: View {
                 } else if viewModel.matchupStats.isEmpty
                     && viewModel.completedMatchups.isEmpty
                 {
-                    EmptyStateSection(message: "No matchup history yet")
-                        .frame(maxWidth: .infinity)
-                        .frame(maxHeight: .infinity, alignment: .center)
-                        .padding(.bottom, 80)
+                    List {
+                        EmptyStateSection(message: "No matchup history yet")
+                            .frame(maxWidth: .infinity)
+                            .frame(maxHeight: .infinity)
+                            .frame(minHeight: UIScreen.main.bounds.height - 200)
+                            .listRowBackground(Color.black)
+                            .listRowInsets(EdgeInsets())
+                    }
+                    .listStyle(PlainListStyle())
+                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                    .listRowSpacing(0)
+                    .background(Color.black)
+                    .scrollContentBackground(.hidden)
+                    .environment(\.defaultMinListRowHeight, 0)
+                    .refreshable {
+                        await viewModel.loadMatchupStats()
+                    }
                 } else {
                     // Stats and completed matchups in list
                     List {
@@ -444,6 +457,9 @@ struct EmptyStateSection: View {
     let message: String
 
     var body: some View {
-        MatchupHistoryEmptyStateView(message: message)
+        VStack {
+            MatchupHistoryEmptyStateView(message: message)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

@@ -80,8 +80,17 @@ struct FriendsView: View {
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else if isViewEmpty {
                         // Empty friends state - use similar layout to HomeEmptyStateView
-                        FriendsEmptyStateView()
-                            .padding(.vertical, VivaDesign.Spacing.medium)
+                        List {
+                            FriendsEmptyStateView()
+                                .listRowBackground(Color.black)
+                                .listRowInsets(EdgeInsets())
+                        }
+                        .listStyle(PlainListStyle())
+                        .scrollContentBackground(.hidden)
+                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                        .refreshable {
+                            await viewModel.loadFriendsData()
+                        }
                     } else {
                         List {
                             // Received Friend Invites Section
