@@ -1,10 +1,12 @@
 import Foundation
+import Combine
 
 @MainActor
 class FriendsViewModel: ObservableObject {
     // Services
     private let friendService: FriendService
     private let userService: UserService
+    private let matchupService: MatchupService
     private let searchDebouncer = SearchDebouncer()
     
     // State for user session
@@ -19,19 +21,63 @@ class FriendsViewModel: ObservableObject {
     @Published var searchResults: [UserSummary] = []
     @Published var isSearchMode = false
     @Published var searchQuery: String?
+    @Published var searchText: String = ""
+    
+    // Navigation state
+    @Published var selectedUserId: String? = nil
     
     // Shared state
     @Published var isLoading = false
     @Published var error: String?
+    @Published var selectedMatchup: Matchup?
     
     // Data tracking properties
     private var dataLoadedTime: Date?
     private var dataRequestedTime: Date?
+    private var cancellables = Set<AnyCancellable>()
     
-    init(friendService: FriendService, userService: UserService, userSession: UserSession) {
+    init(friendService: FriendService, userService: UserService, matchupService: MatchupService, userSession: UserSession) {
         self.friendService = friendService
         self.userService = userService
+        self.matchupService = matchupService
         self.userSession = userSession
+        
+        setupNotificationObservers()
+    }
+    
+    private func setupNotificationObservers() {
+        // Observe friend request sent notifications
+        NotificationCenter.default.publisher(for: .friendRequestSent)
+            .compactMap { $0.object as? UserSummary }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] sentUser in
+                Task { @MainActor in
+                    // Add the user to sent invites if not already present
+                    if let self = self, !self.sentInvites.contains(where: {
+                        $0.id == sentUser.id
+                    }) {
+                        self.sentInvites.append(sentUser)
+                    }
+                }
+            }
+            .store(in: &cancellables)
+        
+        // Observe matchup creation notifications
+        NotificationCenter.default.publisher(for: .matchupCreationFlowCompleted)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                if let matchupDetails = notification.object as? MatchupDetails,
+                   let userInfo = notification.userInfo,
+                   let source = userInfo["source"] as? String,
+                   source == "friends" {
+                    Task {
+                        await MainActor.run {
+                            self?.selectedMatchup = matchupDetails.asMatchup
+                        }
+                    }
+                }
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Data Loading
@@ -55,9 +101,11 @@ class FriendsViewModel: ObservableObject {
     
     // MARK: - Search Functions
     
-    func debouncedSearch(query: String) {
+    func debouncedSearch() {
         searchDebouncer.debounce { [weak self] in
-            await self?.searchUsers(query: query)
+            if let self = self {
+                await self.searchUsers(query: self.searchText)
+            }
         }
     }
     

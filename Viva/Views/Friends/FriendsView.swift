@@ -23,9 +23,6 @@ struct FriendsView: View {
     )
 
     @StateObject private var viewModel: FriendsViewModel
-    @State private var searchText = ""
-    @State private var selectedMatchup: Matchup?
-    @State private var selectedUserId: String? = nil
     @FocusState private var isSearchFieldFocused: Bool
 
     init(viewModel: FriendsViewModel) {
@@ -37,7 +34,7 @@ struct FriendsView: View {
             VStack(spacing: 0) {
                 // Search Header
                 FriendsHeader(
-                    searchText: $searchText, viewModel: viewModel,
+                    searchText: $viewModel.searchText, viewModel: viewModel,
                     isSearchFieldFocused: _isSearchFieldFocused
                 )
                 .padding(.top, VivaDesign.Spacing.medium)
@@ -57,7 +54,7 @@ struct FriendsView: View {
                                 ForEach(viewModel.searchResults) { user in
                                     FriendRequestCard(
                                         viewModel: viewModel, user: user,
-                                        selectedUserId: $selectedUserId
+                                        selectedUserId: $viewModel.selectedUserId
                                     )
                                     .listRowSeparator(.hidden)
                                     .listRowInsets(EdgeInsets())
@@ -93,7 +90,7 @@ struct FriendsView: View {
                                     ForEach(viewModel.friendInvites) { user in
                                         FriendRequestCard(
                                             viewModel: viewModel, user: user,
-                                            selectedUserId: $selectedUserId
+                                            selectedUserId: $viewModel.selectedUserId
                                         )
                                         .listRowSeparator(.hidden)
                                         .listRowInsets(EdgeInsets())
@@ -114,7 +111,7 @@ struct FriendsView: View {
                                     ForEach(viewModel.sentInvites) { user in
                                         FriendRequestCard(
                                             viewModel: viewModel, user: user,
-                                            selectedUserId: $selectedUserId
+                                            selectedUserId: $viewModel.selectedUserId
                                         )
                                         .listRowSeparator(.hidden)
                                         .listRowInsets(EdgeInsets())
@@ -140,7 +137,7 @@ struct FriendsView: View {
                                             healthKitDataManager:
                                                 healthKitDataManager,
                                             userSession: viewModel.userSession,
-                                            selectedUserId: $selectedUserId
+                                            selectedUserId: $viewModel.selectedUserId
                                         )
                                         .listRowSeparator(.hidden)
                                         .listRowInsets(EdgeInsets())
@@ -174,7 +171,7 @@ struct FriendsView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
-            .navigationDestination(item: $selectedMatchup) { matchup in
+            .navigationDestination(item: $viewModel.selectedMatchup) { matchup in
                 MatchupDetailView(
                     viewModel: MatchupDetailViewModel(
                         matchupId: matchup.id,
@@ -190,10 +187,10 @@ struct FriendsView: View {
             }
             // Add NavigationLink for profile navigation
             .navigationDestination(isPresented: Binding(
-                get: { selectedUserId != nil },
-                set: { if !$0 { selectedUserId = nil } }
+                get: { viewModel.selectedUserId != nil },
+                set: { if !$0 { viewModel.selectedUserId = nil } }
             )) {
-                if let userId = selectedUserId {
+                if let userId = viewModel.selectedUserId {
                     ProfileView(
                         viewModel: ProfileViewModel(
                             userId: userId,
@@ -207,42 +204,6 @@ struct FriendsView: View {
             .onAppear {
                 Task {
                     await viewModel.loadInitialDataIfNeeded()
-                }
-
-                // Observe friend request sent notifications
-                NotificationCenter.default.addObserver(
-                    forName: .friendRequestSent,
-                    object: nil,
-                    queue: .main
-                ) { notification in
-                    if let sentUser = notification.object as? UserSummary {
-                        Task { @MainActor in
-                            // Add the user to sent invites if not already present
-                            if !viewModel.sentInvites.contains(where: {
-                                $0.id == sentUser.id
-                            }) {
-                                viewModel.sentInvites.append(sentUser)
-                            }
-                        }
-                    }
-                }
-
-                // Observe matchup creation notifications
-                NotificationCenter.default.addObserver(
-                    forName: .matchupCreationFlowCompleted,
-                    object: nil,
-                    queue: .main
-                ) { notification in
-                    if let matchupDetails = notification.object as? MatchupDetails,
-                       let userInfo = notification.userInfo,
-                       let source = userInfo["source"] as? String,
-                       source == "friends" {
-                        Task {
-                            await MainActor.run {
-                                selectedMatchup = matchupDetails.asMatchup
-                            }
-                        }
-                    }
                 }
             }
             .onDisappear {
@@ -267,7 +228,7 @@ struct FriendsHeader: View {
                 .foregroundColor(VivaDesign.Colors.primaryText)
                 .focused($isSearchFieldFocused)
                 .onChange(of: searchText) { oldValue, newValue in
-                    viewModel.debouncedSearch(query: newValue)
+                    viewModel.debouncedSearch()
                 }
 
             if !searchText.isEmpty {

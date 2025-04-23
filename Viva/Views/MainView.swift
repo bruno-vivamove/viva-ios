@@ -81,6 +81,7 @@ struct MainView: View {
                     viewModel: FriendsViewModel(
                         friendService: friendService,
                         userService: userService,
+                        matchupService: matchupService,
                         userSession: userSession
                     )
                 )
