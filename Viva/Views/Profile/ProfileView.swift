@@ -17,13 +17,13 @@ struct ProfileView: View {
     init(viewModel: ProfileViewModel) {
         // Note: This will be properly initialized when the view is created since the required services are provided as environment objects
         _viewModel = StateObject(wrappedValue: viewModel)
-        
+
         // Make navigation bar transparent
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()
         appearance.backgroundColor = .clear
         appearance.shadowColor = .clear
-        
+
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().compactAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
@@ -73,8 +73,10 @@ struct ProfileView: View {
                                 ZStack(alignment: .bottomTrailing) {
                                     // Profile image with skeleton loading built in
                                     VivaProfileImage(
-                                        userId: viewModel.userProfile?.userSummary.id,
-                                        imageUrl: viewModel.userProfile?.userSummary.imageUrl,
+                                        userId: viewModel.userProfile?
+                                            .userSummary.id,
+                                        imageUrl: viewModel.userProfile?
+                                            .userSummary.imageUrl,
                                         size: .xlarge
                                     )
                                     .padding(.top, 16)
@@ -124,10 +126,13 @@ struct ProfileView: View {
                             .padding(.horizontal, 16)
 
                             // User name (left aligned)
-                            Text(viewModel.userProfile?.userSummary.displayName ?? "")
-                                .font(.system(size: 28, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 16)
+                            Text(
+                                viewModel.userProfile?.userSummary.displayName
+                                    ?? ""
+                            )
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 16)
 
                             // Location (left aligned)
                             HStack(spacing: 6) {
@@ -166,7 +171,8 @@ struct ProfileView: View {
                             }
 
                             // User caption
-                            if let caption = viewModel.userProfile?.userSummary.caption, !caption.isEmpty
+                            if let caption = viewModel.userProfile?.userSummary
+                                .caption, !caption.isEmpty
                             {
                                 Text(caption)
                                     .font(.system(size: 16))
@@ -174,7 +180,7 @@ struct ProfileView: View {
                                     .multilineTextAlignment(.leading)
                                     .lineLimit(4)
                                     .padding(.horizontal, 16)
-                                    .padding(.top, 8)
+                                    .padding(.top, VivaDesign.Spacing.xsmall)
                             }
 
                             // Stats row
@@ -196,7 +202,8 @@ struct ProfileView: View {
                                     Spacer()
 
                                     StatItem(
-                                        value: "\(userStats?.totalElevatedHeartRate ?? 0)",
+                                        value:
+                                            "\(userStats?.totalElevatedHeartRate ?? 0)",
                                         label: "Move Mins",
                                         iconName: "figure.run",
                                         size: min(
@@ -208,7 +215,8 @@ struct ProfileView: View {
                                     Spacer()
 
                                     StatItem(
-                                        value: "\(userStats?.totalEnergyBurned ?? 0)",
+                                        value:
+                                            "\(userStats?.totalEnergyBurned ?? 0)",
                                         label: "Active Cals",
                                         iconName: "flame.fill",
                                         size: min(
@@ -222,12 +230,16 @@ struct ProfileView: View {
                                 .frame(width: geo.size.width)
                             }
                             .frame(height: 120)
-                            .padding(.bottom, VivaDesign.Spacing.large)
+                            .padding(.top, VivaDesign.Spacing.medium)
+                            .padding(
+                                .bottom,
+                                VivaDesign.Spacing.large
+                            )
                         }
                     }
 
                     VivaDivider()
-                        .padding(.bottom, VivaDesign.Spacing.small)
+                        .padding(.bottom, VivaDesign.Spacing.medium)
                         .padding(
                             .horizontal,
                             VivaDesign.Spacing.outerPadding
@@ -350,6 +362,14 @@ struct StatItem: View {
         self.size = size
     }
 
+    private var formattedValue: String {
+        if let intValue = Int(value), intValue >= 1000 {
+            let floatValue = Float(intValue) / 1000.0
+            return String(format: "%.1fK", floatValue)
+        }
+        return value
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Concentric circles
@@ -388,7 +408,7 @@ struct StatItem: View {
                     )
                     .frame(width: size - 20, height: size - 20)
 
-                Text(value)
+                Text(formattedValue)
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(.white)
             }

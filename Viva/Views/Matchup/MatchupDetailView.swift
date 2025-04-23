@@ -257,27 +257,20 @@ struct MatchupDetailView: View {
                     inviteCode: invite.inviteCode
                 )
             }
-            
-            // Hidden NavigationLink that activates when selectedUserId changes
-            NavigationLink(
-                destination: Group {
-                    if let userId = selectedUserId {
-                        ProfileView(
-                            viewModel: ProfileViewModel(
-                                userId: userId,
-                                userSession: viewModel.userSession,
-                                userService: viewModel.userService,
-                                matchupService: viewModel.matchupService
-                            )
-                        )
-                    }
-                },
-                isActive: Binding(
-                    get: { selectedUserId != nil },
-                    set: { if !$0 { selectedUserId = nil } }
+        }
+        .navigationDestination(isPresented: Binding(
+            get: { selectedUserId != nil },
+            set: { if !$0 { selectedUserId = nil } }
+        )) {
+            if let userId = selectedUserId {
+                ProfileView(
+                    viewModel: ProfileViewModel(
+                        userId: userId,
+                        userSession: viewModel.userSession,
+                        userService: viewModel.userService,
+                        matchupService: viewModel.matchupService
+                    )
                 )
-            ) {
-                EmptyView()
             }
         }
         .task {
@@ -295,7 +288,7 @@ struct MatchupDetailView: View {
         .toolbarBackground(Color.black, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.dark)
-        .onChange(of: selectedUserId) { newValue in
+        .onChange(of: selectedUserId) { oldValue, newValue in
             navigateToProfile = newValue != nil
         }
     }
