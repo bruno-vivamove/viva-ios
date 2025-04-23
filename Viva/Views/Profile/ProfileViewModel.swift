@@ -16,6 +16,10 @@ class ProfileViewModel: ObservableObject {
     private let userId: String
     private var cancellables = Set<AnyCancellable>()
     
+    // Data tracking properties
+    private var dataLoadedTime: Date?
+    private var dataRequestedTime: Date?
+    
     init(userId: String, userSession: UserSession, userService: UserService, matchupService: MatchupService) {
         self.userId = userId
         self.userSession = userSession
@@ -47,6 +51,23 @@ class ProfileViewModel: ObservableObject {
         }
     }
     
+    func loadInitialDataIfNeeded() async {
+        // Don't load if we've requested data in the last minute, regardless of result
+        if let requestedTime = dataRequestedTime, 
+           Date().timeIntervalSince(requestedTime) < 60 {
+            return
+        }
+        
+        // Only load data if it hasn't been loaded in the last 10 minutes
+        if dataLoadedTime == nil
+            || Date().timeIntervalSince(dataLoadedTime!) > 600
+        {
+            // Mark that we've requested data
+            dataRequestedTime = Date()
+            await loadData()
+        }
+    }
+    
     func loadData() async {
         do {
             if self.isCurrentUser {
@@ -57,6 +78,9 @@ class ProfileViewModel: ObservableObject {
             
             let matchupsResponse = try await matchupService.getUserMatchups(userId: self.userId, filter: .ACTIVE)
             self.activeMatchups = matchupsResponse.matchups
+            
+            // Update the time when data was successfully loaded
+            self.dataLoadedTime = Date()
         } catch {
             self.errorMessage = "Failed to load profile: \(error.localizedDescription)"
         }

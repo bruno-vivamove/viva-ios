@@ -14,7 +14,9 @@ class HomeViewModel: ObservableObject {
     @Published var error: Error?
     @Published var selectedMatchup: Matchup?
 
-    var dataRefreshedTime: Date? = nil
+    // Data tracking properties
+    var dataLoadedTime: Date? = nil
+    private var dataRequestedTime: Date?
     private var cancellables = Set<AnyCancellable>()
 
     init(
@@ -124,10 +126,18 @@ class HomeViewModel: ObservableObject {
     }
 
     func loadInitialDataIfNeeded() async {
-        // Only load data if it hasn't been refreshed in the last 10 minutes
-        if dataRefreshedTime == nil
-            || Date().timeIntervalSince(dataRefreshedTime!) > 600
+        // Don't load if we've requested data in the last minute, regardless of result
+        if let requestedTime = dataRequestedTime, 
+           Date().timeIntervalSince(requestedTime) < 60 {
+            return
+        }
+        
+        // Only load data if it hasn't been loaded in the last 10 minutes
+        if dataLoadedTime == nil
+            || Date().timeIntervalSince(dataLoadedTime!) > 600
         {
+            // Mark that we've requested data
+            dataRequestedTime = Date()
             await loadData()
         }
     }
@@ -153,7 +163,8 @@ class HomeViewModel: ObservableObject {
             self.receivedInvites = fetchedReceivedInvites
             self.sentInvites = fetchedSentInvites
 
-            self.dataRefreshedTime = Date()
+            // Update the time when data was successfully loaded
+            self.dataLoadedTime = Date()
         } catch {
             self.error = error
         }

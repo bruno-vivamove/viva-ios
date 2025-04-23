@@ -24,10 +24,33 @@ class FriendsViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var error: String?
     
+    // Data tracking properties
+    private var dataLoadedTime: Date?
+    private var dataRequestedTime: Date?
+    
     init(friendService: FriendService, userService: UserService, userSession: UserSession) {
         self.friendService = friendService
         self.userService = userService
         self.userSession = userSession
+    }
+    
+    // MARK: - Data Loading
+    
+    func loadInitialDataIfNeeded() async {
+        // Don't load if we've requested data in the last minute, regardless of result
+        if let requestedTime = dataRequestedTime, 
+           Date().timeIntervalSince(requestedTime) < 60 {
+            return
+        }
+        
+        // Only load data if it hasn't been loaded in the last 10 minutes
+        if dataLoadedTime == nil
+            || Date().timeIntervalSince(dataLoadedTime!) > 600
+        {
+            // Mark that we've requested data
+            dataRequestedTime = Date()
+            await loadFriendsData()
+        }
     }
     
     // MARK: - Search Functions
@@ -118,6 +141,9 @@ class FriendsViewModel: ObservableObject {
             self.friendInvites = receivedInvites
             self.sentInvites = sentInvites
             self.friends = friends
+            
+            // Update the time when data was successfully loaded
+            self.dataLoadedTime = Date()
         } catch {
             self.error = "Failed to load friends. Please try again."
         }

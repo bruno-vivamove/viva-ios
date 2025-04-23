@@ -321,7 +321,7 @@ struct ProfileView: View {
         }
         .onAppear {
             Task {
-                await viewModel.loadData()
+                await viewModel.loadInitialDataIfNeeded()
             }
         }
     }

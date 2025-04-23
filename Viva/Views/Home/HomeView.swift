@@ -163,7 +163,7 @@ struct HomeContentList: View {
                 MatchupSectionView(
                     title: "Completed Matchups",
                     matchups: viewModel.completedMatchups,
-                    lastRefreshTime: viewModel.dataRefreshedTime,
+                    lastRefreshTime: viewModel.dataLoadedTime,
                     onMatchupSelected: { matchup in
                         viewModel.selectedMatchup = matchup
                     },
@@ -179,7 +179,7 @@ struct HomeContentList: View {
                 MatchupSectionView(
                     title: "Active Matchups",
                     matchups: viewModel.activeMatchups,
-                    lastRefreshTime: viewModel.dataRefreshedTime,
+                    lastRefreshTime: viewModel.dataLoadedTime,
                     onMatchupSelected: { matchup in
                         viewModel.selectedMatchup = matchup
                     },
@@ -195,7 +195,7 @@ struct HomeContentList: View {
                 MatchupSectionView(
                     title: "Pending Matchups",
                     matchups: viewModel.pendingMatchups,
-                    lastRefreshTime: viewModel.dataRefreshedTime,
+                    lastRefreshTime: viewModel.dataLoadedTime,
                     onMatchupSelected: { matchup in
                         viewModel.selectedMatchup = matchup
                     },

@@ -121,7 +121,7 @@ struct MatchupHistoryView: View {
             }
             .onAppear {
                 Task {
-                    await viewModel.loadMatchupStats()
+                    await viewModel.loadInitialDataIfNeeded()
                 }
             }
             .onChange(of: viewModel.selectedMatchup) { oldValue, newValue in

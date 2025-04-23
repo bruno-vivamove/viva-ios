@@ -13,6 +13,10 @@ final class MatchupHistoryViewModel: ObservableObject {
     private let statsService: StatsService
     private let matchupService: MatchupService
     private var cancellables = Set<AnyCancellable>()
+    
+    // Data tracking properties
+    private var dataLoadedTime: Date?
+    private var dataRequestedTime: Date?
 
     init(statsService: StatsService, matchupService: MatchupService) {
         self.statsService = statsService
@@ -107,6 +111,24 @@ final class MatchupHistoryViewModel: ObservableObject {
             self.selectedMatchup = nil
         }
     }
+    
+    @MainActor
+    func loadInitialDataIfNeeded() async {
+        // Don't load if we've requested data in the last minute, regardless of result
+        if let requestedTime = dataRequestedTime, 
+           Date().timeIntervalSince(requestedTime) < 60 {
+            return
+        }
+        
+        // Only load data if it hasn't been loaded in the last 10 minutes
+        if dataLoadedTime == nil
+            || Date().timeIntervalSince(dataLoadedTime!) > 600
+        {
+            // Mark that we've requested data
+            dataRequestedTime = Date()
+            await loadMatchupStats()
+        }
+    }
 
     @MainActor
     func loadMatchupStats() async {
@@ -131,6 +153,9 @@ final class MatchupHistoryViewModel: ObservableObject {
 
             // Use the completed matchups from the response
             completedMatchups = matchupsResponse.matchups
+            
+            // Update the time when data was successfully loaded
+            self.dataLoadedTime = Date()
 
             isLoading = false
         } catch {

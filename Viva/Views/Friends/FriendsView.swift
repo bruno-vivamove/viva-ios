@@ -24,7 +24,6 @@ struct FriendsView: View {
 
     @StateObject private var viewModel: FriendsViewModel
     @State private var searchText = ""
-    @State private var hasLoaded = false
     @State private var selectedMatchup: Matchup?
     @State private var selectedUserId: String? = nil
     @FocusState private var isSearchFieldFocused: Bool
@@ -206,11 +205,8 @@ struct FriendsView: View {
                 }
             }
             .onAppear {
-                if !hasLoaded {
-                    hasLoaded = true
-                    Task {
-                        await viewModel.loadFriendsData()
-                    }
+                Task {
+                    await viewModel.loadInitialDataIfNeeded()
                 }
 
                 // Observe friend request sent notifications
