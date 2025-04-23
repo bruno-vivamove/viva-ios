@@ -25,6 +25,7 @@ struct VivaApp: App {
                 .environmentObject(vivaAppObjects.userService)
                 .environmentObject(vivaAppObjects.healthKitDataManager)
                 .environmentObject(vivaAppObjects.userMeasurementService)
+                .environmentObject(vivaAppObjects.errorManager)
                 .onOpenURL { url in
                     if url.absoluteString.contains("google") {
                         GIDSignIn.sharedInstance.handle(url)

@@ -4,6 +4,7 @@ class VivaAppObjects: ObservableObject {
     public let userSession: UserSession
     public let authManager: AuthenticationManager
     public let healthKitDataManager: HealthKitDataManager
+    public let errorManager: ErrorManager
 
     public let authNetworkClientSettings: AuthNetworkClientSettings
     public let appNetworkClientSettings: AppNetworkClientSettings
@@ -27,6 +28,7 @@ class VivaAppObjects: ObservableObject {
 
     init() {
         userSession = UserSession()
+        errorManager = ErrorManager()
 
         // Settings with no session
         authNetworkClientSettings = AuthNetworkClientSettings(shouldLogBodies: true)
@@ -35,9 +37,11 @@ class VivaAppObjects: ObservableObject {
 
         // Clients with no session
         authNetworkClient = NetworkClient<AuthErrorResponse>(
-            settings: authNetworkClientSettings)
+            settings: authNetworkClientSettings,
+            errorManager: errorManager)
         appNetworkClientWithNoSession = NetworkClient<VivaErrorResponse>(
-            settings: appWithNoSessionNetworkClientSettings)
+            settings: appWithNoSessionNetworkClientSettings,
+            errorManager: errorManager)
 
         // Services with no session
         authService = AuthService(networkClient: authNetworkClient)
@@ -54,12 +58,14 @@ class VivaAppObjects: ObservableObject {
         appNetworkClient = NetworkClient(
             settings: appNetworkClientSettings,
             tokenRefreshHandler: TokenRefreshHandler(
-                sessionService: sessionService, userSession: userSession))
+                sessionService: sessionService, userSession: userSession),
+            errorManager: errorManager)
 
         appNetworkClientNoBodies = NetworkClient(
             settings: appNetworkClientSettingsNoBodies,
             tokenRefreshHandler: TokenRefreshHandler(
-                sessionService: sessionService, userSession: userSession))
+                sessionService: sessionService, userSession: userSession),
+            errorManager: errorManager)
 
         // Services with session
         friendService = FriendService(

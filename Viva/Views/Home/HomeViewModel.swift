@@ -28,7 +28,20 @@ class HomeViewModel: ObservableObject {
 
         setupNotificationObservers()
     }
-
+    
+    // Set error only if it's not a network error
+    func setError(_ error: Error) {
+        // Only store the error if it's not a NetworkClientError
+        if !(error is NetworkClientError) {
+            self.error = error
+        }
+    }
+    
+    // Clear the current error
+    func clearError() {
+        error = nil
+    }
+    
     private func setupNotificationObservers() {
         // Matchup created observer
         NotificationCenter.default.publisher(for: .matchupCreated)
@@ -96,7 +109,7 @@ class HomeViewModel: ObservableObject {
                                 matchupId: matchupInvite.matchupId
                             ).asMatchup
                     } catch {
-                        self.error = error
+                        self.setError(error)
                     }
                 }
             }
@@ -166,7 +179,7 @@ class HomeViewModel: ObservableObject {
             // Update the time when data was successfully loaded
             self.dataLoadedTime = Date()
         } catch {
-            self.error = error
+            self.setError(error)
         }
 
         isLoading = false
@@ -242,7 +255,7 @@ class HomeViewModel: ObservableObject {
         do {
             try await matchupService.deleteInvite(matchupInvite)
         } catch {
-            self.error = error
+            self.setError(error)
         }
     }
 
@@ -276,7 +289,7 @@ class HomeViewModel: ObservableObject {
         do {
             try await matchupService.acceptInvite(invite)
         } catch {
-            self.error = error
+            self.setError(error)
         }
     }
 
@@ -295,7 +308,7 @@ class HomeViewModel: ObservableObject {
             })
             self.selectedMatchup = newMatchup
         } catch {
-            self.error = error
+            self.setError(error)
         }
     }
 

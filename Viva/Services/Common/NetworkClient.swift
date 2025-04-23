@@ -17,13 +17,18 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
         settings: NetworkClientSettings,
         session: Session = .default,
         decoder: JSONDecoder = JSONDecoder.vivaDecoder,
-        tokenRefreshHandler: TokenRefreshHandler? = nil
+        tokenRefreshHandler: TokenRefreshHandler? = nil,
+        errorManager: ErrorManager? = nil
     ) {
         self.settings = settings
         self.session = session
         self.decoder = decoder
         self.requestBuilder = RequestBuilder(settings: settings)
-        self.responseHandler = ResponseHandler<ErrorType>(decoder: decoder, shouldLogBodies: settings.shouldLogBodies)
+        self.responseHandler = ResponseHandler<ErrorType>(
+            decoder: decoder, 
+            shouldLogBodies: settings.shouldLogBodies,
+            errorManager: errorManager
+        )
         self.tokenRefreshHandler = tokenRefreshHandler
         
         AppLogger.info("NetworkClient initialized with baseURL: \(settings.baseUrl)", category: .network)
@@ -221,30 +226,22 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             .responseDecodable(of: T.self, decoder: decoder) { [weak self] response in
                 guard let self = self else { return }
                 
-                self.responseHandler.logResponse(response)
-                
-                switch response.result {
-                case .success(let value):
-                    continuation.resume(returning: value)
-                case .failure(let error):
-                    // Create retry handler closure for uploads
-                    let retryHandler = { [weak self] () async throws -> T in
-                        guard let self = self else {
-                            throw NetworkClientError(code: "INTERNAL_ERROR", message: "NetworkClient was deallocated")
-                        }
-                        // Retry the upload with potentially new token
-                        let updatedHeaders = self.requestBuilder.buildHeaders(for: .upload, additionalHeaders: headers)
-                        return try await self.upload(path: path, headers: updatedHeaders.dictionary, data: data)
+                // Create retry handler closure for uploads
+                let retryHandler = { [weak self] () async throws -> T in
+                    guard let self = self else {
+                        throw NetworkClientError(code: "INTERNAL_ERROR", message: "NetworkClient was deallocated")
                     }
-                    
-                    self.responseHandler.handleError(
-                        error,
-                        response: response,
-                        continuation: continuation,
-                        tokenRefreshHandler: self.tokenRefreshHandler,
-                        retryHandler: retryHandler
-                    )
+                    // Retry the upload with potentially new token
+                    let updatedHeaders = self.requestBuilder.buildHeaders(for: .upload, additionalHeaders: headers)
+                    return try await self.upload(path: path, headers: updatedHeaders.dictionary, data: data)
                 }
+                
+                self.responseHandler.handleResponse(
+                    response: response,
+                    continuation: continuation,
+                    tokenRefreshHandler: self.tokenRefreshHandler,
+                    retryHandler: retryHandler
+                )
             }
         }
     }
@@ -278,29 +275,21 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             .response { [weak self] response in
                 guard let self = self else { return }
                 
-                self.responseHandler.logResponse(response)
-                
-                switch response.result {
-                case .success:
-                    continuation.resume()
-                case .failure(let error):
-                    // Create retry handler closure for uploads without response
-                    let retryHandler = { [weak self] () async throws in
-                        guard let self = self else {
-                            throw NetworkClientError(code: "INTERNAL_ERROR", message: "NetworkClient was deallocated")
-                        }
-                        // Retry the upload with potentially new token
-                        try await self.upload(path: path, headers: nil, data: data)
+                // Create retry handler closure for uploads without response
+                let retryHandler = { [weak self] () async throws in
+                    guard let self = self else {
+                        throw NetworkClientError(code: "INTERNAL_ERROR", message: "NetworkClient was deallocated")
                     }
-                    
-                    self.responseHandler.handleErrorWithoutResponse(
-                        error,
-                        response: response,
-                        continuation: continuation,
-                        tokenRefreshHandler: self.tokenRefreshHandler,
-                        retryHandler: retryHandler
-                    )
+                    // Retry the upload with potentially new token
+                    try await self.upload(path: path, headers: nil, data: data)
                 }
+                
+                self.responseHandler.handleResponseWithoutResponse(
+                    response: response,
+                    continuation: continuation,
+                    tokenRefreshHandler: self.tokenRefreshHandler,
+                    retryHandler: retryHandler
+                )
             }
         }
     }
@@ -320,30 +309,22 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                 .responseDecodable(of: T.self, decoder: decoder) { [weak self] response in
                     guard let self = self else { return }
                     
-                    self.responseHandler.logResponse(response)
-                    
-                    switch response.result {
-                    case .success(let value):
-                        continuation.resume(returning: value)
-                    case .failure(let error):
-                        // Create retry handler closure
-                        let retryHandler = { [weak self] () async throws -> T in
-                            guard let self = self else {
-                                throw NetworkClientError(code: "INTERNAL_ERROR", message: "NetworkClient was deallocated")
-                            }
-                            // Recreate request with potentially new token
-                            let updatedHeaders = self.requestBuilder.buildHeaders(for: method.toRequestType(), additionalHeaders: nil)
-                            return try await self.performRequestWithResponse(url: url, method: method, headers: updatedHeaders)
+                    // Create retry handler closure
+                    let retryHandler = { [weak self] () async throws -> T in
+                        guard let self = self else {
+                            throw NetworkClientError(code: "INTERNAL_ERROR", message: "NetworkClient was deallocated")
                         }
-                        
-                        self.responseHandler.handleError(
-                            error,
-                            response: response,
-                            continuation: continuation,
-                            tokenRefreshHandler: self.tokenRefreshHandler,
-                            retryHandler: retryHandler
-                        )
+                        // Recreate request with potentially new token
+                        let updatedHeaders = self.requestBuilder.buildHeaders(for: method.toRequestType(), additionalHeaders: nil)
+                        return try await self.performRequestWithResponse(url: url, method: method, headers: updatedHeaders)
                     }
+                    
+                    self.responseHandler.handleResponse(
+                        response: response,
+                        continuation: continuation,
+                        tokenRefreshHandler: self.tokenRefreshHandler,
+                        retryHandler: retryHandler
+                    )
                 }
         }
     }
@@ -374,30 +355,22 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             .responseDecodable(of: T.self, decoder: decoder) { [weak self] response in
                 guard let self = self else { return }
                 
-                self.responseHandler.logResponse(response)
-                
-                switch response.result {
-                case .success(let value):
-                    continuation.resume(returning: value)
-                case .failure(let error):
-                    // Create retry handler closure
-                    let retryHandler = { [weak self] () async throws -> T in
-                        guard let self = self else {
-                            throw NetworkClientError(code: "INTERNAL_ERROR", message: "NetworkClient was deallocated")
-                        }
-                        // Recreate request with potentially new token
-                        let updatedHeaders = self.requestBuilder.buildHeaders(for: method.toRequestType(), additionalHeaders: nil)
-                        return try await self.performRequestWithResponse(url: url, method: method, headers: updatedHeaders, body: body)
+                // Create retry handler closure
+                let retryHandler = { [weak self] () async throws -> T in
+                    guard let self = self else {
+                        throw NetworkClientError(code: "INTERNAL_ERROR", message: "NetworkClient was deallocated")
                     }
-                    
-                    self.responseHandler.handleError(
-                        error,
-                        response: response,
-                        continuation: continuation,
-                        tokenRefreshHandler: self.tokenRefreshHandler,
-                        retryHandler: retryHandler
-                    )
+                    // Recreate request with potentially new token
+                    let updatedHeaders = self.requestBuilder.buildHeaders(for: method.toRequestType(), additionalHeaders: nil)
+                    return try await self.performRequestWithResponse(url: url, method: method, headers: updatedHeaders, body: body)
                 }
+                
+                self.responseHandler.handleResponse(
+                    response: response,
+                    continuation: continuation,
+                    tokenRefreshHandler: self.tokenRefreshHandler,
+                    retryHandler: retryHandler
+                )
             }
         }
     }
@@ -415,30 +388,22 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                 .response { [weak self] response in
                     guard let self = self else { return }
                     
-                    self.responseHandler.logResponse(response)
-                    
-                    switch response.result {
-                    case .success:
-                        continuation.resume()
-                    case .failure(let error):
-                        // Create retry handler closure
-                        let retryHandler = { [weak self] () async throws -> Void in
-                            guard let self = self else {
-                                throw NetworkClientError(code: "INTERNAL_ERROR", message: "NetworkClient was deallocated")
-                            }
-                            // Recreate request with potentially new token
-                            let updatedHeaders = self.requestBuilder.buildHeaders(for: method.toRequestType(), additionalHeaders: nil)
-                            try await self.performRequestWithoutResponse(url: url, method: method, headers: updatedHeaders)
+                    // Create retry handler closure
+                    let retryHandler = { [weak self] () async throws -> Void in
+                        guard let self = self else {
+                            throw NetworkClientError(code: "INTERNAL_ERROR", message: "NetworkClient was deallocated")
                         }
-                        
-                        self.responseHandler.handleErrorWithoutResponse(
-                            error,
-                            response: response,
-                            continuation: continuation,
-                            tokenRefreshHandler: self.tokenRefreshHandler,
-                            retryHandler: retryHandler
-                        )
+                        // Recreate request with potentially new token
+                        let updatedHeaders = self.requestBuilder.buildHeaders(for: method.toRequestType(), additionalHeaders: nil)
+                        try await self.performRequestWithoutResponse(url: url, method: method, headers: updatedHeaders)
                     }
+                    
+                    self.responseHandler.handleResponseWithoutResponse(
+                        response: response,
+                        continuation: continuation,
+                        tokenRefreshHandler: self.tokenRefreshHandler,
+                        retryHandler: retryHandler
+                    )
                 }
         }
     }
@@ -469,30 +434,22 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             .response { [weak self] response in
                 guard let self = self else { return }
                 
-                self.responseHandler.logResponse(response)
-                
-                switch response.result {
-                case .success:
-                    continuation.resume()
-                case .failure(let error):
-                    // Create retry handler closure
-                    let retryHandler = { [weak self] () async throws -> Void in
-                        guard let self = self else {
-                            throw NetworkClientError(code: "INTERNAL_ERROR", message: "NetworkClient was deallocated")
-                        }
-                        // Recreate request with potentially new token
-                        let updatedHeaders = self.requestBuilder.buildHeaders(for: method.toRequestType(), additionalHeaders: nil)
-                        try await self.performRequestWithoutResponse(url: url, method: method, body: body, headers: updatedHeaders)
+                // Create retry handler closure
+                let retryHandler = { [weak self] () async throws -> Void in
+                    guard let self = self else {
+                        throw NetworkClientError(code: "INTERNAL_ERROR", message: "NetworkClient was deallocated")
                     }
-                    
-                    self.responseHandler.handleErrorWithoutResponse(
-                        error,
-                        response: response,
-                        continuation: continuation,
-                        tokenRefreshHandler: self.tokenRefreshHandler,
-                        retryHandler: retryHandler
-                    )
+                    // Recreate request with potentially new token
+                    let updatedHeaders = self.requestBuilder.buildHeaders(for: method.toRequestType(), additionalHeaders: nil)
+                    try await self.performRequestWithoutResponse(url: url, method: method, body: body, headers: updatedHeaders)
                 }
+                
+                self.responseHandler.handleResponseWithoutResponse(
+                    response: response,
+                    continuation: continuation,
+                    tokenRefreshHandler: self.tokenRefreshHandler,
+                    retryHandler: retryHandler
+                )
             }
         }
     }

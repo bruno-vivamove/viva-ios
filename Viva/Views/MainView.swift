@@ -8,6 +8,7 @@ struct MainView: View {
     @EnvironmentObject var matchupService: MatchupService
     @EnvironmentObject var userService: UserService
     @EnvironmentObject var healthKitDataManager: HealthKitDataManager
+    @EnvironmentObject var errorManager: ErrorManager
 
     private let activeTabColor: Color = VivaDesign.Colors.vivaGreen
     private let inactiveTabColor: UIColor = .white
@@ -27,74 +28,82 @@ struct MainView: View {
     }
 
     var body: some View {
-        TabView {
-            // Home Tab
-            NavigationStack {
-                HomeView(
-                    viewModel: HomeViewModel(
-                        userSession: userSession,
-                        matchupService: matchupService
+        ZStack(alignment: .top) {
+            TabView {
+                // Home Tab
+                NavigationStack {
+                    HomeView(
+                        viewModel: HomeViewModel(
+                            userSession: userSession,
+                            matchupService: matchupService
+                        )
                     )
-                )
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .tabItem {
-                Image(systemName: "house.fill")
-                Text("Home")
-            }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .tabItem {
+                    Image(systemName: "house.fill")
+                    Text("Home")
+                }
 
-            // Profile Tab
-            NavigationStack {
-                ProfileView(
-                    viewModel: ProfileViewModel(
-                        userId: userSession.userId!,
-                        userSession: userSession,
-                        userService: userService,
-                        matchupService: matchupService
+                // Profile Tab
+                NavigationStack {
+                    ProfileView(
+                        viewModel: ProfileViewModel(
+                            userId: userSession.userId!,
+                            userSession: userSession,
+                            userService: userService,
+                            matchupService: matchupService
+                        )
                     )
-                )
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .tabItem {
-                Image(systemName: "person.fill")
-                Text("Profile")
-            }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .tabItem {
+                    Image(systemName: "person.fill")
+                    Text("Profile")
+                }
 
-            // Matchup History Tab
-            NavigationStack {
-                MatchupHistoryView(
-                    viewModel: MatchupHistoryViewModel(
-                        statsService: statsService,
-                        matchupService: matchupService
+                // Matchup History Tab
+                NavigationStack {
+                    MatchupHistoryView(
+                        viewModel: MatchupHistoryViewModel(
+                            statsService: statsService,
+                            matchupService: matchupService
+                        )
                     )
-                )
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .tabItem {
-                Image(systemName: "trophy.fill")
-                Text("History")
-            }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .tabItem {
+                    Image(systemName: "trophy.fill")
+                    Text("History")
+                }
 
-            // Matchups Tab
-            NavigationStack {
-                FriendsView(
-                    viewModel: FriendsViewModel(
-                        friendService: friendService,
-                        userService: userService,
-                        matchupService: matchupService,
-                        userSession: userSession
+                // Matchups Tab
+                NavigationStack {
+                    FriendsView(
+                        viewModel: FriendsViewModel(
+                            friendService: friendService,
+                            userService: userService,
+                            matchupService: matchupService,
+                            userSession: userSession
+                        )
                     )
-                )
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .tabItem {
+                    Image(systemName: "person.2.fill")
+                    Text("Friends")
+                }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .tabItem {
-                Image(systemName: "person.2.fill")
-                Text("Friends")
+            .tint(activeTabColor)
+            .onAppear {
+                healthKitDataManager.requestAuthorization()
             }
-        }
-        .tint(activeTabColor)
-        .onAppear {
-            healthKitDataManager.requestAuthorization()
+            
+            // Error banner appears above everything else
+            if errorManager.hasErrors {
+                ErrorBanner(errorManager: errorManager)
+                    .zIndex(100)
+            }
         }
     }
 }
