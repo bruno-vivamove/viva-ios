@@ -141,28 +141,13 @@ struct MatchupDetailView: View {
                             .listRowSeparator(.hidden)
                             .listRowInsets(EdgeInsets())
                         }
-
-                        MatchupFooter(
-                            endTime: matchup.endTime,
-                            leftUser: matchup.leftTeam.users.first,
-                            rightUser: matchup.rightTeam.users.first,
-                            record: (
-                                leftWins: matchup.leftTeam.winCount,
-                                rightWins: matchup.rightTeam.winCount
-                            ),
-                            isCompleted: matchup.status == .completed,
-                            matchupService: viewModel.matchupService,
-                            friendService: viewModel.friendService,
-                            userService: viewModel.userService,
-                            userSession: viewModel.userSession,
-                            matchupId: matchup.id,
-                            selectedUserId: $selectedUserId,
-                            source: source
-                        )
-                        .padding(.vertical, VivaDesign.Spacing.medium)
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                        .listRowInsets(EdgeInsets())
+                        
+                        // Add empty space at the bottom for footer
+                        Color.clear
+                            .frame(height: 100)
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets())
                     }
                     .listStyle(PlainListStyle())
                     .environment(\.defaultMinListRowHeight, 0)
@@ -178,6 +163,28 @@ struct MatchupDetailView: View {
                                 }
                             }
                     )
+                    
+                    // Footer pinned to bottom
+                    MatchupFooter(
+                        endTime: matchup.endTime,
+                        leftUser: matchup.leftTeam.users.first,
+                        rightUser: matchup.rightTeam.users.first,
+                        record: (
+                            leftWins: matchup.leftTeam.winCount,
+                            rightWins: matchup.rightTeam.winCount
+                        ),
+                        isCompleted: matchup.status == .completed,
+                        matchupService: viewModel.matchupService,
+                        friendService: viewModel.friendService,
+                        userService: viewModel.userService,
+                        userSession: viewModel.userSession,
+                        matchupId: matchup.id,
+                        selectedUserId: $selectedUserId,
+                        source: source
+                    )
+                    .padding(.vertical, VivaDesign.Spacing.medium)
+                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                    .background(Color.black)
                 }
                 .padding(.horizontal, VivaDesign.Spacing.outerPadding)
             } else {
@@ -329,6 +336,13 @@ struct MatchupDetailView: View {
                 .listRowBackground(Color.black)
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets())
+                
+                // Add empty space at the bottom for footer
+                Color.clear
+                    .frame(height: 100)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets())
             }
             .listStyle(PlainListStyle())
             .scrollContentBackground(.hidden)
