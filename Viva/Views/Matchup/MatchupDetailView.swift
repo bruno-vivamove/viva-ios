@@ -77,12 +77,11 @@ struct MatchupDetailView: View {
                             source: source
                         )
                         .padding(.top, matchup.status == .completed ? 0 : VivaDesign.Spacing.medium)
-                        .padding(.bottom, VivaDesign.Spacing.medium)
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
                         .listRowInsets(EdgeInsets())
 
-                        // Show matchup result message if completed
+                        // Show matchup result message - if completed
                         if matchup.status == .completed {
                             // Winning and losing teams
                             let currentUserId = viewModel.userSession.userId
@@ -105,7 +104,7 @@ struct MatchupDetailView: View {
                                 userIsWinner: userIsWinner,
                                 opponentName: oppopnentName
                             )
-                            .padding(.bottom, VivaDesign.Spacing.medium)
+                            .padding(.vertical, VivaDesign.Spacing.large)
                             .listRowBackground(Color.black)
                             .listRowSeparator(.hidden)
                             .listRowInsets(EdgeInsets())
@@ -117,7 +116,7 @@ struct MatchupDetailView: View {
                                 isShowingTotal: $isShowingTotal,
                                 isCompleted: false
                             )
-                            .padding(.bottom, VivaDesign.Spacing.small)
+                            .padding(.vertical, VivaDesign.Spacing.medium)
                             .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
                             .listRowInsets(EdgeInsets())
@@ -481,9 +480,7 @@ struct MatchupDetailView: View {
             }
 
             // Divider placeholder
-            Rectangle()
-                .fill(placeholderColor)
-                .frame(height: 1)
+            VivaDivider()
                 .padding(.top, VivaDesign.Spacing.small)
         }
     }
