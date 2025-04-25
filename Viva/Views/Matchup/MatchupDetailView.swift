@@ -715,7 +715,7 @@ struct UserScoreView: View {
         VStack(alignment: .center) {
             Text(displayName)
                 .foregroundColor(VivaDesign.Colors.vivaGreen)
-                .font(VivaDesign.Typography.caption)
+                .font(VivaDesign.Typography.caption.bold())
                 .lineLimit(1)
             Text("\(totalPoints)")
                 .foregroundColor(VivaDesign.Colors.primaryText)
@@ -750,6 +750,7 @@ struct ViewToggle: View {
             HStack(spacing: VivaDesign.Spacing.xsmall) {
                 Text("Today")
                     .lineLimit(1)
+                    .font(VivaDesign.Typography.pointsTitle)
                     .fontWeight(.bold)
                     .truncationMode(.tail)
                     .foregroundColor(
@@ -763,6 +764,7 @@ struct ViewToggle: View {
 
                 Text("Total")
                     .lineLimit(1)
+                    .font(VivaDesign.Typography.pointsTitle)
                     .fontWeight(.bold)
                     .truncationMode(.tail)
                     .foregroundColor(
@@ -821,13 +823,13 @@ struct ComparisonRow: View {
         // Left side with fixed width
         VStack(alignment: .center) {
             Text(leftValue)
-                .font(.title2)
+                .font(Font.system(size: 20, weight: .bold))
                 .fontWeight(.bold)
                 .lineLimit(1)
                 .truncationMode(.tail)
                 .foregroundColor(VivaDesign.Colors.primaryText)
             Text(leftPoints)
-                .font(VivaDesign.Typography.caption)
+                .font(Font.system(size: 12, weight: .bold))
                 .fontWeight(.bold)
                 .lineLimit(1)
                 .truncationMode(.tail)
@@ -849,13 +851,13 @@ struct ComparisonRow: View {
         // Right side with fixed width
         VStack(alignment: .center) {
             Text(rightValue)
-                .font(.title2)
+                .font(Font.system(size: 20, weight: .bold))
                 .fontWeight(.bold)
                 .lineLimit(1)
                 .truncationMode(.tail)
                 .foregroundColor(VivaDesign.Colors.primaryText)
             Text(rightPoints)
-                .font(VivaDesign.Typography.caption)
+                .font(Font.system(size: 12, weight: .bold))
                 .fontWeight(.bold)
                 .lineLimit(1)
                 .truncationMode(.tail)
@@ -916,7 +918,7 @@ struct MatchupFooter: View {
                 VStack(spacing: VivaDesign.Spacing.small) {
                     // All-Time Wins label
                     Text("All-Time Wins")
-                        .font(VivaDesign.Typography.caption)
+                        .font(VivaDesign.Typography.caption.bold())
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .foregroundColor(VivaDesign.Colors.primaryText)
@@ -969,7 +971,7 @@ struct MatchupFooter: View {
                 // Left section
                 VStack(spacing: VivaDesign.Spacing.small) {
                     Text("Matchup Ends")
-                        .font(VivaDesign.Typography.caption)
+                        .font(VivaDesign.Typography.caption.bold())
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .foregroundColor(VivaDesign.Colors.primaryText)
@@ -987,7 +989,7 @@ struct MatchupFooter: View {
                 // Right section
                 VStack(spacing: VivaDesign.Spacing.small) {
                     Text("All-Time Wins")
-                        .font(VivaDesign.Typography.caption)
+                        .font(VivaDesign.Typography.caption.bold())
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .foregroundColor(VivaDesign.Colors.primaryText)
@@ -1043,7 +1045,7 @@ struct TimeRemainingDisplay: View {
 
     private var waitingView: some View {
         Text("Waiting for final data")
-            .font(.title3)
+            .font(.title3.bold())
             .minimumScaleFactor(0.2)
             .lineLimit(1)
             .foregroundColor(VivaDesign.Colors.vivaGreen)
@@ -1055,23 +1057,26 @@ struct TimeRemainingDisplay: View {
 
         return HStack(spacing: VivaDesign.Spacing.xsmall) {
             Text("\(remainingTime.days)")
-                .font(.title)
+                .font(.title.bold())
                 .lineLimit(1)
             Text("d")
                 .foregroundColor(VivaDesign.Colors.vivaGreen)
                 .lineLimit(1)
+                .font(VivaDesign.Typography.caption.bold())
             Text("\(remainingTime.hours)")
-                .font(.title)
+                .font(.title.bold())
                 .lineLimit(1)
             Text("hr")
                 .foregroundColor(VivaDesign.Colors.vivaGreen)
                 .lineLimit(1)
+                .font(VivaDesign.Typography.caption.bold())
             Text("\(remainingTime.minutes)")
-                .font(.title)
+                .font(.title.bold())
                 .lineLimit(1)
             Text("min")
                 .foregroundColor(VivaDesign.Colors.vivaGreen)
                 .lineLimit(1)
+                .font(VivaDesign.Typography.caption.bold())
         }
         .foregroundColor(VivaDesign.Colors.primaryText)
     }
@@ -1097,7 +1102,7 @@ struct RecordDisplay: View {
     @Binding var selectedUserId: String?
 
     var body: some View {
-        HStack(spacing: VivaDesign.Spacing.medium) {
+        HStack(spacing: 0) {
             VivaProfileImage(
                 userId: leftUser?.id,
                 imageUrl: leftUser?.imageUrl,
@@ -1112,10 +1117,13 @@ struct RecordDisplay: View {
             Text("\(record.leftWins)")
                 .font(.system(size: 30, weight: .bold))
                 .lineLimit(1)
+                .padding(.horizontal, VivaDesign.Spacing.small)
+                        
             Text("\(record.rightWins)")
                 .font(.system(size: 30, weight: .bold))
                 .lineLimit(1)
-            
+                .padding(.horizontal, VivaDesign.Spacing.small)
+
             VivaProfileImage(
                 userId: rightUser?.id,
                 imageUrl: rightUser?.imageUrl,

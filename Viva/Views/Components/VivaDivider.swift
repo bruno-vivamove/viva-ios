@@ -10,7 +10,7 @@ import SwiftUI
 struct VivaDivider: View {
     var body: some View {
         Rectangle()
-            .fill(VivaDesign.Colors.divider.opacity(0.5))
-            .frame(height: 1.5)
+            .fill(VivaDesign.Colors.divider)
+            .frame(height: 0.5)
     }
 }

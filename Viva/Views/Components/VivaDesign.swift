@@ -15,7 +15,7 @@ enum VivaDesign {
         static let primaryText = Color.white
         static let secondaryText = Color.gray
         static let error = Color.red
-        static let divider = Color.white.opacity(0.6)
+        static let divider = Color.white.opacity(0.5)
         static let warning = Color.orange
         static let destructive = Color.red
     }
