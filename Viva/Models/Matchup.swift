@@ -14,13 +14,13 @@ struct MatchupRequest: Codable {
 
 struct MatchupsResponse: Codable {
     let matchups: [Matchup]
-    let pagination: Pagination
+    let pagination: PaginationMetadata
 }
 
 struct Pagination: Codable {
     let page: Int
     let pageSize: Int
-    let total: Int
+    let totalItems: Int
     let totalPages: Int
 }
 
@@ -107,6 +107,7 @@ struct MatchupDetails: Codable, Equatable {
     let teams: [MatchupTeam]
     let measurements: [MatchupMeasurement]
     var userMeasurements: [MatchupUserMeasurement]
+    var workouts: [WorkoutExpanded]
     var invites: [MatchupInvite]
     var finalized: Bool
     

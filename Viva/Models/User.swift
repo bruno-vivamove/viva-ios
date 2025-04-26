@@ -44,10 +44,6 @@ struct UserAccountUpdateRequest: Codable {
     let caption: String?
 }
 
-struct UserSummaryResponse: Codable {
-    let userSummary: UserSummary
-}
-
 struct UserAccountResponse: Codable {
     let user: User
 }
