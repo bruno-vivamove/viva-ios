@@ -43,6 +43,10 @@ class MatchupDetailViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var error: Error?
     @Published var isCompletedButNotFinalized = false
+    
+    // Data tracking properties
+    private var dataLoadedTime: Date? = nil
+    private var dataRequestedTime: Date?
 
     // Set error only if it's not a network error
     func setError(_ error: Error) {
@@ -138,6 +142,22 @@ class MatchupDetailViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
+    func loadInitialDataIfNeeded() async {
+        // Don't load if we've requested data in the last minute, regardless of result
+        if let requestedTime = dataRequestedTime, 
+           Date().timeIntervalSince(requestedTime) < 60 {
+            return
+        }
+        
+        // Only load data if it hasn't been loaded in the last 10 minutes or if matchup is nil
+        if matchup == nil || dataLoadedTime == nil || 
+           Date().timeIntervalSince(dataLoadedTime!) > 600 {
+            // Mark that we've requested data
+            dataRequestedTime = Date()
+            await loadData()
+        }
+    }
+
     func loadData() async {
         guard !isLoading else { return }
 
@@ -196,6 +216,9 @@ class MatchupDetailViewModel: ObservableObject {
                     }
                 }
             }
+            
+            // Update the time when data was successfully loaded
+            self.dataLoadedTime = Date()
         } catch {
             self.setError(error)
         }

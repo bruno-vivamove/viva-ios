@@ -42,6 +42,9 @@ struct MatchupCard: View {
         .onChange(of: lastRefreshTime) { oldValue, newValue in
             viewModel.updateLastRefreshTime(newValue)
         }
+        .task(id: "initial_load") {
+            await viewModel.loadMatchupDetails()
+        }
     }
 
     private func matchupCardView(_ details: MatchupDetails) -> some View {

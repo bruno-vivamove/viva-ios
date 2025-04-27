@@ -290,7 +290,7 @@ struct MatchupDetailView: View {
             }
         }
         .task {
-            await viewModel.loadData()
+            await viewModel.loadInitialDataIfNeeded()
         }
         .alert("Error", isPresented: .constant(viewModel.error != nil)) {
             Button("OK") {

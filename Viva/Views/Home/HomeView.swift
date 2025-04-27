@@ -86,10 +86,8 @@ struct HomeView: View {
                 Text(error.localizedDescription)
             }
         }
-        .onAppear {
-            Task {
-                await viewModel.loadInitialDataIfNeeded()
-            }
+        .task {
+            await viewModel.loadInitialDataIfNeeded()
         }
     }
 }

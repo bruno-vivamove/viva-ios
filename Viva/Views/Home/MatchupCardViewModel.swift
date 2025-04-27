@@ -3,7 +3,7 @@ import Foundation
 
 class MatchupCardViewModel: ObservableObject, Identifiable {
     @Published var matchupDetails: MatchupDetails?
-    @Published var isLoading: Bool = false
+    @Published var isLoading: Bool
     @Published var error: Error?
 
     private let matchupId: String
@@ -34,11 +34,6 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
 
         // Listen for relevant notifications that should trigger a refresh
         setupNotificationObservers()
-
-        // Load the matchup details
-        Task {
-            await loadMatchupDetails()
-        }
     }
 
     // Add this method to update the refresh time

@@ -132,10 +132,8 @@ struct MatchupHistoryView: View {
                     Text(error.localizedDescription)
                 }
             }
-            .onAppear {
-                Task {
-                    await viewModel.loadInitialDataIfNeeded()
-                }
+            .task {
+                await viewModel.loadInitialDataIfNeeded()
             }
             .onChange(of: viewModel.selectedMatchup) { oldValue, newValue in
                 if oldValue != nil && newValue == nil {
