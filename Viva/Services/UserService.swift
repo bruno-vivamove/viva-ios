@@ -45,8 +45,7 @@ final class UserService: ObservableObject {
 
         // Convert profile update request to JSON data if provided
         if let updateRequest = updateRequest {
-            let jsonEncoder = JSONEncoder()
-            let profileData = try jsonEncoder.encode(updateRequest)
+            let profileData = try JSONEncoder.vivaEncoder.encode(updateRequest)
             multipartData.append(
                 MultipartData(
                     data: profileData,

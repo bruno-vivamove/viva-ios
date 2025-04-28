@@ -93,7 +93,7 @@ final class UserSession: ObservableObject {
             "sessionToken": accessToken ?? "",
             "refreshToken": refreshToken ?? "",
             "isLoggedIn": isLoggedIn,
-            "userProfileData": (try? JSONEncoder().encode(userProfile)) ?? Data()
+            "userProfileData": (try? JSONEncoder.vivaEncoder.encode(userProfile)) ?? Data()
         ]
         
         // Convert session data to Data

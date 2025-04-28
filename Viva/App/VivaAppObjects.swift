@@ -23,6 +23,7 @@ class VivaAppObjects: ObservableObject {
     public let statsService: StatsService
     public let matchupService: MatchupService
     public let userMeasurementService: UserMeasurementService
+    public let workoutService: WorkoutService
     public let userService: UserService
     public let healthService: HealthService
 
@@ -73,6 +74,7 @@ class VivaAppObjects: ObservableObject {
         statsService = StatsService(networkClient: appNetworkClient)
         matchupService = MatchupService(networkClient: appNetworkClientNoBodies)
         userMeasurementService = UserMeasurementService(networkClient: appNetworkClientNoBodies)
+        workoutService = WorkoutService(networkClient: appNetworkClient)
         userService = UserService(networkClient: appNetworkClient, userSession: userSession)
 
         // Other
@@ -85,7 +87,8 @@ class VivaAppObjects: ObservableObject {
         // Initialize HealthKitDataManager with UserMeasurementService
         healthKitDataManager = HealthKitDataManager(
             userSession: userSession,
-            userMeasurementService: userMeasurementService
+            userMeasurementService: userMeasurementService,
+            workoutService: workoutService
         )
         
         // Configure ErrorManager with HealthService for connectivity monitoring

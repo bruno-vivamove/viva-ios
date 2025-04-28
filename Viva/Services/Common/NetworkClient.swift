@@ -348,7 +348,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                 url,
                 method: method,
                 parameters: body,
-                encoder: JSONParameterEncoder.default,
+                encoder: JSONParameterEncoder.vivaParameterEncoder,
                 headers: headers
             )
             .validate()
@@ -427,7 +427,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                 url,
                 method: method,
                 parameters: body,
-                encoder: JSONParameterEncoder.default,
+                encoder: JSONParameterEncoder.vivaParameterEncoder,
                 headers: headers
             )
             .validate()
@@ -502,5 +502,24 @@ extension JSONDecoder {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return decoder
+    }()
+}
+
+// MARK: - Custom JSON Encoder Extension
+
+extension JSONEncoder {
+    static let vivaEncoder: JSONEncoder = {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        return encoder
+    }()
+}
+
+// MARK: - Custom JSONParameterEncoder
+
+extension JSONParameterEncoder {
+    static let vivaParameterEncoder: JSONParameterEncoder = {
+        let encoder = JSONEncoder.vivaEncoder
+        return JSONParameterEncoder(encoder: encoder)
     }()
 }

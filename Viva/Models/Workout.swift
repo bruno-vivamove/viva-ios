@@ -2,6 +2,25 @@ import Foundation
 
 enum WorkoutType: String, Codable {
     case basketball = "BASKETBALL"
+    case walking = "WALKING"
+    case running = "RUNNING"
+    case cycling = "CYCLING"
+    case swimming = "SWIMMING"
+    case strengthTraining = "STRENGTH_TRAINING"
+    case yoga = "YOGA"
+    case dancing = "DANCING"
+    case hiking = "HIKING"
+    case gymWorkout = "GYM_WORKOUT"
+    case football = "FOOTBALL"
+    case martialArts = "MARTIAL_ARTS"
+    case pilates = "PILATES"
+    case rowing = "ROWING"
+    case tennis = "TENNIS"
+    case tableTennis = "TABLE_TENNIS"
+    case bowling = "BOWLING"
+    case fishing = "FISHING"
+    case gardening = "GARDENING"
+    case volleyball = "VOLLEYBALL"
     case other = "OTHER"
 }
 
