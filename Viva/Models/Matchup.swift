@@ -107,7 +107,7 @@ struct MatchupDetails: Codable, Equatable {
     let teams: [MatchupTeam]
     let measurements: [MatchupMeasurement]
     var userMeasurements: [MatchupUserMeasurement]
-    var workouts: [WorkoutExpanded]
+    var workouts: [Workout]
     var invites: [MatchupInvite]
     var finalized: Bool
     

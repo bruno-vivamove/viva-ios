@@ -3,7 +3,7 @@ import Foundation
 extension Notification.Name {
     static let matchupCreated = Notification.Name("matchupCreated")
     static let matchupUpdated = Notification.Name("matchupUpdated")
-    static let matchupStarted = Notification.Name("matchupCreated")
+    static let matchupStarted = Notification.Name("matchupStarted")
     static let matchupCanceled = Notification.Name("matchupCanceled")
 
     static let matchupUserAdded = Notification.Name("matchupUserAdded")
@@ -21,4 +21,7 @@ extension Notification.Name {
 
     // Notification sent when health data is updated in the background
     static let healthDataUpdated = Notification.Name("healthDataUpdated")
+    
+    // Workout notifications
+    static let workoutsRecorded = Notification.Name("workoutsRecorded")
 }

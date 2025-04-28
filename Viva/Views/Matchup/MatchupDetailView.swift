@@ -141,6 +141,14 @@ struct MatchupDetailView: View {
                             .listRowInsets(EdgeInsets())
                         }
                         
+                        // Add workouts section
+                        if let userId = viewModel.userSession.userId {
+                            WorkoutListSection(userId: userId, viewModel: viewModel)
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
+                                .listRowInsets(EdgeInsets())
+                        }
+                        
                         // Add empty space at the bottom for footer
                         Color.clear
                             .frame(height: 100)
@@ -735,7 +743,7 @@ struct UserScoreView: View {
     private var userInfo: some View {
         VStack(alignment: .center) {
             Text(displayName)
-                .foregroundColor(VivaDesign.Colors.vivaGreen)
+                .foregroundColor(VivaDesign.Colors.primaryText)
                 .font(VivaDesign.Typography.caption.bold())
                 .lineLimit(1)
             Text("\(totalPoints)")
@@ -854,7 +862,7 @@ struct ComparisonRow: View {
                 .fontWeight(.bold)
                 .lineLimit(1)
                 .truncationMode(.tail)
-                .foregroundColor(VivaDesign.Colors.secondaryText)
+                .foregroundColor(VivaDesign.Colors.vivaGreen)
         }
         .frame(width: 80, alignment: .center)  // Fixed width with center alignment
     }
@@ -864,7 +872,7 @@ struct ComparisonRow: View {
             .lineLimit(1)
             .truncationMode(.tail)
             .font(VivaDesign.Typography.pointsTitle)
-            .foregroundColor(VivaDesign.Colors.vivaGreen)
+            .foregroundColor(VivaDesign.Colors.primaryText)
             .frame(width: 140, alignment: .center)  // Fixed width
     }
 
@@ -882,36 +890,53 @@ struct ComparisonRow: View {
                 .fontWeight(.bold)
                 .lineLimit(1)
                 .truncationMode(.tail)
-                .foregroundColor(VivaDesign.Colors.secondaryText)
+                .foregroundColor(VivaDesign.Colors.vivaGreen)
         }
         .frame(width: 80, alignment: .center)  // Fixed width with center alignment
     }
 }
 
-struct WorkoutsSection: View {
-    let workouts: [WorkoutEntry]
-
+struct WorkoutListSection: View {
+    let userId: String
+    @ObservedObject var viewModel: MatchupDetailViewModel
+    
     var body: some View {
-        VStack(spacing: VivaDesign.Spacing.small) {
-            Text("Workouts")
-                .font(.headline)
-                .lineLimit(1)
-                .truncationMode(.tail)
-                .foregroundColor(VivaDesign.Colors.primaryText)
-                .frame(maxWidth: .infinity, alignment: .center)
-
-            VivaDivider()
-
-            ForEach(workouts) { workout in
-                Text(
-                    "\(workout.user) - \(workout.type) - \(workout.calories) Cals"
-                )
-                .font(VivaDesign.Typography.caption)
-                .lineLimit(1)
-                .truncationMode(.tail)
-                .foregroundColor(VivaDesign.Colors.primaryText)
-                .frame(maxWidth: .infinity, alignment: .center)
+        Section {
+            // Workout list
+            if let workouts = viewModel.matchup?.workouts.filter({ $0.user.id == userId }), !workouts.isEmpty {
+                ForEach(workouts) { workout in
+                    WorkoutCard(workout: workout)
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(EdgeInsets())
+                        .padding(.vertical, VivaDesign.Spacing.xsmall)
+                    
+                    VivaDivider()
+                }
+            } else {
+                Text("No workouts recorded")
+                    .foregroundColor(VivaDesign.Colors.secondaryText)
+                    .font(VivaDesign.Typography.body)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, VivaDesign.Spacing.medium)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets())
             }
+        } header: {
+            VStack {
+                HStack {
+                    Text("Workouts")
+                        .font(VivaDesign.Typography.header)
+                        .foregroundColor(.white)
+                    Spacer()
+                }
+                .padding(.top, VivaDesign.Spacing.medium)
+                .padding(.bottom, VivaDesign.Spacing.small)
+                
+                VivaDivider()
+            }
+            .listRowInsets(EdgeInsets())
         }
     }
 }
@@ -1069,7 +1094,8 @@ struct TimeRemainingDisplay: View {
             .font(.title3.bold())
             .minimumScaleFactor(0.2)
             .lineLimit(1)
-            .foregroundColor(VivaDesign.Colors.vivaGreen)
+            .lineLimit(1)
+            .foregroundColor(VivaDesign.Colors.primaryText)
             .padding(.horizontal, VivaDesign.Spacing.small)
     }
 
