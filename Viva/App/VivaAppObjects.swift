@@ -82,7 +82,11 @@ class VivaAppObjects: ObservableObject {
             sessionService: sessionService
         )
 
-        healthKitDataManager = HealthKitDataManager(userSession: userSession)
+        // Initialize HealthKitDataManager with UserMeasurementService
+        healthKitDataManager = HealthKitDataManager(
+            userSession: userSession,
+            userMeasurementService: userMeasurementService
+        )
         
         // Configure ErrorManager with HealthService for connectivity monitoring
         errorManager.setHealthService(healthService)

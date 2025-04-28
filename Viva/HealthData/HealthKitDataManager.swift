@@ -5,15 +5,20 @@ import SwiftUI
 final class HealthKitDataManager: ObservableObject {
     private let healthStore = HKHealthStore()
     private let userSession: UserSession
+    private let userMeasurementService: UserMeasurementService
     private var queryHandlers: [MeasurementType: HealthDataQuery] = [:]
-    
+
     @Published var isAuthorized = false
 
-    init(userSession: UserSession) {
+    init(
+        userSession: UserSession,
+        userMeasurementService: UserMeasurementService
+    ) {
         self.userSession = userSession
+        self.userMeasurementService = userMeasurementService
         setupQueryHandlers()
     }
-    
+
     private func setupQueryHandlers() {
         // Register query handlers for each measurement type
         queryHandlers[.steps] = StepsQuery()
@@ -23,7 +28,9 @@ final class HealthKitDataManager: ObservableObject {
         queryHandlers[.cycling] = WorkoutQuery(workoutType: .cycling)
         queryHandlers[.swimming] = WorkoutQuery(workoutType: .swimming)
         queryHandlers[.yoga] = WorkoutQuery(workoutType: .yoga)
-        queryHandlers[.strengthTraining] = WorkoutQuery(workoutType: .strengthTraining)
+        queryHandlers[.strengthTraining] = WorkoutQuery(
+            workoutType: .strengthTraining
+        )
         queryHandlers[.elevatedHeartRate] = ElevatedHeartRateQuery()
         queryHandlers[.asleep] = SleepQuery()
         queryHandlers[.standing] = StandingQuery()
@@ -42,7 +49,8 @@ final class HealthKitDataManager: ObservableObject {
         ]
 
         healthStore.requestAuthorization(toShare: nil, read: typesToRead) {
-            success, error in
+            success,
+            error in
             DispatchQueue.main.async {
                 self.isAuthorized = success
             }
@@ -67,7 +75,8 @@ final class HealthKitDataManager: ObservableObject {
         // Use dispatch group to coordinate multiple async health queries
         let queryGroup = DispatchGroup()
         let measurementQueue = DispatchQueue(
-            label: "com.app.measurements.\(matchupDetail.id)")
+            label: "com.app.measurements.\(matchupDetail.id)"
+        )
         var newMeasurements: [MatchupUserMeasurement] = []
 
         // Process each measurement type in the matchup
@@ -96,6 +105,58 @@ final class HealthKitDataManager: ObservableObject {
                 new: newMeasurements
             )
             completion(updatedMatchup)
+        }
+    }
+
+    /// Updates and uploads health data for a matchup in a single operation
+    /// - Parameters:
+    ///   - matchupDetail: The matchup detail to update
+    ///   - completion: Callback with the result - success with updated data or failure with error
+    func updateAndUploadHealthData(
+        matchupDetail: MatchupDetails,
+        completion: @escaping (Result<MatchupDetails, Error>) -> Void
+    ) {
+        guard let userId = userSession.userId else {
+            return
+        }
+
+        // First update the health data
+        updateMatchupData(matchupDetail: matchupDetail) { updatedMatchup in
+            // Filter only the current user's measurements
+            let userMeasurements = updatedMatchup.userMeasurements
+                .filter { $0.userId == userId }
+
+            // Skip upload if no measurements
+            if userMeasurements.isEmpty {
+                completion(.success(updatedMatchup))
+                return
+            }
+
+            // Upload the measurements
+            Task {
+                do {
+                    // Send all measurements in a single call
+                    let savedMatchupDetails =
+                        try await self.userMeasurementService
+                        .saveUserMeasurements(
+                            matchupId: matchupDetail.id,
+                            measurements: userMeasurements
+                        )
+
+                    // Return the saved details
+                    DispatchQueue.main.async {
+                        completion(.success(savedMatchupDetails))
+                    }
+                } catch {
+                    AppLogger.error(
+                        "Failed to save measurements: \(error)",
+                        category: .data
+                    )
+                    DispatchQueue.main.async {
+                        completion(.failure(error))
+                    }
+                }
+            }
         }
     }
 

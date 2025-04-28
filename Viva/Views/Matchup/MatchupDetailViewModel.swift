@@ -181,36 +181,17 @@ class MatchupDetailViewModel: ObservableObject {
                 if self.isCompletedButNotFinalized {
                     try await finalizeUserParticipation(matchup: matchup)
                 } else if matchup.status == .active {
-                    healthKitDataManager.updateMatchupData(matchupDetail: matchup) {
-                        updatedMatchup in
-                        Task {
-                            // Get only the current user's measurements
-                            let userMeasurements = updatedMatchup.userMeasurements
-                                .filter {
-                                    $0.userId == self.userSession.userId
-                                }
-                            
-                            if userMeasurements.isEmpty {
-                                return
-                            }
-                            
-                            do {
-                                // Send all measurements in a single call
-                                let savedMatchupDetails =
-                                try await self.userMeasurementService
-                                    .saveUserMeasurements(
-                                        matchupId: self.matchupId,
-                                        measurements: userMeasurements
-                                    )
-                                
-                                self.updateMeasurements(
-                                    matchup: savedMatchupDetails
-                                )
-                            } catch {
-                                AppLogger.error(
-                                    "Failed to save measurements: \(error)",
-                                    category: .data
-                                )
+                    // Use the unified method for updating and uploading health data
+                    healthKitDataManager.updateAndUploadHealthData(matchupDetail: matchup) { [weak self] result in
+                        guard let self = self else { return }
+                        
+                        Task { @MainActor in
+                            switch result {
+                            case .success(let updatedMatchup):
+                                self.updateMeasurements(matchup: updatedMatchup)
+                            case .failure(let error):
+                                AppLogger.error("Failed to update and upload health data: \(error)", category: .data)
+                                self.error = error
                             }
                         }
                     }

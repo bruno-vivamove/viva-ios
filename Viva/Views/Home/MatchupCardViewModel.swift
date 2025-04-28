@@ -32,6 +32,9 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
         self.lastRefreshTime = lastRefreshTime
         self.isLoading = true
 
+        // The UserMeasurementService is now injected in VivaAppObjects
+        // healthKitDataManager.setupUserMeasurementService(userMeasurementService)
+        
         // Listen for relevant notifications that should trigger a refresh
         setupNotificationObservers()
     }
@@ -61,33 +64,19 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
 
             // If the matchup is active to update the health data
             if details.status == .active && uploadHealthData {
-                healthKitDataManager.updateMatchupData(matchupDetail: details) {
-                    updatedMatchup in
+                // Use the unified method for updating and uploading health data
+                healthKitDataManager.updateAndUploadHealthData(matchupDetail: details) { [weak self] result in
+                    guard let self = self else { return }
+                    
                     Task { @MainActor in
-                        self.matchupDetails = updatedMatchup
-
-                        // If there are updated measurements from the current user, save them
-                        let userMeasurements = updatedMatchup.userMeasurements
-                            .filter {
-                                $0.userId == self.userSession.userId
-                            }
-
-                        if !userMeasurements.isEmpty {
-                            do {
-                                // Send all measurements in a single call
-                                let savedMatchupDetails =
-                                    try await self.userMeasurementService
-                                    .saveUserMeasurements(
-                                        matchupId: self.matchupId,
-                                        measurements: userMeasurements
-                                    )
-
-                                self.matchupDetails = savedMatchupDetails
-                                self.isLoading = false
-                            } catch {
-                                AppLogger.error("Failed to save measurements: \(error)", category: .data)
-                            }
+                        switch result {
+                        case .success(let updatedMatchup):
+                            self.matchupDetails = updatedMatchup
+                        case .failure(let error):
+                            AppLogger.error("Failed to update and upload health data: \(error)", category: .data)
+                            self.error = error
                         }
+                        self.isLoading = false
                     }
                 }
             } else {
