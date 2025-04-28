@@ -82,7 +82,7 @@ struct InvitedModifier: ViewModifier {
                                 dash: [5]
                             )
                         )
-                        .foregroundColor(VivaDesign.Colors.vivaGreen)
+                        .foregroundColor(VivaDesign.Colors.primaryText)
                 )
         } else {
             content

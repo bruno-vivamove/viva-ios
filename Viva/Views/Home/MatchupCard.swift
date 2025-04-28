@@ -24,7 +24,8 @@ struct MatchupCard: View {
                 healthKitDataManager: healthKitDataManager,
                 userSession: userSession,
                 lastRefreshTime: lastRefreshTime
-            ))
+            )
+        )
     }
 
     var body: some View {
@@ -84,7 +85,7 @@ struct MatchupCard: View {
                         .foregroundColor(VivaDesign.Colors.secondaryText)
                         .font(VivaDesign.Typography.title3)
                 }
-                .frame(width: 20)
+                .frame(width: 5)
 
                 // Right side container - aligned to right edge
                 HStack(spacing: VivaDesign.Spacing.small) {
@@ -114,6 +115,7 @@ struct MatchupCard: View {
                     )
                 }
             }
+
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             if details.status == .pending {
@@ -134,7 +136,8 @@ struct MatchupCard: View {
 
                         Task {
                             _ = await viewModel.removeCurrentUser(
-                                userId: userId)
+                                userId: userId
+                            )
                         }
                     } label: {
                         Text("Leave")
@@ -160,7 +163,8 @@ struct MatchupCard: View {
                             width: VivaDesign.Sizing.ProfileImage.small
                                 .rawValue,
                             height: VivaDesign.Sizing.ProfileImage.small
-                                .rawValue)
+                                .rawValue
+                        )
 
                     VStack(alignment: .leading) {
                         // Name placeholder
@@ -210,11 +214,13 @@ struct MatchupCard: View {
                             width: VivaDesign.Sizing.ProfileImage.small
                                 .rawValue,
                             height: VivaDesign.Sizing.ProfileImage.small
-                                .rawValue)
+                                .rawValue
+                        )
                 }
             }
             .shimmering(
-                animation: VivaDesign.AnimationStyle.loadingShimmer)
+                animation: VivaDesign.AnimationStyle.loadingShimmer
+            )
         }
     }
 

@@ -314,7 +314,7 @@ struct SentInvitesView: View {
                 actions: [
                     UserActionCard.UserAction(
                         title: "Remind",
-                        variant: .primary
+                        variant: .secondary
                     ) {
                         // Add remind functionality
                     },

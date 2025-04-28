@@ -26,7 +26,7 @@ struct VivaCard<Content: View>: View {
                             cornerRadius: VivaDesign.Sizing.cornerRadius
                         )
                         .stroke(
-                            VivaDesign.Colors.divider,
+                            VivaDesign.Colors.cardBorder,
                             lineWidth: VivaDesign.Sizing.borderWidth)
                     )
             )

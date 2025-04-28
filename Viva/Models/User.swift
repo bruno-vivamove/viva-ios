@@ -53,4 +53,5 @@ enum FriendStatus: String, Codable {
     case requestSent = "REQUEST_SENT"
     case requestReceived = "REQUEST_RECEIVED"
     case notFriend = "NOT_FRIEND"
+    case currentUser = "CURRENT_USER"
 }

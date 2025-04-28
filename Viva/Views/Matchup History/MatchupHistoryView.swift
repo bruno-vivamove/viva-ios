@@ -183,7 +183,7 @@ struct MatchupStatsTableHeader: View {
                 Text("W-L")
                     .font(VivaDesign.Typography.body)
                     .foregroundColor(
-                        VivaDesign.Colors.vivaGreen
+                        VivaDesign.Colors.primaryText
                     )
                     .frame(width: 60, alignment: .leading)
 
@@ -204,10 +204,6 @@ struct MatchupStatsTableHeader: View {
 
                 Spacer()
             }
-            .padding(.leading, VivaDesign.Spacing.large)
-            .padding(.bottom, VivaDesign.Spacing.small)
-
-            VivaDivider()
         }
     }
 }
@@ -219,48 +215,54 @@ struct MatchupStatsSection: View {
     @ObservedObject var viewModel: MatchupHistoryViewModel
 
     var body: some View {
+        // Header Stats Section
         Section {
-            // Header Stats Section
-            Section {
-                // Using the trophy header as a section header
-                if let userStats = userStats {
-                    HStack(spacing: VivaDesign.Spacing.medium) {
-                        VivaDivider()
+            // Using the trophy header as a section header
+            if let userStats = userStats {
+                HStack(spacing: VivaDesign.Spacing.medium) {
+                    VivaDivider()
 
-                        // Total Score
-                        Text("\(userStats.wins)-\(userStats.losses)")
-                            .font(.system(size: 50, weight: .bold))
-                            .foregroundColor(VivaDesign.Colors.primaryText)
+                    // Total Score
+                    Text("\(userStats.wins)-\(userStats.losses)")
+                        .font(.system(size: 50, weight: .bold))
+                        .foregroundColor(VivaDesign.Colors.primaryText)
 
-                        VivaDivider()
-                    }
-                    .background(Color.black)
-                    .listRowBackground(Color.black)
-                    .listRowInsets(EdgeInsets())
-                    .listRowSeparator(.hidden)
+                    VivaDivider()
                 }
+                .background(Color.black)
+                .listRowBackground(Color.black)
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
             }
+        }
 
-            // Matchups Section
-            Section {
-                // Table Header
-                MatchupStatsTableHeader()
-                    .listRowBackground(Color.black)
-                    .listRowInsets(EdgeInsets())
-                    .listRowSeparator(.hidden)
+        // Matchups Section
+        Section {
+            // Table Header
+            MatchupStatsTableHeader()
+                .listRowBackground(Color.black)
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+                .padding(.leading, VivaDesign.Spacing.xlarge)
+                .padding(.bottom, VivaDesign.Spacing.small)
 
-                // Matchup rows
-                ForEach(matchupStats, id: \.matchupHash) { stats in
-                    VStack(spacing: 0) {
-                        MatchupStatsCard(stats: stats, viewModel: viewModel)
-                            .padding(.leading, VivaDesign.Spacing.large)
-                            .padding(.vertical, VivaDesign.Spacing.small)
-                        VivaDivider()
-                    }
-                    .listRowBackground(Color.black)
-                    .listRowInsets(EdgeInsets())
-                    .listRowSeparator(.hidden)
+            VivaDivider()
+                .listRowBackground(Color.black)
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+
+
+            // Matchup rows
+            ForEach(matchupStats, id: \.matchupHash) { stats in
+                VStack(spacing: 0) {
+                    MatchupStatsCard(stats: stats, viewModel: viewModel)
+                        .padding(.leading, VivaDesign.Spacing.xlarge)
+                        .padding(.vertical, VivaDesign.Spacing.small)
+                    VivaDivider()
                 }
+                .listRowBackground(Color.black)
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
             }
         }
     }
@@ -313,7 +315,7 @@ struct MatchupStatsCard: View {
                 .frame(width: 60, alignment: .leading)
 
             Spacer()
-                .frame(width: VivaDesign.Spacing.medium)
+                .frame(width: VivaDesign.Spacing.xsmall)
 
             // VS - fixed position
             Text("vs.")
@@ -322,7 +324,7 @@ struct MatchupStatsCard: View {
                 .frame(width: 30, alignment: .center)
 
             Spacer()
-                .frame(width: VivaDesign.Spacing.medium)
+                .frame(width: VivaDesign.Spacing.xsmall)
 
             // Opponent Info with Profile Picture - fixed position
             if let opponent = stats.opponentTeamUsers.first {

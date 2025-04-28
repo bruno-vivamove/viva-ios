@@ -19,6 +19,15 @@ struct FriendRequestCard: View {
     var body: some View {
         // Action button based on friend status
         let action = switch user.friendStatus {
+        case .currentUser:
+            UserActionCard.UserAction(
+                title: "Current User",
+                width: buttonWidth,
+                variant: .primary
+            ) {
+                // This should not happen
+            }
+            
         case .notFriend, nil:
             UserActionCard.UserAction(
                 title: "Add Friend",
