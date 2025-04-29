@@ -108,25 +108,17 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         response: DataResponse<T, AFError>,
         continuation: CheckedContinuation<T, Error>
     ) {
-        AppLogger.error(
-            "Error occurred during request: \(error.localizedDescription)",
-            category: .network
-        )
-
+        var errorMessage = "Error occurred during request: \(error.localizedDescription)"
+        
         if let underlyingError = error.underlyingError {
-            AppLogger.error(
-                "Underlying error: \(underlyingError)",
-                category: .network
-            )
+            errorMessage += "\nUnderlying error: \(underlyingError)"
         }
-
+        
         if let data = response.data,
             let errorResponse = try? decoder.decode(ErrorType.self, from: data)
         {
-            AppLogger.error(
-                "Decoded Error Response: \(errorResponse)",
-                category: .network
-            )
+            errorMessage += "\nDecoded Error Response: \(errorResponse)"
+            AppLogger.error(errorMessage, category: .network)
             continuation.resume(throwing: errorResponse)
         } else {
             // Determine the appropriate network error type based on the error
@@ -153,18 +145,15 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
                 )
             }
 
-            AppLogger.error(
-                "Network Error: \(networkError)",
-                category: .network
-            )
+            errorMessage += "\nNetwork Error: \(networkError)"
+            
             if let data = response.data,
                 let rawString = String(data: data, encoding: .utf8)
             {
-                AppLogger.error(
-                    "Raw error response: \(rawString)",
-                    category: .network
-                )
+                errorMessage += "\nRaw error response: \(rawString)"
             }
+            
+            AppLogger.error(errorMessage, category: .network)
 
             // Display the error in the UI if errorManager is available
             errorManager?.displayError(
@@ -215,28 +204,20 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
             }
         } else {
             // Handle error normally for non-401 errors or when we don't have a refresh handler
-            AppLogger.error(
-                "Error occurred during request: \(error.localizedDescription)",
-                category: .network
-            )
-
+            var errorMessage = "Error occurred during request: \(error.localizedDescription)"
+            
             if let underlyingError = error.underlyingError {
-                AppLogger.error(
-                    "Underlying error: \(underlyingError)",
-                    category: .network
-                )
+                errorMessage += "\nUnderlying error: \(underlyingError)"
             }
-
+            
             if let data = response.data,
                 let errorResponse = try? decoder.decode(
                     ErrorType.self,
                     from: data
                 )
             {
-                AppLogger.error(
-                    "Decoded Error Response: \(errorResponse)",
-                    category: .network
-                )
+                errorMessage += "\nDecoded Error Response: \(errorResponse)"
+                AppLogger.error(errorMessage, category: .network)
                 continuation.resume(throwing: errorResponse)
             } else {
                 // Determine the appropriate network error type based on the error
@@ -263,18 +244,15 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
                     )
                 }
 
-                AppLogger.error(
-                    "Network Error: \(networkError)",
-                    category: .network
-                )
+                errorMessage += "\nNetwork Error: \(networkError)"
+                
                 if let data = response.data,
                     let rawString = String(data: data, encoding: .utf8)
                 {
-                    AppLogger.error(
-                        "Raw error response: \(rawString)",
-                        category: .network
-                    )
+                    errorMessage += "\nRaw error response: \(rawString)"
                 }
+                
+                AppLogger.error(errorMessage, category: .network)
 
                 // Display the network error in the UI
                 errorManager?.displayError(
@@ -292,25 +270,17 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         response: AFDataResponse<Data?>,
         continuation: CheckedContinuation<Void, Error>
     ) {
-        AppLogger.error(
-            "Error occurred during request: \(error.localizedDescription)",
-            category: .network
-        )
-
+        var errorMessage = "Error occurred during request: \(error.localizedDescription)"
+        
         if let underlyingError = error.underlyingError {
-            AppLogger.error(
-                "Underlying error: \(underlyingError)",
-                category: .network
-            )
+            errorMessage += "\nUnderlying error: \(underlyingError)"
         }
-
+        
         if let data = response.data,
             let errorResponse = try? decoder.decode(ErrorType.self, from: data)
         {
-            AppLogger.error(
-                "Decoded Error Response: \(errorResponse)",
-                category: .network
-            )
+            errorMessage += "\nDecoded Error Response: \(errorResponse)"
+            AppLogger.error(errorMessage, category: .network)
             continuation.resume(throwing: errorResponse)
         } else {
             // Determine the appropriate network error type based on the error
@@ -337,18 +307,15 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
                 )
             }
 
-            AppLogger.error(
-                "Network Error: \(networkError)",
-                category: .network
-            )
+            errorMessage += "\nNetwork Error: \(networkError)"
+            
             if let data = response.data,
                 let rawString = String(data: data, encoding: .utf8)
             {
-                AppLogger.error(
-                    "Raw error response: \(rawString)",
-                    category: .network
-                )
+                errorMessage += "\nRaw error response: \(rawString)"
             }
+            
+            AppLogger.error(errorMessage, category: .network)
 
             // Display the network error in the UI
             errorManager?.displayError(
@@ -408,46 +375,36 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
             }
         } else {
             // Handle error normally for non-401 errors or when we don't have a refresh handler
-            AppLogger.error(
-                "Error occurred during request: \(error.localizedDescription)",
-                category: .network
-            )
-
+            var errorMessage = "Error occurred during request: \(error.localizedDescription)"
+            
             if let underlyingError = error.underlyingError {
-                AppLogger.error(
-                    "Underlying error: \(underlyingError)",
-                    category: .network
-                )
+                errorMessage += "\nUnderlying error: \(underlyingError)"
             }
-
+            
             if let data = response.data,
                 let errorResponse = try? decoder.decode(
                     ErrorType.self,
                     from: data
                 )
             {
-                AppLogger.error(
-                    "Decoded Error Response: \(errorResponse)",
-                    category: .network
-                )
+                errorMessage += "\nDecoded Error Response: \(errorResponse)"
+                AppLogger.error(errorMessage, category: .network)
                 continuation.resume(throwing: errorResponse)
             } else {
                 let networkError = NetworkClientError(
                     code: "REQUEST_ERROR",
                     message: error.localizedDescription
                 )
-                AppLogger.error(
-                    "Network Error: \(networkError)",
-                    category: .network
-                )
+                
+                errorMessage += "\nNetwork Error: \(networkError)"
+                
                 if let data = response.data,
                     let rawString = String(data: data, encoding: .utf8)
                 {
-                    AppLogger.error(
-                        "Raw error response: \(rawString)",
-                        category: .network
-                    )
+                    errorMessage += "\nRaw error response: \(rawString)"
                 }
+                
+                AppLogger.error(errorMessage, category: .network)
 
                 // Display the network error in the UI
                 errorManager?.displayError(
@@ -470,8 +427,7 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         // Add request information
         if let request = response.request {
             logMessage +=
-                "Request URL: \(request.url?.absoluteString ?? "unknown")\n"
-            logMessage += "Request Method: \(request.httpMethod ?? "unknown")\n"
+                "Request: \(request.httpMethod ?? "unknown") \(request.url?.absoluteString ?? "unknown")\n"
             if let headers = request.allHTTPHeaderFields {
                 logMessage +=
                     "Request Headers: \(headers.filter { $0.key != "Authorization" })\n"
@@ -505,8 +461,7 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         // Add request information
         if let request = response.request {
             logMessage +=
-                "Request URL: \(request.url?.absoluteString ?? "unknown")\n"
-            logMessage += "Request Method: \(request.httpMethod ?? "unknown")\n"
+                "Request: \(request.httpMethod ?? "unknown") \(request.url?.absoluteString ?? "unknown")\n"
             if let headers = request.allHTTPHeaderFields {
                 logMessage +=
                     "Request Headers: \(headers.filter { $0.key != "Authorization" })\n"

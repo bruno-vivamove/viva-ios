@@ -257,7 +257,10 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
         )
 
         AppLogger.debug(
-            "Upload Request:\nURL: \(url.absoluteString)\nHeaders: \(requestHeaders.filter { $0.name != "Authorization" })\nFiles: \(data.count)",
+            "Upload Request:\n" +
+            "URL: \(url.absoluteString)\n" +
+            "Headers: \(requestHeaders.filter { $0.name != "Authorization" })\n" +
+            "Files: \(data.count)",
             category: .network
         )
 
@@ -326,7 +329,10 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
         )
 
         AppLogger.debug(
-            "Upload Request:\nURL: \(url.absoluteString)\nHeaders: \(requestHeaders.filter { $0.name != "Authorization" })\nFiles: \(data.count)",
+            "Upload Request:\n" +
+            "URL: \(url.absoluteString)\n" +
+            "Headers: \(requestHeaders.filter { $0.name != "Authorization" })\n" +
+            "Files: \(data.count)",
             category: .network
         )
 
@@ -382,8 +388,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
         headers: HTTPHeaders
     ) async throws -> T {
         AppLogger.debug(
-            "\(method.rawValue) Request:\n"
-                + "URL: \(url.absoluteString)\n"
+            "Request: \(method.rawValue) \(url.absoluteString)\n"
                 + "Headers: \(headers.filter { $0.name != "Authorization" })",
             category: .network
         )
@@ -432,14 +437,21 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
         body: E
     ) async throws -> T {
         var logMessage =
-            "\(method.rawValue) Request:\nURL: \(url.absoluteString)\nHeaders: \(headers.filter { $0.name != "Authorization" })"
+            "Request: \(method.rawValue) \(url.absoluteString)\n"
+            + "Headers: \(headers.filter { $0.name != "Authorization" })"
 
         if settings.shouldLogBodies {
             // Pretty print JSON body
             if let jsonData = try? JSONEncoder.vivaEncoder.encode(body),
-               let jsonObject = try? JSONSerialization.jsonObject(with: jsonData),
-               let prettyData = try? JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted),
-               let prettyString = String(data: prettyData, encoding: .utf8) {
+                let jsonObject = try? JSONSerialization.jsonObject(
+                    with: jsonData
+                ),
+                let prettyData = try? JSONSerialization.data(
+                    withJSONObject: jsonObject,
+                    options: .prettyPrinted
+                ),
+                let prettyString = String(data: prettyData, encoding: .utf8)
+            {
                 logMessage += "\nBody:\n\(prettyString)"
             } else {
                 logMessage += "\nBody: \(body)"
@@ -553,9 +565,15 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
         if settings.shouldLogBodies {
             // Pretty print JSON body
             if let jsonData = try? JSONEncoder.vivaEncoder.encode(body),
-               let jsonObject = try? JSONSerialization.jsonObject(with: jsonData),
-               let prettyData = try? JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted),
-               let prettyString = String(data: prettyData, encoding: .utf8) {
+                let jsonObject = try? JSONSerialization.jsonObject(
+                    with: jsonData
+                ),
+                let prettyData = try? JSONSerialization.data(
+                    withJSONObject: jsonObject,
+                    options: .prettyPrinted
+                ),
+                let prettyString = String(data: prettyData, encoding: .utf8)
+            {
                 logMessage += "\nBody:\n\(prettyString)"
             } else {
                 logMessage += "\nBody: \(body)"
