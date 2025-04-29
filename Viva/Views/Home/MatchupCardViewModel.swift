@@ -36,7 +36,7 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
 
         // The UserMeasurementService is now injected in VivaAppObjects
         // healthKitDataManager.setupUserMeasurementService(userMeasurementService)
-        
+
         // Listen for relevant notifications that should trigger a refresh
         setupNotificationObservers()
     }
@@ -57,42 +57,55 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
     @MainActor
     func loadInitialDataIfNeeded() async {
         // Don't load if we've requested data in the last minute, regardless of result
-        if let requestedTime = dataRequestedTime, 
-           Date().timeIntervalSince(requestedTime) < 60 {
+        if let requestedTime = dataRequestedTime,
+            Date().timeIntervalSince(requestedTime) < 60
+        {
             return
         }
-        
+
         // Only load data if it hasn't been loaded in the last 10 minutes or if matchupDetails is nil
-        if matchupDetails == nil || dataLoadedTime == nil || 
-           Date().timeIntervalSince(dataLoadedTime!) > 600 {
+        if matchupDetails == nil || dataLoadedTime == nil
+            || Date().timeIntervalSince(dataLoadedTime!) > 600
+        {
             // Mark that we've requested data
             dataRequestedTime = Date()
-            await loadData()
+            await loadData(uploadHealthData: true)
         }
     }
 
     @MainActor
-    func loadData(uploadHealthData: Bool = true) async {
+    func loadData(uploadHealthData: Bool) async {
         isLoading = true
         error = nil
 
         do {
             // First, get the basic matchup details
             let details = try await matchupService.getMatchup(
-                matchupId: matchupId)
+                matchupId: matchupId
+            )
+
+            let isCurrentUserInMatchup = details.teams.flatMap { $0.users }
+                .contains { $0.id == userSession.userId }
 
             // If the matchup is active to update the health data
-            if details.status == .active && uploadHealthData {
+            if details.status == .active && isCurrentUserInMatchup
+                && uploadHealthData
+            {
                 // Use the unified method for updating and uploading health data
-                healthKitDataManager.updateAndUploadHealthData(matchupDetail: details) { [weak self] result in
+                healthKitDataManager.updateAndUploadHealthData(
+                    matchupDetail: details
+                ) { [weak self] result in
                     guard let self = self else { return }
-                    
+
                     Task { @MainActor in
                         switch result {
                         case .success(let updatedMatchup):
                             self.matchupDetails = updatedMatchup
                         case .failure(let error):
-                            AppLogger.error("Failed to update and upload health data: \(error)", category: .data)
+                            AppLogger.error(
+                                "Failed to update and upload health data: \(error)",
+                                category: .data
+                            )
                             self.error = error
                         }
                         self.isLoading = false
@@ -102,11 +115,14 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
                 self.matchupDetails = details
                 self.isLoading = false
             }
-            
+
             // Update the time when data was successfully loaded
             self.dataLoadedTime = Date()
         } catch {
-            AppLogger.error("Error loading matchup details: \(error)", category: .network)
+            AppLogger.error(
+                "Error loading matchup details: \(error)",
+                category: .network
+            )
             self.error = error
             self.isLoading = false
         }
@@ -118,7 +134,8 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
         do {
             _ = try await matchupService.removeMatchupUser(
                 matchupId: matchupId,
-                userId: userId)
+                userId: userId
+            )
             return true
         } catch {
             self.error = error
@@ -142,6 +159,15 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
         // Refresh when user profile is updated
         NotificationCenter.default.publisher(for: .userProfileUpdated)
             .compactMap { $0.object as? UserProfile }
+            .filter { [weak self] profile in
+                guard let self = self, let details = self.matchupDetails else {
+                    return false
+                }
+                // Only process notification if this user is in the matchup
+                return details.teams.flatMap { $0.users }.contains {
+                    $0.id == profile.userSummary.id
+                }
+            }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] details in
                 Task {
@@ -167,7 +193,7 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 Task { [weak self] in
-                    await self?.loadData()
+                    await self?.loadData(uploadHealthData: false)
                 }
             }
             .store(in: &cancellables)
