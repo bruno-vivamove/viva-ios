@@ -10,8 +10,8 @@ enum WorkoutType: String, Codable {
     case yoga = "YOGA"
     case dancing = "DANCING"
     case hiking = "HIKING"
-    case gymWorkout = "GYM_WORKOUT"
     case football = "FOOTBALL"
+    case soccer = "SOCCER"
     case martialArts = "MARTIAL_ARTS"
     case pilates = "PILATES"
     case rowing = "ROWING"
@@ -19,7 +19,6 @@ enum WorkoutType: String, Codable {
     case tableTennis = "TABLE_TENNIS"
     case bowling = "BOWLING"
     case fishing = "FISHING"
-    case gardening = "GARDENING"
     case volleyball = "VOLLEYBALL"
     case other = "OTHER"
 }

@@ -217,7 +217,8 @@ final class HealthKitDataManager: ObservableObject {
         case .basketball: return .basketball
         case .dance: return .dancing
         case .hiking: return .hiking
-        case .soccer: return .football
+        case .americanFootball: return .football
+        case .soccer: return .soccer
         case .tennis: return .tennis
         case .tableTennis: return .tableTennis
         case .bowling: return .bowling
@@ -242,8 +243,8 @@ final class HealthKitDataManager: ObservableObject {
         case .yoga: return "Yoga"
         case .dancing: return "Dancing"
         case .hiking: return "Hiking"
-        case .gymWorkout: return "Gym Workout"
         case .football: return "Football"
+        case .soccer: return "Soccer"
         case .martialArts: return "Martial Arts"
         case .pilates: return "Pilates"
         case .rowing: return "Rowing"
@@ -251,7 +252,6 @@ final class HealthKitDataManager: ObservableObject {
         case .tableTennis: return "Table Tennis"
         case .bowling: return "Bowling"
         case .fishing: return "Fishing"
-        case .gardening: return "Gardening"
         case .volleyball: return "Volleyball"
         case .other: return "Workout"
         }

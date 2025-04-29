@@ -159,7 +159,7 @@ struct HomeContentList: View {
             // Completed Matchups
             if !viewModel.completedMatchups.isEmpty {
                 MatchupSectionView(
-                    title: "Completed Matchups",
+                    title: "Final Matchups",
                     matchups: viewModel.completedMatchups,
                     lastRefreshTime: viewModel.dataLoadedTime,
                     onMatchupSelected: { matchup in

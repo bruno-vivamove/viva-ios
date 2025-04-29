@@ -23,9 +23,6 @@ class SleepQuery: BaseHealthQuery {
             )
 
             // Create and execute query for sleep samples
-            AppLogger.debug("Day Start: \(dayStart)")
-            AppLogger.debug("Day End: \(dayEnd)")
-            
             let predicate = HKQuery.predicateForSamples(
                 withStart: dayStart,
                 end: dayEnd,
