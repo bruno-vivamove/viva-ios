@@ -13,7 +13,9 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
     private let userSession: UserSession
     private var cancellables = Set<AnyCancellable>()
 
-    // Add this property to track refresh time
+    // Data tracking properties
+    private var dataLoadedTime: Date?
+    private var dataRequestedTime: Date?
     private var lastRefreshTime: Date?
 
     init(
@@ -47,13 +49,30 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
         {
             lastRefreshTime = newTime
             Task {
-                await loadMatchupDetails()
+                await loadInitialDataIfNeeded()
             }
         }
     }
 
     @MainActor
-    func loadMatchupDetails(uploadHealthData: Bool = true) async {
+    func loadInitialDataIfNeeded() async {
+        // Don't load if we've requested data in the last minute, regardless of result
+        if let requestedTime = dataRequestedTime, 
+           Date().timeIntervalSince(requestedTime) < 60 {
+            return
+        }
+        
+        // Only load data if it hasn't been loaded in the last 10 minutes or if matchupDetails is nil
+        if matchupDetails == nil || dataLoadedTime == nil || 
+           Date().timeIntervalSince(dataLoadedTime!) > 600 {
+            // Mark that we've requested data
+            dataRequestedTime = Date()
+            await loadData()
+        }
+    }
+
+    @MainActor
+    func loadData(uploadHealthData: Bool = true) async {
         isLoading = true
         error = nil
 
@@ -83,6 +102,9 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
                 self.matchupDetails = details
                 self.isLoading = false
             }
+            
+            // Update the time when data was successfully loaded
+            self.dataLoadedTime = Date()
         } catch {
             AppLogger.error("Error loading matchup details: \(error)", category: .network)
             self.error = error
@@ -123,7 +145,7 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] details in
                 Task {
-                    await self?.loadMatchupDetails(uploadHealthData: false)
+                    await self?.loadData(uploadHealthData: false)
                 }
             }
             .store(in: &cancellables)
@@ -145,7 +167,7 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 Task { [weak self] in
-                    await self?.loadMatchupDetails()
+                    await self?.loadData()
                 }
             }
             .store(in: &cancellables)

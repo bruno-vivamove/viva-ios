@@ -44,7 +44,7 @@ struct MatchupCard: View {
             viewModel.updateLastRefreshTime(newValue)
         }
         .task(id: "initial_load") {
-            await viewModel.loadMatchupDetails()
+            await viewModel.loadInitialDataIfNeeded()
         }
     }
 
