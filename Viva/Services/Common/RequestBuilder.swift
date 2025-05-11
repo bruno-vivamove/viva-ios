@@ -52,9 +52,13 @@ final class RequestBuilder {
             defaultHeaders = defaultDeleteHeaders
         }
         
-        let headers = defaultHeaders
+        var headers = defaultHeaders
             .merging(settings.headers) { _, new in new }
             .merging(additionalHeaders ?? [:]) { _, new in new }
+        
+        if headers["X-Request-ID"] == nil {
+            headers["X-Request-ID"] = UUID().uuidString
+        }
         
         return HTTPHeaders(headers)
     }

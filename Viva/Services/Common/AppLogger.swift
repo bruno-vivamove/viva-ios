@@ -10,6 +10,7 @@ struct AppLogger {
         case ui = "UserInterface"
         case data = "DataManagement"
         case general = "General"
+        case health = "HealthData"
         
         var logger: Logger {
             Logger(subsystem: Bundle.main.bundleIdentifier!, category: self.rawValue)
@@ -25,7 +26,7 @@ struct AppLogger {
     ///   - line: Line number (auto-filled)
     static func debug(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
-        category.logger.debug("[\(context)]\n\(message)")
+        category.logger.debug("[\(context, privacy: .public)]\n\(message, privacy: .public)")
     }
     
     /// Log an info message (collected but may be dynamically disabled)
@@ -37,7 +38,7 @@ struct AppLogger {
     ///   - line: Line number (auto-filled)
     static func info(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
-        category.logger.info("[\(context)]\n\(message)")
+        category.logger.info("[\(context, privacy: .public)]\n\(message, privacy: .public)")
     }
     
     /// Log a default message (standard level for most logging needs)
@@ -49,7 +50,7 @@ struct AppLogger {
     ///   - line: Line number (auto-filled)
     static func log(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
-        category.logger.log("[\(context)]\n\(message)")
+        category.logger.log("[\(context, privacy: .public)]\n\(message, privacy: .public)")
     }
     
     /// Log a warning message (default visibility)
@@ -61,7 +62,7 @@ struct AppLogger {
     ///   - line: Line number (auto-filled)
     static func warning(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
-        category.logger.warning("[\(context)]\n\(message)")
+        category.logger.warning("[\(context, privacy: .public)]\n\(message, privacy: .public)")
     }
     
     /// Log an error message (persisted due to higher importance)
@@ -73,7 +74,7 @@ struct AppLogger {
     ///   - line: Line number (auto-filled)
     static func error(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
-        category.logger.error("[\(context)]\n\(message)")
+        category.logger.error("[\(context, privacy: .public)]\n\(message, privacy: .public)")
     }
     
     /// Log a critical fault (always collected, for severe issues)
@@ -85,7 +86,7 @@ struct AppLogger {
     ///   - line: Line number (auto-filled)
     static func fault(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
-        category.logger.fault("[\(context)]\n\(message)")
+        category.logger.fault("[\(context, privacy: .public)]\n\(message, privacy: .public)")
     }
     
     /// Log network requests with privacy considerations
@@ -106,10 +107,10 @@ struct AppLogger {
         }
         
         let message = "Request: \(method) \(url.absoluteString)"
-        Category.network.logger.debug("[\(context)]\n\(message)")
+        Category.network.logger.debug("[\(context, privacy: .public)]\n\(message, privacy: .public)")
         
         if let headers = safeHeaders as? [String: String], !headers.isEmpty {
-            Category.network.logger.debug("[\(context)]\nHeaders: \(headers)")
+            Category.network.logger.debug("[\(context, privacy: .public)]\nHeaders: \(headers, privacy: .public)")
         }
     }
     
@@ -125,9 +126,9 @@ struct AppLogger {
         let message = "Response: \(statusCode) \(url.absoluteString)"
         
         if statusCode >= 400 {
-            Category.network.logger.error("[\(context)]\n\(message)")
+            Category.network.logger.error("[\(context, privacy: .public)]\n\(message, privacy: .public)")
         } else {
-            Category.network.logger.debug("[\(context)]\n\(message)")
+            Category.network.logger.debug("[\(context, privacy: .public)]\n\(message, privacy: .public)")
         }
     }
     
