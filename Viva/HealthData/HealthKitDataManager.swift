@@ -226,6 +226,7 @@ final class HealthKitDataManager: ObservableObject {
         case .swimming: return .swimming
         case .yoga: return .yoga
         case .traditionalStrengthTraining: return .strengthTraining
+        case .functionalStrengthTraining: return .functionalStrengthTraining
         case .basketball: return .basketball
         case .dance: return .dancing
         case .hiking: return .hiking
@@ -239,6 +240,13 @@ final class HealthKitDataManager: ObservableObject {
         case .pilates: return .pilates
         case .rowing: return .rowing
         case .volleyball: return .volleyball
+        case .flexibility: return .flexibility
+        case .socialDance: return .socialDance
+        case .cardioDance: return .cardioDance
+        case .coreTraining: return .coreTraining
+        case .highIntensityIntervalTraining: return .hiit
+        case .crossTraining: return .crossTraining
+        case .barre: return .barre
         default: return .other
         }
     }
@@ -265,6 +273,14 @@ final class HealthKitDataManager: ObservableObject {
         case .bowling: return "Bowling"
         case .fishing: return "Fishing"
         case .volleyball: return "Volleyball"
+        case .flexibility: return "Flexibility"
+        case .socialDance: return "Social Dance"
+        case .cardioDance: return "Cardio Dance"
+        case .coreTraining: return "Core Training"
+        case .functionalStrengthTraining: return "Functional Strength Training"
+        case .hiit: return "High Intensity Interval Training"
+        case .crossTraining: return "Cross Training"
+        case .barre: return "Barre"
         case .other: return "Workout"
         }
     }
