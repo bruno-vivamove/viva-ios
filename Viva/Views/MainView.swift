@@ -95,9 +95,6 @@ struct MainView: View {
                 }
             }
             .tint(activeTabColor)
-            .onAppear {
-                healthKitDataManager.requestAuthorization()
-            }
             
             // Error banner appears above everything else
             if errorManager.hasErrors {

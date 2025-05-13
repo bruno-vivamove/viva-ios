@@ -1,5 +1,6 @@
 import HealthKit
 import SwiftUI
+import BackgroundTasks
 
 /// Manages HealthKit data access and processing for the app
 final class HealthKitDataManager: ObservableObject {
@@ -7,18 +8,25 @@ final class HealthKitDataManager: ObservableObject {
     private let userSession: UserSession
     private let userMeasurementService: UserMeasurementService
     private let workoutService: WorkoutService
+    private let matchupService: MatchupService
     private var queryHandlers: [MeasurementType: HealthDataQuery] = [:]
+    private var backgroundObservers: [HKObserverQuery] = []
+    private var backgroundDeliveryEnabled = false
+    private var lastHealthDataUpdateTime: Date?
+    private let updateTimeQueue = DispatchQueue(label: "com.app.healthKitUpdateTimeQueue")
 
     @Published var isAuthorized = false
 
     init(
         userSession: UserSession,
         userMeasurementService: UserMeasurementService,
-        workoutService: WorkoutService
+        workoutService: WorkoutService,
+        matchupService: MatchupService
     ) {
         self.userSession = userSession
         self.userMeasurementService = userMeasurementService
         self.workoutService = workoutService
+        self.matchupService = matchupService
         setupQueryHandlers()
     }
 
@@ -49,6 +57,7 @@ final class HealthKitDataManager: ObservableObject {
             HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
             HKObjectType.categoryType(forIdentifier: .highHeartRateEvent)!,
             HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
+            HKObjectType.quantityType(forIdentifier: .appleStandTime)!,
         ]
 
         healthStore.requestAuthorization(toShare: nil, read: typesToRead) {
@@ -56,6 +65,9 @@ final class HealthKitDataManager: ObservableObject {
             error in
             DispatchQueue.main.async {
                 self.isAuthorized = success
+                if success {
+                    self.setupBackgroundObservers()
+                }
             }
         }
     }
@@ -372,5 +384,175 @@ final class HealthKitDataManager: ObservableObject {
         }
 
         return merged
+    }
+
+    /// Sets up background observers for all health data types we're interested in
+    func setupBackgroundObservers() {
+        guard isAuthorized else { return }
+        
+        // Stop any existing observers
+        stopBackgroundObservers()
+        
+        // Health data types to observe - explicitly defined as sample types
+        let observedTypes: [HKSampleType] = [
+            HKObjectType.workoutType(),
+            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
+            HKObjectType.quantityType(forIdentifier: .stepCount)!,
+            HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
+            HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
+            HKObjectType.quantityType(forIdentifier: .appleStandTime)!
+        ]
+        
+        // Setup observers for each type
+        for type in observedTypes {
+            setupObserver(for: type)
+        }
+        
+        // Start background delivery if not already enabled
+        if !backgroundDeliveryEnabled {
+            enableBackgroundDelivery()
+        }
+    }
+    
+    /// Sets up an observer for a specific health data type
+    private func setupObserver(for type: HKSampleType) {
+        // Create an observer query
+        let query = HKObserverQuery(sampleType: type, predicate: nil) { [weak self] query, completionHandler, error in
+            guard let self = self, userSession.isLoggedIn else {
+                completionHandler()
+                return
+            }
+            
+            let typeName = self.getTypeDisplayName(type)
+            AppLogger.info("New HealthKit data detected for: \(typeName)", category: .health)
+            processHealthDataUpdate()
+            completionHandler()
+        }
+        
+        // Execute the query
+        healthStore.execute(query)
+        backgroundObservers.append(query)
+    }
+    
+    /// Enables background delivery for health data updates
+    private func enableBackgroundDelivery() {
+        // Define types for background delivery - explicitly defined as sample types
+        let types: [HKSampleType] = [
+            HKObjectType.workoutType(),
+            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
+            HKObjectType.quantityType(forIdentifier: .stepCount)!,
+            HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
+            HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
+            HKObjectType.quantityType(forIdentifier: .appleStandTime)!
+        ]
+        
+        // Enable background delivery for each type
+        let group = DispatchGroup()
+        
+        for type in types {
+            group.enter()
+            
+            healthStore.enableBackgroundDelivery(for: type, frequency: .immediate) { success, error in
+                if let error = error {
+                    AppLogger.error("Failed to enable background delivery for \(self.getTypeDisplayName(type)): \(error.localizedDescription)", category: .health)
+                } else if success {
+                    AppLogger.info("Background delivery enabled for \(self.getTypeDisplayName(type))", category: .health)
+                }
+                group.leave()
+            }
+        }
+        
+        group.notify(queue: .main) {
+            self.backgroundDeliveryEnabled = true
+            AppLogger.info("HealthKit background delivery setup complete", category: .health)
+        }
+    }
+    
+    /// Stops all background observers
+    func stopBackgroundObservers() {
+        for query in backgroundObservers {
+            healthStore.stop(query)
+        }
+        backgroundObservers.removeAll()
+    }
+    
+    /// Process new health data
+    func processHealthDataUpdate() {
+        if let lastUpdate = lastHealthDataUpdateTime,
+           Date().timeIntervalSince(lastUpdate) < 60 {
+            AppLogger.info("Skipping health data update - last update was less than a minute ago", category: .health)
+            return
+        }
+
+        AppLogger.info("Processing health data update in background", category: .health)
+        lastHealthDataUpdateTime = Date()
+
+        // Create a task to handle the asynchronous work
+        Task {
+            do {
+                // Get active matchups for the current user
+                let matchupsResponse = try await matchupService.getMyMatchups(filter: .UNFINALIZED)
+                let activeMatchups = matchupsResponse.matchups.filter { $0.status == .active }
+                
+                if activeMatchups.isEmpty {
+                    AppLogger.info("No active matchups found to update", category: .health)
+                    return
+                }
+                
+                AppLogger.info("Updating health data for \(activeMatchups.count) active matchups", category: .health)
+                
+                // Process each active matchup
+                for matchup in activeMatchups {
+                    do {
+                        // Get full matchup details
+                        let matchupDetails = try await matchupService.getMatchup(matchupId: matchup.id)
+                        
+                        // Update and upload health data for this matchup
+                        updateAndUploadHealthData(matchupDetail: matchupDetails) { result in
+                            switch result {
+                            case .success(let updatedMatchup):
+                                AppLogger.info("Successfully updated health data for matchup \(updatedMatchup.id)", category: .health)
+                            case .failure(let error):
+                                AppLogger.error("Failed to update health data for matchup \(matchup.id): \(error)", category: .health)
+                            }
+                        }
+                    } catch {
+                        AppLogger.error("Error getting details for matchup \(matchup.id): \(error)", category: .health)
+                        continue
+                    }
+                }
+            } catch {
+                AppLogger.error("Failed to fetch matchups for health data update: \(error)", category: .health)
+            }
+        }
+    }
+    
+    /// Get a display name for a health data type
+    private func getTypeDisplayName(_ type: HKObjectType) -> String {
+        if type is HKWorkoutType {
+            return "Workout"
+        } else if let quantityType = type as? HKQuantityType {
+            switch quantityType.identifier {
+            case HKQuantityTypeIdentifier.activeEnergyBurned.rawValue:
+                return "Active Energy Burned"
+            case HKQuantityTypeIdentifier.stepCount.rawValue:
+                return "Step Count"
+            case HKQuantityTypeIdentifier.appleExerciseTime.rawValue:
+                return "Apple Exercise Time"
+            case HKQuantityTypeIdentifier.appleStandTime.rawValue:
+                return "Apple Stand Time"
+            default:
+                return quantityType.identifier
+            }
+        } else if let categoryType = type as? HKCategoryType {
+            switch categoryType.identifier {
+            case HKCategoryTypeIdentifier.sleepAnalysis.rawValue:
+                return "Sleep Analysis"
+            default:
+                return categoryType.identifier
+            }
+        }
+        
+        return type.identifier
     }
 }

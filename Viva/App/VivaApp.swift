@@ -45,12 +45,19 @@ struct VivaApp: App {
                 // This is a good place to refresh data
                 AppLogger.info("App became active", category: .general)
                 
-            case .background:
-                // App is entering background, schedule background tasks
-                AppLogger.info("App entered background - scheduling background refresh task", category: .general)
-                if vivaAppObjects.userSession.isLoggedIn {
-                    BackgroundTaskManager.shared.scheduleHealthUpdateTask()
+                // Setup HealthKit background observers when app becomes active
+                if vivaAppObjects.healthKitDataManager.isAuthorized {
+                    vivaAppObjects.healthKitDataManager.setupBackgroundObservers()
+                    AppLogger.info("Set up HealthKit background observers", category: .health)
+                } else {
+                    // Request HealthKit authorization if not already authorized
+                    vivaAppObjects.healthKitDataManager.requestAuthorization()
+                    AppLogger.info("Requested HealthKit authorization", category: .health)
                 }
+                
+            case .background:
+                // App is entering background
+                AppLogger.info("App entered background", category: .general)
                 
             case .inactive:
                 // App is inactive but visible

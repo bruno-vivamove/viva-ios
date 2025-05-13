@@ -31,51 +31,69 @@ class VivaAppObjects: ObservableObject {
         userSession = UserSession()
         errorManager = ErrorManager()
 
-        // Settings with no session
-        authNetworkClientSettings = AuthNetworkClientSettings(shouldLogBodies: true)
+        // Network Client Settings
+        authNetworkClientSettings = AuthNetworkClientSettings(
+            shouldLogBodies: false
+        )
         appWithNoSessionNetworkClientSettings =
-            AppWithNoSessionNetworkClientSettings(shouldLogBodies: true)
-
-        // Clients with no session
-        authNetworkClient = NetworkClient<AuthErrorResponse>(
-            settings: authNetworkClientSettings,
-            errorManager: errorManager)
-        appNetworkClientWithNoSession = NetworkClient<VivaErrorResponse>(
-            settings: appWithNoSessionNetworkClientSettings,
-            errorManager: errorManager)
+            AppWithNoSessionNetworkClientSettings(shouldLogBodies: false)
+        appNetworkClientSettings = AppNetworkClientSettings(
+            userSession,
+            shouldLogBodies: true
+        )
+        appNetworkClientSettingsNoBodies = AppNetworkClientSettings(
+            userSession,
+            shouldLogBodies: false
+        )
 
         // Services with no session
+        authNetworkClient = NetworkClient<AuthErrorResponse>(
+            settings: authNetworkClientSettings,
+            errorManager: errorManager
+        )
+        appNetworkClientWithNoSession = NetworkClient<VivaErrorResponse>(
+            settings: appWithNoSessionNetworkClientSettings,
+            errorManager: errorManager
+        )
+
         authService = AuthService(networkClient: authNetworkClient)
         sessionService = SessionService(
-            networkClient: appNetworkClientWithNoSession)
+            networkClient: appNetworkClientWithNoSession
+        )
         healthService = HealthService(
-            networkClient: appNetworkClientWithNoSession)
+            networkClient: appNetworkClientWithNoSession
+        )
 
-        // Settings with session
-        appNetworkClientSettings = AppNetworkClientSettings(userSession, shouldLogBodies: true)
-        appNetworkClientSettingsNoBodies = AppNetworkClientSettings(userSession, shouldLogBodies: false)
-
-        // Client with session
+        // Services with Session
         appNetworkClient = NetworkClient(
             settings: appNetworkClientSettings,
             tokenRefreshHandler: TokenRefreshHandler(
-                sessionService: sessionService, userSession: userSession),
-            errorManager: errorManager)
-
+                sessionService: sessionService,
+                userSession: userSession
+            ),
+            errorManager: errorManager
+        )
         appNetworkClientNoBodies = NetworkClient(
             settings: appNetworkClientSettingsNoBodies,
             tokenRefreshHandler: TokenRefreshHandler(
-                sessionService: sessionService, userSession: userSession),
-            errorManager: errorManager)
-
-        // Services with session
+                sessionService: sessionService,
+                userSession: userSession
+            ),
+            errorManager: errorManager
+        )
         friendService = FriendService(
-            networkClient: appNetworkClient)
+            networkClient: appNetworkClient
+        )
         statsService = StatsService(networkClient: appNetworkClient)
-        matchupService = MatchupService(networkClient: appNetworkClientNoBodies)
-        userMeasurementService = UserMeasurementService(networkClient: appNetworkClientNoBodies)
+        matchupService = MatchupService(networkClient: appNetworkClient)
+        userMeasurementService = UserMeasurementService(
+            networkClient: appNetworkClientNoBodies
+        )
         workoutService = WorkoutService(networkClient: appNetworkClient)
-        userService = UserService(networkClient: appNetworkClient, userSession: userSession)
+        userService = UserService(
+            networkClient: appNetworkClient,
+            userSession: userSession
+        )
 
         // Other
         authManager = AuthenticationManager(
@@ -88,9 +106,10 @@ class VivaAppObjects: ObservableObject {
         healthKitDataManager = HealthKitDataManager(
             userSession: userSession,
             userMeasurementService: userMeasurementService,
-            workoutService: workoutService
+            workoutService: workoutService,
+            matchupService: matchupService
         )
-        
+
         // Configure ErrorManager with HealthService for connectivity monitoring
         errorManager.setHealthService(healthService)
     }
