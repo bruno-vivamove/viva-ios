@@ -903,7 +903,7 @@ struct WorkoutListSection: View {
     var body: some View {
         Section {
             // Workout list
-            if let workouts = viewModel.matchup?.workouts.filter({ $0.user.id == userId }), !workouts.isEmpty {
+            if let workouts = viewModel.matchup?.workouts, !workouts.isEmpty {
                 ForEach(workouts) { workout in
                     WorkoutCard(workout: workout)
                         .listRowBackground(Color.clear)
@@ -924,19 +924,7 @@ struct WorkoutListSection: View {
                     .listRowInsets(EdgeInsets())
             }
         } header: {
-            VStack {
-                HStack {
-                    Text("Workouts")
-                        .font(VivaDesign.Typography.header)
-                        .foregroundColor(.white)
-                    Spacer()
-                }
-                .padding(.top, VivaDesign.Spacing.medium)
-                .padding(.bottom, VivaDesign.Spacing.small)
-                
-                VivaDivider()
-            }
-            .listRowInsets(EdgeInsets())
+            SectionHeaderView(title: "Workouts")
         }
     }
 }
