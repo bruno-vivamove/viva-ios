@@ -30,9 +30,9 @@ struct MatchupCard: View {
 
     var body: some View {
         Group {
-            if viewModel.isLoading && viewModel.matchupDetails == nil {
+            if viewModel.isLoading && viewModel.matchup == nil {
                 skeletonLoadingView
-            } else if let details = viewModel.matchupDetails {
+            } else if let details = viewModel.matchup {
                 matchupCardView(details)
             } else {
                 errorView

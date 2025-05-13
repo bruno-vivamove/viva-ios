@@ -2,7 +2,7 @@ import Combine
 import Foundation
 
 class MatchupCardViewModel: ObservableObject, Identifiable {
-    @Published var matchupDetails: MatchupDetails?
+    @Published var matchup: MatchupDetails?
     @Published var isLoading: Bool
     @Published var error: Error?
 
@@ -64,7 +64,7 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
         }
 
         // Only load data if it hasn't been loaded in the last 10 minutes or if matchupDetails is nil
-        if matchupDetails == nil || dataLoadedTime == nil
+        if matchup == nil || dataLoadedTime == nil
             || Date().timeIntervalSince(dataLoadedTime!) > 600
         {
             // Mark that we've requested data
@@ -79,28 +79,32 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
         error = nil
 
         do {
-            // First, get the basic matchup details
-            let details = try await matchupService.getMatchup(
+            // First, get the matchup details
+            let matchup = try await matchupService.getMatchup(
                 matchupId: matchupId
             )
 
-            let isCurrentUserInMatchup = details.teams.flatMap { $0.users }
+            self.matchup = matchup
+            self.dataLoadedTime = Date()
+            self.isLoading = false
+
+            // If the matchup is active, update the health data in background
+            let isCurrentUserInMatchup = matchup.teams.flatMap { $0.users }
                 .contains { $0.id == userSession.userId }
 
-            // If the matchup is active to update the health data
-            if details.status == .active && isCurrentUserInMatchup
+            if matchup.status == .active && isCurrentUserInMatchup
                 && uploadHealthData
             {
                 // Use the unified method for updating and uploading health data
                 healthKitDataManager.updateAndUploadHealthData(
-                    matchupDetail: details
+                    matchupDetail: matchup
                 ) { [weak self] result in
                     guard let self = self else { return }
 
                     Task { @MainActor in
                         switch result {
                         case .success(let updatedMatchup):
-                            self.matchupDetails = updatedMatchup
+                            self.matchup = updatedMatchup
                         case .failure(let error):
                             AppLogger.error(
                                 "Failed to update and upload health data: \(error)",
@@ -108,16 +112,9 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
                             )
                             self.error = error
                         }
-                        self.isLoading = false
                     }
                 }
-            } else {
-                self.matchupDetails = details
-                self.isLoading = false
             }
-
-            // Update the time when data was successfully loaded
-            self.dataLoadedTime = Date()
         } catch {
             AppLogger.error(
                 "Error loading matchup details: \(error)",
@@ -160,7 +157,7 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
         NotificationCenter.default.publisher(for: .userProfileUpdated)
             .compactMap { $0.object as? UserProfile }
             .filter { [weak self] profile in
-                guard let self = self, let details = self.matchupDetails else {
+                guard let self = self, let details = self.matchup else {
                     return false
                 }
                 // Only process notification if this user is in the matchup
@@ -182,7 +179,7 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
             .filter { $0.id == self.matchupId }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] details in
-                self?.matchupDetails = details
+                self?.matchup = details
             }
             .store(in: &cancellables)
 
@@ -206,9 +203,9 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
             .sink { [weak self] matchup in
                 guard let self = self else { return }
 
-                if var details = self.matchupDetails {
+                if var details = self.matchup {
                     details.status = matchup.status
-                    self.matchupDetails = details
+                    self.matchup = details
                 }
             }
             .store(in: &cancellables)
@@ -222,12 +219,12 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
                 guard let self = self else { return }
 
                 // Only add the invite if it doesn't already exist in the matchup
-                if var details = self.matchupDetails {
+                if var details = self.matchup {
                     if !details.invites.contains(where: {
                         $0.inviteCode == matchupInvite.inviteCode
                     }) {
                         details.invites.append(matchupInvite)
-                        self.matchupDetails = details  // Update the published property to trigger UI refresh
+                        self.matchup = details  // Update the published property to trigger UI refresh
                     }
                 }
             }
@@ -241,11 +238,11 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
             .sink { [weak self] matchupInvite in
                 guard let self = self else { return }
 
-                if var details = self.matchupDetails {
+                if var details = self.matchup {
                     details.invites.removeAll {
                         $0.inviteCode == matchupInvite.inviteCode
                     }
-                    self.matchupDetails = details  // Update the published property to trigger UI refresh
+                    self.matchup = details  // Update the published property to trigger UI refresh
                 }
             }
             .store(in: &cancellables)

@@ -165,19 +165,24 @@ class MatchupDetailViewModel: ObservableObject {
         error = nil
 
         do {
-            let matchup: MatchupDetails = try await matchupService.getMatchup(
+            // First, get the matchup details
+            let matchup = try await matchupService.getMatchup(
                 matchupId: matchupId
             )
             self.matchup = matchup
+            self.dataLoadedTime = Date()
             self.updateMeasurements(matchup: matchup)
+            isLoading = false
 
             // Finalize if matchup is completed
             withAnimation(.easeInOut(duration: 0.5)) {
                 self.isCompletedButNotFinalized = matchup.status == .completed && !matchup.finalized
             }
             
-            let isUserInMatchup = matchup.teams.flatMap { $0.users }.contains { $0.id == userSession.userId }
-            if isUserInMatchup {
+            // If the matchup is active, update the health data in background
+            let isCurrentUserInMatchup = matchup.teams.flatMap { $0.users }.contains { $0.id == userSession.userId }
+            
+            if isCurrentUserInMatchup {
                 if self.isCompletedButNotFinalized {
                     try await finalizeUserParticipation(matchup: matchup)
                 } else if matchup.status == .active {
@@ -197,14 +202,10 @@ class MatchupDetailViewModel: ObservableObject {
                     }
                 }
             }
-            
-            // Update the time when data was successfully loaded
-            self.dataLoadedTime = Date()
         } catch {
             self.setError(error)
+            isLoading = false
         }
-
-        isLoading = false
     }
 
     private func finalizeUserParticipation(matchup: MatchupDetails) async throws
