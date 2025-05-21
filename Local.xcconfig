@@ -2,3 +2,5 @@
 // https://help.apple.com/xcode/#/dev745c5c974
 
 BASE_URL = http:/$()/localhost:8080
+REFERER = https:/$()/dev.vivamove.io
+AUTH_API_KEY = AIzaSyBt_443_Npn0Rtx-Rk_xBS5CdAt_FqWHh8

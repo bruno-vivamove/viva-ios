@@ -9,7 +9,7 @@ protocol NetworkClientSettings {
 final class AuthNetworkClientSettings: NetworkClientSettings {
     let baseUrl = "https://identitytoolkit.googleapis.com/v1/accounts"
     let headers = [
-        "referer": "https://dev.vivamove.io",
+        "referer": Bundle.main.object(forInfoDictionaryKey: "REFERER") as! String,
     ]
     let shouldLogBodies: Bool
     
@@ -21,7 +21,7 @@ final class AuthNetworkClientSettings: NetworkClientSettings {
 final class AppWithNoSessionNetworkClientSettings: NetworkClientSettings {
     let baseUrl = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as! String
     let headers = [
-        "referer": "https://dev.vivamove.io",
+        "referer": Bundle.main.object(forInfoDictionaryKey: "REFERER") as! String,
     ]
     let shouldLogBodies: Bool
     

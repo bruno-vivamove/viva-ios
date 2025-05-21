@@ -1,0 +1,6 @@
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+BASE_URL = https:/$()/viva-svc-p63mljxesa-ue.a.run.app
+REFERER = https:/$()/vivamove.io
+AUTH_API_KEY = AIzaSyDFFQYxbY4RYsglPIceIgNCQO-3FU8IDt8

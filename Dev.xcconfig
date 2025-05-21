@@ -2,3 +2,5 @@
 // https://help.apple.com/xcode/#/dev745c5c974
 
 BASE_URL = https:/$()/viva-svc-7e66d6saga-ue.a.run.app
+REFERER = https:/$()/dev.vivamove.io
+AUTH_API_KEY = AIzaSyBt_443_Npn0Rtx-Rk_xBS5CdAt_FqWHh8

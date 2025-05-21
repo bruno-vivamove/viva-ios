@@ -1,5 +1,8 @@
+import Foundation
+
 final class AuthService {
-    private let apiKey: String = "AIzaSyBt_443_Npn0Rtx-Rk_xBS5CdAt_FqWHh8"
+    // TODO: Store in Keychain
+    private let apiKey: String = Bundle.main.object(forInfoDictionaryKey: "AUTH_API_KEY") as! String
 
     private let networkClient: NetworkClient<AuthErrorResponse>
     private let settings: NetworkClientSettings

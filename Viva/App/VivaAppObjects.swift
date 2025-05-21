@@ -33,7 +33,7 @@ class VivaAppObjects: ObservableObject {
 
         // Network Client Settings
         authNetworkClientSettings = AuthNetworkClientSettings(
-            shouldLogBodies: false
+            shouldLogBodies: true
         )
         appWithNoSessionNetworkClientSettings =
             AppWithNoSessionNetworkClientSettings(shouldLogBodies: false)
