@@ -7,58 +7,46 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C04B469A2D98B7B200C06E09 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = C04B46992D98B7B200C06E09 /* GoogleSignIn */; };
-		C04B469C2D98B88E00C06E09 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C04B469B2D98B88E00C06E09 /* GoogleSignInSwift */; };
-		C060A29D2DA75D89005367BB /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = C060A29C2DA75D89005367BB /* Lottie */; };
-		C0A63A672DAC9E8A00EBFDD3 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = C0A63A662DAC9E8A00EBFDD3 /* Nuke */; };
-		C0A63A692DAC9E8A00EBFDD3 /* NukeExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = C0A63A682DAC9E8A00EBFDD3 /* NukeExtensions */; };
-		C0A63A6B2DAC9E8A00EBFDD3 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = C0A63A6A2DAC9E8A00EBFDD3 /* NukeUI */; };
-		C0A63A6D2DAC9E8A00EBFDD3 /* NukeVideo in Frameworks */ = {isa = PBXBuildFile; productRef = C0A63A6C2DAC9E8A00EBFDD3 /* NukeVideo */; };
-		C0C51AE62D792E4D002CC61A /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = C0C51AE52D792E4D002CC61A /* Alamofire */; };
-		C0C51AE82D792E6D002CC61A /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = C0C51AE72D792E6D002CC61A /* OrderedCollections */; };
+		C02329182DEBA47200D4D49A /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = C023290F2DEBA47200D4D49A /* Lottie */; };
+		C02329192DEBA47200D4D49A /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = C023290A2DEBA47200D4D49A /* OrderedCollections */; };
+		C023291A2DEBA47200D4D49A /* NukeExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = C02329132DEBA47200D4D49A /* NukeExtensions */; };
+		C023291B2DEBA47200D4D49A /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = C02329082DEBA47200D4D49A /* Alamofire */; };
+		C023291C2DEBA47200D4D49A /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = C02329112DEBA47200D4D49A /* Nuke */; };
+		C023291D2DEBA47200D4D49A /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = C023290C2DEBA47200D4D49A /* GoogleSignIn */; };
+		C023291E2DEBA47200D4D49A /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C023290E2DEBA47200D4D49A /* GoogleSignInSwift */; };
+		C023291F2DEBA47200D4D49A /* NukeVideo in Frameworks */ = {isa = PBXBuildFile; productRef = C02329152DEBA47200D4D49A /* NukeVideo */; };
+		C02329202DEBA47200D4D49A /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = C02329142DEBA47200D4D49A /* NukeUI */; };
+		C0232EDE2DEBAA9700D4D49A /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = C0232ED52DEBAA9700D4D49A /* Lottie */; };
+		C0232EDF2DEBAA9700D4D49A /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = C0232ED02DEBAA9700D4D49A /* OrderedCollections */; };
+		C0232EE02DEBAA9700D4D49A /* NukeExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = C0232ED92DEBAA9700D4D49A /* NukeExtensions */; };
+		C0232EE12DEBAA9700D4D49A /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = C0232ECE2DEBAA9700D4D49A /* Alamofire */; };
+		C0232EE22DEBAA9700D4D49A /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = C0232ED72DEBAA9700D4D49A /* Nuke */; };
+		C0232EE32DEBAA9700D4D49A /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = C0232ED22DEBAA9700D4D49A /* GoogleSignIn */; };
+		C0232EE42DEBAA9700D4D49A /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C0232ED42DEBAA9700D4D49A /* GoogleSignInSwift */; };
+		C0232EE52DEBAA9700D4D49A /* NukeVideo in Frameworks */ = {isa = PBXBuildFile; productRef = C0232EDB2DEBAA9700D4D49A /* NukeVideo */; };
+		C0232EE62DEBAA9700D4D49A /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = C0232EDA2DEBAA9700D4D49A /* NukeUI */; };
+		C0232F652DEBAB5A00D4D49A /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = C0232F5C2DEBAB5A00D4D49A /* Lottie */; };
+		C0232F662DEBAB5A00D4D49A /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = C0232F572DEBAB5A00D4D49A /* OrderedCollections */; };
+		C0232F672DEBAB5A00D4D49A /* NukeExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = C0232F602DEBAB5A00D4D49A /* NukeExtensions */; };
+		C0232F682DEBAB5A00D4D49A /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = C0232F552DEBAB5A00D4D49A /* Alamofire */; };
+		C0232F692DEBAB5A00D4D49A /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = C0232F5E2DEBAB5A00D4D49A /* Nuke */; };
+		C0232F6A2DEBAB5A00D4D49A /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = C0232F592DEBAB5A00D4D49A /* GoogleSignIn */; };
+		C0232F6B2DEBAB5A00D4D49A /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C0232F5B2DEBAB5A00D4D49A /* GoogleSignInSwift */; };
+		C0232F6C2DEBAB5A00D4D49A /* NukeVideo in Frameworks */ = {isa = PBXBuildFile; productRef = C0232F622DEBAB5A00D4D49A /* NukeVideo */; };
+		C0232F6D2DEBAB5A00D4D49A /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = C0232F612DEBAB5A00D4D49A /* NukeUI */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		C03975B72D2F83D000BCE78F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C039759E2D2F83CE00BCE78F /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C03975A52D2F83CE00BCE78F;
-			remoteInfo = Viva;
-		};
-		C03975C12D2F83D000BCE78F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C039759E2D2F83CE00BCE78F /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C03975A52D2F83CE00BCE78F;
-			remoteInfo = Viva;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
-		C00B452F2D6AF86D0015DC84 /* Local.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Local.xcconfig; sourceTree = "<group>"; };
-		C00B45312D6AF90A0015DC84 /* Dev.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Dev.xcconfig; sourceTree = "<group>"; };
-		C03975A62D2F83CE00BCE78F /* Viva.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Viva.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C02329262DEBA47200D4D49A /* Viva - Dev (Debug).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Viva - Dev (Debug).app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0232EED2DEBAA9700D4D49A /* Viva - Prod (Debug).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Viva - Prod (Debug).app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0232F742DEBAB5A00D4D49A /* Viva - Local (Debug).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Viva - Local (Debug).app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C03975B62D2F83D000BCE78F /* VivaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VivaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C03975C02D2F83D000BCE78F /* VivaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VivaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		C00B45342D6AFFD00015DC84 /* Exceptions for "Viva" folder in "Viva" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = C03975A52D2F83CE00BCE78F /* Viva */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C03975A82D2F83CE00BCE78F /* Viva */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				C00B45342D6AFFD00015DC84 /* Exceptions for "Viva" folder in "Viva" target */,
-			);
 			path = Viva;
 			sourceTree = "<group>";
 		};
@@ -75,19 +63,51 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		C03975A32D2F83CE00BCE78F /* Frameworks */ = {
+		C02329172DEBA47200D4D49A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C060A29D2DA75D89005367BB /* Lottie in Frameworks */,
-				C0C51AE82D792E6D002CC61A /* OrderedCollections in Frameworks */,
-				C0A63A692DAC9E8A00EBFDD3 /* NukeExtensions in Frameworks */,
-				C0C51AE62D792E4D002CC61A /* Alamofire in Frameworks */,
-				C0A63A672DAC9E8A00EBFDD3 /* Nuke in Frameworks */,
-				C04B469A2D98B7B200C06E09 /* GoogleSignIn in Frameworks */,
-				C04B469C2D98B88E00C06E09 /* GoogleSignInSwift in Frameworks */,
-				C0A63A6D2DAC9E8A00EBFDD3 /* NukeVideo in Frameworks */,
-				C0A63A6B2DAC9E8A00EBFDD3 /* NukeUI in Frameworks */,
+				C02329182DEBA47200D4D49A /* Lottie in Frameworks */,
+				C02329192DEBA47200D4D49A /* OrderedCollections in Frameworks */,
+				C023291A2DEBA47200D4D49A /* NukeExtensions in Frameworks */,
+				C023291B2DEBA47200D4D49A /* Alamofire in Frameworks */,
+				C023291C2DEBA47200D4D49A /* Nuke in Frameworks */,
+				C023291D2DEBA47200D4D49A /* GoogleSignIn in Frameworks */,
+				C023291E2DEBA47200D4D49A /* GoogleSignInSwift in Frameworks */,
+				C023291F2DEBA47200D4D49A /* NukeVideo in Frameworks */,
+				C02329202DEBA47200D4D49A /* NukeUI in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0232EDD2DEBAA9700D4D49A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0232EDE2DEBAA9700D4D49A /* Lottie in Frameworks */,
+				C0232EDF2DEBAA9700D4D49A /* OrderedCollections in Frameworks */,
+				C0232EE02DEBAA9700D4D49A /* NukeExtensions in Frameworks */,
+				C0232EE12DEBAA9700D4D49A /* Alamofire in Frameworks */,
+				C0232EE22DEBAA9700D4D49A /* Nuke in Frameworks */,
+				C0232EE32DEBAA9700D4D49A /* GoogleSignIn in Frameworks */,
+				C0232EE42DEBAA9700D4D49A /* GoogleSignInSwift in Frameworks */,
+				C0232EE52DEBAA9700D4D49A /* NukeVideo in Frameworks */,
+				C0232EE62DEBAA9700D4D49A /* NukeUI in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0232F642DEBAB5A00D4D49A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0232F652DEBAB5A00D4D49A /* Lottie in Frameworks */,
+				C0232F662DEBAB5A00D4D49A /* OrderedCollections in Frameworks */,
+				C0232F672DEBAB5A00D4D49A /* NukeExtensions in Frameworks */,
+				C0232F682DEBAB5A00D4D49A /* Alamofire in Frameworks */,
+				C0232F692DEBAB5A00D4D49A /* Nuke in Frameworks */,
+				C0232F6A2DEBAB5A00D4D49A /* GoogleSignIn in Frameworks */,
+				C0232F6B2DEBAB5A00D4D49A /* GoogleSignInSwift in Frameworks */,
+				C0232F6C2DEBAB5A00D4D49A /* NukeVideo in Frameworks */,
+				C0232F6D2DEBAB5A00D4D49A /* NukeUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,8 +131,6 @@
 		C039759D2D2F83CE00BCE78F = {
 			isa = PBXGroup;
 			children = (
-				C00B452F2D6AF86D0015DC84 /* Local.xcconfig */,
-				C00B45312D6AF90A0015DC84 /* Dev.xcconfig */,
 				C03975A82D2F83CE00BCE78F /* Viva */,
 				C03975B92D2F83D000BCE78F /* VivaTests */,
 				C03975C32D2F83D000BCE78F /* VivaUITests */,
@@ -124,9 +142,11 @@
 		C03975A72D2F83CE00BCE78F /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C03975A62D2F83CE00BCE78F /* Viva.app */,
 				C03975B62D2F83D000BCE78F /* VivaTests.xctest */,
 				C03975C02D2F83D000BCE78F /* VivaUITests.xctest */,
+				C02329262DEBA47200D4D49A /* Viva - Dev (Debug).app */,
+				C0232EED2DEBAA9700D4D49A /* Viva - Prod (Debug).app */,
+				C0232F742DEBAB5A00D4D49A /* Viva - Local (Debug).app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -141,13 +161,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C03975A52D2F83CE00BCE78F /* Viva */ = {
+		C02329072DEBA47200D4D49A /* Viva - Dev (Debug) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C03975CA2D2F83D000BCE78F /* Build configuration list for PBXNativeTarget "Viva" */;
+			buildConfigurationList = C02329222DEBA47200D4D49A /* Build configuration list for PBXNativeTarget "Viva - Dev (Debug)" */;
 			buildPhases = (
-				C03975A22D2F83CE00BCE78F /* Sources */,
-				C03975A32D2F83CE00BCE78F /* Frameworks */,
-				C03975A42D2F83CE00BCE78F /* Resources */,
+				C02329162DEBA47200D4D49A /* Sources */,
+				C02329172DEBA47200D4D49A /* Frameworks */,
+				C02329212DEBA47200D4D49A /* Resources */,
 			);
 			buildRules = (
 			);
@@ -156,20 +176,82 @@
 			fileSystemSynchronizedGroups = (
 				C03975A82D2F83CE00BCE78F /* Viva */,
 			);
-			name = Viva;
+			name = "Viva - Dev (Debug)";
 			packageProductDependencies = (
-				C0C51AE52D792E4D002CC61A /* Alamofire */,
-				C0C51AE72D792E6D002CC61A /* OrderedCollections */,
-				C04B46992D98B7B200C06E09 /* GoogleSignIn */,
-				C04B469B2D98B88E00C06E09 /* GoogleSignInSwift */,
-				C060A29C2DA75D89005367BB /* Lottie */,
-				C0A63A662DAC9E8A00EBFDD3 /* Nuke */,
-				C0A63A682DAC9E8A00EBFDD3 /* NukeExtensions */,
-				C0A63A6A2DAC9E8A00EBFDD3 /* NukeUI */,
-				C0A63A6C2DAC9E8A00EBFDD3 /* NukeVideo */,
+				C02329082DEBA47200D4D49A /* Alamofire */,
+				C023290A2DEBA47200D4D49A /* OrderedCollections */,
+				C023290C2DEBA47200D4D49A /* GoogleSignIn */,
+				C023290E2DEBA47200D4D49A /* GoogleSignInSwift */,
+				C023290F2DEBA47200D4D49A /* Lottie */,
+				C02329112DEBA47200D4D49A /* Nuke */,
+				C02329132DEBA47200D4D49A /* NukeExtensions */,
+				C02329142DEBA47200D4D49A /* NukeUI */,
+				C02329152DEBA47200D4D49A /* NukeVideo */,
 			);
 			productName = Viva;
-			productReference = C03975A62D2F83CE00BCE78F /* Viva.app */;
+			productReference = C02329262DEBA47200D4D49A /* Viva - Dev (Debug).app */;
+			productType = "com.apple.product-type.application";
+		};
+		C0232ECD2DEBAA9700D4D49A /* Viva - Prod (Debug) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0232EE82DEBAA9700D4D49A /* Build configuration list for PBXNativeTarget "Viva - Prod (Debug)" */;
+			buildPhases = (
+				C0232EDC2DEBAA9700D4D49A /* Sources */,
+				C0232EDD2DEBAA9700D4D49A /* Frameworks */,
+				C0232EE72DEBAA9700D4D49A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				C03975A82D2F83CE00BCE78F /* Viva */,
+			);
+			name = "Viva - Prod (Debug)";
+			packageProductDependencies = (
+				C0232ECE2DEBAA9700D4D49A /* Alamofire */,
+				C0232ED02DEBAA9700D4D49A /* OrderedCollections */,
+				C0232ED22DEBAA9700D4D49A /* GoogleSignIn */,
+				C0232ED42DEBAA9700D4D49A /* GoogleSignInSwift */,
+				C0232ED52DEBAA9700D4D49A /* Lottie */,
+				C0232ED72DEBAA9700D4D49A /* Nuke */,
+				C0232ED92DEBAA9700D4D49A /* NukeExtensions */,
+				C0232EDA2DEBAA9700D4D49A /* NukeUI */,
+				C0232EDB2DEBAA9700D4D49A /* NukeVideo */,
+			);
+			productName = Viva;
+			productReference = C0232EED2DEBAA9700D4D49A /* Viva - Prod (Debug).app */;
+			productType = "com.apple.product-type.application";
+		};
+		C0232F542DEBAB5A00D4D49A /* Viva - Local (Debug) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0232F6F2DEBAB5A00D4D49A /* Build configuration list for PBXNativeTarget "Viva - Local (Debug)" */;
+			buildPhases = (
+				C0232F632DEBAB5A00D4D49A /* Sources */,
+				C0232F642DEBAB5A00D4D49A /* Frameworks */,
+				C0232F6E2DEBAB5A00D4D49A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				C03975A82D2F83CE00BCE78F /* Viva */,
+			);
+			name = "Viva - Local (Debug)";
+			packageProductDependencies = (
+				C0232F552DEBAB5A00D4D49A /* Alamofire */,
+				C0232F572DEBAB5A00D4D49A /* OrderedCollections */,
+				C0232F592DEBAB5A00D4D49A /* GoogleSignIn */,
+				C0232F5B2DEBAB5A00D4D49A /* GoogleSignInSwift */,
+				C0232F5C2DEBAB5A00D4D49A /* Lottie */,
+				C0232F5E2DEBAB5A00D4D49A /* Nuke */,
+				C0232F602DEBAB5A00D4D49A /* NukeExtensions */,
+				C0232F612DEBAB5A00D4D49A /* NukeUI */,
+				C0232F622DEBAB5A00D4D49A /* NukeVideo */,
+			);
+			productName = Viva;
+			productReference = C0232F742DEBAB5A00D4D49A /* Viva - Local (Debug).app */;
 			productType = "com.apple.product-type.application";
 		};
 		C03975B52D2F83D000BCE78F /* VivaTests */ = {
@@ -183,7 +265,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				C03975B82D2F83D000BCE78F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				C03975B92D2F83D000BCE78F /* VivaTests */,
@@ -206,7 +287,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				C03975C22D2F83D000BCE78F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				C03975C32D2F83D000BCE78F /* VivaUITests */,
@@ -228,9 +308,6 @@
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
-					C03975A52D2F83CE00BCE78F = {
-						CreatedOnToolsVersion = 16.0;
-					};
 					C03975B52D2F83D000BCE78F = {
 						CreatedOnToolsVersion = 16.0;
 						TestTargetID = C03975A52D2F83CE00BCE78F;
@@ -262,7 +339,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C03975A52D2F83CE00BCE78F /* Viva */,
+				C0232F542DEBAB5A00D4D49A /* Viva - Local (Debug) */,
+				C02329072DEBA47200D4D49A /* Viva - Dev (Debug) */,
+				C0232ECD2DEBAA9700D4D49A /* Viva - Prod (Debug) */,
 				C03975B52D2F83D000BCE78F /* VivaTests */,
 				C03975BF2D2F83D000BCE78F /* VivaUITests */,
 			);
@@ -270,7 +349,21 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		C03975A42D2F83CE00BCE78F /* Resources */ = {
+		C02329212DEBA47200D4D49A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0232EE72DEBAA9700D4D49A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0232F6E2DEBAB5A00D4D49A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -294,7 +387,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		C03975A22D2F83CE00BCE78F /* Sources */ = {
+		C02329162DEBA47200D4D49A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0232EDC2DEBAA9700D4D49A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0232F632DEBAB5A00D4D49A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -317,23 +424,9 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		C03975B82D2F83D000BCE78F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C03975A52D2F83CE00BCE78F /* Viva */;
-			targetProxy = C03975B72D2F83D000BCE78F /* PBXContainerItemProxy */;
-		};
-		C03975C22D2F83D000BCE78F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C03975A52D2F83CE00BCE78F /* Viva */;
-			targetProxy = C03975C12D2F83D000BCE78F /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin XCBuildConfiguration section */
-		C00B45292D6AF7E30015DC84 /* Release - Local */ = {
+		C02329292DEBA4DD00D4D49A /* Config - Dev */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C00B452F2D6AF86D0015DC84 /* Local.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -386,9 +479,43 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
-			name = "Release - Local";
+			name = "Config - Dev";
 		};
-		C00B452A2D6AF7E30015DC84 /* Release - Local */ = {
+		C023292B2DEBA4DD00D4D49A /* Config - Dev */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.VivaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Viva.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Viva";
+			};
+			name = "Config - Dev";
+		};
+		C023292C2DEBA4DD00D4D49A /* Config - Dev */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.VivaUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Viva;
+			};
+			name = "Config - Dev";
+		};
+		C023292D2DEBA4DD00D4D49A /* Config - Dev */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -402,7 +529,50 @@
 				ENABLE_PREVIEWS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Viva/Info.plist;
+				INFOPLIST_FILE = "Viva/Info-dev.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Viva Dev";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva.dev;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = "Config - Dev";
+		};
+		C0232EEB2DEBAA9700D4D49A /* Config - Dev */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Viva/Viva.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"Viva/Preview Content\"";
+				DEVELOPMENT_TEAM = 7B3LP5G4DK;
+				ENABLE_PREVIEWS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Viva/Info-prod.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Viva;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
@@ -429,108 +599,53 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = "Release - Local";
+			name = "Config - Dev";
 		};
-		C00B452B2D6AF7E30015DC84 /* Release - Local */ = {
+		C0232F722DEBAB5A00D4D49A /* Config - Dev */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Viva/Viva.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.VivaTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Viva.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Viva";
-			};
-			name = "Release - Local";
-		};
-		C00B452C2D6AF7E30015DC84 /* Release - Local */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.VivaUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Viva;
-			};
-			name = "Release - Local";
-		};
-		C03975C82D2F83D000BCE78F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
+				CURRENT_PROJECT_VERSION = 2;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"Viva/Preview Content\"";
+				DEVELOPMENT_TEAM = 7B3LP5G4DK;
+				ENABLE_PREVIEWS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Viva/Info-local.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Viva Local";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
+					"@executable_path/Frameworks",
 				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva.local;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = Debug;
+			name = "Config - Dev";
 		};
-		C03975C92D2F83D000BCE78F /* Release - Dev */ = {
+		C023303F2DEBAC2C00D4D49A /* Config - Prod */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C00B45312D6AF90A0015DC84 /* Dev.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -583,9 +698,43 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
-			name = "Release - Dev";
+			name = "Config - Prod";
 		};
-		C03975CB2D2F83D000BCE78F /* Debug */ = {
+		C02330412DEBAC2C00D4D49A /* Config - Prod */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.VivaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Viva.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Viva";
+			};
+			name = "Config - Prod";
+		};
+		C02330422DEBAC2C00D4D49A /* Config - Prod */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.VivaUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Viva;
+			};
+			name = "Config - Prod";
+		};
+		C02330432DEBAC2C00D4D49A /* Config - Prod */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -599,7 +748,93 @@
 				ENABLE_PREVIEWS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Viva/Info.plist;
+				INFOPLIST_FILE = "Viva/Info-local.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Viva Local";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva.local;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = "Config - Prod";
+		};
+		C02330442DEBAC2C00D4D49A /* Config - Prod */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Viva/Viva.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"Viva/Preview Content\"";
+				DEVELOPMENT_TEAM = 7B3LP5G4DK;
+				ENABLE_PREVIEWS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Viva/Info-dev.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Viva Dev";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva.dev;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = "Config - Prod";
+		};
+		C02330452DEBAC2C00D4D49A /* Config - Prod */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Viva/Viva.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"Viva/Preview Content\"";
+				DEVELOPMENT_TEAM = 7B3LP5G4DK;
+				ENABLE_PREVIEWS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Viva/Info-prod.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Viva;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
@@ -626,9 +861,99 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = Debug;
+			name = "Config - Prod";
 		};
-		C03975CC2D2F83D000BCE78F /* Release - Dev */ = {
+		C02330462DEBAC3B00D4D49A /* Config - Local */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Config - Local";
+		};
+		C02330482DEBAC3B00D4D49A /* Config - Local */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.VivaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Viva.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Viva";
+			};
+			name = "Config - Local";
+		};
+		C02330492DEBAC3B00D4D49A /* Config - Local */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.VivaUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Viva;
+			};
+			name = "Config - Local";
+		};
+		C023304A2DEBAC3B00D4D49A /* Config - Local */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -642,7 +967,93 @@
 				ENABLE_PREVIEWS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Viva/Info.plist;
+				INFOPLIST_FILE = "Viva/Info-local.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Viva Local";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva.local;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = "Config - Local";
+		};
+		C023304B2DEBAC3B00D4D49A /* Config - Local */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Viva/Viva.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"Viva/Preview Content\"";
+				DEVELOPMENT_TEAM = 7B3LP5G4DK;
+				ENABLE_PREVIEWS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Viva/Info-dev.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Viva Dev";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva.dev;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = "Config - Local";
+		};
+		C023304C2DEBAC3B00D4D49A /* Config - Local */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Viva/Viva.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"Viva/Preview Content\"";
+				DEVELOPMENT_TEAM = 7B3LP5G4DK;
+				ENABLE_PREVIEWS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Viva/Info-prod.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Viva;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
@@ -669,122 +1080,194 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = "Release - Dev";
-		};
-		C03975CE2D2F83D000BCE78F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.VivaTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Viva.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Viva";
-			};
-			name = Debug;
-		};
-		C03975CF2D2F83D000BCE78F /* Release - Dev */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.VivaTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Viva.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Viva";
-			};
-			name = "Release - Dev";
-		};
-		C03975D12D2F83D000BCE78F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.VivaUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Viva;
-			};
-			name = Debug;
-		};
-		C03975D22D2F83D000BCE78F /* Release - Dev */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.VivaUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Viva;
-			};
-			name = "Release - Dev";
+			name = "Config - Local";
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		C02329222DEBA47200D4D49A /* Build configuration list for PBXNativeTarget "Viva - Dev (Debug)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C023292D2DEBA4DD00D4D49A /* Config - Dev */,
+				C023304B2DEBAC3B00D4D49A /* Config - Local */,
+				C02330442DEBAC2C00D4D49A /* Config - Prod */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Config - Dev";
+		};
+		C0232EE82DEBAA9700D4D49A /* Build configuration list for PBXNativeTarget "Viva - Prod (Debug)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0232EEB2DEBAA9700D4D49A /* Config - Dev */,
+				C023304C2DEBAC3B00D4D49A /* Config - Local */,
+				C02330452DEBAC2C00D4D49A /* Config - Prod */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Config - Dev";
+		};
+		C0232F6F2DEBAB5A00D4D49A /* Build configuration list for PBXNativeTarget "Viva - Local (Debug)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0232F722DEBAB5A00D4D49A /* Config - Dev */,
+				C023304A2DEBAC3B00D4D49A /* Config - Local */,
+				C02330432DEBAC2C00D4D49A /* Config - Prod */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Config - Dev";
+		};
 		C03975A12D2F83CE00BCE78F /* Build configuration list for PBXProject "Viva" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C03975C82D2F83D000BCE78F /* Debug */,
-				C03975C92D2F83D000BCE78F /* Release - Dev */,
-				C00B45292D6AF7E30015DC84 /* Release - Local */,
+				C02329292DEBA4DD00D4D49A /* Config - Dev */,
+				C02330462DEBAC3B00D4D49A /* Config - Local */,
+				C023303F2DEBAC2C00D4D49A /* Config - Prod */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release - Dev";
-		};
-		C03975CA2D2F83D000BCE78F /* Build configuration list for PBXNativeTarget "Viva" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C03975CB2D2F83D000BCE78F /* Debug */,
-				C03975CC2D2F83D000BCE78F /* Release - Dev */,
-				C00B452A2D6AF7E30015DC84 /* Release - Local */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release - Dev";
+			defaultConfigurationName = "Config - Dev";
 		};
 		C03975CD2D2F83D000BCE78F /* Build configuration list for PBXNativeTarget "VivaTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C03975CE2D2F83D000BCE78F /* Debug */,
-				C03975CF2D2F83D000BCE78F /* Release - Dev */,
-				C00B452B2D6AF7E30015DC84 /* Release - Local */,
+				C023292B2DEBA4DD00D4D49A /* Config - Dev */,
+				C02330482DEBAC3B00D4D49A /* Config - Local */,
+				C02330412DEBAC2C00D4D49A /* Config - Prod */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release - Dev";
+			defaultConfigurationName = "Config - Dev";
 		};
 		C03975D02D2F83D000BCE78F /* Build configuration list for PBXNativeTarget "VivaUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C03975D12D2F83D000BCE78F /* Debug */,
-				C03975D22D2F83D000BCE78F /* Release - Dev */,
-				C00B452C2D6AF7E30015DC84 /* Release - Local */,
+				C023292C2DEBA4DD00D4D49A /* Config - Dev */,
+				C02330492DEBAC3B00D4D49A /* Config - Local */,
+				C02330422DEBAC2C00D4D49A /* Config - Prod */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release - Dev";
+			defaultConfigurationName = "Config - Dev";
 		};
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		C02329092DEBA47200D4D49A /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.2;
+			};
+		};
+		C023290B2DEBA47200D4D49A /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.4;
+			};
+		};
+		C023290D2DEBA47200D4D49A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		C02329102DEBA47200D4D49A /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.1;
+			};
+		};
+		C02329122DEBA47200D4D49A /* XCRemoteSwiftPackageReference "Nuke" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Nuke";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.8.0;
+			};
+		};
+		C0232ECF2DEBAA9700D4D49A /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.2;
+			};
+		};
+		C0232ED12DEBAA9700D4D49A /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.4;
+			};
+		};
+		C0232ED32DEBAA9700D4D49A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		C0232ED62DEBAA9700D4D49A /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.1;
+			};
+		};
+		C0232ED82DEBAA9700D4D49A /* XCRemoteSwiftPackageReference "Nuke" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Nuke";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.8.0;
+			};
+		};
+		C0232F562DEBAB5A00D4D49A /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.2;
+			};
+		};
+		C0232F582DEBAB5A00D4D49A /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.4;
+			};
+		};
+		C0232F5A2DEBAB5A00D4D49A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		C0232F5D2DEBAB5A00D4D49A /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.1;
+			};
+		};
+		C0232F5F2DEBAB5A00D4D49A /* XCRemoteSwiftPackageReference "Nuke" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Nuke";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.8.0;
+			};
+		};
 		C04B46982D98B7B200C06E09 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
@@ -828,50 +1311,140 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		C04B46992D98B7B200C06E09 /* GoogleSignIn */ = {
+		C02329082DEBA47200D4D49A /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C04B46982D98B7B200C06E09 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
-			productName = GoogleSignIn;
-		};
-		C04B469B2D98B88E00C06E09 /* GoogleSignInSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C04B46982D98B7B200C06E09 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
-			productName = GoogleSignInSwift;
-		};
-		C060A29C2DA75D89005367BB /* Lottie */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C060A29B2DA75D88005367BB /* XCRemoteSwiftPackageReference "lottie-spm" */;
-			productName = Lottie;
-		};
-		C0A63A662DAC9E8A00EBFDD3 /* Nuke */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C0A63A652DAC9E8A00EBFDD3 /* XCRemoteSwiftPackageReference "Nuke" */;
-			productName = Nuke;
-		};
-		C0A63A682DAC9E8A00EBFDD3 /* NukeExtensions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C0A63A652DAC9E8A00EBFDD3 /* XCRemoteSwiftPackageReference "Nuke" */;
-			productName = NukeExtensions;
-		};
-		C0A63A6A2DAC9E8A00EBFDD3 /* NukeUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C0A63A652DAC9E8A00EBFDD3 /* XCRemoteSwiftPackageReference "Nuke" */;
-			productName = NukeUI;
-		};
-		C0A63A6C2DAC9E8A00EBFDD3 /* NukeVideo */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C0A63A652DAC9E8A00EBFDD3 /* XCRemoteSwiftPackageReference "Nuke" */;
-			productName = NukeVideo;
-		};
-		C0C51AE52D792E4D002CC61A /* Alamofire */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C0C51AE42D792E4D002CC61A /* XCRemoteSwiftPackageReference "Alamofire" */;
+			package = C02329092DEBA47200D4D49A /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
 		};
-		C0C51AE72D792E6D002CC61A /* OrderedCollections */ = {
+		C023290A2DEBA47200D4D49A /* OrderedCollections */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C0C51AE32D792E3C002CC61A /* XCRemoteSwiftPackageReference "swift-collections" */;
+			package = C023290B2DEBA47200D4D49A /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = OrderedCollections;
+		};
+		C023290C2DEBA47200D4D49A /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C023290D2DEBA47200D4D49A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		C023290E2DEBA47200D4D49A /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C023290D2DEBA47200D4D49A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		C023290F2DEBA47200D4D49A /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C02329102DEBA47200D4D49A /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
+		};
+		C02329112DEBA47200D4D49A /* Nuke */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C02329122DEBA47200D4D49A /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = Nuke;
+		};
+		C02329132DEBA47200D4D49A /* NukeExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C02329122DEBA47200D4D49A /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeExtensions;
+		};
+		C02329142DEBA47200D4D49A /* NukeUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C02329122DEBA47200D4D49A /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeUI;
+		};
+		C02329152DEBA47200D4D49A /* NukeVideo */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C02329122DEBA47200D4D49A /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeVideo;
+		};
+		C0232ECE2DEBAA9700D4D49A /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232ECF2DEBAA9700D4D49A /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		C0232ED02DEBAA9700D4D49A /* OrderedCollections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232ED12DEBAA9700D4D49A /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = OrderedCollections;
+		};
+		C0232ED22DEBAA9700D4D49A /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232ED32DEBAA9700D4D49A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		C0232ED42DEBAA9700D4D49A /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232ED32DEBAA9700D4D49A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		C0232ED52DEBAA9700D4D49A /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232ED62DEBAA9700D4D49A /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
+		};
+		C0232ED72DEBAA9700D4D49A /* Nuke */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232ED82DEBAA9700D4D49A /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = Nuke;
+		};
+		C0232ED92DEBAA9700D4D49A /* NukeExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232ED82DEBAA9700D4D49A /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeExtensions;
+		};
+		C0232EDA2DEBAA9700D4D49A /* NukeUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232ED82DEBAA9700D4D49A /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeUI;
+		};
+		C0232EDB2DEBAA9700D4D49A /* NukeVideo */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232ED82DEBAA9700D4D49A /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeVideo;
+		};
+		C0232F552DEBAB5A00D4D49A /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232F562DEBAB5A00D4D49A /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		C0232F572DEBAB5A00D4D49A /* OrderedCollections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232F582DEBAB5A00D4D49A /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = OrderedCollections;
+		};
+		C0232F592DEBAB5A00D4D49A /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232F5A2DEBAB5A00D4D49A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		C0232F5B2DEBAB5A00D4D49A /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232F5A2DEBAB5A00D4D49A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		C0232F5C2DEBAB5A00D4D49A /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232F5D2DEBAB5A00D4D49A /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
+		};
+		C0232F5E2DEBAB5A00D4D49A /* Nuke */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232F5F2DEBAB5A00D4D49A /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = Nuke;
+		};
+		C0232F602DEBAB5A00D4D49A /* NukeExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232F5F2DEBAB5A00D4D49A /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeExtensions;
+		};
+		C0232F612DEBAB5A00D4D49A /* NukeUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232F5F2DEBAB5A00D4D49A /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeUI;
+		};
+		C0232F622DEBAB5A00D4D49A /* NukeVideo */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0232F5F2DEBAB5A00D4D49A /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeVideo;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

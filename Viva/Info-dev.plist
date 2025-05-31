@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AUTH_API_KEY</key>
+	<string>AIzaSyBt_443_Npn0Rtx-Rk_xBS5CdAt_FqWHh8</string>
+	<key>BASE_URL</key>
+	<string>https://viva-svc-890110655718.us-east1.run.app</string>
+	<key>REFERER</key>
+	<string>https://dev.vivamove.io</string>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>io.vivamove.healthupdate</string>
+		<string>com.app.healthkitUpdate</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>Google Sign In</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.890110655718-2b2ltlm76i9gqdf8ddm6d1hr32q2pufm</string>
+			</array>
+		</dict>
+	</array>
+	<key>GIDClientID</key>
+	<string>890110655718-2b2ltlm76i9gqdf8ddm6d1hr32q2pufm.apps.googleusercontent.com</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
+		<string>location</string>
+	</array>
+</dict>
+</plist>

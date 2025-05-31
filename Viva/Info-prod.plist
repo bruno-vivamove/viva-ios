@@ -2,8 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>AUTH_API_KEY</key>
+	<string>AIzaSyDFFQYxbY4RYsglPIceIgNCQO-3FU8IDt8</string>
 	<key>BASE_URL</key>
-	<string>$(BASE_URL)</string>
+	<string>https://viva-svc-844768047313.us-east1.run.app</string>
+	<key>REFERER</key>
+	<string>https://vivamove.io</string>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>io.vivamove.healthupdate</string>
@@ -18,12 +22,12 @@
 			<string>Google Sign In</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.186325173541-c2qrng58cosmsbg1rtpfb0o2i1nd4365</string>
+				<string>com.googleusercontent.apps.844768047313-l2p1h4ahq8qkvupse80l19e6no2abv2k</string>
 			</array>
 		</dict>
 	</array>
 	<key>GIDClientID</key>
-	<string>186325173541-c2qrng58cosmsbg1rtpfb0o2i1nd4365.apps.googleusercontent.com</string>
+	<string>844768047313-l2p1h4ahq8qkvupse80l19e6no2abv2k.apps.googleusercontent.com</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
