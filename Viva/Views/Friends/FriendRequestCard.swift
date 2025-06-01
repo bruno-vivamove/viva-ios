@@ -24,8 +24,9 @@ struct FriendRequestCard: View {
                 title: "Current User",
                 width: buttonWidth,
                 variant: .primary
-            ) {
+            ) { context in
                 // This should not happen
+                context.actionCompleted()
             }
             
         case .notFriend, nil:
@@ -33,10 +34,11 @@ struct FriendRequestCard: View {
                 title: "Add Friend",
                 width: buttonWidth,
                 variant: .primary
-            ) {
+            ) { context in
                 Task {
                     await viewModel.sendFriendRequest(
                         userId: user.id)
+                    context.actionCompleted()
                 }
             }
             
@@ -45,12 +47,11 @@ struct FriendRequestCard: View {
                 title: "Cancel",
                 width: buttonWidth,
                 variant: .secondary
-            ) {
+            ) { context in
                 Task {
-                    Task {
-                        await viewModel.cancelFriendRequest(
-                            userId: user.id)
-                    }
+                    await viewModel.cancelFriendRequest(
+                        userId: user.id)
+                    context.actionCompleted()
                 }
             }
             
@@ -59,11 +60,12 @@ struct FriendRequestCard: View {
                 title: "Accept Request",
                 width: buttonWidth,
                 variant: .primary
-            ) {
+            ) { context in
                 Task {
                     await viewModel
                         .acceptFriendRequest(
                             userId: user.id)
+                    context.actionCompleted()
                 }
             }
 
@@ -72,8 +74,9 @@ struct FriendRequestCard: View {
                 title: "Already Friends",
                 width: buttonWidth,
                 variant: .noAction
-            ) {
+            ) { context in
                 // No action
+                context.actionCompleted()
             }
         }
         

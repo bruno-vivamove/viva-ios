@@ -73,6 +73,7 @@ struct AuthButtonStack: View {
 
     @State private var showSignInForm = false
     @State private var showSignUpForm = false
+    @State private var loadingStates: [String: Bool] = [:]
 
     var body: some View {
         VStack(spacing: VivaDesign.Spacing.small) {
@@ -80,39 +81,39 @@ struct AuthButtonStack: View {
             AuthButtonView(
                 title: "Sign Up",
                 style: .primary,
-                action: {
-                    showSignUpForm = true
-                }
-            )
+                isLoading: loadingStates["Sign Up"] ?? false
+            ) {
+                showSignUpForm = true
+            }
 
             // Basic Sign In Button
             AuthButtonView(
                 title: "Sign In",
                 style: .secondary,
-                action: {
-                    showSignInForm = true
-                }
-            )
+                isLoading: loadingStates["Sign In"] ?? false
+            ) {
+                showSignInForm = true
+            }
 
             // Google Sign In Button
             AuthButtonView(
                 title: "Sign In with Google",
                 style: .secondary,
                 image: Image("google_logo"),
-                action: {
-                    authenticationManager.signInWithGoogle()
-                }
-            )
+                isLoading: loadingStates["Sign In with Google"] ?? false
+            ) {
+                executeGoogleSignIn()
+            }
 
             // Apple Sign In Button
             AuthButtonView(
                 title: "Sign in with Apple",
                 style: .white,
                 image: Image(systemName: "applelogo"),
-                action: {
-                    authenticationManager.signInWithApple()
-                }
-            )
+                isLoading: loadingStates["Sign in with Apple"] ?? false
+            ) {
+                executeAppleSignIn()
+            }
         }
         .padding(.horizontal, VivaDesign.Spacing.large)
         .sheet(isPresented: $showSignInForm) {
@@ -126,6 +127,48 @@ struct AuthButtonStack: View {
                 authManager: authenticationManager, userSession: userSession
             )
             .presentationBackground(.clear)
+        }
+    }
+    
+    private func executeGoogleSignIn() {
+        let actionId = "Sign In with Google"
+        loadingStates[actionId] = true
+        
+        authenticationManager.signInWithGoogle { result in
+            DispatchQueue.main.async {
+                loadingStates[actionId] = false
+                
+                switch result {
+                case .success:
+                    break // Authentication successful, UI will update automatically
+                case .cancelled:
+                    break // User cancelled, just clear loading state
+                case .error(let error):
+                    print("Google sign-in failed: \(error.localizedDescription)")
+                    // Could show error alert here if needed
+                }
+            }
+        }
+    }
+    
+    private func executeAppleSignIn() {
+        let actionId = "Sign in with Apple"
+        loadingStates[actionId] = true
+        
+        authenticationManager.signInWithApple { result in
+            DispatchQueue.main.async {
+                loadingStates[actionId] = false
+                
+                switch result {
+                case .success:
+                    break // Authentication successful, UI will update automatically
+                case .cancelled:
+                    break // User cancelled, just clear loading state
+                case .error(let error):
+                    print("Apple sign-in failed: \(error.localizedDescription)")
+                    // Could show error alert here if needed
+                }
+            }
         }
     }
 }
@@ -173,36 +216,55 @@ struct AuthButtonView: View {
     let title: String
     let style: AuthButtonStyle
     let image: Image?
+    let isLoading: Bool
     let action: () -> Void
 
     init(
         title: String,
         style: AuthButtonStyle,
         image: Image? = nil,
+        isLoading: Bool = false,
         action: @escaping () -> Void
     ) {
         self.title = title
         self.style = style
         self.image = image
+        self.isLoading = isLoading
         self.action = action
     }
 
     var body: some View {
-        Button(action: action) {
-            HStack {
-                if let image = image {
-                    image
-                        .resizable()
-                        .frame(width: 20, height: 20)
+        Button(action: {
+            if !isLoading {
+                action()
+            }
+        }) {
+            ZStack {
+                // Always present content to maintain layout space
+                HStack {
+                    if let image = image {
+                        image
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .foregroundColor(style.foregroundColor)
+                    }
+
+                    Text(title)
+                        .font(VivaDesign.Typography.body.bold())
                         .foregroundColor(style.foregroundColor)
                 }
-
-                Text(title)
-                    .font(VivaDesign.Typography.body.bold())
-                    .foregroundColor(style.foregroundColor)
+                .opacity(isLoading ? 0 : 1)
+                
+                // Loading indicator overlay
+                if isLoading {
+                    ProgressView()
+                        .tint(style.foregroundColor)
+                }
             }
             .frame(maxWidth: .infinity)
-            .padding()
+            .frame(minHeight: 36)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
             .background(
                 RoundedRectangle(
                     cornerRadius: VivaDesign.Sizing.buttonCornerRadius
@@ -218,5 +280,6 @@ struct AuthButtonView: View {
                     lineWidth: VivaDesign.Sizing.buttonBorderWidth)
             )
         }
+        .disabled(isLoading)
     }
 }

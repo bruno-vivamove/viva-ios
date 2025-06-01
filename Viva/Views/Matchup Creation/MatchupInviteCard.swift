@@ -30,12 +30,13 @@ struct MatchupInviteCard: View {
                     UserActionCard.UserAction(
                         title: "Cancel Invite",
                         variant: .secondary
-                    ) {
+                    ) { context in
                         Task {
                             await coordinator.deleteInvite(
                                 userId: user.id,
                                 matchupId: matchup.id
                             )
+                            context.actionCompleted()
                         }
                     }
                 ]
@@ -48,9 +49,10 @@ struct MatchupInviteCard: View {
                     UserActionCard.UserAction(
                         title: "Add Friend",
                         variant: .secondary
-                    ) {
+                    ) { context in
                         Task {
                             await coordinator.sendFriendRequest(userId: user.id)
+                            context.actionCompleted()
                         }
                     }
                 ] : [])
@@ -67,9 +69,10 @@ struct MatchupInviteCard: View {
                             UserActionCard.UserAction(
                                 title: "Add Friend",
                                 variant: .secondary
-                            ) {
+                            ) { context in
                                 Task {
                                     await coordinator.sendFriendRequest(userId: user.id)
+                                    context.actionCompleted()
                                 }
                             }
                         )
@@ -79,13 +82,14 @@ struct MatchupInviteCard: View {
                         actions.append(
                             UserActionCard.UserAction(
                                 title: "Invite Teammate"
-                            ) {
+                            ) { context in
                                 Task {
                                     await coordinator.inviteFriend(
                                         userId: user.id,
                                         matchupId: matchup.id,
                                         teamId: teamId
                                     )
+                                    context.actionCompleted()
                                 }
                             }
                         )
@@ -95,13 +99,14 @@ struct MatchupInviteCard: View {
                         actions.append(
                             UserActionCard.UserAction(
                                 title: "Invite"
-                            ) {
+                            ) { context in
                                 Task {
                                     await coordinator.inviteFriend(
                                         userId: user.id,
                                         matchupId: matchup.id,
                                         teamId: teamId
                                     )
+                                    context.actionCompleted()
                                 }
                             }
                         )

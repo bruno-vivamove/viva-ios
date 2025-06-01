@@ -14,8 +14,9 @@ struct FriendCard: View {
         UserActionCard(
             user: user,
             actions: [
-                UserActionCard.UserAction(title: "Challenge", variant: .secondary) {
+                UserActionCard.UserAction(title: "Challenge", variant: .secondary) { context in
                     showMatchupCreation = true
+                    context.actionCompleted()
                 }
             ],
             onProfileTap: { userId in

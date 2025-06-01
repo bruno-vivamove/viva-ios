@@ -275,17 +275,19 @@ struct ReceivedInvitesView: View {
                     UserActionCard.UserAction(
                         title: "Accept",
                         variant: .primary
-                    ) {
+                    ) { context in
                         Task {
                             await viewModel.acceptInvite(invite)
+                            context.actionCompleted()
                         }
                     },
                     UserActionCard.UserAction(
                         title: "Decline",
                         variant: .secondary
-                    ) {
+                    ) { context in
                         Task {
                             await viewModel.deleteInvite(invite)
+                            context.actionCompleted()
                         }
                     },
                 ]
@@ -319,15 +321,17 @@ struct SentInvitesView: View {
                     UserActionCard.UserAction(
                         title: "Remind",
                         variant: .secondary
-                    ) {
+                    ) { context in
                         // Add remind functionality
+                        context.actionCompleted()
                     },
                     UserActionCard.UserAction(
                         title: "Delete",
                         variant: .secondary
-                    ) {
+                    ) { context in
                         Task {
                             await viewModel.deleteInvite(invite)
+                            context.actionCompleted()
                         }
                     },
                 ]

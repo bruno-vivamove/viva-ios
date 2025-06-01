@@ -4,6 +4,12 @@ import SwiftUI
 import GoogleSignIn
 import AuthenticationServices
 
+enum AuthResult {
+    case success
+    case cancelled
+    case error(Error)
+}
+
 final class AuthenticationManager: ObservableObject {
     let userSession: UserSession
     let authService: AuthService
@@ -73,10 +79,11 @@ final class AuthenticationManager: ObservableObject {
         AppLogger.debug("User signed out successfully", category: .auth)
     }
     
-    func signInWithGoogle() {
+    func signInWithGoogle(completion: @escaping (AuthResult) -> Void = { _ in }) {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let rootViewController = windowScene.windows.first?.rootViewController else {
             AppLogger.error("Unable to find root view controller", category: .auth)
+            completion(.error(NSError(domain: "AuthError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unable to find root view controller"])))
             return
         }
         
@@ -84,26 +91,38 @@ final class AuthenticationManager: ObservableObject {
         GIDSignIn.sharedInstance.signIn(
             withPresenting: rootViewController
         ) { [weak self] signInResult, error in
-            guard let self = self else { return }
+            guard let self = self else { 
+                completion(.error(NSError(domain: "AuthError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Authentication manager deallocated"])))
+                return 
+            }
             
             if let error = error {
                 AppLogger.error("Error signing in with Google: \(error.localizedDescription)", category: .auth)
+                // Check if error is user cancellation
+                if error.localizedDescription.contains("cancel") || (error as NSError).code == -5 {
+                    completion(.cancelled)
+                } else {
+                    completion(.error(error))
+                }
                 return
             }
 
             guard let signInResult = signInResult else {
                 AppLogger.error("Missing authentication object", category: .auth)
+                completion(.error(NSError(domain: "AuthError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Missing authentication object"])))
                 return
             }
 
             signInResult.user.refreshTokensIfNeeded { user, error in
                 if let error = error {
                     AppLogger.error("Error refreshing tokens: \(error.localizedDescription)", category: .auth)
+                    completion(.error(error))
                     return
                 }
 
                 guard let user = user, let idToken = user.idToken else {
                     AppLogger.error("Missing user or ID token after refreshing tokens", category: .auth)
+                    completion(.error(NSError(domain: "AuthError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Missing user or ID token"])))
                     return
                 }
 
@@ -112,8 +131,14 @@ final class AuthenticationManager: ObservableObject {
                     do {
                         try await self.createSession(idToken: idToken.tokenString)
                         AppLogger.info("User signed in with Google successfully", category: .auth)
+                        await MainActor.run {
+                            completion(.success)
+                        }
                     } catch {
                         AppLogger.error("Failed to create session: \(error.localizedDescription)", category: .auth)
+                        await MainActor.run {
+                            completion(.error(error))
+                        }
                     }
                 }
             }
@@ -121,7 +146,7 @@ final class AuthenticationManager: ObservableObject {
     }
     
 
-    func signInWithApple() {
+    func signInWithApple(completion: @escaping (AuthResult) -> Void = { _ in }) {
         let request = ASAuthorizationAppleIDProvider().createRequest()
         request.requestedScopes = [.fullName, .email]
         
@@ -129,13 +154,14 @@ final class AuthenticationManager: ObservableObject {
         authorizationController.delegate = AppleSignInDelegate.shared
         authorizationController.presentationContextProvider = AppleSignInDelegate.shared
         
-        // Keep a reference to the auth manager
+        // Keep a reference to the auth manager and completion
         AppleSignInDelegate.shared.authManager = self
+        AppleSignInDelegate.shared.completion = completion
         
         authorizationController.performRequests()
     }
     
-    func handleAppleSignInCompletion(with idToken: String, userId: String, fullName: PersonNameComponents?, email: String?) {
+    func handleAppleSignInCompletion(with idToken: String, userId: String, fullName: PersonNameComponents?, email: String?, completion: @escaping (AuthResult) -> Void) {
         AppLogger.info("User signed in with Apple successfully, creating session", category: .auth)
         
         // Store the Apple user ID in UserDefaults for credential state checking
@@ -152,8 +178,14 @@ final class AuthenticationManager: ObservableObject {
                 }
                 
                 AppLogger.info("User signed in with Apple successfully", category: .auth)
+                await MainActor.run {
+                    completion(.success)
+                }
             } catch {
                 AppLogger.error("Failed to create session with Apple ID token: \(error.localizedDescription)", category: .auth)
+                await MainActor.run {
+                    completion(.error(error))
+                }
             }
         }
     }
@@ -178,6 +210,7 @@ class AppleSignInDelegate: NSObject, ASAuthorizationControllerDelegate, ASAuthor
     
     // Weak reference to avoid retain cycles
     weak var authManager: AuthenticationManager?
+    var completion: ((AuthResult) -> Void)?
     
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -191,8 +224,10 @@ class AppleSignInDelegate: NSObject, ASAuthorizationControllerDelegate, ASAuthor
         guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
               let idTokenData = appleIDCredential.identityToken,
               let idToken = String(data: idTokenData, encoding: .utf8),
-              let authManager = authManager else {
+              let authManager = authManager,
+              let completion = completion else {
             AppLogger.error("Failed to get Apple ID token", category: .auth)
+            completion?(.error(NSError(domain: "AuthError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get Apple ID token"])))
             return
         }
         
@@ -200,10 +235,27 @@ class AppleSignInDelegate: NSObject, ASAuthorizationControllerDelegate, ASAuthor
         let fullName = appleIDCredential.fullName
         let email = appleIDCredential.email
         
-        authManager.handleAppleSignInCompletion(with: idToken, userId: userId, fullName: fullName, email: email)
+        authManager.handleAppleSignInCompletion(with: idToken, userId: userId, fullName: fullName, email: email, completion: completion)
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         AppLogger.error("Apple sign in failed: \(error.localizedDescription)", category: .auth)
+        
+        // Check if error is user cancellation
+        if let authError = error as? ASAuthorizationError {
+            switch authError.code {
+            case .canceled:
+                completion?(.cancelled)
+            case .failed, .invalidResponse, .notHandled, .unknown:
+                completion?(.error(error))
+            @unknown default:
+                completion?(.error(error))
+            }
+        } else {
+            completion?(.error(error))
+        }
+        
+        // Clean up
+        completion = nil
     }
 }

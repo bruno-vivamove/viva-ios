@@ -6,6 +6,8 @@ struct UserActionCard: View {
     let actions: [UserAction]
     let onProfileTap: ((String) -> Void)?
     
+    @State private var loadingStates: [String: Bool] = [:]
+    
     init(
         user: UserSummary,
         actions: [UserAction],
@@ -23,9 +25,25 @@ struct UserActionCard: View {
         case noAction
     }
     
+    class ActionContext: ObservableObject {
+        private let actionId: String
+        private let completion: (String) -> Void
+        
+        init(actionId: String, completion: @escaping (String) -> Void) {
+            self.actionId = actionId
+            self.completion = completion
+        }
+        
+        func actionCompleted() {
+            DispatchQueue.main.async {
+                self.completion(self.actionId)
+            }
+        }
+    }
+    
     struct UserAction {
         let title: String
-        let action: (() -> Void)?
+        let action: ((ActionContext) -> Void)?
         let style: Style
         let width: CGFloat?
         
@@ -33,7 +51,7 @@ struct UserActionCard: View {
             title: String,
             width: CGFloat? = nil,
             variant: Style = .primary,
-            action: (() -> Void)? = nil
+            action: ((ActionContext) -> Void)? = nil
         ) {
             self.title = title
             self.width = width
@@ -68,6 +86,7 @@ struct UserActionCard: View {
                 // Action Buttons
                 HStack(spacing: VivaDesign.Spacing.small) {
                     ForEach(actions, id: \.title) { action in
+                        let isLoading = loadingStates[action.title] ?? false
                         let color = switch action.style {
                         case .primary:
                             VivaDesign.Colors.vivaGreen
@@ -80,11 +99,18 @@ struct UserActionCard: View {
                         switch action.style {
                         case .primary, .secondary, .destructive:
                             CardButton(
-                                title: action.title,
+                                title: isLoading ? "" : action.title,
                                 width: action.width,
-                                color: color
+                                color: color,
+                                isLoading: isLoading
                             ) {
-                                action.action?()
+                                if !isLoading {
+                                    loadingStates[action.title] = true
+                                    let context = ActionContext(actionId: action.title) { actionId in
+                                        loadingStates[actionId] = false
+                                    }
+                                    action.action?(context)
+                                }
                             }
 
                         case .noAction:
