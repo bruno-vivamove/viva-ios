@@ -6,16 +6,8 @@ class VivaAppObjects: ObservableObject {
     public let healthKitDataManager: HealthKitDataManager
     public let errorManager: ErrorManager
 
-    public let networkClientSettingsForAuth: AuthNetworkClientSettings
-    public let networkClientSettings: AppNetworkClientSettings
-    public let networkClientSettingsNoBodies: AppNetworkClientSettings
-    public let networkClientSettingsWithNoSession:
-        AppWithNoSessionNetworkClientSettings
-
-    public let authNetworkClient: NetworkClient<AuthErrorResponse>
     public let appNetworkClient: NetworkClient<VivaErrorResponse>
     public let appNetworkClientNoBodies: NetworkClient<VivaErrorResponse>
-    public let appNetworkClientWithNoSession: NetworkClient<VivaErrorResponse>
 
     public let authService: AuthService
     public let sessionService: SessionService
@@ -31,42 +23,39 @@ class VivaAppObjects: ObservableObject {
         userSession = UserSession()
         errorManager = ErrorManager()
 
-        // Network Client Settings
-        networkClientSettingsForAuth = AuthNetworkClientSettings(
-            shouldLogBodies: false
-        )
-        networkClientSettingsWithNoSession =
-            AppWithNoSessionNetworkClientSettings(shouldLogBodies: false)
-        networkClientSettings = AppNetworkClientSettings(
-            userSession,
-            shouldLogBodies: true
-        )
-        networkClientSettingsNoBodies = AppNetworkClientSettings(
-            userSession,
-            shouldLogBodies: false
-        )
-
         // Services with no session
-        authNetworkClient = NetworkClient<AuthErrorResponse>(
-            settings: networkClientSettingsForAuth,
-            errorManager: errorManager
-        )
-        appNetworkClientWithNoSession = NetworkClient<VivaErrorResponse>(
-            settings: networkClientSettingsWithNoSession,
-            errorManager: errorManager
+        authService = AuthService(
+            networkClient: NetworkClient<AuthErrorResponse>(
+                settings: AuthNetworkClientSettings(shouldLogBodies: false),
+                errorManager: errorManager
+            )
         )
 
-        authService = AuthService(networkClient: authNetworkClient)
         sessionService = SessionService(
-            networkClient: appNetworkClientWithNoSession
-        )
-        healthService = HealthService(
-            networkClient: appNetworkClientWithNoSession
+            networkClient: NetworkClient<VivaErrorResponse>(
+                settings: AppWithNoSessionNetworkClientSettings(
+                    shouldLogBodies: false
+                ),
+                errorManager: errorManager
+            )
         )
 
-        // Services with Session
+        healthService = HealthService(
+            networkClient: NetworkClient<VivaErrorResponse>(
+                settings: AppWithNoSessionNetworkClientSettings(
+                    shouldLogBodies: false,
+                    maxRetries: 0
+                ),
+                errorManager: errorManager,
+            )
+        )
+
+        // Services with session
         appNetworkClient = NetworkClient(
-            settings: networkClientSettings,
+            settings: AppNetworkClientSettings(
+                userSession,
+                shouldLogBodies: true
+            ),
             tokenRefreshHandler: TokenRefreshHandler(
                 sessionService: sessionService,
                 userSession: userSession
@@ -74,13 +63,17 @@ class VivaAppObjects: ObservableObject {
             errorManager: errorManager
         )
         appNetworkClientNoBodies = NetworkClient(
-            settings: networkClientSettingsNoBodies,
+            settings: AppNetworkClientSettings(
+                userSession,
+                shouldLogBodies: false
+            ),
             tokenRefreshHandler: TokenRefreshHandler(
                 sessionService: sessionService,
                 userSession: userSession
             ),
             errorManager: errorManager
         )
+
         friendService = FriendService(
             networkClient: appNetworkClient
         )

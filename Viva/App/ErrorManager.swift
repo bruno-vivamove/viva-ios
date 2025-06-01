@@ -17,7 +17,7 @@ class ErrorManager: ObservableObject {
         self.healthService = service
     }
     
-    func displayError(_ message: String, type: ErrorType) {
+    func registerError(_ message: String, type: ErrorType) {
         currentErrors[type] = message
         
         if type == .network {

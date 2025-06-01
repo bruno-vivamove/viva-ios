@@ -54,7 +54,8 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             headers: requestBuilder.buildHeaders(
                 for: .get,
                 additionalHeaders: headers
-            )
+            ),
+            remainingRetries: settings.maxRetries
         )
     }
 
@@ -75,7 +76,8 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                 for: .post,
                 additionalHeaders: headers
             ),
-            body: body
+            body: body,
+            remainingRetries: settings.maxRetries
         )
     }
 
@@ -94,7 +96,8 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             headers: requestBuilder.buildHeaders(
                 for: .post,
                 additionalHeaders: headers
-            )
+            ),
+            remainingRetries: settings.maxRetries
         )
     }
 
@@ -109,7 +112,8 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             headers: requestBuilder.buildHeaders(
                 for: .put,
                 additionalHeaders: headers
-            )
+            ),
+            remainingRetries: settings.maxRetries
         )
     }
 
@@ -126,7 +130,8 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                 for: .put,
                 additionalHeaders: headers
             ),
-            body: body
+            body: body,
+            remainingRetries: settings.maxRetries
         )
     }
 
@@ -143,7 +148,8 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             headers: requestBuilder.buildHeaders(
                 for: .post,
                 additionalHeaders: headers
-            )
+            ),
+            remainingRetries: settings.maxRetries
         )
     }
 
@@ -160,7 +166,8 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             headers: requestBuilder.buildHeaders(
                 for: .post,
                 additionalHeaders: headers
-            )
+            ),
+            remainingRetries: settings.maxRetries
         )
     }
 
@@ -175,7 +182,8 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             headers: requestBuilder.buildHeaders(
                 for: .put,
                 additionalHeaders: headers
-            )
+            ),
+            remainingRetries: settings.maxRetries
         )
     }
 
@@ -192,7 +200,8 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             headers: requestBuilder.buildHeaders(
                 for: .put,
                 additionalHeaders: headers
-            )
+            ),
+            remainingRetries: settings.maxRetries
         )
     }
 
@@ -207,7 +216,8 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             headers: requestBuilder.buildHeaders(
                 for: .patch,
                 additionalHeaders: headers
-            )
+            ),
+            remainingRetries: settings.maxRetries
         )
     }
 
@@ -224,7 +234,8 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             headers: requestBuilder.buildHeaders(
                 for: .patch,
                 additionalHeaders: headers
-            )
+            ),
+            remainingRetries: settings.maxRetries
         )
     }
 
@@ -239,7 +250,8 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             headers: requestBuilder.buildHeaders(
                 for: .delete,
                 additionalHeaders: headers
-            )
+            ),
+            remainingRetries: settings.maxRetries
         )
     }
 
@@ -250,71 +262,12 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
         headers: [String: String]? = nil,
         data: [MultipartData]
     ) async throws -> T {
-        let url = try requestBuilder.buildURL(path: path)
-        let requestHeaders = requestBuilder.buildHeaders(
-            for: .upload,
-            additionalHeaders: headers
+        return try await performUploadWithResponse(
+            path: path,
+            headers: headers,
+            data: data,
+            remainingRetries: settings.maxRetries
         )
-
-        AppLogger.debug(
-            "Upload Request:\n" +
-            "URL: \(url.absoluteString)\n" +
-            "Headers: \(requestHeaders.filter { $0.name != "Authorization" })\n" +
-            "Files: \(data.count)",
-            category: .network
-        )
-
-        return try await withCheckedThrowingContinuation { continuation in
-            session.upload(
-                multipartFormData: { multipartFormData in
-                    self.configureMultipartFormData(
-                        multipartFormData,
-                        with: data
-                    )
-                },
-                to: url,
-                method: .patch,
-                headers: requestHeaders
-            )
-            .uploadProgress { progress in
-                AppLogger.debug(
-                    "Upload progress: \(progress.fractionCompleted * 100)% (\(progress.completedUnitCount)/\(progress.totalUnitCount) bytes)",
-                    category: .network
-                )
-            }
-            .validate()
-            .responseDecodable(of: T.self, decoder: decoder) {
-                [weak self] response in
-                guard let self = self else { return }
-
-                // Create retry handler closure for uploads
-                let retryHandler = { [weak self] () async throws -> T in
-                    guard let self = self else {
-                        throw NetworkClientError(
-                            code: "INTERNAL_ERROR",
-                            message: "NetworkClient was deallocated"
-                        )
-                    }
-                    // Retry the upload with potentially new token
-                    let updatedHeaders = self.requestBuilder.buildHeaders(
-                        for: .upload,
-                        additionalHeaders: headers
-                    )
-                    return try await self.upload(
-                        path: path,
-                        headers: updatedHeaders.dictionary,
-                        data: data
-                    )
-                }
-
-                self.responseHandler.handleResponseWithBody(
-                    response: response,
-                    continuation: continuation,
-                    tokenRefreshHandler: self.tokenRefreshHandler,
-                    retryHandler: retryHandler
-                )
-            }
-        }
     }
 
     public func upload(
@@ -322,62 +275,12 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
         headers: [String: String]? = nil,
         data: [MultipartData]
     ) async throws {
-        let url = try requestBuilder.buildURL(path: path)
-        let requestHeaders = requestBuilder.buildHeaders(
-            for: .upload,
-            additionalHeaders: headers
+        try await performUploadWithoutResponse(
+            path: path,
+            headers: headers,
+            data: data,
+            remainingRetries: settings.maxRetries
         )
-
-        AppLogger.debug(
-            "Upload Request:\n" +
-            "URL: \(url.absoluteString)\n" +
-            "Headers: \(requestHeaders.filter { $0.name != "Authorization" })\n" +
-            "Files: \(data.count)",
-            category: .network
-        )
-
-        try await withCheckedThrowingContinuation { continuation in
-            session.upload(
-                multipartFormData: { multipartFormData in
-                    self.configureMultipartFormData(
-                        multipartFormData,
-                        with: data
-                    )
-                },
-                to: url,
-                method: .patch,
-                headers: requestHeaders
-            )
-            .uploadProgress { progress in
-                AppLogger.debug(
-                    "Upload progress: \(progress.fractionCompleted * 100)% (\(progress.completedUnitCount)/\(progress.totalUnitCount) bytes)",
-                    category: .network
-                )
-            }
-            .validate()
-            .response { [weak self] response in
-                guard let self = self else { return }
-
-                // Create retry handler closure for uploads without response
-                let retryHandler = { [weak self] () async throws in
-                    guard let self = self else {
-                        throw NetworkClientError(
-                            code: "INTERNAL_ERROR",
-                            message: "NetworkClient was deallocated"
-                        )
-                    }
-                    // Retry the upload with potentially new token
-                    try await self.upload(path: path, headers: nil, data: data)
-                }
-
-                self.responseHandler.handleResponseWithoutBody(
-                    response: response,
-                    continuation: continuation,
-                    tokenRefreshHandler: self.tokenRefreshHandler,
-                    retryHandler: retryHandler
-                )
-            }
-        }
     }
 
     // MARK: - Private Request Methods
@@ -385,13 +288,10 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
     private func performRequestWithResponse<T: Decodable>(
         url: URL,
         method: HTTPMethod,
-        headers: HTTPHeaders
+        headers: HTTPHeaders,
+        remainingRetries: Int
     ) async throws -> T {
-        AppLogger.debug(
-            "Request: \(method.rawValue) \(url.absoluteString)\n"
-                + "Headers: \(headers.filter { $0.name != "Authorization" })",
-            category: .network
-        )
+        logRequest(method: method, url: url, headers: headers, remainingRetries: remainingRetries)
 
         return try await withCheckedThrowingContinuation { continuation in
             session.request(url, method: method, headers: headers)
@@ -400,25 +300,29 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                     [weak self] response in
                     guard let self = self else { return }
 
-                    // Create retry handler closure
-                    let retryHandler = { [weak self] () async throws -> T in
-                        guard let self = self else {
-                            throw NetworkClientError(
-                                code: "INTERNAL_ERROR",
-                                message: "NetworkClient was deallocated"
+                    // Create retry handler closure only if retries remain
+                    let retryHandler: (() async throws -> T)? =
+                        remainingRetries > 0
+                        ? { [weak self] () async throws -> T in
+                            guard let self = self else {
+                                throw NetworkClientError(
+                                    code: "INTERNAL_ERROR",
+                                    message: "NetworkClient was deallocated"
+                                )
+                            }
+                            // Recreate request with potentially new token
+                            let updatedHeaders = self.requestBuilder
+                                .buildHeaders(
+                                    for: method.toRequestType(),
+                                    additionalHeaders: nil
+                                )
+                            return try await self.performRequestWithResponse(
+                                url: url,
+                                method: method,
+                                headers: updatedHeaders,
+                                remainingRetries: remainingRetries - 1
                             )
-                        }
-                        // Recreate request with potentially new token
-                        let updatedHeaders = self.requestBuilder.buildHeaders(
-                            for: method.toRequestType(),
-                            additionalHeaders: nil
-                        )
-                        return try await self.performRequestWithResponse(
-                            url: url,
-                            method: method,
-                            headers: updatedHeaders
-                        )
-                    }
+                        } : nil
 
                     self.responseHandler.handleResponseWithBody(
                         response: response,
@@ -434,31 +338,10 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
         url: URL,
         method: HTTPMethod,
         headers: HTTPHeaders,
-        body: E
+        body: E,
+        remainingRetries: Int
     ) async throws -> T {
-        var logMessage =
-            "Request: \(method.rawValue) \(url.absoluteString)\n"
-            + "Headers: \(headers.filter { $0.name != "Authorization" })"
-
-        if settings.shouldLogBodies {
-            // Pretty print JSON body
-            if let jsonData = try? JSONEncoder.vivaEncoder.encode(body),
-                let jsonObject = try? JSONSerialization.jsonObject(
-                    with: jsonData
-                ),
-                let prettyData = try? JSONSerialization.data(
-                    withJSONObject: jsonObject,
-                    options: .prettyPrinted
-                ),
-                let prettyString = String(data: prettyData, encoding: .utf8)
-            {
-                logMessage += "\nBody:\n\(prettyString)"
-            } else {
-                logMessage += "\nBody: \(body)"
-            }
-        }
-
-        AppLogger.debug(logMessage, category: .network)
+        logRequest(method: method, url: url, headers: headers, remainingRetries: remainingRetries, body: body)
 
         return try await withCheckedThrowingContinuation { continuation in
             session.request(
@@ -473,26 +356,29 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                 [weak self] response in
                 guard let self = self else { return }
 
-                // Create retry handler closure
-                let retryHandler = { [weak self] () async throws -> T in
-                    guard let self = self else {
-                        throw NetworkClientError(
-                            code: "INTERNAL_ERROR",
-                            message: "NetworkClient was deallocated"
+                // Create retry handler closure only if retries remain
+                let retryHandler: (() async throws -> T)? =
+                    remainingRetries > 0
+                    ? { [weak self] () async throws -> T in
+                        guard let self = self else {
+                            throw NetworkClientError(
+                                code: "INTERNAL_ERROR",
+                                message: "NetworkClient was deallocated"
+                            )
+                        }
+                        // Recreate request with potentially new token
+                        let updatedHeaders = self.requestBuilder.buildHeaders(
+                            for: method.toRequestType(),
+                            additionalHeaders: nil
                         )
-                    }
-                    // Recreate request with potentially new token
-                    let updatedHeaders = self.requestBuilder.buildHeaders(
-                        for: method.toRequestType(),
-                        additionalHeaders: nil
-                    )
-                    return try await self.performRequestWithResponse(
-                        url: url,
-                        method: method,
-                        headers: updatedHeaders,
-                        body: body
-                    )
-                }
+                        return try await self.performRequestWithResponse(
+                            url: url,
+                            method: method,
+                            headers: updatedHeaders,
+                            body: body,
+                            remainingRetries: remainingRetries - 1
+                        )
+                    } : nil
 
                 self.responseHandler.handleResponseWithBody(
                     response: response,
@@ -507,13 +393,10 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
     private func performRequestWithoutResponse(
         url: URL,
         method: HTTPMethod,
-        headers: HTTPHeaders
+        headers: HTTPHeaders,
+        remainingRetries: Int
     ) async throws {
-        AppLogger.debug(
-            "\(method.rawValue) Request:\n" + "URL: \(url.absoluteString)\n"
-                + "Headers: \(headers.filter { $0.name != "Authorization" })",
-            category: .network
-        )
+        logRequest(method: method, url: url, headers: headers, remainingRetries: remainingRetries)
 
         try await withCheckedThrowingContinuation { continuation in
             session.request(url, method: method, headers: headers)
@@ -521,25 +404,29 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                 .response { [weak self] response in
                     guard let self = self else { return }
 
-                    // Create retry handler closure
-                    let retryHandler = { [weak self] () async throws -> Void in
-                        guard let self = self else {
-                            throw NetworkClientError(
-                                code: "INTERNAL_ERROR",
-                                message: "NetworkClient was deallocated"
+                    // Create retry handler closure only if retries remain
+                    let retryHandler: (() async throws -> Void)? =
+                        remainingRetries > 0
+                        ? { [weak self] () async throws -> Void in
+                            guard let self = self else {
+                                throw NetworkClientError(
+                                    code: "INTERNAL_ERROR",
+                                    message: "NetworkClient was deallocated"
+                                )
+                            }
+                            // Recreate request with potentially new token
+                            let updatedHeaders = self.requestBuilder
+                                .buildHeaders(
+                                    for: method.toRequestType(),
+                                    additionalHeaders: nil
+                                )
+                            try await self.performRequestWithoutResponse(
+                                url: url,
+                                method: method,
+                                headers: updatedHeaders,
+                                remainingRetries: remainingRetries - 1
                             )
-                        }
-                        // Recreate request with potentially new token
-                        let updatedHeaders = self.requestBuilder.buildHeaders(
-                            for: method.toRequestType(),
-                            additionalHeaders: nil
-                        )
-                        try await self.performRequestWithoutResponse(
-                            url: url,
-                            method: method,
-                            headers: updatedHeaders
-                        )
-                    }
+                        } : nil
 
                     self.responseHandler.handleResponseWithoutBody(
                         response: response,
@@ -555,32 +442,10 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
         url: URL,
         method: HTTPMethod,
         body: E,
-        headers: HTTPHeaders
+        headers: HTTPHeaders,
+        remainingRetries: Int
     ) async throws {
-        var logMessage =
-            "\(method.rawValue) Request:\n"
-            + "URL: \(url.absoluteString)\n"
-            + "Headers: \(headers.filter { $0.name != "Authorization" })"
-
-        if settings.shouldLogBodies {
-            // Pretty print JSON body
-            if let jsonData = try? JSONEncoder.vivaEncoder.encode(body),
-                let jsonObject = try? JSONSerialization.jsonObject(
-                    with: jsonData
-                ),
-                let prettyData = try? JSONSerialization.data(
-                    withJSONObject: jsonObject,
-                    options: .prettyPrinted
-                ),
-                let prettyString = String(data: prettyData, encoding: .utf8)
-            {
-                logMessage += "\nBody:\n\(prettyString)"
-            } else {
-                logMessage += "\nBody: \(body)"
-            }
-        }
-
-        AppLogger.debug(logMessage, category: .network)
+        logRequest(method: method, url: url, headers: headers, remainingRetries: remainingRetries, body: body)
 
         try await withCheckedThrowingContinuation { continuation in
             session.request(
@@ -594,26 +459,160 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             .response { [weak self] response in
                 guard let self = self else { return }
 
-                // Create retry handler closure
-                let retryHandler = { [weak self] () async throws -> Void in
-                    guard let self = self else {
-                        throw NetworkClientError(
-                            code: "INTERNAL_ERROR",
-                            message: "NetworkClient was deallocated"
+                // Create retry handler closure only if retries remain
+                let retryHandler: (() async throws -> Void)? =
+                    remainingRetries > 0
+                    ? { [weak self] () async throws -> Void in
+                        guard let self = self else {
+                            throw NetworkClientError(
+                                code: "INTERNAL_ERROR",
+                                message: "NetworkClient was deallocated"
+                            )
+                        }
+                        // Recreate request with potentially new token
+                        let updatedHeaders = self.requestBuilder.buildHeaders(
+                            for: method.toRequestType(),
+                            additionalHeaders: nil
                         )
-                    }
-                    // Recreate request with potentially new token
-                    let updatedHeaders = self.requestBuilder.buildHeaders(
-                        for: method.toRequestType(),
-                        additionalHeaders: nil
+                        try await self.performRequestWithoutResponse(
+                            url: url,
+                            method: method,
+                            body: body,
+                            headers: updatedHeaders,
+                            remainingRetries: remainingRetries - 1
+                        )
+                    } : nil
+
+                self.responseHandler.handleResponseWithoutBody(
+                    response: response,
+                    continuation: continuation,
+                    tokenRefreshHandler: self.tokenRefreshHandler,
+                    retryHandler: retryHandler
+                )
+            }
+        }
+    }
+
+    private func performUploadWithResponse<T: Decodable>(
+        path: String,
+        headers: [String: String]?,
+        data: [MultipartData],
+        remainingRetries: Int
+    ) async throws -> T {
+        let url = try requestBuilder.buildURL(path: path)
+        let requestHeaders = requestBuilder.buildHeaders(
+            for: .upload,
+            additionalHeaders: headers
+        )
+
+        logRequest(method: .patch, url: url, headers: requestHeaders, remainingRetries: remainingRetries, fileCount: data.count)
+
+        return try await withCheckedThrowingContinuation { continuation in
+            session.upload(
+                multipartFormData: { multipartFormData in
+                    self.configureMultipartFormData(
+                        multipartFormData,
+                        with: data
                     )
-                    try await self.performRequestWithoutResponse(
-                        url: url,
-                        method: method,
-                        body: body,
-                        headers: updatedHeaders
+                },
+                to: url,
+                method: .patch,
+                headers: requestHeaders
+            )
+            .uploadProgress { progress in
+                AppLogger.debug(
+                    "Upload progress: \(progress.fractionCompleted * 100)% (\(progress.completedUnitCount)/\(progress.totalUnitCount) bytes)",
+                    category: .network
+                )
+            }
+            .validate()
+            .responseDecodable(of: T.self, decoder: decoder) {
+                [weak self] response in
+                guard let self = self else { return }
+
+                // Create retry handler closure for uploads only if retries remain
+                let retryHandler: (() async throws -> T)? =
+                    remainingRetries > 0
+                    ? { [weak self] () async throws -> T in
+                        guard let self = self else {
+                            throw NetworkClientError(
+                                code: "INTERNAL_ERROR",
+                                message: "NetworkClient was deallocated"
+                            )
+                        }
+                        // Retry the upload with potentially new token
+                        return try await self.performUploadWithResponse(
+                            path: path,
+                            headers: nil,
+                            data: data,
+                            remainingRetries: remainingRetries - 1
+                        )
+                    } : nil
+
+                self.responseHandler.handleResponseWithBody(
+                    response: response,
+                    continuation: continuation,
+                    tokenRefreshHandler: self.tokenRefreshHandler,
+                    retryHandler: retryHandler
+                )
+            }
+        }
+    }
+
+    private func performUploadWithoutResponse(
+        path: String,
+        headers: [String: String]?,
+        data: [MultipartData],
+        remainingRetries: Int
+    ) async throws {
+        let url = try requestBuilder.buildURL(path: path)
+        let requestHeaders = requestBuilder.buildHeaders(
+            for: .upload,
+            additionalHeaders: headers
+        )
+
+        logRequest(method: .patch, url: url, headers: requestHeaders, remainingRetries: remainingRetries, fileCount: data.count)
+
+        try await withCheckedThrowingContinuation { continuation in
+            session.upload(
+                multipartFormData: { multipartFormData in
+                    self.configureMultipartFormData(
+                        multipartFormData,
+                        with: data
                     )
-                }
+                },
+                to: url,
+                method: .patch,
+                headers: requestHeaders
+            )
+            .uploadProgress { progress in
+                AppLogger.debug(
+                    "Upload progress: \(progress.fractionCompleted * 100)% (\(progress.completedUnitCount)/\(progress.totalUnitCount) bytes)",
+                    category: .network
+                )
+            }
+            .validate()
+            .response { [weak self] response in
+                guard let self = self else { return }
+
+                // Create retry handler closure for uploads without response only if retries remain
+                let retryHandler: (() async throws -> Void)? =
+                    remainingRetries > 0
+                    ? { [weak self] () async throws -> Void in
+                        guard let self = self else {
+                            throw NetworkClientError(
+                                code: "INTERNAL_ERROR",
+                                message: "NetworkClient was deallocated"
+                            )
+                        }
+                        // Retry the upload with potentially new token
+                        try await self.performUploadWithoutResponse(
+                            path: path,
+                            headers: nil,
+                            data: data,
+                            remainingRetries: remainingRetries - 1
+                        )
+                    } : nil
 
                 self.responseHandler.handleResponseWithoutBody(
                     response: response,
@@ -626,6 +625,46 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
     }
 
     // MARK: - Helper Methods
+
+    private func logRequest(
+        method: HTTPMethod,
+        url: URL,
+        headers: HTTPHeaders,
+        remainingRetries: Int,
+        body: (any Encodable)? = nil,
+        fileCount: Int? = nil
+    ) {
+        let currentAttempt = settings.maxRetries - remainingRetries + 1
+        
+        // Build request title with retry info if applicable
+        var requestTitle = "\(method.rawValue) Request"
+        if currentAttempt > 1 {
+            requestTitle += " (retry \(currentAttempt - 1)/\(settings.maxRetries))"
+        }
+        
+        var logMessage = "\(requestTitle):\nURL: \(url.absoluteString)\n"
+        logMessage += "Headers: \(headers.filter { $0.name != "Authorization" })"
+        
+        // Add file count for uploads
+        if let fileCount = fileCount {
+            logMessage += "\nFiles: \(fileCount)"
+        }
+        
+        // Add body for requests with body
+        if let body = body, settings.shouldLogBodies {
+            if let jsonData = try? JSONEncoder.vivaEncoder.encode(body),
+                let jsonObject = try? JSONSerialization.jsonObject(with: jsonData),
+                let prettyData = try? JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted),
+                let prettyString = String(data: prettyData, encoding: .utf8)
+            {
+                logMessage += "\nBody:\n\(prettyString)"
+            } else {
+                logMessage += "\nBody: \(body)"
+            }
+        }
+        
+        AppLogger.debug(logMessage, category: .network)
+    }
 
     private func configureMultipartFormData(
         _ multipartFormData: MultipartFormData,

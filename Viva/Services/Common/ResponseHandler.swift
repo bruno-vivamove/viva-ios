@@ -34,7 +34,9 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         switch response.result {
         case .success(let value):
             // Clear any network errors on successful response
-            errorManager?.clearError(type: .network)
+            Task { @MainActor in
+                errorManager?.clearError(type: .network)
+            }
             continuation.resume(returning: value)
         case .failure(let error):
             handleError(
@@ -64,7 +66,9 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         switch response.result {
         case .success:
             // Clear any network errors on successful response
-            errorManager?.clearError(type: .network)
+            Task { @MainActor in
+                errorManager?.clearError(type: .network)
+            }
             continuation.resume()
         case .failure(let error):
             handleError(
@@ -101,7 +105,57 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
             )
             return
         }
+        
+        // Check if we have a retry handler and this is not a 401 error - attempt retry
+        if let retryHandler = retryHandler,
+           !isUnauthorizedError(httpResponse)
+        {
+            handleRetryWithDelay(
+                continuation: continuation,
+                retryHandler: retryHandler
+            )
+            return
+        }
 
+        // Handle final error (no retry handler or after retries failed)
+        handleFinalError(
+            error: error,
+            responseData: responseData,
+            httpResponse: httpResponse,
+            continuation: continuation
+        )
+    }
+    
+    private func handleRetryWithDelay<T>(
+        continuation: CheckedContinuation<T, Error>,
+        retryHandler: @escaping () async throws -> T
+    ) {
+        Task {
+            do {
+                // Add a 5-second delay before retry
+                try await Task.sleep(nanoseconds: UInt64(5.0 * 1_000_000_000))
+                
+                let result = try await retryHandler()
+                
+                // Clear any network errors on successful retry
+                Task { @MainActor in
+                    errorManager?.clearError(type: .network)
+                }
+                continuation.resume(returning: result)
+                
+            } catch {
+                AppLogger.error("Retry failed: \(error.localizedDescription)", category: .network)
+                continuation.resume(throwing: error)
+            }
+        }
+    }
+    
+    private func handleFinalError<T>(
+        error: AFError,
+        responseData: Data?,
+        httpResponse: HTTPURLResponse?,
+        continuation: CheckedContinuation<T, Error>
+    ) {
         // Try to decode custom error response first
         if let data = responseData,
             let errorResponse = try? decoder.decode(ErrorType.self, from: data)
@@ -128,10 +182,12 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         )
 
         AppLogger.error(errorMessage, category: .network)
-        errorManager?.displayError(
-            networkError.userFriendlyMessage,
-            type: .network
-        )
+        Task { @MainActor in
+            errorManager?.registerError(
+                networkError.userFriendlyMessage,
+                type: .network
+            )
+        }
         
         continuation.resume(throwing: networkError)
     }
@@ -149,7 +205,9 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
 
                 // Clear the authentication error since refresh succeeded (for void responses)
                 if T.self == Void.self {
-                    errorManager?.clearError(type: .authentication)
+                    Task { @MainActor in
+                        errorManager?.clearError(type: .authentication)
+                    }
                 }
 
                 // Retry the original request with the new token
@@ -162,10 +220,12 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
                     category: .network
                 )
 
-                errorManager?.displayError(
-                    "Session expired. Please log in again.",
-                    type: .authentication
-                )
+                Task { @MainActor in
+                    errorManager?.registerError(
+                        "Session expired. Please log in again.",
+                        type: .authentication
+                    )
+                }
 
                 continuation.resume(throwing: error)
             }

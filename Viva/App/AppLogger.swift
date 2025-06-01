@@ -3,6 +3,17 @@ import os.log
 
 /// A centralized logging system for the Viva app
 struct AppLogger {
+    
+    // MARK: - Private Properties
+    
+    /// Date formatter for consistent timestamp formatting across all logs
+    private static let timestampFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+        formatter.timeZone = TimeZone.current
+        return formatter
+    }()
+    
     /// Log categories to organize logs by app component
     enum Category: String {
         case network = "Network"
@@ -134,10 +145,11 @@ struct AppLogger {
     
     // MARK: - Helper Methods
     
-    /// Extract context information from file, function and line
+    /// Extract context information from file, function and line, including timestamp
     private static func extractContext(file: String, function: String, line: Int) -> String {
         let fileName = URL(fileURLWithPath: file).lastPathComponent
-        return "\(fileName):\(line) \(function)"
+        let timestamp = timestampFormatter.string(from: Date())
+        return "\(timestamp) \(fileName):\(line) \(function)"
     }
 }
 
