@@ -106,9 +106,9 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
             return
         }
         
-        // Check if we have a retry handler and this is not a 401 error - attempt retry
+        // Check if we have a retry handler and there is no HTTP response (server unreachable)
         if let retryHandler = retryHandler,
-           !isUnauthorizedError(httpResponse)
+           httpResponse == nil
         {
             handleRetryWithDelay(
                 continuation: continuation,

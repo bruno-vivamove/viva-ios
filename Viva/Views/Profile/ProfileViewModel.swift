@@ -5,7 +5,7 @@ import Combine
 @MainActor
 class ProfileViewModel: ObservableObject {
     @Published var isImageLoading = false
-    @Published var errorMessage: Error?
+    @Published var error: Error?
     @Published var userProfile: UserProfile?
     @Published var activeMatchups: [Matchup] = []
     @Published var selectedMatchup: Matchup?
@@ -24,7 +24,7 @@ class ProfileViewModel: ObservableObject {
     func setError(_ error: Error) {
         // Only store the error if it's not a NetworkClientError
         if !(error is NetworkClientError) {
-            self.errorMessage = error
+            self.error = error
         }
     }
     

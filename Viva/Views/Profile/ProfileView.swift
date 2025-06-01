@@ -324,13 +324,17 @@ struct ProfileView: View {
                 source: "profile"
             )
         }
-        .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
+        .alert("Error", isPresented: .constant(viewModel.error != nil)) {
             Button("OK") {
-                viewModel.errorMessage = nil
+                viewModel.error = nil
             }
         } message: {
-            if let error = viewModel.errorMessage {
-                Text(error.localizedDescription)
+            if let error = viewModel.error {
+                if let vivaError = error as? VivaErrorResponse {
+                    Text(vivaError.message)
+                } else {
+                    Text(error.localizedDescription)
+                }
             }
         }
         .task {
