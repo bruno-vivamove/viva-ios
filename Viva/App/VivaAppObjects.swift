@@ -6,10 +6,10 @@ class VivaAppObjects: ObservableObject {
     public let healthKitDataManager: HealthKitDataManager
     public let errorManager: ErrorManager
 
-    public let authNetworkClientSettings: AuthNetworkClientSettings
-    public let appNetworkClientSettings: AppNetworkClientSettings
-    public let appNetworkClientSettingsNoBodies: AppNetworkClientSettings
-    public let appWithNoSessionNetworkClientSettings:
+    public let networkClientSettingsForAuth: AuthNetworkClientSettings
+    public let networkClientSettings: AppNetworkClientSettings
+    public let networkClientSettingsNoBodies: AppNetworkClientSettings
+    public let networkClientSettingsWithNoSession:
         AppWithNoSessionNetworkClientSettings
 
     public let authNetworkClient: NetworkClient<AuthErrorResponse>
@@ -32,27 +32,27 @@ class VivaAppObjects: ObservableObject {
         errorManager = ErrorManager()
 
         // Network Client Settings
-        authNetworkClientSettings = AuthNetworkClientSettings(
+        networkClientSettingsForAuth = AuthNetworkClientSettings(
             shouldLogBodies: false
         )
-        appWithNoSessionNetworkClientSettings =
+        networkClientSettingsWithNoSession =
             AppWithNoSessionNetworkClientSettings(shouldLogBodies: false)
-        appNetworkClientSettings = AppNetworkClientSettings(
+        networkClientSettings = AppNetworkClientSettings(
             userSession,
             shouldLogBodies: true
         )
-        appNetworkClientSettingsNoBodies = AppNetworkClientSettings(
+        networkClientSettingsNoBodies = AppNetworkClientSettings(
             userSession,
             shouldLogBodies: false
         )
 
         // Services with no session
         authNetworkClient = NetworkClient<AuthErrorResponse>(
-            settings: authNetworkClientSettings,
+            settings: networkClientSettingsForAuth,
             errorManager: errorManager
         )
         appNetworkClientWithNoSession = NetworkClient<VivaErrorResponse>(
-            settings: appWithNoSessionNetworkClientSettings,
+            settings: networkClientSettingsWithNoSession,
             errorManager: errorManager
         )
 
@@ -66,7 +66,7 @@ class VivaAppObjects: ObservableObject {
 
         // Services with Session
         appNetworkClient = NetworkClient(
-            settings: appNetworkClientSettings,
+            settings: networkClientSettings,
             tokenRefreshHandler: TokenRefreshHandler(
                 sessionService: sessionService,
                 userSession: userSession
@@ -74,7 +74,7 @@ class VivaAppObjects: ObservableObject {
             errorManager: errorManager
         )
         appNetworkClientNoBodies = NetworkClient(
-            settings: appNetworkClientSettingsNoBodies,
+            settings: networkClientSettingsNoBodies,
             tokenRefreshHandler: TokenRefreshHandler(
                 sessionService: sessionService,
                 userSession: userSession

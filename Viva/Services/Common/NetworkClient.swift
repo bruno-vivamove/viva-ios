@@ -307,7 +307,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                     )
                 }
 
-                self.responseHandler.handleResponse(
+                self.responseHandler.handleResponseWithBody(
                     response: response,
                     continuation: continuation,
                     tokenRefreshHandler: self.tokenRefreshHandler,
@@ -370,7 +370,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                     try await self.upload(path: path, headers: nil, data: data)
                 }
 
-                self.responseHandler.handleResponseWithoutResponse(
+                self.responseHandler.handleResponseWithoutBody(
                     response: response,
                     continuation: continuation,
                     tokenRefreshHandler: self.tokenRefreshHandler,
@@ -420,7 +420,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                         )
                     }
 
-                    self.responseHandler.handleResponse(
+                    self.responseHandler.handleResponseWithBody(
                         response: response,
                         continuation: continuation,
                         tokenRefreshHandler: self.tokenRefreshHandler,
@@ -494,7 +494,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                     )
                 }
 
-                self.responseHandler.handleResponse(
+                self.responseHandler.handleResponseWithBody(
                     response: response,
                     continuation: continuation,
                     tokenRefreshHandler: self.tokenRefreshHandler,
@@ -541,7 +541,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                         )
                     }
 
-                    self.responseHandler.handleResponseWithoutResponse(
+                    self.responseHandler.handleResponseWithoutBody(
                         response: response,
                         continuation: continuation,
                         tokenRefreshHandler: self.tokenRefreshHandler,
@@ -615,7 +615,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                     )
                 }
 
-                self.responseHandler.handleResponseWithoutResponse(
+                self.responseHandler.handleResponseWithoutBody(
                     response: response,
                     continuation: continuation,
                     tokenRefreshHandler: self.tokenRefreshHandler,

@@ -18,414 +18,239 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
 
     // MARK: - Handle Response
 
-    func handleResponse<T>(
+    func handleResponseWithBody<T>(
         response: DataResponse<T, AFError>,
         continuation: CheckedContinuation<T, Error>,
         tokenRefreshHandler: TokenRefreshHandler? = nil,
         retryHandler: (() async throws -> T)? = nil
     ) {
-        logResponse(response)
+        logResponse(
+            request: response.request,
+            httpResponse: response.response,
+            data: response.data,
+            responseType: String(describing: T.self)
+        )
 
         switch response.result {
         case .success(let value):
-            handleSuccess(value, continuation: continuation)
+            // Clear any network errors on successful response
+            errorManager?.clearError(type: .network)
+            continuation.resume(returning: value)
         case .failure(let error):
-            if let tokenRefreshHandler = tokenRefreshHandler,
-                let retryHandler = retryHandler
-            {
-                handleError(
-                    error,
-                    response: response,
-                    continuation: continuation,
-                    tokenRefreshHandler: tokenRefreshHandler,
-                    retryHandler: retryHandler
-                )
-            } else {
-                handleError(
-                    error,
-                    response: response,
-                    continuation: continuation
-                )
-            }
+            handleError(
+                error: error,
+                responseData: response.data,
+                httpResponse: response.response,
+                continuation: continuation,
+                tokenRefreshHandler: tokenRefreshHandler,
+                retryHandler: retryHandler
+            )
         }
     }
 
-    func handleResponseWithoutResponse(
+    func handleResponseWithoutBody(
         response: AFDataResponse<Data?>,
         continuation: CheckedContinuation<Void, Error>,
         tokenRefreshHandler: TokenRefreshHandler? = nil,
         retryHandler: (() async throws -> Void)? = nil
     ) {
-        logResponse(response)
+        logResponse(
+            request: response.request,
+            httpResponse: response.response,
+            data: response.data,
+            responseType: nil
+        )
 
         switch response.result {
         case .success:
-            handleSuccessWithoutResponse(continuation: continuation)
+            // Clear any network errors on successful response
+            errorManager?.clearError(type: .network)
+            continuation.resume()
         case .failure(let error):
-            if let tokenRefreshHandler = tokenRefreshHandler,
-                let retryHandler = retryHandler
-            {
-                handleErrorWithoutResponse(
-                    error,
-                    response: response,
-                    continuation: continuation,
-                    tokenRefreshHandler: tokenRefreshHandler,
-                    retryHandler: retryHandler
-                )
-            } else {
-                handleErrorWithoutResponse(
-                    error,
-                    response: response,
-                    continuation: continuation
-                )
-            }
-        }
-    }
-
-    // MARK: - Success Handlers
-
-    func handleSuccess<T>(
-        _ value: T,
-        continuation: CheckedContinuation<T, Error>
-    ) {
-        // Clear any network errors on successful response
-        errorManager?.clearError(type: .network)
-        continuation.resume(returning: value)
-    }
-
-    func handleSuccessWithoutResponse(
-        continuation: CheckedContinuation<Void, Error>
-    ) {
-        // Clear any network errors on successful response
-        errorManager?.clearError(type: .network)
-        continuation.resume()
-    }
-
-    // MARK: - Error Handlers
-
-    func handleError<T>(
-        _ error: AFError,
-        response: DataResponse<T, AFError>,
-        continuation: CheckedContinuation<T, Error>
-    ) {
-        var errorMessage = "Error occurred during request: \(error.localizedDescription)"
-        
-        if let underlyingError = error.underlyingError {
-            errorMessage += "\nUnderlying error: \(underlyingError)"
-        }
-        
-        if let data = response.data,
-            let errorResponse = try? decoder.decode(ErrorType.self, from: data)
-        {
-            errorMessage += "\nDecoded Error Response: \(errorResponse)"
-            AppLogger.error(errorMessage, category: .network)
-            continuation.resume(throwing: errorResponse)
-        } else {
-            // Determine the appropriate network error type based on the error
-            let networkError: NetworkClientError
-
-            if let urlError = error.underlyingError as? URLError {
-                switch urlError.code {
-                case .notConnectedToInternet, .networkConnectionLost:
-                    networkError = NetworkClientError.connectionError()
-                case .timedOut:
-                    networkError = NetworkClientError.timeoutError()
-                default:
-                    networkError = NetworkClientError.requestError(
-                        message: error.localizedDescription
-                    )
-                }
-            } else if response.response?.statusCode == 500 {
-                networkError = NetworkClientError.serverError()
-            } else if response.response?.statusCode == 401 {
-                networkError = NetworkClientError.authenticationError()
-            } else {
-                networkError = NetworkClientError.requestError(
-                    message: error.localizedDescription
-                )
-            }
-
-            errorMessage += "\nNetwork Error: \(networkError)"
-            
-            if let data = response.data,
-                let rawString = String(data: data, encoding: .utf8)
-            {
-                errorMessage += "\nRaw error response: \(rawString)"
-            }
-            
-            AppLogger.error(errorMessage, category: .network)
-
-            // Display the error in the UI if errorManager is available
-            errorManager?.displayError(
-                networkError.userFriendlyMessage,
-                type: .network
+            handleError(
+                error: error,
+                responseData: response.data,
+                httpResponse: response.response,
+                continuation: continuation,
+                tokenRefreshHandler: tokenRefreshHandler,
+                retryHandler: retryHandler
             )
-
-            continuation.resume(throwing: networkError)
         }
     }
 
-    func handleError<T>(
-        _ error: AFError,
-        response: DataResponse<T, AFError>,
+    // MARK: - Private Helper Methods
+
+    private func handleError<T>(
+        error: AFError,
+        responseData: Data?,
+        httpResponse: HTTPURLResponse?,
         continuation: CheckedContinuation<T, Error>,
         tokenRefreshHandler: TokenRefreshHandler?,
         retryHandler: (() async throws -> T)?
     ) {
-        // Check if the error is a 401 Unauthorized and we have a refresh handler
+        // Check if this is a 401 error and we have token refresh capability
         if let tokenRefreshHandler = tokenRefreshHandler,
-            let retryHandler = retryHandler,
-            isUnauthorizedError(response.response)
+           let retryHandler = retryHandler,
+           isUnauthorizedError(httpResponse)
+        {
+            handleTokenRefreshAndRetry(
+                error: error,
+                continuation: continuation,
+                tokenRefreshHandler: tokenRefreshHandler,
+                retryHandler: retryHandler
+            )
+            return
+        }
+
+        // Try to decode custom error response first
+        if let data = responseData,
+            let errorResponse = try? decoder.decode(ErrorType.self, from: data)
         {
 
-            Task {
-                do {
-                    // Attempt to refresh the token using the actor
-                    try await tokenRefreshHandler.handleUnauthorizedError()
+            let errorMessage = buildErrorMessage(
+                error: error,
+                decodedError: errorResponse
+            )
+            AppLogger.error(errorMessage, category: .network)
+            continuation.resume(throwing: errorResponse)
+            return
+        }
 
-                    // Retry the original request with the new token
-                    let result = try await retryHandler()
-                    continuation.resume(returning: result)
-                } catch {
-                    // If refresh fails, return the original error
-                    AppLogger.error(
-                        "Request retry after token refresh failed: \(error.localizedDescription)",
-                        category: .network
-                    )
+        // Create network error and handle it
+        let networkError = createNetworkError(
+            from: error,
+            httpResponse: httpResponse
+        )
+        let errorMessage = buildErrorMessage(
+            error: error,
+            networkError: networkError,
+            responseData: responseData
+        )
 
-                    // Update authentication error message
-                    errorManager?.displayError(
-                        "Session expired. Please log in again.",
-                        type: .authentication
-                    )
+        AppLogger.error(errorMessage, category: .network)
+        errorManager?.displayError(
+            networkError.userFriendlyMessage,
+            type: .network
+        )
+        
+        continuation.resume(throwing: networkError)
+    }
 
-                    continuation.resume(throwing: error)
+    private func handleTokenRefreshAndRetry<T>(
+        error: AFError,
+        continuation: CheckedContinuation<T, Error>,
+        tokenRefreshHandler: TokenRefreshHandler,
+        retryHandler: @escaping () async throws -> T
+    ) {
+        Task {
+            do {
+                // Attempt to refresh the token
+                try await tokenRefreshHandler.handleUnauthorizedError()
+
+                // Clear the authentication error since refresh succeeded (for void responses)
+                if T.self == Void.self {
+                    errorManager?.clearError(type: .authentication)
                 }
-            }
-        } else {
-            // Handle error normally for non-401 errors or when we don't have a refresh handler
-            var errorMessage = "Error occurred during request: \(error.localizedDescription)"
-            
-            if let underlyingError = error.underlyingError {
-                errorMessage += "\nUnderlying error: \(underlyingError)"
-            }
-            
-            if let data = response.data,
-                let errorResponse = try? decoder.decode(
-                    ErrorType.self,
-                    from: data
+
+                // Retry the original request with the new token
+                let result = try await retryHandler()
+                continuation.resume(returning: result)
+            } catch {
+                // If refresh fails, handle the original error
+                AppLogger.error(
+                    "Request retry after token refresh failed: \(error.localizedDescription)",
+                    category: .network
                 )
-            {
-                errorMessage += "\nDecoded Error Response: \(errorResponse)"
-                AppLogger.error(errorMessage, category: .network)
-                continuation.resume(throwing: errorResponse)
-            } else {
-                // Determine the appropriate network error type based on the error
-                let networkError: NetworkClientError
 
-                if let urlError = error.underlyingError as? URLError {
-                    switch urlError.code {
-                    case .notConnectedToInternet, .networkConnectionLost:
-                        networkError = NetworkClientError.connectionError()
-                    case .timedOut:
-                        networkError = NetworkClientError.timeoutError()
-                    default:
-                        networkError = NetworkClientError.requestError(
-                            message: error.localizedDescription
-                        )
-                    }
-                } else if response.response?.statusCode == 500 {
-                    networkError = NetworkClientError.serverError()
-                } else if response.response?.statusCode == 401 {
-                    networkError = NetworkClientError.authenticationError()
-                } else {
-                    networkError = NetworkClientError.requestError(
-                        message: error.localizedDescription
-                    )
-                }
-
-                errorMessage += "\nNetwork Error: \(networkError)"
-                
-                if let data = response.data,
-                    let rawString = String(data: data, encoding: .utf8)
-                {
-                    errorMessage += "\nRaw error response: \(rawString)"
-                }
-                
-                AppLogger.error(errorMessage, category: .network)
-
-                // Display the network error in the UI
                 errorManager?.displayError(
-                    networkError.userFriendlyMessage,
-                    type: .network
+                    "Session expired. Please log in again.",
+                    type: .authentication
                 )
 
-                continuation.resume(throwing: networkError)
+                continuation.resume(throwing: error)
             }
         }
     }
 
-    func handleErrorWithoutResponse(
-        _ error: AFError,
-        response: AFDataResponse<Data?>,
-        continuation: CheckedContinuation<Void, Error>
-    ) {
-        var errorMessage = "Error occurred during request: \(error.localizedDescription)"
-        
+    private func createNetworkError(
+        from error: AFError,
+        httpResponse: HTTPURLResponse?
+    ) -> NetworkClientError {
+        if let urlError = error.underlyingError as? URLError {
+            switch urlError.code {
+            case .notConnectedToInternet, .networkConnectionLost:
+                return NetworkClientError.connectionError()
+            case .timedOut:
+                return NetworkClientError.timeoutError()
+            default:
+                return NetworkClientError.requestError(
+                    message: error.localizedDescription
+                )
+            }
+        } else if httpResponse?.statusCode == 500 {
+            return NetworkClientError.serverError()
+        } else if httpResponse?.statusCode == 401 {
+            return NetworkClientError.authenticationError()
+        } else {
+            return NetworkClientError.requestError(
+                message: error.localizedDescription
+            )
+        }
+    }
+
+    private func buildErrorMessage(error: AFError, decodedError: any Error)
+        -> String
+    {
+        var errorMessage =
+            "Error occurred during request: \(error.localizedDescription)"
+
         if let underlyingError = error.underlyingError {
             errorMessage += "\nUnderlying error: \(underlyingError)"
         }
-        
-        if let data = response.data,
-            let errorResponse = try? decoder.decode(ErrorType.self, from: data)
-        {
-            errorMessage += "\nDecoded Error Response: \(errorResponse)"
-            AppLogger.error(errorMessage, category: .network)
-            continuation.resume(throwing: errorResponse)
-        } else {
-            // Determine the appropriate network error type based on the error
-            let networkError: NetworkClientError
 
-            if let urlError = error.underlyingError as? URLError {
-                switch urlError.code {
-                case .notConnectedToInternet, .networkConnectionLost:
-                    networkError = NetworkClientError.connectionError()
-                case .timedOut:
-                    networkError = NetworkClientError.timeoutError()
-                default:
-                    networkError = NetworkClientError.requestError(
-                        message: error.localizedDescription
-                    )
-                }
-            } else if response.response?.statusCode == 500 {
-                networkError = NetworkClientError.serverError()
-            } else if response.response?.statusCode == 401 {
-                networkError = NetworkClientError.authenticationError()
-            } else {
-                networkError = NetworkClientError.requestError(
-                    message: error.localizedDescription
-                )
-            }
-
-            errorMessage += "\nNetwork Error: \(networkError)"
-            
-            if let data = response.data,
-                let rawString = String(data: data, encoding: .utf8)
-            {
-                errorMessage += "\nRaw error response: \(rawString)"
-            }
-            
-            AppLogger.error(errorMessage, category: .network)
-
-            // Display the network error in the UI
-            errorManager?.displayError(
-                networkError.userFriendlyMessage,
-                type: .network
-            )
-
-            continuation.resume(throwing: networkError)
-        }
+        errorMessage += "\nDecoded Error Response: \(decodedError)"
+        return errorMessage
     }
 
-    func handleErrorWithoutResponse(
-        _ error: AFError,
-        response: AFDataResponse<Data?>,
-        continuation: CheckedContinuation<Void, Error>,
-        tokenRefreshHandler: TokenRefreshHandler?,
-        retryHandler: (() async throws -> Void)?
-    ) {
-        // Check if the error is a 401 Unauthorized and we have a refresh handler
-        if let tokenRefreshHandler = tokenRefreshHandler,
-            let retryHandler = retryHandler,
-            isUnauthorizedError(response.response)
-        {
+    private func buildErrorMessage(
+        error: AFError,
+        networkError: NetworkClientError,
+        responseData: Data?
+    ) -> String {
+        var errorMessage =
+            "Error occurred during request: \(error.localizedDescription)"
 
-            // Display authentication error
-            errorManager?.displayError(
-                "Your session has expired. Attempting to renew...",
-                type: .authentication
-            )
-
-            Task {
-                do {
-                    // Attempt to refresh the token using the actor
-                    try await tokenRefreshHandler.handleUnauthorizedError()
-
-                    // Clear the authentication error since refresh succeeded
-                    errorManager?.clearError(type: .authentication)
-
-                    // Retry the original request with the new token
-                    try await retryHandler()
-                    continuation.resume()
-                } catch {
-                    // If refresh fails, return the original error
-                    AppLogger.error(
-                        "Request retry after token refresh failed: \(error.localizedDescription)",
-                        category: .network
-                    )
-
-                    // Update authentication error message
-                    errorManager?.displayError(
-                        "Session expired. Please log in again.",
-                        type: .authentication
-                    )
-
-                    continuation.resume(throwing: error)
-                }
-            }
-        } else {
-            // Handle error normally for non-401 errors or when we don't have a refresh handler
-            var errorMessage = "Error occurred during request: \(error.localizedDescription)"
-            
-            if let underlyingError = error.underlyingError {
-                errorMessage += "\nUnderlying error: \(underlyingError)"
-            }
-            
-            if let data = response.data,
-                let errorResponse = try? decoder.decode(
-                    ErrorType.self,
-                    from: data
-                )
-            {
-                errorMessage += "\nDecoded Error Response: \(errorResponse)"
-                AppLogger.error(errorMessage, category: .network)
-                continuation.resume(throwing: errorResponse)
-            } else {
-                let networkError = NetworkClientError(
-                    code: "REQUEST_ERROR",
-                    message: error.localizedDescription
-                )
-                
-                errorMessage += "\nNetwork Error: \(networkError)"
-                
-                if let data = response.data,
-                    let rawString = String(data: data, encoding: .utf8)
-                {
-                    errorMessage += "\nRaw error response: \(rawString)"
-                }
-                
-                AppLogger.error(errorMessage, category: .network)
-
-                // Display the network error in the UI
-                errorManager?.displayError(
-                    networkError.userFriendlyMessage,
-                    type: .network
-                )
-
-                continuation.resume(throwing: networkError)
-            }
+        if let underlyingError = error.underlyingError {
+            errorMessage += "\nUnderlying error: \(underlyingError)"
         }
+
+        errorMessage += "\nNetwork Error: \(networkError)"
+
+        if let data = responseData,
+            let rawString = String(data: data, encoding: .utf8)
+        {
+            errorMessage += "\nRaw error response: \(rawString)"
+        }
+
+        return errorMessage
     }
 
-    func isUnauthorizedError(_ response: HTTPURLResponse?) -> Bool {
+    private func isUnauthorizedError(_ response: HTTPURLResponse?) -> Bool {
         return response?.statusCode == 401
     }
 
-    func logResponse<T>(_ response: DataResponse<T, AFError>) {
+    // MARK: - Response Logging
+
+    private func logResponse(
+        request: URLRequest?,
+        httpResponse: HTTPURLResponse?,
+        data: Data?,
+        responseType: String?
+    ) {
         var logMessage = ""
 
         // Add request information
-        if let request = response.request {
+        if let request = request {
             logMessage +=
                 "Request: \(request.httpMethod ?? "unknown") \(request.url?.absoluteString ?? "unknown")\n"
             if let headers = request.allHTTPHeaderFields {
@@ -434,50 +259,27 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
             }
         }
 
-        logMessage +=
-            "Response Type: \(T.self)\n"
-            + "Response Status: \(String(describing: response.response?.statusCode))\n"
-            + "Response Headers: \(String(describing: response.response?.headers))"
-
-        if let data = response.data {
-            logMessage += "\nSize: \(data.count) bytes"
-            if shouldLogBodies {
-                if let jsonObject = try? JSONSerialization.jsonObject(with: data),
-                   let prettyData = try? JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted),
-                   let prettyString = String(data: prettyData, encoding: .utf8) {
-                    logMessage += "\nRaw Response:\n\(prettyString)"
-                } else if let rawString = String(data: data, encoding: .utf8) {
-                    logMessage += "\nRaw Response: \(rawString)"
-                }
-            }
-        }
-
-        AppLogger.debug(logMessage, category: .network)
-    }
-
-    func logResponse(_ response: AFDataResponse<Data?>) {
-        var logMessage = ""
-
-        // Add request information
-        if let request = response.request {
-            logMessage +=
-                "Request: \(request.httpMethod ?? "unknown") \(request.url?.absoluteString ?? "unknown")\n"
-            if let headers = request.allHTTPHeaderFields {
-                logMessage +=
-                    "Request Headers: \(headers.filter { $0.key != "Authorization" })\n"
-            }
+        if let responseType = responseType {
+            logMessage += "Response Type: \(responseType)\n"
         }
 
         logMessage +=
-            "Response Status: \(String(describing: response.response?.statusCode))\n"
-            + "Response Headers: \(String(describing: response.response?.headers))"
+            "Response Status: \(String(describing: httpResponse?.statusCode))\n"
+        logMessage +=
+            "Response Headers: \(String(describing: httpResponse?.headers))"
 
-        if let data = response.data {
+        if let data = data {
             logMessage += "\nSize: \(data.count) bytes"
             if shouldLogBodies {
-                if let jsonObject = try? JSONSerialization.jsonObject(with: data),
-                   let prettyData = try? JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted),
-                   let prettyString = String(data: prettyData, encoding: .utf8) {
+                if let jsonObject = try? JSONSerialization.jsonObject(
+                    with: data
+                ),
+                    let prettyData = try? JSONSerialization.data(
+                        withJSONObject: jsonObject,
+                        options: .prettyPrinted
+                    ),
+                    let prettyString = String(data: prettyData, encoding: .utf8)
+                {
                     logMessage += "\nRaw Response:\n\(prettyString)"
                 } else if let rawString = String(data: data, encoding: .utf8) {
                     logMessage += "\nRaw Response: \(rawString)"
