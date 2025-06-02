@@ -120,11 +120,14 @@ struct SignInFormView: View {
                         )
 
                         // Sign In Button
-                        SignInButton(
+                        VivaButton(
+                            title: "Sign In",
+                            style: .primary,
                             isLoading: viewModel.isLoading,
-                            isEnabled: viewModel.isFormValid,
                             action: signIn
                         )
+                        .opacity(viewModel.isFormValid ? 1.0 : 0.5)
+                        .disabled(!viewModel.isFormValid)
 
                         // Forgot Password
                         HStack {
@@ -176,30 +179,6 @@ struct SignInFormView: View {
         Task {
             if await viewModel.signIn() {
                 dismiss()
-            }
-        }
-    }
-}
-
-// Updated SignInButton to include isEnabled parameter
-struct SignInButton: View {
-    let isLoading: Bool
-    let isEnabled: Bool
-    let action: () -> Void
-
-    var body: some View {
-        ZStack {
-            AuthButtonView(
-                title: "Sign In",
-                style: .primary,
-                action: action
-            )
-            .opacity(isLoading || !isEnabled ? 0.5 : 1.0)
-            .disabled(isLoading || !isEnabled)
-
-            if isLoading {
-                ProgressView()
-                    .tint(VivaDesign.Colors.vivaGreen)
             }
         }
     }

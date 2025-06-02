@@ -91,7 +91,10 @@ struct MatchupInviteView: View {
                 }
 
                 // Done Button
-                AuthButtonView(title: "Done", style: .primary) {
+                VivaButton(
+                    title: "Done", 
+                    style: .primary
+                ) {
                     if isInvitingFromDetails {
                         dismiss()
                     } else {

@@ -12,6 +12,7 @@ class SignUpViewModel: ObservableObject {
     @Published var showConfirmPassword = false
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var loadingStates: [String: Bool] = [:]
     
     // Computed property to check if form is valid
     var isFormValid: Bool {
@@ -69,6 +70,48 @@ class SignUpViewModel: ObservableObject {
         
         isLoading = false
         return false
+    }
+    
+    func executeGoogleSignIn() {
+        let actionId = "Continue with Google"
+        loadingStates[actionId] = true
+        
+        authManager.signInWithGoogle { result in
+            DispatchQueue.main.async {
+                self.loadingStates[actionId] = false
+                
+                switch result {
+                case .success:
+                    break // Authentication successful, UI will update automatically
+                case .cancelled:
+                    break // User cancelled, just clear loading state
+                case .error(let error):
+                    print("Google sign-in failed: \(error.localizedDescription)")
+                    // Could show error alert here if needed
+                }
+            }
+        }
+    }
+    
+    func executeAppleSignIn() {
+        let actionId = "Continue with Apple"
+        loadingStates[actionId] = true
+        
+        authManager.signInWithApple { result in
+            DispatchQueue.main.async {
+                self.loadingStates[actionId] = false
+                
+                switch result {
+                case .success:
+                    break // Authentication successful, UI will update automatically
+                case .cancelled:
+                    break // User cancelled, just clear loading state
+                case .error(let error):
+                    print("Apple sign-in failed: \(error.localizedDescription)")
+                    // Could show error alert here if needed
+                }
+            }
+        }
     }
 }
 
@@ -145,11 +188,14 @@ struct SignUpFormView: View {
                         }
                         
                         // Sign Up Button
-                        SignUpButton(
+                        VivaButton(
+                            title: "Sign Up",
+                            style: .primary,
                             isLoading: viewModel.isLoading,
-                            isEnabled: viewModel.isFormValid,
                             action: signUp
                         )
+                        .opacity(viewModel.isFormValid ? 1.0 : 0.5)
+                        .disabled(!viewModel.isFormValid)
 
                         // Terms Text with interactive links
                         LegalLinksView()
@@ -165,23 +211,23 @@ struct SignUpFormView: View {
                         
                         // Social Buttons
                         VStack(spacing: VivaDesign.Spacing.medium) {
-                            AuthButtonView(
+                            VivaButton(
                                 title: "Continue with Google",
                                 style: .secondary,
                                 image: Image("google_logo"),
-                                action: {
-                                    viewModel.authManager.signInWithGoogle()
-                                }
-                            )
+                                isLoading: viewModel.loadingStates["Continue with Google"] ?? false
+                            ) {
+                                viewModel.executeGoogleSignIn()
+                            }
                             
-                            AuthButtonView(
+                            VivaButton(
                                 title: "Continue with Apple",
                                 style: .white,
                                 image: Image(systemName: "applelogo"),
-                                action: {
-                                    viewModel.authManager.signInWithApple()
-                                }
-                            )
+                                isLoading: viewModel.loadingStates["Continue with Apple"] ?? false
+                            ) {
+                                viewModel.executeAppleSignIn()
+                            }
                         }
                     }
                     
@@ -224,29 +270,6 @@ struct SignUpFormView: View {
         Task {
             if await viewModel.signUp() {
                 dismiss()
-            }
-        }
-    }
-}
-
-struct SignUpButton: View {
-    let isLoading: Bool
-    let isEnabled: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        ZStack {
-            AuthButtonView(
-                title: "Sign Up",
-                style: .primary,
-                action: action
-            )
-            .opacity(isLoading || !isEnabled ? 0.5 : 1.0)
-            .disabled(isLoading || !isEnabled)
-            
-            if isLoading {
-                ProgressView()
-                    .tint(VivaDesign.Colors.vivaGreen)
             }
         }
     }

@@ -31,7 +31,12 @@ struct MatchupTypeView: View {
                 VStack(spacing: VivaDesign.Spacing.xlarge) {
                     // Type Selection Buttons
                     VStack(spacing: VivaDesign.Spacing.large) {
-                        Button(action: {
+                        VivaButton(
+                            title: "1v1",
+                            size: .large,
+                            style: .secondary,
+                            isLoading: coordinator.isCreatingMatchup
+                        ) {
                             Task {
                                 matchupCreated =
                                     await coordinator.createMatchup(
@@ -39,16 +44,6 @@ struct MatchupTypeView: View {
                                         usersPerSide: 1
                                     )
                             }
-                        }) {
-                            Text("1v1")
-                                .font(.system(size: 24, weight: .semibold))
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, VivaDesign.Spacing.large)
-                                .foregroundColor(.white)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.white, lineWidth: 1)
-                                )
                         }
                     }
                 }
@@ -62,11 +57,6 @@ struct MatchupTypeView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 100)
                     .padding(.bottom, VivaDesign.Spacing.xlarge)
-            }
-
-            if coordinator.isCreatingMatchup {
-                ProgressView()
-                    .tint(.white)
             }
         }
         .navigationBarBackButtonHidden(true)

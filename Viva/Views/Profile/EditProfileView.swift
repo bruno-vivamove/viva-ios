@@ -249,35 +249,17 @@ struct EditProfileView: View {
     }
 
     private var saveButton: some View {
-        Button(action: {
+        VivaButton(
+            title: "Save Changes",
+            style: .primary,
+            isLoading: viewModel.isLoading
+        ) {
             Task {
                 if await viewModel.saveUserAccount() {
                     dismiss()
                 }
             }
-        }) {
-            ZStack {
-                HStack {
-                    Text("Save Changes")
-                        .font(VivaDesign.Typography.body.bold())
-                        .foregroundColor(.black)
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(
-                    RoundedRectangle(
-                        cornerRadius: VivaDesign.Sizing.buttonCornerRadius
-                    )
-                    .fill(VivaDesign.Colors.vivaGreen)
-                )
-
-                if viewModel.isLoading {
-                    ProgressView()
-                        .tint(.black)
-                }
-            }
         }
-        .disabled(viewModel.isLoading)
     }
 }
 

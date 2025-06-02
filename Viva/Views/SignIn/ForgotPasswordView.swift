@@ -105,20 +105,14 @@ struct ForgotPasswordView: View {
                         )
                         
                         // Reset Password Button
-                        ZStack {
-                            AuthButtonView(
-                                title: "Send Reset Link",
-                                style: .primary,
-                                action: resetPassword
-                            )
-                            .opacity(viewModel.isLoading || !viewModel.isFormValid ? 0.5 : 1.0)
-                            .disabled(viewModel.isLoading || !viewModel.isFormValid)
-                            
-                            if viewModel.isLoading {
-                                ProgressView()
-                                    .tint(VivaDesign.Colors.vivaGreen)
-                            }
-                        }
+                        VivaButton(
+                            title: "Send Reset Link",
+                            style: .primary,
+                            isLoading: viewModel.isLoading,
+                            action: resetPassword
+                        )
+                        .opacity(viewModel.isFormValid ? 1.0 : 0.5)
+                        .disabled(!viewModel.isFormValid)
                     }
                     .padding(.horizontal, VivaDesign.Spacing.large)
                     

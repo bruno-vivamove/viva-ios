@@ -79,7 +79,7 @@ struct AuthButtonStack: View {
     var body: some View {
         VStack(spacing: VivaDesign.Spacing.small) {
             // Sign Up Button
-            AuthButtonView(
+            VivaButton(
                 title: "Sign Up",
                 style: .primary,
                 isLoading: loadingStates["Sign Up"] ?? false
@@ -88,7 +88,7 @@ struct AuthButtonStack: View {
             }
 
             // Basic Sign In Button
-            AuthButtonView(
+            VivaButton(
                 title: "Sign In",
                 style: .secondary,
                 isLoading: loadingStates["Sign In"] ?? false
@@ -97,7 +97,7 @@ struct AuthButtonStack: View {
             }
 
             // Google Sign In Button
-            AuthButtonView(
+            VivaButton(
                 title: "Sign In with Google",
                 style: .secondary,
                 image: Image("google_logo"),
@@ -107,7 +107,7 @@ struct AuthButtonStack: View {
             }
 
             // Apple Sign In Button
-            AuthButtonView(
+            VivaButton(
                 title: "Sign in with Apple",
                 style: .white,
                 image: Image(systemName: "applelogo"),
@@ -171,117 +171,5 @@ struct AuthButtonStack: View {
                 }
             }
         }
-    }
-}
-
-enum AuthButtonStyle {
-    case primary
-    case secondary
-    case white
-
-    var foregroundColor: Color {
-        switch self {
-        case .primary:
-            return .black
-        case .secondary:
-            return .white
-        case .white:
-            return .black
-        }
-    }
-
-    var backgroundColor: Color {
-        switch self {
-        case .primary:
-            return VivaDesign.Colors.vivaGreen
-        case .secondary:
-            return .clear
-        case .white:
-            return .white
-        }
-    }
-
-    var borderColor: Color {
-        switch self {
-        case .primary:
-            return VivaDesign.Colors.vivaGreen
-        case .secondary:
-            return .white
-        case .white:
-            return .white
-        }
-    }
-}
-
-struct AuthButtonView: View {
-    let title: String
-    let style: AuthButtonStyle
-    let image: Image?
-    let isLoading: Bool
-    let action: () -> Void
-
-    init(
-        title: String,
-        style: AuthButtonStyle,
-        image: Image? = nil,
-        isLoading: Bool = false,
-        action: @escaping () -> Void
-    ) {
-        self.title = title
-        self.style = style
-        self.image = image
-        self.isLoading = isLoading
-        self.action = action
-    }
-
-    var body: some View {
-        Button(action: {
-            if !isLoading {
-                action()
-            }
-        }) {
-            ZStack {
-                // Always present content to maintain layout space
-                HStack {
-                    if let image = image {
-                        image
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(style.foregroundColor)
-                    }
-
-                    Text(title)
-                        .font(VivaDesign.Typography.body.bold())
-                        .foregroundColor(style.foregroundColor)
-                }
-                .opacity(isLoading ? 0 : 1)
-                
-                // Loading indicator overlay
-                if isLoading {
-                    LottieView(animation: .named("bounce_balls_white"))
-                        .playing(loopMode: .loop)
-                        .frame(width: 30, height: 30)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .frame(minHeight: 36)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 16)
-            .background(
-                RoundedRectangle(
-                    cornerRadius: VivaDesign.Sizing.buttonCornerRadius
-                )
-                .fill(style.backgroundColor)
-            )
-            .overlay(
-                RoundedRectangle(
-                    cornerRadius: VivaDesign.Sizing.buttonCornerRadius
-                )
-                .stroke(
-                    style.borderColor,
-                    lineWidth: VivaDesign.Sizing.buttonBorderWidth)
-            )
-        }
-        .disabled(isLoading)
     }
 }
