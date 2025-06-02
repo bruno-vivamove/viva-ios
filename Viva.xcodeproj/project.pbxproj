@@ -37,9 +37,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C02329262DEBA47200D4D49A /* Viva - Dev (Debug).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Viva - Dev (Debug).app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		C0232EED2DEBAA9700D4D49A /* Viva - Prod (Debug).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Viva - Prod (Debug).app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		C0232F742DEBAB5A00D4D49A /* Viva - Local (Debug).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Viva - Local (Debug).app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C02329262DEBA47200D4D49A /* Viva - Dev Debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Viva - Dev Debug.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0232EED2DEBAA9700D4D49A /* Viva - Prod Debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Viva - Prod Debug.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0232F742DEBAB5A00D4D49A /* Viva - Local Debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Viva - Local Debug.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C03975B62D2F83D000BCE78F /* VivaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VivaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C03975C02D2F83D000BCE78F /* VivaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VivaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -144,9 +144,9 @@
 			children = (
 				C03975B62D2F83D000BCE78F /* VivaTests.xctest */,
 				C03975C02D2F83D000BCE78F /* VivaUITests.xctest */,
-				C02329262DEBA47200D4D49A /* Viva - Dev (Debug).app */,
-				C0232EED2DEBAA9700D4D49A /* Viva - Prod (Debug).app */,
-				C0232F742DEBAB5A00D4D49A /* Viva - Local (Debug).app */,
+				C02329262DEBA47200D4D49A /* Viva - Dev Debug.app */,
+				C0232EED2DEBAA9700D4D49A /* Viva - Prod Debug.app */,
+				C0232F742DEBAB5A00D4D49A /* Viva - Local Debug.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -161,9 +161,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C02329072DEBA47200D4D49A /* Viva - Dev (Debug) */ = {
+		C02329072DEBA47200D4D49A /* Viva - Dev Debug */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C02329222DEBA47200D4D49A /* Build configuration list for PBXNativeTarget "Viva - Dev (Debug)" */;
+			buildConfigurationList = C02329222DEBA47200D4D49A /* Build configuration list for PBXNativeTarget "Viva - Dev Debug" */;
 			buildPhases = (
 				C02329162DEBA47200D4D49A /* Sources */,
 				C02329172DEBA47200D4D49A /* Frameworks */,
@@ -176,7 +176,7 @@
 			fileSystemSynchronizedGroups = (
 				C03975A82D2F83CE00BCE78F /* Viva */,
 			);
-			name = "Viva - Dev (Debug)";
+			name = "Viva - Dev Debug";
 			packageProductDependencies = (
 				C02329082DEBA47200D4D49A /* Alamofire */,
 				C023290A2DEBA47200D4D49A /* OrderedCollections */,
@@ -189,12 +189,12 @@
 				C02329152DEBA47200D4D49A /* NukeVideo */,
 			);
 			productName = Viva;
-			productReference = C02329262DEBA47200D4D49A /* Viva - Dev (Debug).app */;
+			productReference = C02329262DEBA47200D4D49A /* Viva - Dev Debug.app */;
 			productType = "com.apple.product-type.application";
 		};
-		C0232ECD2DEBAA9700D4D49A /* Viva - Prod (Debug) */ = {
+		C0232ECD2DEBAA9700D4D49A /* Viva - Prod Debug */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C0232EE82DEBAA9700D4D49A /* Build configuration list for PBXNativeTarget "Viva - Prod (Debug)" */;
+			buildConfigurationList = C0232EE82DEBAA9700D4D49A /* Build configuration list for PBXNativeTarget "Viva - Prod Debug" */;
 			buildPhases = (
 				C0232EDC2DEBAA9700D4D49A /* Sources */,
 				C0232EDD2DEBAA9700D4D49A /* Frameworks */,
@@ -207,7 +207,7 @@
 			fileSystemSynchronizedGroups = (
 				C03975A82D2F83CE00BCE78F /* Viva */,
 			);
-			name = "Viva - Prod (Debug)";
+			name = "Viva - Prod Debug";
 			packageProductDependencies = (
 				C0232ECE2DEBAA9700D4D49A /* Alamofire */,
 				C0232ED02DEBAA9700D4D49A /* OrderedCollections */,
@@ -220,12 +220,12 @@
 				C0232EDB2DEBAA9700D4D49A /* NukeVideo */,
 			);
 			productName = Viva;
-			productReference = C0232EED2DEBAA9700D4D49A /* Viva - Prod (Debug).app */;
+			productReference = C0232EED2DEBAA9700D4D49A /* Viva - Prod Debug.app */;
 			productType = "com.apple.product-type.application";
 		};
-		C0232F542DEBAB5A00D4D49A /* Viva - Local (Debug) */ = {
+		C0232F542DEBAB5A00D4D49A /* Viva - Local Debug */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C0232F6F2DEBAB5A00D4D49A /* Build configuration list for PBXNativeTarget "Viva - Local (Debug)" */;
+			buildConfigurationList = C0232F6F2DEBAB5A00D4D49A /* Build configuration list for PBXNativeTarget "Viva - Local Debug" */;
 			buildPhases = (
 				C0232F632DEBAB5A00D4D49A /* Sources */,
 				C0232F642DEBAB5A00D4D49A /* Frameworks */,
@@ -238,7 +238,7 @@
 			fileSystemSynchronizedGroups = (
 				C03975A82D2F83CE00BCE78F /* Viva */,
 			);
-			name = "Viva - Local (Debug)";
+			name = "Viva - Local Debug";
 			packageProductDependencies = (
 				C0232F552DEBAB5A00D4D49A /* Alamofire */,
 				C0232F572DEBAB5A00D4D49A /* OrderedCollections */,
@@ -251,7 +251,7 @@
 				C0232F622DEBAB5A00D4D49A /* NukeVideo */,
 			);
 			productName = Viva;
-			productReference = C0232F742DEBAB5A00D4D49A /* Viva - Local (Debug).app */;
+			productReference = C0232F742DEBAB5A00D4D49A /* Viva - Local Debug.app */;
 			productType = "com.apple.product-type.application";
 		};
 		C03975B52D2F83D000BCE78F /* VivaTests */ = {
@@ -339,9 +339,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C0232F542DEBAB5A00D4D49A /* Viva - Local (Debug) */,
-				C02329072DEBA47200D4D49A /* Viva - Dev (Debug) */,
-				C0232ECD2DEBAA9700D4D49A /* Viva - Prod (Debug) */,
+				C0232F542DEBAB5A00D4D49A /* Viva - Local Debug */,
+				C02329072DEBA47200D4D49A /* Viva - Dev Debug */,
+				C0232ECD2DEBAA9700D4D49A /* Viva - Prod Debug */,
 				C03975B52D2F83D000BCE78F /* VivaTests */,
 				C03975BF2D2F83D000BCE78F /* VivaUITests */,
 			);
@@ -543,7 +543,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -586,7 +586,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -629,7 +629,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva.local;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -762,7 +762,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva.local;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -805,7 +805,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -848,7 +848,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -981,7 +981,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva.local;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1024,7 +1024,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1067,7 +1067,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.vivamove.Viva;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1085,7 +1085,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C02329222DEBA47200D4D49A /* Build configuration list for PBXNativeTarget "Viva - Dev (Debug)" */ = {
+		C02329222DEBA47200D4D49A /* Build configuration list for PBXNativeTarget "Viva - Dev Debug" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C023292D2DEBA4DD00D4D49A /* Config - Dev */,
@@ -1095,7 +1095,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "Config - Dev";
 		};
-		C0232EE82DEBAA9700D4D49A /* Build configuration list for PBXNativeTarget "Viva - Prod (Debug)" */ = {
+		C0232EE82DEBAA9700D4D49A /* Build configuration list for PBXNativeTarget "Viva - Prod Debug" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C0232EEB2DEBAA9700D4D49A /* Config - Dev */,
@@ -1105,7 +1105,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "Config - Dev";
 		};
-		C0232F6F2DEBAB5A00D4D49A /* Build configuration list for PBXNativeTarget "Viva - Local (Debug)" */ = {
+		C0232F6F2DEBAB5A00D4D49A /* Build configuration list for PBXNativeTarget "Viva - Local Debug" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C0232F722DEBAB5A00D4D49A /* Config - Dev */,

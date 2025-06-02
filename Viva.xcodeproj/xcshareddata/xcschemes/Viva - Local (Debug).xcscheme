@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C0232F542DEBAB5A00D4D49A"
-               BuildableName = "Viva - Local (Debug).app"
-               BlueprintName = "Viva - Local (Debug)"
+               BuildableName = "Viva - Local Debug.app"
+               BlueprintName = "Viva - Local Debug"
                ReferencedContainer = "container:Viva.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,8 +45,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C0232F542DEBAB5A00D4D49A"
-            BuildableName = "Viva - Local (Debug).app"
-            BlueprintName = "Viva - Local (Debug)"
+            BuildableName = "Viva - Local Debug.app"
+            BlueprintName = "Viva - Local Debug"
             ReferencedContainer = "container:Viva.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,8 +62,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C0232F542DEBAB5A00D4D49A"
-            BuildableName = "Viva - Local (Debug).app"
-            BlueprintName = "Viva - Local (Debug)"
+            BuildableName = "Viva - Local Debug.app"
+            BlueprintName = "Viva - Local Debug"
             ReferencedContainer = "container:Viva.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
