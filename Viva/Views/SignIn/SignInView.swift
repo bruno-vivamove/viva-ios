@@ -1,5 +1,6 @@
 import Foundation
 import GoogleSignIn
+import Lottie
 import Security
 import SwiftUI
 
@@ -257,8 +258,9 @@ struct AuthButtonView: View {
                 
                 // Loading indicator overlay
                 if isLoading {
-                    ProgressView()
-                        .tint(style.foregroundColor)
+                    LottieView(animation: .named("bounce_balls_white"))
+                        .playing(loopMode: .loop)
+                        .frame(width: 30, height: 30)
                 }
             }
             .frame(maxWidth: .infinity)

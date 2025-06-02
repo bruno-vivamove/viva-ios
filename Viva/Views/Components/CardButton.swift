@@ -5,6 +5,7 @@
 //  Created by Bruno Souto on 1/12/25.
 //
 
+import Lottie
 import SwiftUI
 
 struct CardButton: View {
@@ -31,11 +32,11 @@ struct CardButton: View {
                     .font(VivaDesign.Typography.caption)
                     .opacity(isLoading ? 0 : 1)
                 
-                // Hourglass overlay when loading
+                // Lottie animation overlay when loading
                 if isLoading {
-                    Image(systemName: "hourglass")
-                        .foregroundColor(color)
-                        .font(VivaDesign.Typography.caption)
+                    LottieView(animation: .named("bounce_balls_white"))
+                        .playing(loopMode: .loop)
+                        .frame(width: 20, height: 20)
                 }
             }
             .frame(width: width)
