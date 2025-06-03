@@ -8,190 +8,277 @@
 import Lottie
 import SwiftUI
 
+// MARK: - Simplified Button Size System
 enum VivaButtonSize {
-    case small   // For card buttons
-    case medium  // For auth buttons  
-    case large   // For matchup type buttons
+    case small, medium, large
     
-    var minHeight: CGFloat {
+    var height: CGFloat {
         switch self {
-        case .small: return 36
-        case .medium: return 36  // Match auth buttons exactly
-        case .large: return 60
+        case .small: return VivaDesign.Sizing.buttonSmall
+        case .medium: return VivaDesign.Sizing.buttonMedium
+        case .large: return VivaDesign.Sizing.buttonLarge
         }
     }
     
     var font: Font {
         switch self {
-        case .small: return VivaDesign.Typography.caption
-        case .medium: return VivaDesign.Typography.body.bold()  // Match auth buttons
-        case .large: return .system(size: 24, weight: .semibold)
-        }
-    }
-    
-    var lottieSize: CGFloat {
-        switch self {
-        case .small: return 20
-        case .medium: return 30  // Match auth buttons
-        case .large: return 40
-        }
-    }
-    
-    var verticalPadding: CGFloat {
-        switch self {
-        case .small: return 8
-        case .medium: return 8   // Match auth buttons
-        case .large: return 16
+        case .small: return VivaDesign.Typography.labelMedium
+        case .medium: return VivaDesign.Typography.labelLarge
+        case .large: return VivaDesign.Typography.labelLarge
         }
     }
     
     var horizontalPadding: CGFloat {
         switch self {
-        case .small: return 8
-        case .medium: return 16  // Match auth buttons
-        case .large: return 24
+        case .small: return VivaDesign.Spacing.contentMedium
+        case .medium: return VivaDesign.Spacing.contentLarge
+        case .large: return VivaDesign.Spacing.componentMedium
         }
     }
     
-    var cornerRadius: CGFloat {
+    var iconSize: CGFloat {
         switch self {
-        case .small: return VivaDesign.Sizing.cornerRadius
-        case .medium: return VivaDesign.Sizing.buttonCornerRadius  // Match auth buttons
-        case .large: return 8
+        case .small: return VivaDesign.Sizing.iconSmall
+        case .medium: return VivaDesign.Sizing.iconMedium
+        case .large: return VivaDesign.Sizing.iconSmall
         }
     }
     
-    var borderWidth: CGFloat {
+    var loadingSize: CGFloat {
         switch self {
-        case .small: return VivaDesign.Sizing.borderWidth
-        case .medium: return VivaDesign.Sizing.buttonBorderWidth  // Match auth buttons
-        case .large: return 1
+        case .small: return 16
+        case .medium: return 24
+        case .large: return 32
         }
     }
 }
 
-enum VivaButtonStyle {
-    case primary    // Green background
-    case secondary  // Clear background, white border
-    case white      // White background
-    case outline    // Clear background, colored border
-    
-    func foregroundColor(for baseColor: Color = VivaDesign.Colors.vivaGreen) -> Color {
-        switch self {
-        case .primary:
-            return .black
-        case .secondary, .outline:
-            return .white
-        case .white:
-            return .black
-        }
-    }
-    
-    func backgroundColor(for baseColor: Color = VivaDesign.Colors.vivaGreen) -> Color {
-        switch self {
-        case .primary:
-            return baseColor
-        case .secondary, .outline:
-            return .clear
-        case .white:
-            return .white
-        }
-    }
-    
-    func borderColor(for baseColor: Color = VivaDesign.Colors.vivaGreen) -> Color {
-        switch self {
-        case .primary:
-            return baseColor
-        case .secondary, .outline:
-            return .white
-        case .white:
-            return .white
-        }
-    }
-}
-
+// MARK: - Main Button Component
 struct VivaButton: View {
     let title: String
+    let variant: VivaDesign.ButtonVariant
     let size: VivaButtonSize
-    let style: VivaButtonStyle
-    let image: Image?
-    let width: CGFloat?
+    let icon: Image?
+    let iconPosition: IconPosition
+    let width: VivaButtonWidth
     let isLoading: Bool
+    let isDisabled: Bool
     let action: () -> Void
-    private let baseColor: Color
     
-    // Computed property to determine the correct Lottie animation based on text color
-    private var lottieAnimationName: String {
-        let textColor = style.foregroundColor(for: baseColor)
-        return textColor == .black ? "bounce_balls_black" : "bounce_balls_white"
+    @State private var isPressed = false
+    
+    enum IconPosition {
+        case leading, trailing
     }
     
+    enum VivaButtonWidth {
+        case flexible, fixed(CGFloat), fullWidth
+    }
+    
+    // Computed properties
+    private var style: (background: Color, foreground: Color, border: Color) {
+        if isDisabled {
+            return (VivaDesign.Colors.disabled, VivaDesign.Colors.disabledContent, VivaDesign.Colors.disabled)
+        }
+        return variant.style
+    }
+    
+    private var lottieAnimationName: String {
+        style.foreground == .black ? "bounce_balls_black" : "bounce_balls_white"
+    }
+    
+    // Initializers
     init(
-        title: String,
+        _ title: String,
+        variant: VivaDesign.ButtonVariant = .primary,
         size: VivaButtonSize = .medium,
-        style: VivaButtonStyle = .primary,
-        image: Image? = nil,
-        width: CGFloat? = nil,
-        baseColor: Color = VivaDesign.Colors.vivaGreen,
+        icon: Image? = nil,
+        iconPosition: IconPosition = .leading,
+        width: VivaButtonWidth = .fullWidth,
         isLoading: Bool = false,
+        isDisabled: Bool = false,
         action: @escaping () -> Void
     ) {
         self.title = title
+        self.variant = variant
         self.size = size
-        self.style = style
-        self.image = image
+        self.icon = icon
+        self.iconPosition = iconPosition
         self.width = width
-        self.baseColor = baseColor
         self.isLoading = isLoading
+        self.isDisabled = isDisabled
         self.action = action
     }
     
     var body: some View {
         Button(action: {
-            if !isLoading {
+            if !isLoading && !isDisabled {
                 action()
             }
         }) {
-            ZStack {
-                // Always present content to maintain layout space
-                HStack {
-                    if let image = image {
-                        image
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(style.foregroundColor(for: baseColor))
-                    }
-
-                    Text(title)
-                        .font(size.font)
-                        .foregroundColor(style.foregroundColor(for: baseColor))
+            buttonContent
+        }
+        .buttonStyle(VivaButtonStyle(
+            style: style,
+            size: size,
+            width: width,
+            isPressed: $isPressed,
+            pressedOpacity: variant.pressedOpacity
+        ))
+        .disabled(isLoading || isDisabled)
+    }
+    
+    @ViewBuilder
+    private var buttonContent: some View {
+        ZStack {
+            // Main content
+            HStack(spacing: VivaDesign.Spacing.contentSmall) {
+                if iconPosition == .leading, let icon = icon {
+                    iconView(icon)
                 }
-                .opacity(isLoading ? 0 : 1)
                 
-                // Lottie animation overlay when loading
-                if isLoading {
-                    LottieView(animation: .named(lottieAnimationName))
-                        .playing(loopMode: .loop)
-                        .frame(width: size.lottieSize, height: size.lottieSize)
+                Text(title)
+                    .font(size.font)
+                    .lineLimit(1)
+                
+                if iconPosition == .trailing, let icon = icon {
+                    iconView(icon)
                 }
             }
-            .frame(width: width)
-            .frame(maxWidth: width == nil ? .infinity : nil)
-            .frame(minHeight: size.minHeight)
-            .padding(.vertical, size.verticalPadding)
+            .opacity(isLoading ? 0 : 1)
+            
+            // Loading indicator
+            if isLoading {
+                LottieView(animation: .named(lottieAnimationName))
+                    .playing(loopMode: .loop)
+                    .frame(width: size.loadingSize, height: size.loadingSize)
+            }
+        }
+    }
+    
+    private func iconView(_ icon: Image) -> some View {
+        icon
+            .resizable()
+            .scaledToFit()
+            .frame(width: size.iconSize, height: size.iconSize)
+    }
+}
+
+// MARK: - Button Style
+struct VivaButtonStyle: ButtonStyle {
+    let style: (background: Color, foreground: Color, border: Color)
+    let size: VivaButtonSize
+    let width: VivaButton.VivaButtonWidth
+    @Binding var isPressed: Bool
+    let pressedOpacity: Double
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundColor(style.foreground)
+            .frame(height: size.height)
+            .frame(width: buttonWidth)
+            .frame(maxWidth: maxWidth)
             .padding(.horizontal, size.horizontalPadding)
             .background(
-                RoundedRectangle(cornerRadius: size.cornerRadius)
-                    .fill(style.backgroundColor(for: baseColor))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: size.cornerRadius)
-                    .stroke(
-                        style.borderColor(for: baseColor),
-                        lineWidth: size.borderWidth
+                RoundedRectangle(cornerRadius: VivaDesign.Sizing.radiusMedium)
+                    .fill(style.background)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: VivaDesign.Sizing.radiusMedium)
+                            .stroke(style.border, lineWidth: borderWidth)
                     )
             )
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+            .opacity(configuration.isPressed ? pressedOpacity : 1.0)
+            .animation(VivaDesign.Animation.quick, value: configuration.isPressed)
+            .onChange(of: configuration.isPressed) { oldValue, newValue in
+                isPressed = newValue
+            }
+    }
+    
+    private var buttonWidth: CGFloat? {
+        switch width {
+        case .fixed(let value): return value
+        default: return nil
         }
-        .disabled(isLoading)
+    }
+    
+    private var maxWidth: CGFloat? {
+        switch width {
+        case .fullWidth: return .infinity
+        case .flexible: return nil
+        case .fixed: return nil
+        }
+    }
+    
+    private var borderWidth: CGFloat {
+        style.border == .clear ? 0 : VivaDesign.Sizing.borderMedium
+    }
+}
+
+// MARK: - Convenience Initializers and Extensions
+extension VivaButton {
+    // Common button types
+    static func primary(_ title: String, size: VivaButtonSize = .medium, isLoading: Bool = false, action: @escaping () -> Void) -> VivaButton {
+        VivaButton(title, variant: .primary, size: size, isLoading: isLoading, action: action)
+    }
+    
+    static func secondary(_ title: String, size: VivaButtonSize = .medium, isLoading: Bool = false, action: @escaping () -> Void) -> VivaButton {
+        VivaButton(title, variant: .secondary, size: size, isLoading: isLoading, action: action)
+    }
+    
+    static func outline(_ title: String, size: VivaButtonSize = .medium, isLoading: Bool = false, action: @escaping () -> Void) -> VivaButton {
+        VivaButton(title, variant: .outline, size: size, isLoading: isLoading, action: action)
+    }
+    
+    static func ghost(_ title: String, size: VivaButtonSize = .medium, isLoading: Bool = false, action: @escaping () -> Void) -> VivaButton {
+        VivaButton(title, variant: .ghost, size: size, isLoading: isLoading, action: action)
+    }
+    
+    static func destructive(_ title: String, size: VivaButtonSize = .medium, isLoading: Bool = false, action: @escaping () -> Void) -> VivaButton {
+        VivaButton(title, variant: .destructive, size: size, isLoading: isLoading, action: action)
+    }
+    
+    // With icons
+    func withIcon(_ icon: Image, position: IconPosition = .leading) -> VivaButton {
+        VivaButton(
+            title,
+            variant: variant,
+            size: size,
+            icon: icon,
+            iconPosition: position,
+            width: width,
+            isLoading: isLoading,
+            isDisabled: isDisabled,
+            action: action
+        )
+    }
+    
+    // Width modifiers
+    func flexible() -> VivaButton {
+        VivaButton(
+            title,
+            variant: variant,
+            size: size,
+            icon: icon,
+            iconPosition: iconPosition,
+            width: .flexible,
+            isLoading: isLoading,
+            isDisabled: isDisabled,
+            action: action
+        )
+    }
+    
+    func fixedWidth(_ width: CGFloat) -> VivaButton {
+        VivaButton(
+            title,
+            variant: variant,
+            size: size,
+            icon: icon,
+            iconPosition: iconPosition,
+            width: .fixed(width),
+            isLoading: isLoading,
+            isDisabled: isDisabled,
+            action: action
+        )
     }
 } 

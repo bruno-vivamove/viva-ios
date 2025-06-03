@@ -39,8 +39,7 @@ struct MatchupDetailView: View {
 
     var body: some View {
         ZStack {
-            // Background color
-            Color.black.edgesIgnoringSafeArea(.all)
+            VivaDesign.Colors.background.edgesIgnoringSafeArea(.all)
 
             // Main content
             if viewModel.isLoading && viewModel.matchup == nil {
@@ -63,7 +62,7 @@ struct MatchupDetailView: View {
                                 )
                                 .padding(.top, VivaDesign.Spacing.small)
                                 .padding(.bottom, VivaDesign.Spacing.medium)
-                                .listRowBackground(Color.black)
+                                .listRowBackground(VivaDesign.Colors.surface)
                                 .listRowSeparator(.hidden)
                                 .listRowInsets(EdgeInsets())
                         }
@@ -105,7 +104,7 @@ struct MatchupDetailView: View {
                                 opponentName: oppopnentName
                             )
                             .padding(.vertical, VivaDesign.Spacing.large)
-                            .listRowBackground(Color.black)
+                            .listRowBackground(VivaDesign.Colors.surface)
                             .listRowSeparator(.hidden)
                             .listRowInsets(EdgeInsets())
                         }
@@ -136,7 +135,7 @@ struct MatchupDetailView: View {
                                 rightValue: row.formattedRightValue,
                                 rightPoints: "\(row.rightPoints) pts"
                             )
-                            .listRowBackground(Color.clear)
+                            .listRowBackground(VivaDesign.Colors.surface)
                             .listRowSeparator(.hidden)
                             .listRowInsets(EdgeInsets())
                         }
@@ -144,7 +143,7 @@ struct MatchupDetailView: View {
                         // Add workouts section
                         if let userId = viewModel.userSession.userId {
                             WorkoutListSection(userId: userId, viewModel: viewModel)
-                                .listRowBackground(Color.clear)
+                                .listRowBackground(VivaDesign.Colors.surface)
                                 .listRowSeparator(.hidden)
                                 .listRowInsets(EdgeInsets())
                         }
@@ -152,7 +151,7 @@ struct MatchupDetailView: View {
                         // Add empty space at the bottom for footer
                         Color.clear
                             .frame(height: 100)
-                            .listRowBackground(Color.clear)
+                            .listRowBackground(VivaDesign.Colors.surface)
                             .listRowSeparator(.hidden)
                             .listRowInsets(EdgeInsets())
                     }
@@ -189,11 +188,11 @@ struct MatchupDetailView: View {
                         selectedUserId: $selectedUserId,
                         source: source
                     )
-                    .padding(.vertical, VivaDesign.Spacing.medium)
-                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
-                    .background(Color.black)
+                    .padding(.vertical, VivaDesign.Spacing.componentSmall)
+                    .padding(.horizontal, VivaDesign.Spacing.screenPadding)
+                    .background(VivaDesign.Colors.surface)
                 }
-                .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                .padding(.horizontal, VivaDesign.Spacing.screenPadding)
             } else {
                 // Error state
                 VStack {
@@ -313,7 +312,7 @@ struct MatchupDetailView: View {
                 }
             }
         }
-        .toolbarBackground(Color.black, for: .navigationBar)
+        .toolbarBackground(VivaDesign.Colors.surface, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.dark)
         .onChange(of: selectedUserId) { oldValue, newValue in
@@ -330,7 +329,7 @@ struct MatchupDetailView: View {
                 VStack(spacing: VivaDesign.Spacing.medium) {
                     // Header skeleton
                     skeletonHeader
-                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                        .padding(.horizontal, VivaDesign.Spacing.screenPadding)
                         .padding(.top, VivaDesign.Spacing.medium)
 
                     // Toggle skeleton
@@ -342,16 +341,16 @@ struct MatchupDetailView: View {
                             skeletonComparisonRow
                         }
                     }
-                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                    .padding(.horizontal, VivaDesign.Spacing.screenPadding)
                 }
-                .listRowBackground(Color.black)
+                .listRowBackground(VivaDesign.Colors.surface)
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets())
                 
                 // Add empty space at the bottom for footer
                 Color.clear
                     .frame(height: 100)
-                    .listRowBackground(Color.clear)
+                    .listRowBackground(VivaDesign.Colors.surface)
                     .listRowSeparator(.hidden)
                     .listRowInsets(EdgeInsets())
             }
@@ -360,11 +359,11 @@ struct MatchupDetailView: View {
 
             // Footer skeleton
             skeletonFooter
-                .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                .padding(.horizontal, VivaDesign.Spacing.screenPadding)
                 .padding(.vertical, VivaDesign.Spacing.medium)
-                .background(Color.black)
+                .background(VivaDesign.Colors.surface)
         }
-        .shimmering(animation: VivaDesign.AnimationStyle.loadingShimmer)
+        .shimmering(animation: VivaDesign.Animation.loadingShimmer)
     }
 
     private var skeletonHeader: some View {
@@ -846,7 +845,7 @@ struct ComparisonRow: View {
                 Spacer()
                     .frame(width: VivaDesign.Spacing.medium)
             }
-            .padding(.vertical, VivaDesign.Spacing.small)
+            .padding(.vertical, VivaDesign.Spacing.componentSmall)
 
             VivaDivider()
         }

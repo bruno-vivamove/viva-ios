@@ -31,8 +31,8 @@ struct ProfileView: View {
 
     var body: some View {
         ZStack {
-            // Black background
-            Color.black
+            // Background
+            VivaDesign.Colors.background
                 .edgesIgnoringSafeArea(.all)
 
             // Scrollable content
@@ -242,7 +242,7 @@ struct ProfileView: View {
                         .padding(.bottom, VivaDesign.Spacing.medium)
                         .padding(
                             .horizontal,
-                            VivaDesign.Spacing.outerPadding
+                            VivaDesign.Spacing.screenPadding
                         )
 
                     // Active Matchups section - only show for current user
@@ -261,7 +261,7 @@ struct ProfileView: View {
                         )
                         .padding(
                             .horizontal,
-                            VivaDesign.Spacing.outerPadding
+                            VivaDesign.Spacing.screenPadding
                         )
                     } else {
                         Text("No Active Matchups")
@@ -270,7 +270,7 @@ struct ProfileView: View {
                             .padding(.vertical, 20)
                             .padding(
                                 .horizontal,
-                                VivaDesign.Spacing.outerPadding
+                                VivaDesign.Spacing.screenPadding
                             )
                     }
 

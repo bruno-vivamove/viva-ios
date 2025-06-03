@@ -105,14 +105,9 @@ struct ForgotPasswordView: View {
                         )
                         
                         // Reset Password Button
-                        VivaButton(
-                            title: "Send Reset Link",
-                            style: .primary,
-                            isLoading: viewModel.isLoading,
-                            action: resetPassword
-                        )
-                        .opacity(viewModel.isFormValid ? 1.0 : 0.5)
-                        .disabled(!viewModel.isFormValid)
+                        VivaButton.primary("Send Reset Link", isLoading: viewModel.isLoading, action: resetPassword)
+                            .opacity(viewModel.isFormValid ? 1.0 : 0.5)
+                            .disabled(!viewModel.isFormValid)
                     }
                     .padding(.horizontal, VivaDesign.Spacing.large)
                     

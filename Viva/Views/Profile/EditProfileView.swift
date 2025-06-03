@@ -249,11 +249,7 @@ struct EditProfileView: View {
     }
 
     private var saveButton: some View {
-        VivaButton(
-            title: "Save Changes",
-            style: .primary,
-            isLoading: viewModel.isLoading
-        ) {
+        VivaButton.primary("Save Changes", isLoading: viewModel.isLoading) {
             Task {
                 if await viewModel.saveUserAccount() {
                     dismiss()

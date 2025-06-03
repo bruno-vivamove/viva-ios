@@ -27,7 +27,7 @@ struct MatchupHistoryView: View {
                     userStats: viewModel.userStats,
                     showTimeFilter: $showTimeFilter
                 )
-                .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                .padding(.horizontal, VivaDesign.Spacing.screenPadding)
                 .padding(.vertical, VivaDesign.Spacing.small)
 
                 // Matchup History
@@ -43,13 +43,13 @@ struct MatchupHistoryView: View {
                             .frame(maxWidth: .infinity)
                             .frame(maxHeight: .infinity)
                             .frame(minHeight: UIScreen.main.bounds.height - 200)
-                            .listRowBackground(Color.black)
+                            .listRowBackground(VivaDesign.Colors.surface)
                             .listRowInsets(EdgeInsets())
                     }
                     .listStyle(PlainListStyle())
-                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                    .padding(.horizontal, VivaDesign.Spacing.screenPadding)
                     .listRowSpacing(0)
-                    .background(Color.black)
+                    .background(VivaDesign.Colors.background)
                     .scrollContentBackground(.hidden)
                     .environment(\.defaultMinListRowHeight, 0)
                     .refreshable {
@@ -79,9 +79,9 @@ struct MatchupHistoryView: View {
                         }
                     }
                     .listStyle(PlainListStyle())
-                    .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                    .padding(.horizontal, VivaDesign.Spacing.screenPadding)
                     .listRowSpacing(0)
-                    .background(Color.black)
+                    .background(VivaDesign.Colors.background)
                     .scrollContentBackground(.hidden)
                     .environment(\.defaultMinListRowHeight, 0)
                     .refreshable {
@@ -92,7 +92,7 @@ struct MatchupHistoryView: View {
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.black)
+            .background(VivaDesign.Colors.background)
             .sheet(isPresented: $showTimeFilter) {
                 MatchupHistoryTimeFilterView(isPresented: $showTimeFilter)
                     .presentationDetents([.height(250)])
@@ -233,8 +233,8 @@ struct MatchupStatsSection: View {
 
                     VivaDivider()
                 }
-                .background(Color.black)
-                .listRowBackground(Color.black)
+                .background(VivaDesign.Colors.surface)
+                .listRowBackground(VivaDesign.Colors.surface)
                 .listRowInsets(EdgeInsets())
                 .listRowSeparator(.hidden)
             }
@@ -244,14 +244,14 @@ struct MatchupStatsSection: View {
         Section {
             // Table Header
             MatchupStatsTableHeader()
-                .listRowBackground(Color.black)
+                .listRowBackground(VivaDesign.Colors.surface)
                 .listRowInsets(EdgeInsets())
                 .listRowSeparator(.hidden)
-                .padding(.leading, VivaDesign.Spacing.xlarge)
-                .padding(.bottom, VivaDesign.Spacing.small)
+                .padding(.leading, VivaDesign.Spacing.componentLarge)
+                .padding(.bottom, VivaDesign.Spacing.componentSmall)
 
             VivaDivider()
-                .listRowBackground(Color.black)
+                .listRowBackground(VivaDesign.Colors.surface)
                 .listRowInsets(EdgeInsets())
                 .listRowSeparator(.hidden)
 
@@ -260,11 +260,11 @@ struct MatchupStatsSection: View {
             ForEach(matchupStats, id: \.matchupHash) { stats in
                 VStack(spacing: 0) {
                     MatchupStatsCard(stats: stats, viewModel: viewModel)
-                        .padding(.leading, VivaDesign.Spacing.xlarge)
-                        .padding(.vertical, VivaDesign.Spacing.small)
+                        .padding(.leading, VivaDesign.Spacing.componentLarge)
+                        .padding(.vertical, VivaDesign.Spacing.componentSmall)
                     VivaDivider()
                 }
-                .listRowBackground(Color.black)
+                .listRowBackground(VivaDesign.Colors.surface)
                 .listRowInsets(EdgeInsets())
                 .listRowSeparator(.hidden)
             }
@@ -295,10 +295,10 @@ struct MatchupHistoryCompletedMatchupsSection: View {
                 .onTapGesture {
                     viewModel.selectedMatchup = matchup
                 }
-                .listRowBackground(Color.black)
+                .listRowBackground(VivaDesign.Colors.surface)
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets())
-                .padding(.bottom, VivaDesign.Spacing.cardSpacing)
+                .padding(.bottom, VivaDesign.Spacing.componentSmall)
             }
         } header: {
             SectionHeaderView(title: "Matchup History")
@@ -315,20 +315,20 @@ struct MatchupStatsCard: View {
             // User Record (11-9)
             Text("\(stats.userTeamWins)-\(stats.opponentTeamWins)")
                 .font(VivaDesign.Typography.body.bold())
-                .foregroundColor(VivaDesign.Colors.primaryText)
+                .foregroundColor(VivaDesign.Colors.onBackground)
                 .frame(width: 60, alignment: .leading)
 
             Spacer()
-                .frame(width: VivaDesign.Spacing.xsmall)
+                .frame(width: VivaDesign.Spacing.contentTiny)
 
             // VS - fixed position
             Text("vs.")
                 .font(VivaDesign.Typography.body)
-                .foregroundColor(VivaDesign.Colors.primaryText)
+                .foregroundColor(VivaDesign.Colors.onBackground)
                 .frame(width: 30, alignment: .center)
 
             Spacer()
-                .frame(width: VivaDesign.Spacing.xsmall)
+                .frame(width: VivaDesign.Spacing.contentTiny)
 
             // Opponent Info with Profile Picture - fixed position
             if let opponent = stats.opponentTeamUsers.first {
@@ -360,7 +360,7 @@ struct MatchupStatsCard: View {
                     .frame(width: VivaDesign.Spacing.small)
 
                 Text(stats.displayName)
-                    .font(VivaDesign.Typography.body)
+                    .font(VivaDesign.Typography.valueMedium)
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .lineLimit(1)
                     .frame(alignment: .leading)
@@ -411,7 +411,7 @@ struct MatchupHistoryTimeFilterView: View {
                         .foregroundColor(VivaDesign.Colors.primaryText)
                 }
             }
-            .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+            .padding(.horizontal, VivaDesign.Spacing.screenPadding)
             .padding(.top, VivaDesign.Spacing.medium)
             .padding(.bottom, VivaDesign.Spacing.medium)
 
@@ -436,7 +436,7 @@ struct MatchupHistoryTimeFilterView: View {
                                     )
                             }
                         }
-                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                        .padding(.horizontal, VivaDesign.Spacing.screenPadding)
                         .padding(.vertical, VivaDesign.Spacing.small)
                     }
 
@@ -444,7 +444,7 @@ struct MatchupHistoryTimeFilterView: View {
                         VivaDivider()
                             .padding(
                                 .horizontal,
-                                VivaDesign.Spacing.outerPadding
+                                VivaDesign.Spacing.screenPadding
                             )
                     }
                 }
@@ -452,7 +452,7 @@ struct MatchupHistoryTimeFilterView: View {
 
             Spacer()
         }
-        .background(Color.black)
+        .background(VivaDesign.Colors.surface)
     }
 }
 

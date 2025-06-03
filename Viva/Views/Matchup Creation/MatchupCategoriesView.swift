@@ -94,7 +94,7 @@ struct MatchupCategoriesView: View {
                                     )
                                     .foregroundColor(
                                         category.isSelected
-                                            ? Color.black : Color.white
+                                            ? VivaDesign.Colors.onPrimary : Color.white
                                     )
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 8)
@@ -137,7 +137,7 @@ struct MatchupCategoriesView: View {
                 Spacer()
             }
             .padding()
-            .background(Color.black.edgesIgnoringSafeArea(.all))
+            .background(VivaDesign.Colors.background.edgesIgnoringSafeArea(.all))
             .navigationDestination(isPresented: $navigateToMatchupType) {
                 MatchupTypeView(
                     coordinator: coordinator,

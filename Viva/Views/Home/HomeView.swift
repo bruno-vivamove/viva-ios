@@ -26,7 +26,7 @@ struct HomeView: View {
             )
             .padding(.top, VivaDesign.Spacing.medium)
             .padding(.bottom, 0)
-            .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+            .padding(.horizontal, VivaDesign.Spacing.screenPadding)
 
             if viewModel.isLoading && viewModel.isEmpty {
                 LoadingView()
@@ -34,7 +34,7 @@ struct HomeView: View {
                 // Empty state with refreshable list
                 List {
                     HomeEmptyStateView()
-                        .listRowBackground(Color.black)
+                        .listRowBackground(VivaDesign.Colors.surface)
                         .listRowSeparator(.hidden)
                         .listRowInsets(EdgeInsets())
                 }
@@ -58,11 +58,11 @@ struct HomeView: View {
                     await viewModel.loadData()
                 }
                 .listSectionSpacing(0)
-                .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                .padding(.horizontal, VivaDesign.Spacing.screenPadding)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black)
+        .background(VivaDesign.Colors.background)
         .navigationDestination(item: $viewModel.selectedMatchup) { matchup in
             MatchupDetailView(
                 viewModel: MatchupDetailViewModel(
@@ -151,13 +151,6 @@ struct HomeContentList: View {
     let userSession: UserSession
     let userMeasurementService: UserMeasurementService
 
-    private let rowInsets = EdgeInsets(
-        top: 0,
-        leading: 0,
-        bottom: 0,
-        trailing: 0
-    )
-
     var body: some View {
         List {
             // Completed Matchups
@@ -212,8 +205,7 @@ struct HomeContentList: View {
                 || !viewModel.sentInvites.isEmpty
             {
                 PendingInvitesSection(
-                    viewModel: viewModel,
-                    rowInsets: rowInsets
+                    viewModel: viewModel
                 )
             }
         }
@@ -223,7 +215,6 @@ struct HomeContentList: View {
 // MARK: - Pending Invites Section
 struct PendingInvitesSection: View {
     @ObservedObject var viewModel: HomeViewModel
-    let rowInsets: EdgeInsets
 
     private let headerInsets = EdgeInsets(
         top: 0,
@@ -236,28 +227,15 @@ struct PendingInvitesSection: View {
         Section {
             // Received Invites
             if !viewModel.receivedInvites.isEmpty {
-                ReceivedInvitesView(viewModel: viewModel, rowInsets: rowInsets)
+                ReceivedInvitesView(viewModel: viewModel)
             }
 
             // Sent Invites
             if !viewModel.sentInvites.isEmpty {
-                SentInvitesView(viewModel: viewModel, rowInsets: rowInsets)
+                SentInvitesView(viewModel: viewModel, rowInsets: EdgeInsets())
             }
         } header: {
-            ZStack {
-                Rectangle()
-                    .fill(Color.black)
-                    .frame(maxWidth: .infinity)
-
-                HStack {
-                    Text("Pending Invites")
-                        .font(VivaDesign.Typography.header)
-                        .foregroundColor(.white)
-                    Spacer()
-                }
-                .padding(headerInsets)
-            }
-            .listRowInsets(EdgeInsets())
+            SectionHeaderView(title: "Pending Invites")
         }
     }
 }
@@ -265,7 +243,6 @@ struct PendingInvitesSection: View {
 // MARK: - Received Invites View
 struct ReceivedInvitesView: View {
     @ObservedObject var viewModel: HomeViewModel
-    let rowInsets: EdgeInsets
 
     var body: some View {
         ForEach(viewModel.receivedInvites, id: \.inviteCode) { invite in
@@ -295,8 +272,8 @@ struct ReceivedInvitesView: View {
             .listRowBackground(Color.clear)
             .buttonStyle(PlainButtonStyle())
             .listRowSeparator(.hidden)
-            .listRowInsets(rowInsets)
-            .padding(.bottom, VivaDesign.Spacing.cardSpacing)
+            .listRowInsets(EdgeInsets())
+            .padding(.bottom, VivaDesign.Spacing.componentSmall)
         }
     }
 }
@@ -340,7 +317,7 @@ struct SentInvitesView: View {
             .buttonStyle(PlainButtonStyle())
             .listRowSeparator(.hidden)
             .listRowInsets(rowInsets)
-            .padding(.bottom, VivaDesign.Spacing.cardSpacing)
+            .padding(.bottom, VivaDesign.Spacing.componentSmall)
         }
     }
 }

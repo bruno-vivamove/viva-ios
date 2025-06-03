@@ -15,13 +15,6 @@ struct FriendsView: View {
         trailing: VivaDesign.Spacing.medium
     )
 
-    private let rowInsets = EdgeInsets(
-        top: 0,
-        leading: VivaDesign.Spacing.medium,
-        bottom: VivaDesign.Spacing.small,
-        trailing: VivaDesign.Spacing.medium
-    )
-
     @StateObject private var viewModel: FriendsViewModel
     @FocusState private var isSearchFieldFocused: Bool
 
@@ -39,7 +32,7 @@ struct FriendsView: View {
                 )
                 .padding(.top, VivaDesign.Spacing.medium)
                 .padding(.bottom, 0)
-                .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                .padding(.horizontal, VivaDesign.Spacing.screenPadding)
 
                 if viewModel.isSearchMode {
                     // SEARCH RESULTS MODE
@@ -58,7 +51,7 @@ struct FriendsView: View {
                                     )
                                     .listRowSeparator(.hidden)
                                     .listRowInsets(EdgeInsets())
-                                    .padding(.bottom, VivaDesign.Spacing.cardSpacing)
+                                    .padding(.bottom, VivaDesign.Spacing.componentSmall)
                                 }
                             } header: {
                                 SectionHeaderView(title: "Search Results")
@@ -66,7 +59,7 @@ struct FriendsView: View {
                         }
                         .listStyle(PlainListStyle())
                         .scrollContentBackground(.hidden)
-                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                        .padding(.horizontal, VivaDesign.Spacing.screenPadding)
                     }
                 } else {
                     // FRIENDS LIST MODE
@@ -82,12 +75,12 @@ struct FriendsView: View {
                         // Empty friends state - use similar layout to HomeEmptyStateView
                         List {
                             FriendsEmptyStateView()
-                                .listRowBackground(Color.black)
+                                .listRowBackground(VivaDesign.Colors.surface)
                                 .listRowInsets(EdgeInsets())
                         }
                         .listStyle(PlainListStyle())
                         .scrollContentBackground(.hidden)
-                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                        .padding(.horizontal, VivaDesign.Spacing.screenPadding)
                         .refreshable {
                             await viewModel.loadFriendsData()
                         }
@@ -103,7 +96,7 @@ struct FriendsView: View {
                                         )
                                         .listRowSeparator(.hidden)
                                         .listRowInsets(EdgeInsets())
-                                        .padding(.bottom, VivaDesign.Spacing.cardSpacing)
+                                        .padding(.bottom, VivaDesign.Spacing.componentSmall)
                                     }
                                 } header: {
                                     SectionHeaderView(
@@ -124,7 +117,7 @@ struct FriendsView: View {
                                         )
                                         .listRowSeparator(.hidden)
                                         .listRowInsets(EdgeInsets())
-                                        .padding(.bottom, VivaDesign.Spacing.cardSpacing)
+                                        .padding(.bottom, VivaDesign.Spacing.componentSmall)
                                     }
                                 } header: {
                                     SectionHeaderView(
@@ -150,7 +143,7 @@ struct FriendsView: View {
                                         )
                                         .listRowSeparator(.hidden)
                                         .listRowInsets(EdgeInsets())
-                                        .padding(.bottom, VivaDesign.Spacing.cardSpacing)
+                                        .padding(.bottom, VivaDesign.Spacing.componentSmall)
                                     }
                                 } header: {
                                     SectionHeaderView(
@@ -167,12 +160,12 @@ struct FriendsView: View {
                             await viewModel.loadFriendsData()
                         }
                         .listSectionSpacing(0)
-                        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+                        .padding(.horizontal, VivaDesign.Spacing.screenPadding)
                     }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.black)
+            .background(VivaDesign.Colors.background)
             .navigationDestination(item: $viewModel.selectedMatchup) { matchup in
                 MatchupDetailView(
                     viewModel: MatchupDetailViewModel(

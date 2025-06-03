@@ -15,7 +15,7 @@ struct ErrorBanner: View {
                 }
             }
         }
-        .padding(.horizontal, VivaDesign.Spacing.outerPadding)
+        .padding(.horizontal, VivaDesign.Spacing.screenPadding)
         .padding(.top, 8)
         .animation(.default, value: errorManager.currentErrors.count)
     }
@@ -31,6 +31,7 @@ struct NotificationBanner: View {
     @State private var appearanceOffset: CGFloat = -100 // Start offscreen
     
     var body: some View {
+        
         HStack(alignment: .center, spacing: 8) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundColor(.red)
@@ -42,9 +43,9 @@ struct NotificationBanner: View {
                 .padding(.vertical, 8)
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .background(Color.black)
+        .padding(.horizontal, VivaDesign.Spacing.medium)
+        .padding(.vertical, VivaDesign.Spacing.small)
+        .background(VivaDesign.Colors.background)
         .cornerRadius(12)
         .shadow(color: Color.white.opacity(0.6), radius: 2, x: 0, y: 0)
         .offset(y: appearanceOffset - offset) // Combine appearance and swipe offsets

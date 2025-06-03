@@ -49,7 +49,7 @@ struct WorkoutCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding(0)
-        .background(Color.black)
+        .background(VivaDesign.Colors.surface)
         .onTapGesture {
             if let onTap = onTap {
                 onTap()
@@ -68,33 +68,3 @@ struct WorkoutCard: View {
         return formatter.string(from: workout.workoutStartTime)
     }
 }
-
-#Preview {
-    let userSummary = UserSummary(
-        id: "user-1",
-        displayName: "Test User",
-        caption: nil,
-        imageUrl: nil,
-        friendStatus: nil
-    )
-    
-    let mockWorkout = Workout(
-        id: "workout-1",
-        user: userSummary,
-        workoutStartTime: Date().addingTimeInterval(-3600),
-        workoutEndTime: Date(),
-        type: .basketball,
-        displayName: "Basketball",
-        measurements: [
-            WorkoutMeasurement(
-                workoutId: "workout-1",
-                measurementType: .energyBurned,
-                value: 467
-            )
-        ]
-    )
-    
-    return WorkoutCard(workout: mockWorkout)
-        .frame(maxWidth: .infinity)
-        .background(Color.black)
-} 

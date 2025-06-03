@@ -188,14 +188,9 @@ struct SignUpFormView: View {
                         }
                         
                         // Sign Up Button
-                        VivaButton(
-                            title: "Sign Up",
-                            style: .primary,
-                            isLoading: viewModel.isLoading,
-                            action: signUp
-                        )
-                        .opacity(viewModel.isFormValid ? 1.0 : 0.5)
-                        .disabled(!viewModel.isFormValid)
+                        VivaButton.primary("Sign Up", isLoading: viewModel.isLoading, action: signUp)
+                            .opacity(viewModel.isFormValid ? 1.0 : 0.5)
+                            .disabled(!viewModel.isFormValid)
 
                         // Terms Text with interactive links
                         LegalLinksView()
@@ -211,23 +206,15 @@ struct SignUpFormView: View {
                         
                         // Social Buttons
                         VStack(spacing: VivaDesign.Spacing.medium) {
-                            VivaButton(
-                                title: "Continue with Google",
-                                style: .secondary,
-                                image: Image("google_logo"),
-                                isLoading: viewModel.loadingStates["Continue with Google"] ?? false
-                            ) {
+                            VivaButton.secondary("Continue with Google", isLoading: viewModel.loadingStates["Continue with Google"] ?? false) {
                                 viewModel.executeGoogleSignIn()
                             }
+                            .withIcon(Image("google_logo"))
                             
-                            VivaButton(
-                                title: "Continue with Apple",
-                                style: .white,
-                                image: Image(systemName: "applelogo"),
-                                isLoading: viewModel.loadingStates["Continue with Apple"] ?? false
-                            ) {
+                            VivaButton("Continue with Apple", variant: .secondary, isLoading: viewModel.loadingStates["Continue with Apple"] ?? false) {
                                 viewModel.executeAppleSignIn()
                             }
+                            .withIcon(Image(systemName: "applelogo"))
                         }
                     }
                     

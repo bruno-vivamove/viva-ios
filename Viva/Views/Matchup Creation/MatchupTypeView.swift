@@ -12,8 +12,7 @@ struct MatchupTypeView: View {
 
     var body: some View {
         ZStack {
-            // Background
-            Color.black.edgesIgnoringSafeArea(.all)
+            VivaDesign.Colors.background.edgesIgnoringSafeArea(.all)
 
             VStack {
                 // Header
@@ -28,13 +27,12 @@ struct MatchupTypeView: View {
                 }
 
                 // Main content
-                VStack(spacing: VivaDesign.Spacing.xlarge) {
+                VStack(spacing: VivaDesign.Spacing.componentLarge) {
                     // Type Selection Buttons
                     VStack(spacing: VivaDesign.Spacing.large) {
-                        VivaButton(
-                            title: "1v1",
+                        VivaButton.outline(
+                            "1v1",
                             size: .large,
-                            style: .secondary,
                             isLoading: coordinator.isCreatingMatchup
                         ) {
                             Task {
@@ -56,7 +54,7 @@ struct MatchupTypeView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 100)
-                    .padding(.bottom, VivaDesign.Spacing.xlarge)
+                    .padding(.bottom, VivaDesign.Spacing.componentLarge)
             }
         }
         .navigationBarBackButtonHidden(true)

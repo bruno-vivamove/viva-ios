@@ -220,12 +220,13 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
                     category: .network
                 )
 
-                Task { @MainActor in
-                    errorManager?.registerError(
-                        "Session expired. Please log in again.",
-                        type: .authentication
-                    )
-                }
+                // TODO Decide what we want to do here
+//                Task { @MainActor in
+//                    errorManager?.registerError(
+//                        "Session expired. Please log in again.",
+//                        type: .authentication
+//                    )
+//                }
 
                 continuation.resume(throwing: error)
             }

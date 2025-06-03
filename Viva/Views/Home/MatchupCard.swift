@@ -38,8 +38,8 @@ struct MatchupCard: View {
                 errorView
             }
         }
-        .background(Color.black)
-        .listRowBackground(Color.clear)
+        .background(VivaDesign.Colors.surface)
+        .listRowBackground(VivaDesign.Colors.surface)
         .onChange(of: lastRefreshTime) { oldValue, newValue in
             viewModel.updateLastRefreshTime(newValue)
         }
@@ -68,11 +68,11 @@ struct MatchupCard: View {
                     VStack(alignment: .leading) {
                         Text(getUserDisplayName(user: user, invite: invite))
                             .foregroundColor(VivaDesign.Colors.vivaGreen)
-                            .font(VivaDesign.Typography.caption)
+                            .font(VivaDesign.Typography.valueMedium)
                             .lineLimit(1)
                         Text("\(details.leftTeam.points)")
                             .foregroundColor(VivaDesign.Colors.primaryText)
-                            .font(VivaDesign.Typography.value)
+                            .font(VivaDesign.Typography.valueLarge)
                             .lineLimit(1)
                     }
 
@@ -99,11 +99,11 @@ struct MatchupCard: View {
                     VStack(alignment: .trailing) {
                         Text(getUserDisplayName(user: user, invite: invite))
                             .foregroundColor(VivaDesign.Colors.vivaGreen)
-                            .font(VivaDesign.Typography.caption)
+                            .font(VivaDesign.Typography.valueMedium)
                             .lineLimit(1)
                         Text("\(details.rightTeam.points)")
                             .foregroundColor(VivaDesign.Colors.primaryText)
-                            .font(VivaDesign.Typography.value)
+                            .font(VivaDesign.Typography.valueLarge)
                             .lineLimit(1)
                     }
 
@@ -189,7 +189,7 @@ struct MatchupCard: View {
                         )
                         .font(VivaDesign.Typography.title3)
                 }
-                .frame(width: 20)
+                .frame(width: 5)
 
                 // Right side container - aligned to right edge
                 HStack(spacing: VivaDesign.Spacing.small) {
@@ -219,7 +219,7 @@ struct MatchupCard: View {
                 }
             }
             .shimmering(
-                animation: VivaDesign.AnimationStyle.loadingShimmer
+                animation: VivaDesign.Animation.loadingShimmer
             )
         }
     }

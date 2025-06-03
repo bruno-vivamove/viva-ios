@@ -147,8 +147,7 @@ struct MenuItemButton: View {
                 Image(systemName: "chevron.right")
                     .foregroundColor(VivaDesign.Colors.secondaryText)
             }
-            .padding(.vertical, VivaDesign.Spacing.small)
-            .padding(.horizontal, VivaDesign.Spacing.small)
+            .padding(VivaDesign.Spacing.componentSmall)
             .background(
                 RoundedRectangle(cornerRadius: VivaDesign.Sizing.cornerRadius)
                     .stroke(

@@ -120,14 +120,9 @@ struct SignInFormView: View {
                         )
 
                         // Sign In Button
-                        VivaButton(
-                            title: "Sign In",
-                            style: .primary,
-                            isLoading: viewModel.isLoading,
-                            action: signIn
-                        )
-                        .opacity(viewModel.isFormValid ? 1.0 : 0.5)
-                        .disabled(!viewModel.isFormValid)
+                        VivaButton.primary("Sign In", isLoading: viewModel.isLoading, action: signIn)
+                            .opacity(viewModel.isFormValid ? 1.0 : 0.5)
+                            .disabled(!viewModel.isFormValid)
 
                         // Forgot Password
                         HStack {

@@ -45,7 +45,7 @@ struct VivaProfileImage: View {
                     defaultImage
                         .modifier(InvitedModifier(isInvited: isInvited))
                         .shimmering(
-                            animation: VivaDesign.AnimationStyle.loadingShimmer
+                            animation: VivaDesign.Animation.loadingShimmer
                         )
                 }
             }

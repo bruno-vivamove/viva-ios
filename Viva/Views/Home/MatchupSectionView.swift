@@ -10,14 +10,7 @@ struct MatchupSectionView: View {
     let healthKitDataManager: HealthKitDataManager
     let userSession: UserSession
     let userMeasurementService: UserMeasurementService
-    
-    private let rowInsets = EdgeInsets(
-        top: 0,
-        leading: 0,
-        bottom: 0,
-        trailing: 0
-    )
-    
+        
     var body: some View {
         Section {
             ForEach(matchups) { matchup in
@@ -34,8 +27,8 @@ struct MatchupSectionView: View {
                     onMatchupSelected(matchup)
                 }
                 .listRowSeparator(.hidden)
-                .listRowInsets(rowInsets)
-                .padding(.bottom, VivaDesign.Spacing.cardSpacing)
+                .listRowInsets(EdgeInsets())
+                .padding(.bottom, VivaDesign.Spacing.componentSmall)
             }
         } header: {
             SectionHeaderView(title: title)

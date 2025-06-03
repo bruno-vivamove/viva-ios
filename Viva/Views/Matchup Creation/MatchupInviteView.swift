@@ -45,7 +45,7 @@ struct MatchupInviteView: View {
 
     var body: some View {
         ZStack {
-            Color.black.edgesIgnoringSafeArea(.all)
+            VivaDesign.Colors.background.edgesIgnoringSafeArea(.all)
 
             VStack(spacing: 0) {
                 ScrollView(showsIndicators: false) {
@@ -56,7 +56,7 @@ struct MatchupInviteView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding(.top, 40)
                                 .padding(.bottom, 20)
-                                .background(Color.black)
+                                .background(VivaDesign.Colors.background)
                                 .transition(.opacity.combined(with: .move(edge: .top)))
                         }
                         
@@ -84,17 +84,14 @@ struct MatchupInviteView: View {
                                 }
                             } header: {
                                 searchBar
-                                    .background(Color.black)
+                                    .background(VivaDesign.Colors.background)
                             }
                         }
                     }
                 }
 
                 // Done Button
-                VivaButton(
-                    title: "Done", 
-                    style: .primary
-                ) {
+                VivaButton.primary("Done") {
                     if isInvitingFromDetails {
                         dismiss()
                     } else {
@@ -103,7 +100,7 @@ struct MatchupInviteView: View {
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 20)
-                .background(Color.black)
+                .background(VivaDesign.Colors.background)
             }
         }
         .navigationBarBackButtonHidden(true)

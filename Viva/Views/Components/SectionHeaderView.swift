@@ -11,15 +11,15 @@ struct SectionHeaderView: View {
     
     var body: some View {
         ZStack {
-            // Solid black background that fills the entire width
+            // Solid background that fills the entire width
             Rectangle()
-                .fill(Color.black)
+                .fill(VivaDesign.Colors.surface)
                 .frame(maxWidth: .infinity)
 
             // Header content with title and optional subtitle
             HStack {
                 Text(title)
-                    .font(VivaDesign.Typography.header)
+                    .font(VivaDesign.Typography.titleSmall)
                     .foregroundColor(.white)
                 
                 if let subtitle = subtitle {
@@ -31,10 +31,10 @@ struct SectionHeaderView: View {
                 Spacer()
             }
             .padding(EdgeInsets(
-                top: VivaDesign.Spacing.small,
-                leading: VivaDesign.Spacing.xsmall,
-                bottom: VivaDesign.Spacing.small,
-                trailing: VivaDesign.Spacing.xsmall
+                top: VivaDesign.Spacing.componentSmall,
+                leading: VivaDesign.Spacing.componentTiny,
+                bottom: VivaDesign.Spacing.componentSmall,
+                trailing: VivaDesign.Spacing.componentTiny
             ))
         }
         .listRowInsets(EdgeInsets())

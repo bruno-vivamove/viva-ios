@@ -41,11 +41,11 @@ struct CardButton: View {
             }
             .frame(width: width)
             .frame(minWidth: 44) // Ensure minimum button size
-            .padding(VivaDesign.Spacing.xsmall)
+            .padding(VivaDesign.Spacing.contentTiny)
             .background(
                 RoundedRectangle(
                     cornerRadius: VivaDesign.Sizing
-                        .cornerRadius
+                        .radiusSmall
                 )
                 .stroke(
                     color,
