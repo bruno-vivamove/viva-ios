@@ -240,26 +240,34 @@ class AppleSignInDelegate: NSObject, ASAuthorizationControllerDelegate, ASAuthor
         let email = appleIDCredential.email
         
         authManager.handleAppleSignInCompletion(with: idToken, userId: userId, fullName: fullName, email: email, completion: completion)
+        
+        // Clear references to prevent retain cycles
+        self.authManager = nil
+        self.completion = nil
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         AppLogger.error("Apple sign in failed: \(error.localizedDescription)", category: .auth)
         
+        // Store completion handler before clearing
+        let completionHandler = completion
+        
+        // Clear references to prevent retain cycles
+        self.authManager = nil
+        self.completion = nil
+        
         // Check if error is user cancellation
         if let authError = error as? ASAuthorizationError {
             switch authError.code {
             case .canceled:
-                completion?(.cancelled)
+                completionHandler?(.cancelled)
             case .failed, .invalidResponse, .notHandled, .unknown:
-                completion?(.error(error))
+                completionHandler?(.error(error))
             @unknown default:
-                completion?(.error(error))
+                completionHandler?(.error(error))
             }
         } else {
-            completion?(.error(error))
+            completionHandler?(.error(error))
         }
-        
-        // Clean up
-        completion = nil
     }
 }
