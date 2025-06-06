@@ -434,14 +434,20 @@ final class HealthKitDataManager: ObservableObject {
     private func setupObserver(for type: HKSampleType) {
         // Create an observer query
         let query = HKObserverQuery(sampleType: type, predicate: nil) { [weak self] query, completionHandler, error in
-            guard let self = self, userSession.isLoggedIn else {
+            guard let self = self else {
+                completionHandler()
+                return
+            }
+            
+            // Check if user is still logged in
+            guard self.userSession.isLoggedIn else {
                 completionHandler()
                 return
             }
             
             let typeName = self.getTypeDisplayName(type)
             AppLogger.info("New HealthKit data detected for: \(typeName)", category: .health)
-            processHealthDataUpdate()
+            self.processHealthDataUpdate()
             completionHandler()
         }
         
