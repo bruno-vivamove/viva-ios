@@ -13,6 +13,11 @@ class ErrorManager: ObservableObject {
     private var connectivityTimer: Timer?
     private var healthService: HealthService?
     
+    deinit {
+        // Ensure timer is cleaned up when ErrorManager is deallocated
+        stopConnectivityMonitoring()
+    }
+    
     func setHealthService(_ service: HealthService) {
         self.healthService = service
     }
