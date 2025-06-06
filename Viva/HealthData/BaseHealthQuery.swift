@@ -23,6 +23,12 @@ class BaseHealthQuery: HealthDataQuery {
         matchupId: String,
         completion: @escaping ([MatchupUserMeasurement]) -> Void
     ) {
-        fatalError("Subclasses must implement execute method")
+        // Default implementation that does nothing
+        // Subclasses should override this method
+        AppLogger.warning(
+            "BaseHealthQuery execute method called directly. Subclasses should override this method.",
+            category: .health
+        )
+        completion([])
     }
 } 
