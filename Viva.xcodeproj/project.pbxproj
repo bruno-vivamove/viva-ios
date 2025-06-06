@@ -44,9 +44,44 @@
 		C03975C02D2F83D000BCE78F /* VivaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VivaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C05C6FC22DF38F1E00709A6E /* Exceptions for "Viva" folder in "Viva - Dev Debug" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Info-dev.plist",
+				"Info-local.plist",
+				"Info-prod.plist",
+			);
+			target = C02329072DEBA47200D4D49A /* Viva - Dev Debug */;
+		};
+		C05C6FC32DF38F2500709A6E /* Exceptions for "Viva" folder in "Viva - Prod Debug" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Info-dev.plist",
+				"Info-local.plist",
+				"Info-prod.plist",
+			);
+			target = C0232ECD2DEBAA9700D4D49A /* Viva - Prod Debug */;
+		};
+		C05C6FC42DF38F2B00709A6E /* Exceptions for "Viva" folder in "Viva - Local Debug" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Info-dev.plist",
+				"Info-local.plist",
+				"Info-prod.plist",
+			);
+			target = C0232F542DEBAB5A00D4D49A /* Viva - Local Debug */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C03975A82D2F83CE00BCE78F /* Viva */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C05C6FC42DF38F2B00709A6E /* Exceptions for "Viva" folder in "Viva - Local Debug" target */,
+				C05C6FC22DF38F1E00709A6E /* Exceptions for "Viva" folder in "Viva - Dev Debug" target */,
+				C05C6FC32DF38F2500709A6E /* Exceptions for "Viva" folder in "Viva - Prod Debug" target */,
+			);
 			path = Viva;
 			sourceTree = "<group>";
 		};
