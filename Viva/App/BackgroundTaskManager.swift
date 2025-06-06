@@ -14,7 +14,15 @@ class BackgroundTaskManager {
                 .backgroundHealthUpdateTaskIdentifier,
             using: nil
         ) { task in
-            self.handleHealthKitProcessingTask(task: task as! BGProcessingTask)
+            guard let processingTask = task as? BGProcessingTask else {
+                AppLogger.error(
+                    "❌ Received unexpected task type: \(type(of: task))",
+                    category: .general
+                )
+                task.setTaskCompleted(success: false)
+                return
+            }
+            self.handleHealthKitProcessingTask(task: processingTask)
         }
         AppLogger.info(
             "✅ Registered background HealthKit processing task: \(BackgroundTaskManager.backgroundHealthUpdateTaskIdentifier)",
