@@ -16,8 +16,8 @@ enum VivaDesign {
         static let secondary = Color.white
         
         // Semantic Colors
-        static let background = Color.black
-        static let surface = Color.black
+        static let background = Color(red: 11/255, green: 11/255, blue: 11/255)
+        static let surface = Color(red: 11/255, green: 11/255, blue: 11/255)
         static let surfaceVariant = Color.gray.opacity(0.1)
         
         // Text Colors
