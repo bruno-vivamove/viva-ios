@@ -21,7 +21,8 @@
       "Edit(*)",
       "Bash(timeout:*)",
       "Bash(git add:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   }
