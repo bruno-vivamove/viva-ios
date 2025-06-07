@@ -73,9 +73,9 @@ struct VivaApp: App {
     private func checkAppleSignInState() {
         // This checks if the user has previously signed in with Apple
         let appleIDProvider = ASAuthorizationAppleIDProvider()
-        let appleIdKeychain = UserDefaults.standard.string(forKey: "appleAuthorizedUserIdKey")
+        let appleUserId = vivaAppObjects.userSession.getAppleUserId()
         
-        if let userId = appleIdKeychain {
+        if let userId = appleUserId {
             appleIDProvider.getCredentialState(forUserID: userId) { (credentialState, error) in
                 switch credentialState {
                 case .authorized:
@@ -85,12 +85,12 @@ struct VivaApp: App {
                 case .revoked:
                     // The Apple ID credential was revoked, sign out
                     AppLogger.warning("Apple ID credential was revoked", category: .auth)
-                    UserDefaults.standard.removeObject(forKey: "appleAuthorizedUserIdKey")
+                    self.vivaAppObjects.userSession.deleteAppleUserId()
                     
                 case .notFound:
                     // No Apple ID credential was found, sign out if needed
                     AppLogger.warning("No Apple ID credential was found", category: .auth)
-                    UserDefaults.standard.removeObject(forKey: "appleAuthorizedUserIdKey")
+                    self.vivaAppObjects.userSession.deleteAppleUserId()
                     
                 default:
                     break

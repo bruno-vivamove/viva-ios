@@ -95,7 +95,7 @@ final class AuthenticationManager: ObservableObject {
         AppLogger.info("User signing out", category: .auth)
 
         // Clear Apple Sign In state if it exists
-        UserDefaults.standard.removeObject(forKey: "appleAuthorizedUserIdKey")
+        userSession.deleteAppleUserId()
 
         await userSession.setLoggedOut()
         AppLogger.debug("User signed out successfully", category: .auth)
@@ -271,8 +271,8 @@ final class AuthenticationManager: ObservableObject {
             category: .auth
         )
 
-        // Store the Apple user ID in UserDefaults for credential state checking
-        UserDefaults.standard.set(userId, forKey: "appleAuthorizedUserIdKey")
+        // Store the Apple user ID in secure Keychain for credential state checking
+        userSession.storeAppleUserId(userId)
 
         Task {
             do {

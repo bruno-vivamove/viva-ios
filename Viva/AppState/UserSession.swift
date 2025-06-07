@@ -2,9 +2,11 @@ import Foundation
 import Security
 import SwiftUI
 import Combine
+import LocalAuthentication
 
 final class UserSession: ObservableObject {
     private let sessionKey = "com.vivamove.userSession"
+    private let appleUserIdKey = "com.vivamove.appleUserId"
     private let keychainService = "com.vivamove.keychain"
     
     @Published private(set) var isLoggedIn = false
@@ -105,12 +107,32 @@ final class UserSession: ObservableObject {
             return
         }
         
-        let query: [String: Any] = [
+        // Try to create access control for biometric authentication
+        var query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: keychainService,
             kSecAttrAccount as String: sessionKey,
             kSecValueData as String: sessionDataEncoded
         ]
+        
+        // Check if biometric authentication is available
+        let context = LAContext()
+        var error: NSError?
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            // Biometrics available - use enhanced security
+            let accessControl = SecAccessControlCreateWithFlags(
+                nil,
+                kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+                .biometryAny,
+                nil
+            )
+            query[kSecAttrAccessControl as String] = accessControl
+            AppLogger.info("Using biometric protection for session data", category: .auth)
+        } else {
+            // Biometrics not available - use basic security
+            query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+            AppLogger.info("Using basic keychain protection for session data (biometrics not available)", category: .auth)
+        }
         
         // First try to delete any existing session
         SecItemDelete(query as CFDictionary)
@@ -124,12 +146,17 @@ final class UserSession: ObservableObject {
     }
     
     private func restoreSessionFromKeychain() {
-        let query: [String: Any] = [
+        var query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: keychainService,
             kSecAttrAccount as String: sessionKey,
             kSecReturnData as String: true
         ]
+        
+        // Add biometric authentication context for protected data
+        let context = LAContext()
+        context.localizedFallbackTitle = "Use Device Passcode"
+        query[kSecUseAuthenticationContext as String] = context
         
         var result: AnyObject?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
@@ -177,5 +204,71 @@ final class UserSession: ObservableObject {
         ]
         
         SecItemDelete(query as CFDictionary)
+    }
+    
+    // MARK: - Apple User ID Keychain Storage
+    
+    func storeAppleUserId(_ userId: String) {
+        guard let userIdData = userId.data(using: .utf8) else {
+            AppLogger.error("Error encoding Apple user ID", category: .auth)
+            return
+        }
+        
+        // Use basic security for Apple user ID (non-sensitive identifier)
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: appleUserIdKey,
+            kSecValueData as String: userIdData,
+            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+        ]
+        
+        // First try to delete any existing Apple user ID
+        SecItemDelete(query as CFDictionary)
+        
+        // Then save the new Apple user ID
+        let status = SecItemAdd(query as CFDictionary, nil)
+        guard status == errSecSuccess else {
+            AppLogger.error("Error saving Apple user ID to Keychain: \(status)", category: .auth)
+            return
+        }
+        
+        AppLogger.info("Apple user ID stored securely in Keychain", category: .auth)
+    }
+    
+    func getAppleUserId() -> String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: appleUserIdKey,
+            kSecReturnData as String: true
+        ]
+        
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        
+        guard status == errSecSuccess else {
+            AppLogger.info("No Apple user ID found in keychain: \(status)", category: .auth)
+            return nil
+        }
+        
+        guard let userIdData = result as? Data,
+              let userId = String(data: userIdData, encoding: .utf8) else {
+            AppLogger.warning("Invalid Apple user ID data in keychain", category: .auth)
+            return nil
+        }
+        
+        return userId
+    }
+    
+    func deleteAppleUserId() {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: appleUserIdKey
+        ]
+        
+        SecItemDelete(query as CFDictionary)
+        AppLogger.info("Apple user ID removed from Keychain", category: .auth)
     }
 }
