@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a SwiftUI-based iOS fitness social app called "Viva" that enables users to create fitness matchups/competitions with friends, track health data via HealthKit, and compete in various workout challenges.
 
+**New Session Setup**: When starting a new coding session, read the documents in the `/docs/` folder to build initial context about the project's current state, architecture, and ongoing work.
+
 ## Architecture
 
 **MVVM Pattern**: The app follows Model-View-ViewModel architecture with:
@@ -94,3 +96,27 @@ Each environment has separate Info.plist files with different API endpoints and 
 - **Image Caching**: Custom Nuke pipeline configuration
 - **Error Handling**: Global error management with user-friendly messaging
 - **Reactive Programming**: Combine framework with `@Published` properties
+
+## Recent Bug Fixes & Security Improvements
+
+**Comprehensive Audit Completed (21/36 items, 58% complete)**:
+- All critical memory management issues fixed (retain cycles, fatal errors)
+- Comprehensive Keychain security implemented with biometric protection
+- Apple user ID moved from UserDefaults to secure Keychain storage
+- Build configuration issues resolved
+- Project builds successfully with all improvements
+
+**Key Technical Learnings**:
+- Multi-environment setup works well (Dev/Local/Prod with separate Info.plist files)
+- Client-side OAuth API keys in Info.plist are acceptable security practice
+- Test targets exist but schemes need configuration for test running
+- Build failures were bundle copying issues, not code problems
+- userSession access requires `vivaAppObjects.userSession` scope in VivaApp.swift
+
+**Security Enhancements Implemented**:
+- All Keychain operations use `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`
+- Biometric authentication protection for sensitive session data
+- Secure Apple user ID storage with dedicated Keychain methods
+- Graceful fallback for devices without biometric capabilities
+
+**Ongoing Audit Plan**: See `iOS_APP_AUDIT_PLAN.md` for detailed progress tracking and next steps.

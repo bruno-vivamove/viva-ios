@@ -20,7 +20,8 @@
       "Bash(ls:*)",
       "Edit(*)",
       "Bash(timeout:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(awk:*)"
     ],
     "deny": []
   }

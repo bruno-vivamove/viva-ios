@@ -19,6 +19,30 @@ class HomeViewModel: ObservableObject {
     private var dataRequestedTime: Date?
     private var cancellables = Set<AnyCancellable>()
 
+    var isEmpty: Bool {
+        matchups.isEmpty && receivedInvites.isEmpty && sentInvites.isEmpty
+    }
+
+    var activeMatchups: [Matchup] {
+        matchups.filter { $0.status == .active }
+    }
+
+    var pendingMatchups: [Matchup] {
+        matchups.filter { $0.status == .pending }
+    }
+
+    var completedMatchups: [Matchup] {
+        matchups.filter { $0.status == .completed }
+    }
+
+    var allInvites: [MatchupInvite] {
+        receivedInvites + sentInvites
+    }
+
+    var hasInvites: Bool {
+        !receivedInvites.isEmpty || !sentInvites.isEmpty
+    }
+
     init(
         userSession: UserSession,
         matchupService: MatchupService
@@ -42,102 +66,6 @@ class HomeViewModel: ObservableObject {
         error = nil
     }
     
-    private func setupNotificationObservers() {
-        // Matchup created observer
-        NotificationCenter.default.publisher(for: .matchupCreated)
-            .compactMap { $0.object as? MatchupDetails }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] matchupDetails in
-                self?.handleMatchCreated(matchupDetails.asMatchup)
-            }
-            .store(in: &cancellables)
-
-        // Matchup canceled observer
-        NotificationCenter.default.publisher(for: .matchupCanceled)
-            .compactMap { $0.object as? Matchup }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] matchup in
-                self?.handleMatchupCanceled(matchup)
-            }
-            .store(in: &cancellables)
-
-        // Matchup updated observer
-        NotificationCenter.default.publisher(for: .matchupUpdated)
-            .compactMap { $0.object as? MatchupDetails }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] matchupDetails in
-                self?.handleMatchupUpdated(matchupDetails)
-            }
-            .store(in: &cancellables)
-
-        // Matchup invite sent observer
-        NotificationCenter.default.publisher(for: .matchupInviteSent)
-            .compactMap { $0.object as? MatchupInvite }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] matchupInvite in
-                self?.handleInviteSent(matchupInvite)
-            }
-            .store(in: &cancellables)
-
-        // Matchup invite deleted observer
-        NotificationCenter.default.publisher(for: .matchupInviteDeleted)
-            .compactMap { $0.object as? MatchupInvite }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] matchupInvite in
-                self?.handleInviteDeleted(matchupInvite)
-            }
-            .store(in: &cancellables)
-
-        // Matchup invite accepted observer
-        NotificationCenter.default.publisher(for: .matchupInviteAccepted)
-            .compactMap { $0.object as? MatchupInvite }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] matchupInvite in
-                guard let self = self else { return }
-
-                self.receivedInvites.removeAll(where: {
-                    $0.inviteCode == matchupInvite.inviteCode
-                })
-                self.sentInvites.removeAll(where: {
-                    $0.inviteCode == matchupInvite.inviteCode
-                })
-
-                Task {
-                    do {
-                        self.selectedMatchup =
-                            try await self.matchupService.getMatchup(
-                                matchupId: matchupInvite.matchupId
-                            ).asMatchup
-                    } catch {
-                        self.setError(error)
-                    }
-                }
-            }
-            .store(in: &cancellables)
-
-        // Matchup creation flow completed observer
-        NotificationCenter.default.publisher(
-            for: .matchupCreationFlowCompleted
-        )
-        .receive(on: DispatchQueue.main)
-        .sink { [weak self] notification in
-            guard let matchupDetails = notification.object as? MatchupDetails else {
-                return
-            }
-            
-            // Get the source from userInfo if available
-            if let userInfo = notification.userInfo,
-               let source = userInfo["source"] as? String {
-               
-                // Navigate if source is 'home'
-                if source == "home" {
-                    self?.selectedMatchup = matchupDetails.asMatchup
-                }
-            }
-        }
-        .store(in: &cancellables)
-    }
-
     func loadInitialDataIfNeeded() async {
         // Don't load if we've requested data in the last minute, regardless of result
         if let requestedTime = dataRequestedTime, 
@@ -312,27 +240,99 @@ class HomeViewModel: ObservableObject {
         }
     }
 
-    var isEmpty: Bool {
-        matchups.isEmpty && receivedInvites.isEmpty && sentInvites.isEmpty
-    }
+    private func setupNotificationObservers() {
+        // Matchup created observer
+        NotificationCenter.default.publisher(for: .matchupCreated)
+            .compactMap { $0.object as? MatchupDetails }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] matchupDetails in
+                self?.handleMatchCreated(matchupDetails.asMatchup)
+            }
+            .store(in: &cancellables)
 
-    var activeMatchups: [Matchup] {
-        matchups.filter { $0.status == .active }
-    }
+        // Matchup canceled observer
+        NotificationCenter.default.publisher(for: .matchupCanceled)
+            .compactMap { $0.object as? Matchup }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] matchup in
+                self?.handleMatchupCanceled(matchup)
+            }
+            .store(in: &cancellables)
 
-    var pendingMatchups: [Matchup] {
-        matchups.filter { $0.status == .pending }
-    }
+        // Matchup updated observer
+        NotificationCenter.default.publisher(for: .matchupUpdated)
+            .compactMap { $0.object as? MatchupDetails }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] matchupDetails in
+                self?.handleMatchupUpdated(matchupDetails)
+            }
+            .store(in: &cancellables)
 
-    var completedMatchups: [Matchup] {
-        matchups.filter { $0.status == .completed }
-    }
+        // Matchup invite sent observer
+        NotificationCenter.default.publisher(for: .matchupInviteSent)
+            .compactMap { $0.object as? MatchupInvite }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] matchupInvite in
+                self?.handleInviteSent(matchupInvite)
+            }
+            .store(in: &cancellables)
 
-    var allInvites: [MatchupInvite] {
-        receivedInvites + sentInvites
-    }
+        // Matchup invite deleted observer
+        NotificationCenter.default.publisher(for: .matchupInviteDeleted)
+            .compactMap { $0.object as? MatchupInvite }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] matchupInvite in
+                self?.handleInviteDeleted(matchupInvite)
+            }
+            .store(in: &cancellables)
 
-    var hasInvites: Bool {
-        !receivedInvites.isEmpty || !sentInvites.isEmpty
+        // Matchup invite accepted observer
+        NotificationCenter.default.publisher(for: .matchupInviteAccepted)
+            .compactMap { $0.object as? MatchupInvite }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] matchupInvite in
+                guard let self = self else { return }
+
+                self.receivedInvites.removeAll(where: {
+                    $0.inviteCode == matchupInvite.inviteCode
+                })
+                self.sentInvites.removeAll(where: {
+                    $0.inviteCode == matchupInvite.inviteCode
+                })
+
+                Task {
+                    do {
+                        self.selectedMatchup =
+                            try await self.matchupService.getMatchup(
+                                matchupId: matchupInvite.matchupId
+                            ).asMatchup
+                    } catch {
+                        self.setError(error)
+                    }
+                }
+            }
+            .store(in: &cancellables)
+
+        // Matchup creation flow completed observer
+        NotificationCenter.default.publisher(
+            for: .matchupCreationFlowCompleted
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] notification in
+            guard let matchupDetails = notification.object as? MatchupDetails else {
+                return
+            }
+            
+            // Get the source from userInfo if available
+            if let userInfo = notification.userInfo,
+               let source = userInfo["source"] as? String {
+               
+                // Navigate if source is 'home'
+                if source == "home" {
+                    self?.selectedMatchup = matchupDetails.asMatchup
+                }
+            }
+        }
+        .store(in: &cancellables)
     }
 }
