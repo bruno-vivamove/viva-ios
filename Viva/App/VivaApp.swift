@@ -2,6 +2,7 @@ import SwiftUI
 import GoogleSignIn
 import AuthenticationServices
 import Nuke
+import BackgroundTasks
 
 @main
 struct VivaApp: App {
@@ -9,8 +10,6 @@ struct VivaApp: App {
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
-        // Register background tasks at app startup
-        BackgroundTaskManager.shared.registerBackgroundTasks()
         configureVivaImageCache()
     }
 
@@ -32,6 +31,9 @@ struct VivaApp: App {
                     }
                 }
                 .onAppear {
+                    // Register background tasks at app startup
+                    vivaAppObjects.backgroundTaskManager.registerBackgroundTasks()
+                    
                     // Check for existing Apple sign-in session on app launch
                     checkAppleSignInState()
                 }
@@ -58,6 +60,20 @@ struct VivaApp: App {
             case .background:
                 // App is entering background
                 AppLogger.info("App entered background", category: .general)
+                
+                // Schedule background health update task if user is logged in
+                if vivaAppObjects.userSession.isLoggedIn {
+                    let request = BGProcessingTaskRequest(identifier: BackgroundTaskManager.backgroundHealthUpdateTaskIdentifier)
+                    request.requiresNetworkConnectivity = true
+                    request.requiresExternalPower = false
+                    
+                    do {
+                        try BGTaskScheduler.shared.submit(request)
+                        AppLogger.info("Successfully scheduled background health update task", category: .general)
+                    } catch {
+                        AppLogger.error("Failed to schedule background task: \(error)", category: .general)
+                    }
+                }
                 
             case .inactive:
                 // App is inactive but visible

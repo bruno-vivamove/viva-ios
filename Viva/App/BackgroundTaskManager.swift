@@ -2,9 +2,14 @@ import BackgroundTasks
 import Foundation
 
 class BackgroundTaskManager {
-    static let shared = BackgroundTaskManager()
     public static let backgroundHealthUpdateTaskIdentifier =
         "io.vivamove.healthupdate"
+    
+    private let healthKitDataManager: HealthKitDataManager
+    
+    init(healthKitDataManager: HealthKitDataManager) {
+        self.healthKitDataManager = healthKitDataManager
+    }
 
     /// Registers the background task with the system
     public func registerBackgroundTasks() {
@@ -46,9 +51,8 @@ class BackgroundTaskManager {
             task.setTaskCompleted(success: false)
         }
 
-        // Process the health data
-        let vivaAppObjects = VivaAppObjects()
-        vivaAppObjects.healthKitDataManager.processHealthDataUpdate()
+        // Process the health data using the injected dependency
+        healthKitDataManager.processHealthDataUpdate()
 
         // Notify the app of updated health data
         NotificationCenter.default.post(name: .healthDataUpdated, object: nil)
