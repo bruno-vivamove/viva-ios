@@ -100,48 +100,7 @@ struct AppLogger {
         category.logger.fault("[\(context, privacy: .public)]\n\(message, privacy: .public)")
     }
     
-    /// Log network requests with privacy considerations
-    /// - Parameters:
-    ///   - url: The URL being requested
-    ///   - method: HTTP method
-    ///   - headers: HTTP headers (authorization will be redacted)
-    ///   - file: Source file (auto-filled)
-    ///   - function: Function name (auto-filled)
-    ///   - line: Line number (auto-filled)
-    static func request(url: URL, method: String, headers: [String: Any]? = nil, file: String = #file, function: String = #function, line: Int = #line) {
-        let context = extractContext(file: file, function: function, line: line)
-        
-        // Redact sensitive headers
-        var safeHeaders = headers ?? [:]
-        if safeHeaders["Authorization"] != nil {
-            safeHeaders["Authorization"] = "REDACTED"
-        }
-        
-        let message = "Request: \(method) \(url.absoluteString)"
-        Category.network.logger.debug("[\(context, privacy: .public)]\n\(message, privacy: .public)")
-        
-        if let headers = safeHeaders as? [String: String], !headers.isEmpty {
-            Category.network.logger.debug("[\(context, privacy: .public)]\nHeaders: \(headers, privacy: .public)")
-        }
-    }
     
-    /// Log network responses with appropriate privacy considerations
-    /// - Parameters:
-    ///   - url: The URL that was requested
-    ///   - statusCode: HTTP status code
-    ///   - file: Source file (auto-filled)
-    ///   - function: Function name (auto-filled)
-    ///   - line: Line number (auto-filled)
-    static func response(url: URL, statusCode: Int, file: String = #file, function: String = #function, line: Int = #line) {
-        let context = extractContext(file: file, function: function, line: line)
-        let message = "Response: \(statusCode) \(url.absoluteString)"
-        
-        if statusCode >= 400 {
-            Category.network.logger.error("[\(context, privacy: .public)]\n\(message, privacy: .public)")
-        } else {
-            Category.network.logger.debug("[\(context, privacy: .public)]\n\(message, privacy: .public)")
-        }
-    }
     
     // MARK: - Helper Methods
     

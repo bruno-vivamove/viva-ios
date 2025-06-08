@@ -637,7 +637,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
         let currentAttempt = settings.maxRetries - remainingRetries + 1
         
         // Build request title with retry info if applicable
-        var requestTitle = "\(method.rawValue) Request"
+        var requestTitle = "🚀 \(method.rawValue) Request"
         if currentAttempt > 1 {
             requestTitle += " (retry \(currentAttempt - 1)/\(settings.maxRetries))"
         }

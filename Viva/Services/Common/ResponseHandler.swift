@@ -324,8 +324,11 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
             logMessage += "Response Type: \(responseType)\n"
         }
 
+        // Add icon based on status code
+        let statusCode = httpResponse?.statusCode ?? 0
+        let responseIcon = statusCode >= 400 ? "❌" : "✅"
         logMessage +=
-            "Response Status: \(String(describing: httpResponse?.statusCode))\n"
+            "\(responseIcon) Response Status: \(String(describing: httpResponse?.statusCode))\n"
         logMessage +=
             "Response Headers: \(String(describing: httpResponse?.headers))"
 

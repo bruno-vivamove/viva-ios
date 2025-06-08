@@ -54,7 +54,7 @@ class VivaAppObjects: ObservableObject {
         appNetworkClient = NetworkClient(
             settings: AppNetworkClientSettings(
                 userSession,
-                shouldLogBodies: true
+                shouldLogBodies: false
             ),
             tokenRefreshHandler: TokenRefreshHandler(
                 sessionService: sessionService,
