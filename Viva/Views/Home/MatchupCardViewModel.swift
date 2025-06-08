@@ -95,25 +95,9 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
             if matchup.status == .active && isCurrentUserInMatchup
                 && uploadHealthData
             {
-                // Use the unified method for updating and uploading health data
-                healthKitDataManager.updateAndUploadHealthData(
-                    matchupDetail: matchup
-                ) { [weak self] result in
-                    guard let self = self else { return }
-
-                    Task { @MainActor in
-                        switch result {
-                        case .success(let updatedMatchup):
-                            self.matchup = updatedMatchup
-                        case .failure(let error):
-                            AppLogger.error(
-                                "Failed to update and upload health data: \(error)",
-                                category: .data
-                            )
-                            self.error = error
-                        }
-                    }
-                }
+                // Trigger health data update - UI will be updated via notifications
+                AppLogger.info("MatchupCard triggering health data update for matchup \(matchup.id)", category: .ui)
+                healthKitDataManager.updateAndUploadHealthData(matchupDetail: matchup)
             }
         } catch {
             AppLogger.error(
@@ -243,6 +227,31 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
                         $0.inviteCode == matchupInvite.inviteCode
                     }
                     self.matchup = details  // Update the published property to trigger UI refresh
+                }
+            }
+            .store(in: &cancellables)
+
+        // Refresh when health data is updated
+        NotificationCenter.default.publisher(for: .healthDataUpdated)
+            .compactMap { $0.object as? MatchupDetails }
+            .filter { $0.id == self.matchupId }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] updatedMatchup in
+                AppLogger.info("MatchupCard received health data update for matchup \(updatedMatchup.id)", category: .ui)
+                self?.matchup = updatedMatchup
+            }
+            .store(in: &cancellables)
+
+        // Refresh when workouts are recorded
+        NotificationCenter.default.publisher(for: .workoutsRecorded)
+            .compactMap { $0.object as? MatchupDetails }
+            .filter { $0.id == self.matchupId }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] matchupWithWorkouts in
+                AppLogger.info("MatchupCard received workouts recorded notification for matchup \(matchupWithWorkouts.id)", category: .ui)
+                // Reload the full matchup data to get updated measurements
+                Task { [weak self] in
+                    await self?.loadData(uploadHealthData: false)
                 }
             }
             .store(in: &cancellables)

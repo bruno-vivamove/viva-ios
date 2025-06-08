@@ -286,12 +286,10 @@ final class HealthKitDataManager: ObservableObject {
     }
 
     /// Updates and uploads health data for a matchup in a single operation
-    /// - Parameters:
-    ///   - matchupDetail: The matchup detail to update
-    ///   - completion: Callback with the result - success with updated data or failure with error
+    /// - Parameter matchupDetail: The matchup detail to update
+    /// - Note: Posts .workoutsRecorded and .healthDataUpdated notifications on success
     func updateAndUploadHealthData(
-        matchupDetail: MatchupDetails,
-        completion: @escaping (Result<MatchupDetails, Error>) -> Void
+        matchupDetail: MatchupDetails
     ) {
         // First query and upload workouts
         queryWorkouts(matchupDetail: matchupDetail) { workouts in
@@ -302,32 +300,38 @@ final class HealthKitDataManager: ObservableObject {
                         // Upload the workouts
                         try await self.workoutService.recordWorkouts(workouts: workouts)
                         
+                        // Post notification that workouts were recorded
+                        DispatchQueue.main.async {
+                            AppLogger.info("Posting workouts recorded notification for matchup \(matchupDetail.id)", category: .health)
+                            NotificationCenter.default.post(
+                                name: .workoutsRecorded,
+                                object: matchupDetail
+                            )
+                        }
+                        
                         // Continue with regular health data update after workouts are uploaded
-                        self.updateAndUploadHealthMeasurements(matchupDetail: matchupDetail, completion: completion)
+                        self.updateAndUploadHealthMeasurements(matchupDetail: matchupDetail)
                     } catch {
                         AppLogger.error(
                             "Failed to save workouts: \(error)",
                             category: .data
                         )
-                        DispatchQueue.main.async {
-                            completion(.failure(error))
-                        }
+                        // TODO: Error handling could be improved with global ErrorManager
+                        // For now, just log the error
                     }
                 }
             } else {
                 // No workouts to upload, proceed with regular health data update
-                self.updateAndUploadHealthMeasurements(matchupDetail: matchupDetail, completion: completion)
+                self.updateAndUploadHealthMeasurements(matchupDetail: matchupDetail)
             }
         }
     }
     
     /// Updates and uploads health measurements for a matchup
-    /// - Parameters:
-    ///   - matchupDetail: The matchup detail to update
-    ///   - completion: Callback with the result - success with updated data or failure with error
+    /// - Parameter matchupDetail: The matchup detail to update
+    /// - Note: Posts .healthDataUpdated notification on success
     private func updateAndUploadHealthMeasurements(
-        matchupDetail: MatchupDetails,
-        completion: @escaping (Result<MatchupDetails, Error>) -> Void
+        matchupDetail: MatchupDetails
     ) {
         guard let userId = userSession.userId else {
             return
@@ -339,9 +343,8 @@ final class HealthKitDataManager: ObservableObject {
             let userMeasurements = updatedMatchup.userMeasurements
                 .filter { $0.userId == userId }
 
-            // Skip upload if no measurements
+            // Skip upload if no measurements - no notification needed
             if userMeasurements.isEmpty {
-                completion(.success(updatedMatchup))
                 return
             }
 
@@ -356,18 +359,21 @@ final class HealthKitDataManager: ObservableObject {
                             measurements: userMeasurements
                         )
 
-                    // Return the saved details
+                    // Post notification that health data was updated
                     DispatchQueue.main.async {
-                        completion(.success(savedMatchupDetails))
+                        AppLogger.info("Posting health data updated notification for matchup \(savedMatchupDetails.id)", category: .health)
+                        NotificationCenter.default.post(
+                            name: .healthDataUpdated,
+                            object: savedMatchupDetails
+                        )
                     }
                 } catch {
                     AppLogger.error(
                         "Failed to save measurements: \(error)",
                         category: .data
                     )
-                    DispatchQueue.main.async {
-                        completion(.failure(error))
-                    }
+                    // TODOError handling could be improved with global ErrorManager
+                    // For now, just log the error
                 }
             }
         }
@@ -530,14 +536,8 @@ final class HealthKitDataManager: ObservableObject {
                         let matchupDetails = try await matchupService.getMatchup(matchupId: matchup.id)
                         
                         // Update and upload health data for this matchup
-                        updateAndUploadHealthData(matchupDetail: matchupDetails) { result in
-                            switch result {
-                            case .success(let updatedMatchup):
-                                AppLogger.info("Successfully updated health data for matchup \(updatedMatchup.id)", category: .health)
-                            case .failure(let error):
-                                AppLogger.error("Failed to update health data for matchup \(matchup.id): \(error)", category: .health)
-                            }
-                        }
+                        updateAndUploadHealthData(matchupDetail: matchupDetails)
+                        AppLogger.info("Triggered health data update for matchup \(matchupDetails.id)", category: .health)
                     } catch {
                         AppLogger.error("Error getting details for matchup \(matchup.id): \(error)", category: .health)
                         continue
