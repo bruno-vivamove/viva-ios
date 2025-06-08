@@ -138,15 +138,8 @@ struct MatchupDetailView: View {
             get: { selectedUserId != nil },
             set: { if !$0 { selectedUserId = nil } }
         )) {
-            if let userId = selectedUserId, let viewModel = viewModel {
-                ProfileView(
-                    viewModel: ProfileViewModel(
-                        userId: userId,
-                        userSession: viewModel.userSession,
-                        userService: viewModel.userService,
-                        matchupService: viewModel.matchupService
-                    )
-                )
+            if let userId = selectedUserId {
+                ProfileView(userId: userId)
             }
         }
         .onAppear {

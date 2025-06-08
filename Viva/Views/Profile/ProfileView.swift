@@ -8,15 +8,15 @@ struct ProfileView: View {
     @EnvironmentObject var friendService: FriendService
     @EnvironmentObject var userService: UserService
 
-    @StateObject private var viewModel: ProfileViewModel
+    @State private var viewModel: ProfileViewModel?
     @State private var showSettings = false
     @State private var showEditProfile = false
     @State private var showImagePicker = false
     @State private var selectedImage: UIImage?
+    private let userId: String
 
-    init(viewModel: ProfileViewModel) {
-        // Note: This will be properly initialized when the view is created since the required services are provided as environment objects
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init(userId: String) {
+        self.userId = userId
 
         // Make navigation bar transparent
         let appearance = UINavigationBarAppearance()
@@ -35,8 +35,21 @@ struct ProfileView: View {
             VivaDesign.Colors.background
                 .edgesIgnoringSafeArea(.all)
 
-            // Scrollable content
-            ScrollView(.vertical, showsIndicators: false) {
+            // Main content
+            Group {
+                if let viewModel = viewModel {
+                    ProfileContent(
+                        viewModel: viewModel,
+                        showSettings: $showSettings,
+                        showEditProfile: $showEditProfile,
+                        showImagePicker: $showImagePicker,
+                        selectedImage: $selectedImage
+                    )
+                } else {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
                 GeometryReader { geometry in
                     Color.clear.preference(
                         key: ViewOffsetKey.self,
@@ -73,19 +86,19 @@ struct ProfileView: View {
                                 ZStack(alignment: .bottomTrailing) {
                                     // Profile image with skeleton loading built in
                                     VivaProfileImage(
-                                        userId: viewModel.userProfile?
+                                        userId: viewModel?.userProfile?
                                             .userSummary.id,
-                                        imageUrl: viewModel.userProfile?
+                                        imageUrl: viewModel?.userProfile?
                                             .userSummary.imageUrl,
                                         size: .xlarge
                                     )
                                     .padding(.top, 16)
                                     .opacity(
-                                        viewModel.isImageLoading ? 0.6 : 1
+                                        viewModel?.isImageLoading == true ? 0.6 : 1
                                     )
 
                                     // Plus button for editing profile picture - only for current user
-                                    if viewModel.isCurrentUser {
+                                    if viewModel?.isCurrentUser == true {
                                         Button(action: {
                                             showImagePicker = true
                                         }) {
@@ -104,14 +117,14 @@ struct ProfileView: View {
                                                 )
                                         }
                                         .offset(x: -4, y: -4)
-                                        .disabled(viewModel.isImageLoading)
+                                        .disabled(viewModel?.isImageLoading == true)
                                     }
                                 }
 
                                 Spacer()
 
                                 // Hamburger menu button - only for current user
-                                if viewModel.isCurrentUser {
+                                if viewModel?.isCurrentUser == true {
                                     Button(action: {
                                         showSettings = true
                                     }) {
@@ -127,7 +140,7 @@ struct ProfileView: View {
 
                             // User name (left aligned)
                             Text(
-                                viewModel.userProfile?.userSummary.displayName
+                                viewModel?.userProfile?.userSummary.displayName
                                     ?? ""
                             )
                             .font(.system(size: 28, weight: .bold))
@@ -152,7 +165,7 @@ struct ProfileView: View {
                             .padding(.horizontal, 16)
 
                             // Edit Profile Button (left aligned) - only for current user
-                            if viewModel.isCurrentUser {
+                            if viewModel?.isCurrentUser == true {
                                 Button(action: {
                                     showEditProfile = true
                                 }) {
@@ -171,7 +184,7 @@ struct ProfileView: View {
                             }
 
                             // User caption
-                            if let caption = viewModel.userProfile?.userSummary
+                            if let caption = viewModel?.userProfile?.userSummary
                                 .caption, !caption.isEmpty
                             {
                                 Text(caption)
@@ -185,7 +198,7 @@ struct ProfileView: View {
 
                             // Stats row
                             GeometryReader { geo in
-                                let userStats = viewModel.userProfile?.userStats
+                                let userStats = viewModel?.userProfile?.userStats
                                 HStack(alignment: .top, spacing: 0) {
                                     Spacer()
 
@@ -246,13 +259,13 @@ struct ProfileView: View {
                         )
 
                     // Active Matchups section - only show for current user
-                    if !viewModel.activeMatchups.isEmpty {
+                    if !(viewModel?.activeMatchups.isEmpty ?? true) {
                         MatchupSectionView(
                             title: "Active Matchups",
-                            matchups: viewModel.activeMatchups,
+                            matchups: viewModel?.activeMatchups ?? [],
                             lastRefreshTime: nil,
                             onMatchupSelected: { matchup in
-                                viewModel.selectMatchup(matchup)
+                                viewModel?.selectMatchup(matchup)
                             },
                             matchupService: matchupService,
                             healthKitDataManager: healthKitDataManager,
@@ -281,7 +294,9 @@ struct ProfileView: View {
             }
             .ignoresSafeArea(edges: .top)
             .refreshable {
-                await viewModel.loadData()
+                if let viewModel = viewModel {
+                    await viewModel.loadData()
+                }
             }
         }
         .toolbar {
@@ -302,26 +317,30 @@ struct ProfileView: View {
         .sheet(
             isPresented: $showImagePicker,
             onDismiss: {
-                if let selectedImage = selectedImage {
-                    viewModel.saveProfileImage(selectedImage)
+                if let selectedImage = selectedImage, let viewModel = viewModel {
+                    Task {
+                        await viewModel.uploadProfileImage(selectedImage)
+                    }
                 }
             }
         ) {
             ImagePicker(selectedImage: $selectedImage)
         }
-        .navigationDestination(item: $viewModel.selectedMatchup) {
-            matchup in
+        .navigationDestination(item: Binding(
+            get: { viewModel?.selectedMatchup },
+            set: { newValue in viewModel?.selectedMatchup = newValue }
+        )) { matchup in
             MatchupDetailView(
                 matchupId: matchup.id,
                 source: "profile"
             )
         }
-        .alert("Error", isPresented: .constant(viewModel.error != nil)) {
+        .alert("Error", isPresented: .constant(viewModel?.error != nil)) {
             Button("OK") {
-                viewModel.error = nil
+                viewModel?.error = nil
             }
         } message: {
-            if let error = viewModel.error {
+            if let error = viewModel?.error {
                 if let vivaError = error as? VivaErrorResponse {
                     Text(vivaError.message)
                 } else {
@@ -329,8 +348,20 @@ struct ProfileView: View {
                 }
             }
         }
+        .onAppear {
+            if viewModel == nil {
+                viewModel = ProfileViewModel(
+                    userId: userId,
+                    userSession: userSession,
+                    userService: userService,
+                    matchupService: matchupService
+                )
+            }
+        }
         .task {
-            await viewModel.loadInitialDataIfNeeded()
+            if let viewModel = viewModel {
+                await viewModel.loadInitialDataIfNeeded()
+            }
         }
     }
 }

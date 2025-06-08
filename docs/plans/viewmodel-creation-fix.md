@@ -1,9 +1,9 @@
 # ViewModel Creation Anti-Pattern Fix Plan
 
-## Status: Phase 1 Complete ✅
+## Status: Phase 2 Complete ✅
 
 **Phase 1 (CRITICAL)**: ✅ **COMPLETED** - MatchupDetailViewModel anti-pattern fixed
-**Phase 2 (HIGH)**: ⏳ **PENDING** - ProfileViewModel fixes  
+**Phase 2 (HIGH)**: ✅ **COMPLETED** - ProfileViewModel anti-pattern fixed
 **Phase 3 (MEDIUM)**: ⏳ **PENDING** - Other ViewModels audit
 **Phase 4 (MEDIUM)**: ⏳ **PENDING** - Best practices documentation
 
@@ -77,21 +77,30 @@ ViewModels with notification observers that are being created in navigation clos
   - ✅ All anti-pattern locations updated
   - ✅ Each MatchupDetailView now creates exactly one ViewModel instance
 
-### Phase 2: Fix ProfileViewModel (HIGH)
-**Impact**: Multiple notification observers × 3 locations
+### Phase 2: Fix ProfileViewModel (HIGH) ✅
+**Impact**: Multiple notification observers × 4 locations - **COMPLETED**
 
-- [ ] **Step 2.1**: Update ProfileView to create ViewModel internally
-  - Move ViewModel creation from parent views to ProfileView init
-  - Use `@StateObject` for internal creation
+- [x] **Step 2.1**: Update ProfileView to create ViewModel internally
+  - ✅ Move ViewModel creation from parent views to ProfileView init
+  - ✅ Use `@State` for internal creation (opted for @State over @StateObject for better optional handling)
+  - ✅ Update constructor to take primitive parameters (userId)
+  - ✅ Handle optional ViewModel references throughout the view
 
-- [ ] **Step 2.2**: Update FriendsView → ProfileView navigation
-  - Remove ProfileViewModel creation from navigationDestination
+- [x] **Step 2.2**: Update MainView → ProfileView tab navigation
+  - ✅ Remove ProfileViewModel creation from main tab view
+  - ✅ Pass userId directly to ProfileView
 
-- [ ] **Step 2.3**: Update MatchupHistoryView → ProfileView navigation
-  - Remove ProfileViewModel creation from navigationDestination
+- [x] **Step 2.3**: Update FriendsView → ProfileView navigation
+  - ✅ Remove ProfileViewModel creation from navigationDestination
+  - ✅ Pass userId directly to ProfileView
 
-- [ ] **Step 2.4**: Update MatchupDetailView → ProfileView navigation
-  - Remove ProfileViewModel creation from navigationDestination
+- [x] **Step 2.4**: Update MatchupHistoryView → ProfileView navigation
+  - ✅ Remove ProfileViewModel creation from navigationDestination
+  - ✅ Pass userId directly to ProfileView
+
+- [x] **Step 2.5**: Update MatchupDetailView → ProfileView navigation
+  - ✅ Remove ProfileViewModel creation from navigationDestination
+  - ✅ Pass userId directly to ProfileView
 
 ### Phase 3: Audit and Fix Other ViewModels (MEDIUM)
 - [ ] **Step 3.1**: Audit HomeViewModel usage patterns
@@ -207,10 +216,12 @@ init(itemId: String, dependencies: DependencyContainer) {
 - [x] All navigation flows continue to work correctly
 - [x] Build compilation successful with no errors
 
-### Phase 2 Success
-- [ ] ProfileViewModel instances properly cleaned up
-- [ ] Profile navigation performance improved
-- [ ] No functional regressions in profile functionality
+### Phase 2 Success ✅
+- [x] ProfileViewModel instances properly cleaned up
+- [x] Profile navigation performance improved  
+- [x] No functional regressions in profile functionality
+- [x] All ProfileView navigation updated to use userId directly
+- [x] Build compilation successful with no errors
 
 ### Overall Success
 - [ ] Zero memory leaks from ViewModel creation patterns

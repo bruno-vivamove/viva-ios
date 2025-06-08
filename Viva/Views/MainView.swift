@@ -47,14 +47,7 @@ struct MainView: View {
 
                 // Profile Tab
                 NavigationStack {
-                    ProfileView(
-                        viewModel: ProfileViewModel(
-                            userId: userSession.userId!,
-                            userSession: userSession,
-                            userService: userService,
-                            matchupService: matchupService
-                        )
-                    )
+                    ProfileView(userId: userSession.userId!)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .tabItem {
