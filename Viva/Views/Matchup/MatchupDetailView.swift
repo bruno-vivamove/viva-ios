@@ -139,7 +139,12 @@ struct MatchupDetailView: View {
             set: { if !$0 { selectedUserId = nil } }
         )) {
             if let userId = selectedUserId {
-                ProfileView(userId: userId)
+                ProfileView(
+                    userId: userId,
+                    userSession: userSession,
+                    userService: userService,
+                    matchupService: matchupService
+                )
             }
         }
         .onAppear {

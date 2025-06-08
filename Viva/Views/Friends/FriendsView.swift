@@ -178,7 +178,12 @@ struct FriendsView: View {
                 set: { if !$0 { viewModel.selectedUserId = nil } }
             )) {
                 if let userId = viewModel.selectedUserId {
-                    ProfileView(userId: userId)
+                    ProfileView(
+                        userId: userId,
+                        userSession: userSession,
+                        userService: userService,
+                        matchupService: matchupService
+                    )
                 }
             }
             .alert("Error", isPresented: .constant(viewModel.error != nil)) {

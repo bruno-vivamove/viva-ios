@@ -106,7 +106,12 @@ struct MatchupHistoryView: View {
                 )
             }
             .navigationDestination(item: $viewModel.selectedUserId) { userId in
-                ProfileView(userId: userId)
+                ProfileView(
+                    userId: userId,
+                    userSession: userSession,
+                    userService: userService,
+                    matchupService: matchupService
+                )
             }
             .alert("Error", isPresented: .constant(viewModel.error != nil)) {
                 Button("OK") {
