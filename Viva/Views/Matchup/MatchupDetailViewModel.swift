@@ -140,6 +140,31 @@ class MatchupDetailViewModel: ObservableObject {
                 }
             }
             .store(in: &cancellables)
+
+        // Refresh when health data is updated
+        NotificationCenter.default.publisher(for: .healthDataUpdated)
+            .compactMap { $0.object as? MatchupDetails }
+            .filter { $0.id == self.matchupId }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] updatedMatchup in
+                AppLogger.info("MatchupDetail received health data update for matchup \(updatedMatchup.id)", category: .ui)
+                self?.updateMeasurements(matchup: updatedMatchup)
+            }
+            .store(in: &cancellables)
+
+        // Refresh when workouts are recorded
+        NotificationCenter.default.publisher(for: .workoutsRecorded)
+            .compactMap { $0.object as? MatchupDetails }
+            .filter { $0.id == self.matchupId }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] matchupWithWorkouts in
+                AppLogger.info("MatchupDetail received workouts recorded notification for matchup \(matchupWithWorkouts.id)", category: .ui)
+                // Reload the full matchup data to get updated measurements
+                Task { [weak self] in
+                    await self?.loadData()
+                }
+            }
+            .store(in: &cancellables)
     }
 
     func loadInitialDataIfNeeded() async {
@@ -186,20 +211,9 @@ class MatchupDetailViewModel: ObservableObject {
                 if self.isCompletedButNotFinalized {
                     try await finalizeUserParticipation(matchup: matchup)
                 } else if matchup.status == .active {
-                    // Use the unified method for updating and uploading health data
-                    healthKitDataManager.updateAndUploadHealthData(matchupDetail: matchup) { [weak self] result in
-                        guard let self = self else { return }
-                        
-                        Task { @MainActor in
-                            switch result {
-                            case .success(let updatedMatchup):
-                                self.updateMeasurements(matchup: updatedMatchup)
-                            case .failure(let error):
-                                AppLogger.error("Failed to update and upload health data: \(error)", category: .data)
-                                self.error = error
-                            }
-                        }
-                    }
+                    // Trigger health data update - UI will be updated via notifications
+                    AppLogger.info("MatchupDetail triggering health data update for matchup \(matchup.id)", category: .ui)
+                    healthKitDataManager.updateAndUploadHealthData(matchupDetail: matchup)
                 }
             }
         } catch {

@@ -65,15 +65,7 @@ struct HomeView: View {
         .background(VivaDesign.Colors.background)
         .navigationDestination(item: $viewModel.selectedMatchup) { matchup in
             MatchupDetailView(
-                viewModel: MatchupDetailViewModel(
-                    matchupId: matchup.id,
-                    matchupService: matchupService,
-                    userMeasurementService: userMeasurementService,
-                    friendService: friendService,
-                    userService: userService,
-                    userSession: userSession,
-                    healthKitDataManager: healthKitDataManager
-                ),
+                matchupId: matchup.id,
                 source: "home"
             )
         }
