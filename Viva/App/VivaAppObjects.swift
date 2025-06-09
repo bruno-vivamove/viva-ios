@@ -19,6 +19,7 @@ class VivaAppObjects: ObservableObject {
     public let workoutService: WorkoutService
     public let userService: UserService
     public let healthService: HealthService
+    public let backgroundHealthSyncManager: BackgroundHealthSyncManager
 
     init() {
         userSession = UserSession()
@@ -108,6 +109,14 @@ class VivaAppObjects: ObservableObject {
         // Initialize BackgroundTaskManager with HealthKitDataManager dependency
         backgroundTaskManager = BackgroundTaskManager(
             healthKitDataManager: healthKitDataManager
+        )
+
+        // Initialize BackgroundHealthSyncManager
+        backgroundHealthSyncManager = BackgroundHealthSyncManager(
+            matchupService: matchupService,
+            healthKitDataManager: healthKitDataManager,
+            userMeasurementService: userMeasurementService,
+            userSession: userSession
         )
 
         // Configure ErrorManager with HealthService for connectivity monitoring

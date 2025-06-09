@@ -3,9 +3,80 @@ import GoogleSignIn
 import AuthenticationServices
 import Nuke
 import BackgroundTasks
+import UserNotifications
+
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+    var vivaAppObjects: VivaAppObjects?
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Register for remote notifications
+        registerForPushNotifications()
+        return true
+    }
+    
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
+        let token = tokenParts.joined()
+        AppLogger.info("Device Token: \(token)", category: .general)
+        
+        // Store the device token for sending to server if needed
+        UserDefaults.standard.set(token, forKey: "deviceToken")
+    }
+    
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        AppLogger.error("Failed to register for remote notifications: \(error)", category: .general)
+    }
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        AppLogger.info("Received remote notification: \(userInfo)", category: .general)
+        
+        // Check if this is a silent notification for health data sync
+        if let customData = userInfo["custom_data"] as? [String: Any],
+           let action = customData["action"] as? String,
+           action == "sync_health_data",
+           let userId = customData["user_id"] as? String {
+            
+            AppLogger.info("Processing health data sync for user: \(userId)", category: .data)
+            
+            // Perform background health data sync
+            performBackgroundHealthSync(for: userId) { success in
+                DispatchQueue.main.async {
+                    completionHandler(success ? .newData : .failed)
+                }
+            }
+        } else {
+            completionHandler(.noData)
+        }
+    }
+    
+    private func registerForPushNotifications() {
+        UNUserNotificationCenter.current().delegate = self
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            AppLogger.info("Push notification permission granted: \(granted)", category: .general)
+            if let error = error {
+                AppLogger.error("Push notification permission error: \(error)", category: .general)
+            }
+            
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
+        }
+    }
+    
+    private func performBackgroundHealthSync(for userId: String, completion: @escaping (Bool) -> Void) {
+        guard let vivaAppObjects = vivaAppObjects else {
+            AppLogger.error("VivaAppObjects not available for background health sync", category: .data)
+            completion(false)
+            return
+        }
+        
+        vivaAppObjects.backgroundHealthSyncManager.performBackgroundHealthSync(for: userId, completion: completion)
+    }
+}
 
 @main
 struct VivaApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject var vivaAppObjects = VivaAppObjects()
     @Environment(\.scenePhase) private var scenePhase
 
@@ -31,6 +102,9 @@ struct VivaApp: App {
                     }
                 }
                 .onAppear {
+                    // Connect appDelegate to vivaAppObjects
+                    appDelegate.vivaAppObjects = vivaAppObjects
+                    
                     // Register background tasks at app startup
                     vivaAppObjects.backgroundTaskManager.registerBackgroundTasks()
                     
