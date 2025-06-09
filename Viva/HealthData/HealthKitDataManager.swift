@@ -9,6 +9,7 @@ final class HealthKitDataManager: ObservableObject {
     private let userMeasurementService: UserMeasurementService
     private let workoutService: WorkoutService
     private let matchupService: MatchupService
+    private let errorManager: ErrorManager
     private var queryHandlers: [MeasurementType: HealthDataQuery] = [:]
     private var backgroundObservers: [HKObserverQuery] = []
     private var backgroundDeliveryEnabled = false
@@ -21,12 +22,14 @@ final class HealthKitDataManager: ObservableObject {
         userSession: UserSession,
         userMeasurementService: UserMeasurementService,
         workoutService: WorkoutService,
-        matchupService: MatchupService
+        matchupService: MatchupService,
+        errorManager: ErrorManager
     ) {
         self.userSession = userSession
         self.userMeasurementService = userMeasurementService
         self.workoutService = workoutService
         self.matchupService = matchupService
+        self.errorManager = errorManager
         setupQueryHandlers()
     }
 
@@ -316,8 +319,10 @@ final class HealthKitDataManager: ObservableObject {
                             "Failed to save workouts: \(error)",
                             category: .data
                         )
-                        // TODO: Error handling could be improved with global ErrorManager
-                        // For now, just log the error
+                        self.errorManager.registerError(
+                            "Failed to upload workout data: \(error.localizedDescription)",
+                            type: .network
+                        )
                     }
                 }
             } else {
@@ -372,8 +377,10 @@ final class HealthKitDataManager: ObservableObject {
                         "Failed to save measurements: \(error)",
                         category: .data
                     )
-                    // TODOError handling could be improved with global ErrorManager
-                    // For now, just log the error
+                    self.errorManager.registerError(
+                        "Failed to upload health measurements: \(error.localizedDescription)",
+                        type: .network
+                    )
                 }
             }
         }
@@ -530,21 +537,31 @@ final class HealthKitDataManager: ObservableObject {
                 AppLogger.info("Updating health data for \(activeMatchups.count) active matchups", category: .health)
                 
                 // Process each active matchup
-                for matchup in activeMatchups {
+                for (index, matchup) in activeMatchups.enumerated() {
                     do {
                         // Get full matchup details
                         let matchupDetails = try await matchupService.getMatchup(matchupId: matchup.id)
                         
                         // Update and upload health data for this matchup
                         updateAndUploadHealthData(matchupDetail: matchupDetails)
-                        AppLogger.info("Triggered health data update for matchup \(matchupDetails.id)", category: .health)
+                        AppLogger.info("✅ Completed health data update for matchup \(matchupDetails.id) (\(index + 1)/\(activeMatchups.count))", category: .health)
                     } catch {
-                        AppLogger.error("Error getting details for matchup \(matchup.id): \(error)", category: .health)
+                        AppLogger.error("❌ Error getting details for matchup \(matchup.id): \(error)", category: .health)
+                        errorManager.registerError(
+                            "Failed to fetch matchup details: \(error.localizedDescription)",
+                            type: .network
+                        )
                         continue
                     }
                 }
+                
+                AppLogger.info("🎉 Background health data update completed for all active matchups", category: .health)
             } catch {
-                AppLogger.error("Failed to fetch matchups for health data update: \(error)", category: .health)
+                AppLogger.error("❌ Failed to fetch matchups for health data update: \(error)", category: .health)
+                errorManager.registerError(
+                    "Failed to fetch active matchups: \(error.localizedDescription)",
+                    type: .network
+                )
             }
         }
     }

@@ -69,9 +69,15 @@ struct VivaApp: App {
                     
                     do {
                         try BGTaskScheduler.shared.submit(request)
-                        AppLogger.info("Successfully scheduled background health update task", category: .general)
-                    } catch {
-                        AppLogger.error("Failed to schedule background task: \(error)", category: .general)
+                        AppLogger.info("✅ Successfully scheduled background health update task", category: .general)
+                    } catch let error as NSError {
+                        let errorDescription = switch error.code {
+                        case 1: "BGTaskSchedulerErrorCodeUnavailable - Background tasks not available (requires physical device, background app refresh enabled)"
+                        case 2: "BGTaskSchedulerErrorCodeTooManyPendingTaskRequests - Too many pending requests"
+                        case 3: "BGTaskSchedulerErrorCodeNotPermitted - App not permitted to use background tasks"
+                        default: "Unknown BGTaskScheduler error code \(error.code)"
+                        }
+                        AppLogger.error("❌ Failed to schedule background task: \(errorDescription)", category: .general)
                     }
                 }
                 

@@ -37,6 +37,7 @@ class BackgroundTaskManager {
 
     /// Handles execution of the HealthKit processing task
     private func handleHealthKitProcessingTask(task: BGProcessingTask) {
+        let startTime = Date()
         AppLogger.info(
             "🔄 Running HealthKit data processing task...",
             category: .health
@@ -44,8 +45,9 @@ class BackgroundTaskManager {
 
         // Set up expiration handler
         task.expirationHandler = {
+            let elapsed = Date().timeIntervalSince(startTime)
             AppLogger.warning(
-                "⚠️ HealthKit processing task expired",
+                "⚠️ HealthKit processing task expired after \(String(format: "%.1f", elapsed))s",
                 category: .health
             )
             task.setTaskCompleted(success: false)
@@ -57,10 +59,13 @@ class BackgroundTaskManager {
         // Notify the app of updated health data
         NotificationCenter.default.post(name: .healthDataUpdated, object: nil)
 
+        // Calculate and log execution time
+        let executionTime = Date().timeIntervalSince(startTime)
+        
         // Mark task as completed
         task.setTaskCompleted(success: true)
         AppLogger.info(
-            "✅ Completed HealthKit data processing task",
+            "✅ Completed HealthKit data processing task in \(String(format: "%.1f", executionTime))s",
             category: .health
         )
     }

@@ -22,7 +22,8 @@
       "Bash(timeout:*)",
       "Bash(git add:*)",
       "Bash(awk:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)"
     ],
     "deny": []
   }

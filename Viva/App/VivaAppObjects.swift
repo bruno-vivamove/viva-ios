@@ -101,7 +101,8 @@ class VivaAppObjects: ObservableObject {
             userSession: userSession,
             userMeasurementService: userMeasurementService,
             workoutService: workoutService,
-            matchupService: matchupService
+            matchupService: matchupService,
+            errorManager: errorManager
         )
 
         // Initialize BackgroundTaskManager with HealthKitDataManager dependency
