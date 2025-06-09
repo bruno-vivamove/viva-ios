@@ -361,7 +361,8 @@ final class HealthKitDataManager: ObservableObject {
                         try await self.userMeasurementService
                         .saveUserMeasurements(
                             matchupId: matchupDetail.id,
-                            measurements: userMeasurements
+                            measurements: userMeasurements,
+                            isBackgroundUpdate: true
                         )
 
                     // Post notification that health data was updated

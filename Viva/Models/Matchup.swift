@@ -211,6 +211,12 @@ struct MatchupUserMeasurement: Codable, Equatable {
 
 struct MatchupUserMeasurements: Codable {
     let matchupUserMeasurements: [MatchupUserMeasurement]
+    let isBackgroundUpdate: Bool?
+    
+    init(matchupUserMeasurements: [MatchupUserMeasurement], isBackgroundUpdate: Bool? = nil) {
+        self.matchupUserMeasurements = matchupUserMeasurements
+        self.isBackgroundUpdate = isBackgroundUpdate
+    }
 }
 
 struct MatchupMeasurementPair: Codable, Equatable {

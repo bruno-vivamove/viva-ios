@@ -13,9 +13,17 @@ final class UserMeasurementService: ObservableObject {
     /// - Parameters:
     ///   - matchupId: The ID of the matchup
     ///   - measurements: Array of measurements to save
+    ///   - isBackgroundUpdate: Whether this upload is from a background task
     /// - Returns: Updated matchup details
-    func saveUserMeasurements(matchupId: String, measurements: [MatchupUserMeasurement]) async throws -> MatchupDetails {
-        let request = MatchupUserMeasurements(matchupUserMeasurements: measurements)
+    func saveUserMeasurements(
+        matchupId: String, 
+        measurements: [MatchupUserMeasurement],
+        isBackgroundUpdate: Bool = false
+    ) async throws -> MatchupDetails {
+        let request = MatchupUserMeasurements(
+            matchupUserMeasurements: measurements,
+            isBackgroundUpdate: isBackgroundUpdate
+        )
         
         let matchupDetails: MatchupDetails = try await networkClient.put(
             path: "/matchups/\(matchupId)/user-measurements",
