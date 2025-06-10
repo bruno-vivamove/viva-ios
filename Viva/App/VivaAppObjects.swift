@@ -20,6 +20,7 @@ class VivaAppObjects: ObservableObject {
     public let userService: UserService
     public let healthService: HealthService
     public let backgroundHealthSyncManager: BackgroundHealthSyncManager
+    public let backgroundMatchupRefreshManager: BackgroundMatchupRefreshManager
 
     init() {
         userSession = UserSession()
@@ -116,6 +117,12 @@ class VivaAppObjects: ObservableObject {
             matchupService: matchupService,
             healthKitDataManager: healthKitDataManager,
             userMeasurementService: userMeasurementService,
+            userSession: userSession
+        )
+
+        // Initialize BackgroundMatchupRefreshManager
+        backgroundMatchupRefreshManager = BackgroundMatchupRefreshManager(
+            matchupService: matchupService,
             userSession: userSession
         )
 

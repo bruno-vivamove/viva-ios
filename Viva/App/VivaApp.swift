@@ -30,21 +30,34 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         AppLogger.info("Received remote notification: \(userInfo)", category: .general)
         
-        // Check if this is a silent notification for health data sync
-        if let customData = userInfo["custom_data"] as? [String: Any],
-           let action = customData["action"] as? String,
-           action == "sync_health_data",
-           let userId = customData["user_id"] as? String {
-            
+        // Check if this is a silent notification with custom data
+        guard let customData = userInfo["custom_data"] as? [String: Any],
+              let action = customData["action"] as? String,
+              let userId = customData["user_id"] as? String else {
+            completionHandler(.noData)
+            return
+        }
+        
+        // Route to appropriate handler based on action type
+        switch action {
+        case "sync_health_data":
             AppLogger.info("Processing health data sync for user: \(userId)", category: .data)
-            
-            // Perform background health data sync
             performBackgroundHealthSync(for: userId) { success in
                 DispatchQueue.main.async {
                     completionHandler(success ? .newData : .failed)
                 }
             }
-        } else {
+            
+        case "refresh_matchups":
+            AppLogger.info("Processing matchup refresh for user: \(userId)", category: .data)
+            performBackgroundMatchupRefresh(for: userId) { success in
+                DispatchQueue.main.async {
+                    completionHandler(success ? .newData : .failed)
+                }
+            }
+            
+        default:
+            AppLogger.warning("Unknown notification action: \(action)", category: .general)
             completionHandler(.noData)
         }
     }
@@ -71,6 +84,16 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
         
         vivaAppObjects.backgroundHealthSyncManager.performBackgroundHealthSync(for: userId, completion: completion)
+    }
+    
+    private func performBackgroundMatchupRefresh(for userId: String, completion: @escaping (Bool) -> Void) {
+        guard let vivaAppObjects = vivaAppObjects else {
+            AppLogger.error("VivaAppObjects not available for background matchup refresh", category: .data)
+            completion(false)
+            return
+        }
+        
+        vivaAppObjects.backgroundMatchupRefreshManager.performBackgroundMatchupRefresh(for: userId, completion: completion)
     }
 }
 
