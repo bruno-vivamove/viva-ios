@@ -559,6 +559,7 @@ final class HealthKitDataManager: ObservableObject {
                 AppLogger.info("🎉 Background health data update completed for all active matchups", category: .health)
             } catch {
                 AppLogger.error("❌ Failed to fetch matchups for health data update: \(error)", category: .health)
+                // TODO: resolve "Publishing changes from background threads is not allowed; make sure to publish values from the main thread (via operators like receive(on:)) on model updates."
                 errorManager.registerError(
                     "Failed to fetch active matchups: \(error.localizedDescription)",
                     type: .network
