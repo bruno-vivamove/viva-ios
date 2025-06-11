@@ -24,7 +24,7 @@ class DeviceTokenService {
             throw DeviceTokenError.notAuthenticated("User must be logged in to register device token")
         }
         
-        let _: EmptyResponse = try await networkClient.post(
+        try await networkClient.post(
             path: "/device-tokens",
             body: deviceTokenRequest
         )
@@ -47,7 +47,7 @@ class DeviceTokenService {
             throw DeviceTokenError.notAuthenticated("User must be logged in to update device token")
         }
         
-        let _: EmptyResponse = try await networkClient.put(
+        try await networkClient.put(
             path: "/device-tokens/\(deviceToken)",
             body: deviceTokenRequest
         )
@@ -197,8 +197,3 @@ enum DeviceTokenError: LocalizedError {
     }
 }
 
-// MARK: - Empty Response Helper
-
-private struct EmptyResponse: Codable {
-    // Empty struct for endpoints that return no data
-}
