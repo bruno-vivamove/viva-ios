@@ -3,6 +3,8 @@ import Foundation
 import GoogleSignIn
 import Security
 import SwiftUI
+import UserNotifications
+import FirebaseMessaging
 
 enum AuthResult {
     case success
@@ -14,15 +16,18 @@ final class AuthenticationManager: ObservableObject {
     let userSession: UserSession
     let authService: AuthService
     let sessionService: SessionService
+    let deviceTokenService: DeviceTokenService
 
     init(
         userSession: UserSession,
         authService: AuthService,
-        sessionService: SessionService
+        sessionService: SessionService,
+        deviceTokenService: DeviceTokenService
     ) {
         self.userSession = userSession
         self.authService = authService
         self.sessionService = sessionService
+        self.deviceTokenService = deviceTokenService
     }
 
     func signIn(email: String, password: String) async throws {
@@ -61,6 +66,9 @@ final class AuthenticationManager: ObservableObject {
                 refreshToken: sessionResponse.refreshToken
             )
         }
+        
+        // Register device token after successful session creation
+        await registerDeviceTokenIfNeeded()
     }
 
     func signUp(email: String, password: String) async throws {
@@ -93,6 +101,9 @@ final class AuthenticationManager: ObservableObject {
 
     func signOut() async {
         AppLogger.info("User signing out", category: .auth)
+
+        // Clean up device token before clearing session
+        await deviceTokenService.cleanupDeviceToken()
 
         // Clear Apple Sign In state if it exists
         userSession.deleteAppleUserId()
@@ -329,6 +340,48 @@ final class AuthenticationManager: ObservableObject {
                 category: .auth
             )
             throw error
+        }
+    }
+    
+    // MARK: - Device Token Management
+    
+    /// Registers device token with backend if user is authenticated and push notifications are enabled
+    private func registerDeviceTokenIfNeeded() async {
+        guard userSession.isLoggedIn else {
+            AppLogger.info("User not logged in, skipping device token registration", category: .auth)
+            return
+        }
+        
+        // Check if push notifications are authorized
+        let notificationSettings = await UNUserNotificationCenter.current().notificationSettings()
+        guard notificationSettings.authorizationStatus == .authorized else {
+            AppLogger.info("Push notifications not authorized, skipping device token registration", category: .auth)
+            return
+        }
+        
+        // Get FCM token and register
+        guard let fcmToken = await getFCMToken() else {
+            AppLogger.warning("Failed to get FCM token for registration", category: .auth)
+            return
+        }
+        
+        do {
+            try await deviceTokenService.manageDeviceToken(fcmToken: fcmToken)
+            AppLogger.info("Successfully registered device token after authentication", category: .auth)
+        } catch {
+            AppLogger.error("Failed to register device token after authentication: \(error)", category: .auth)
+        }
+    }
+    
+    /// Gets FCM token from Firebase Messaging
+    private func getFCMToken() async -> String? {
+        do {
+            let token = try await Messaging.messaging().token()
+            AppLogger.info("Retrieved FCM token: \(token.prefix(8))...", category: .auth)
+            return token
+        } catch {
+            AppLogger.error("Failed to get FCM token: \(error)", category: .auth)
+            return nil
         }
     }
 }

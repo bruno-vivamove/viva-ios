@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>FIREBASE_CONFIG_FILE</key>
+	<string>GoogleService-Info</string>
 	<key>AUTH_API_KEY</key>
 	<string>AIzaSyDFFQYxbY4RYsglPIceIgNCQO-3FU8IDt8</string>
 	<key>BASE_URL</key>
@@ -35,5 +37,7 @@
 		<string>remote-notification</string>
 		<string>location</string>
 	</array>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Viva uses Face ID or Touch ID to securely protect your authentication data and provide quick access to the app.</string>
 </dict>
 </plist>

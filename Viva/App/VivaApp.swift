@@ -4,28 +4,71 @@ import AuthenticationServices
 import Nuke
 import BackgroundTasks
 import UserNotifications
+import FirebaseMessaging
+import FirebaseCore
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var vivaAppObjects: VivaAppObjects?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Initialize Firebase
+        configureFirebase()
+        
+        // Set FCM messaging delegate after Firebase is configured
+        Messaging.messaging().delegate = self
+        
         // Register for remote notifications
         registerForPushNotifications()
         return true
     }
     
+    private func configureFirebase() {
+        // Read the file name from the Info.plist
+        guard let plistFileName = Bundle.main.object(forInfoDictionaryKey: "FIREBASE_CONFIG_FILE") as? String else {
+            // Fallback for safety, though this should not happen in a correctly configured project
+            FirebaseApp.configure()
+            AppLogger.error("FIREBASE_CONFIG_FILE not found in Info.plist. Falling back to default Firebase configuration.", category: .general)
+            return
+        }
+        
+        // Load the corresponding plist file
+        if let filePath = Bundle.main.path(forResource: plistFileName, ofType: "plist"),
+           let firebaseOptions = FirebaseOptions(contentsOfFile: filePath) {
+            FirebaseApp.configure(options: firebaseOptions)
+            AppLogger.info("Firebase configured using \(plistFileName).plist.", category: .general)
+        } else {
+            // Fallback to default configuration if specific file is not found
+            FirebaseApp.configure()
+            AppLogger.warning("Could not find \(plistFileName).plist. Falling back to default Firebase configuration.", category: .general)
+        }
+    }
+    
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
         let token = tokenParts.joined()
-        AppLogger.info("Device Token: \(token)", category: .general)
+        AppLogger.info("APNS Device Token: \(token)", category: .general)
         
         // Store the device token for sending to server if needed
         UserDefaults.standard.set(token, forKey: "deviceToken")
+        
+        // Set APNS token for Firebase Messaging (improves FCM reliability)
+        Messaging.messaging().apnsToken = deviceToken
+        AppLogger.info("Set APNS token for Firebase Messaging", category: .network)
+        
+        // Note: FCM token registration is handled by MessagingDelegate
+        // No need to manually call registerFCMTokenIfNeeded here
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         AppLogger.error("Failed to register for remote notifications: \(error)", category: .general)
+                
+        // Check if running in simulator
+        #if targetEnvironment(simulator)
+        AppLogger.info("Running in iOS Simulator - APNS not available, but FCM can still work", category: .network)
+        #endif
     }
+    
+
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         AppLogger.info("Received remote notification: \(userInfo)", category: .general)
@@ -63,15 +106,47 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     }
     
     private func registerForPushNotifications() {
+        AppLogger.info("Starting push notification registration process", category: .general)
+        
         UNUserNotificationCenter.current().delegate = self
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            AppLogger.info("Push notification permission granted: \(granted)", category: .general)
-            if let error = error {
-                AppLogger.error("Push notification permission error: \(error)", category: .general)
-            }
+        
+        // First check current authorization status
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            AppLogger.info("Current notification authorization status: \(settings.authorizationStatus.rawValue)", category: .general)
             
-            DispatchQueue.main.async {
-                UIApplication.shared.registerForRemoteNotifications()
+            switch settings.authorizationStatus {
+            case .notDetermined:
+                AppLogger.info("Notification permission not determined, requesting authorization", category: .general)
+                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                    AppLogger.info("Push notification permission granted: \(granted)", category: .general)
+                    if let error = error {
+                        AppLogger.error("Push notification permission error: \(error)", category: .general)
+                        return
+                    }
+                    
+                    if granted {
+                        AppLogger.info("Push notification permission granted, registering for remote notifications", category: .general)
+                        DispatchQueue.main.async {
+                            UIApplication.shared.registerForRemoteNotifications()
+                        }
+                    } else {
+                        AppLogger.warning("Push notification permission denied, cannot register for remote notifications", category: .general)
+                    }
+                }
+            case .denied:
+                AppLogger.warning("Push notification permission denied by user", category: .general)
+            case .authorized, .provisional:
+                AppLogger.info("Push notification already authorized, registering for remote notifications", category: .general)
+                DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            case .ephemeral:
+                AppLogger.info("Push notification ephemeral authorization, registering for remote notifications", category: .general)
+                DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            @unknown default:
+                AppLogger.warning("Unknown authorization status: \(settings.authorizationStatus.rawValue)", category: .general)
             }
         }
     }
@@ -94,6 +169,78 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
         
         vivaAppObjects.backgroundMatchupRefreshManager.performBackgroundMatchupRefresh(for: userId, completion: completion)
+    }
+    
+    // MARK: - FCM Token Management
+    
+    /// Manually registers FCM token with backend when called explicitly
+    /// This is now only used for manual refresh scenarios
+    func registerFCMTokenIfNeeded() {
+        guard let vivaAppObjects = vivaAppObjects,
+              vivaAppObjects.userSession.isLoggedIn else {
+            AppLogger.info("User not logged in, skipping FCM token registration", category: .network)
+            return
+        }
+        
+        // Remove the APNS token check - FCM can work without it
+        Messaging.messaging().token { [weak self] token, error in
+            if let error = error {
+                AppLogger.error("Error fetching FCM token: \(error)", category: .network)
+                return
+            }
+            
+            guard let token = token else {
+                AppLogger.warning("FCM token is nil", category: .network)
+                return
+            }
+            
+            AppLogger.info("Retrieved FCM token (manual): \(token.prefix(8))...", category: .network)
+            self?.registerDeviceToken(token)
+        }
+    }
+    
+    /// Registers device token with backend
+    private func registerDeviceToken(_ fcmToken: String) {
+        guard let vivaAppObjects = vivaAppObjects else {
+            AppLogger.error("VivaAppObjects not available for device token registration", category: .network)
+            return
+        }
+        
+        // Only register if user is logged in
+        guard vivaAppObjects.userSession.isLoggedIn else {
+            AppLogger.info("User not logged in, skipping FCM token registration with backend", category: .network)
+            return
+        }
+        
+        Task {
+            do {
+                try await vivaAppObjects.deviceTokenService.manageDeviceToken(fcmToken: fcmToken)
+                AppLogger.info("Successfully registered FCM token with backend", category: .network)
+            } catch {
+                AppLogger.error("Failed to register FCM token: \(error)", category: .network)
+            }
+        }
+    }
+}
+
+// MARK: - MessagingDelegate
+
+extension AppDelegate: MessagingDelegate {
+    /// Called when FCM token is refreshed or initially generated
+    /// This is the primary way FCM tokens are obtained - it works with or without APNS
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        AppLogger.info("FCM registration token received/refreshed", category: .network)
+        
+        guard let fcmToken = fcmToken else {
+            AppLogger.warning("Received nil FCM token", category: .network)
+            return
+        }
+        
+        let hasAPNSToken = messaging.apnsToken != nil
+        AppLogger.info("FCM token received: \(fcmToken.prefix(8))..., APNS token available: \(hasAPNSToken)", category: .network)
+        
+        // Register the token with the backend
+        registerDeviceToken(fcmToken)
     }
 }
 
@@ -153,6 +300,9 @@ struct VivaApp: App {
                     vivaAppObjects.healthKitDataManager.requestAuthorization()
                     AppLogger.info("Requested HealthKit authorization", category: .health)
                 }
+                
+                // FCM token registration is primarily handled by MessagingDelegate
+                // Only manually refresh if there are specific reasons to do so
                 
             case .background:
                 // App is entering background

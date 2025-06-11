@@ -21,6 +21,7 @@ class VivaAppObjects: ObservableObject {
     public let healthService: HealthService
     public let backgroundHealthSyncManager: BackgroundHealthSyncManager
     public let backgroundMatchupRefreshManager: BackgroundMatchupRefreshManager
+    public let deviceTokenService: DeviceTokenService
 
     init() {
         userSession = UserSession()
@@ -91,11 +92,18 @@ class VivaAppObjects: ObservableObject {
             userSession: userSession
         )
 
+        // Initialize DeviceTokenService
+        deviceTokenService = DeviceTokenService(
+            networkClient: appNetworkClient,
+            userSession: userSession
+        )
+
         // Other
         authManager = AuthenticationManager(
             userSession: userSession,
             authService: authService,
-            sessionService: sessionService
+            sessionService: sessionService,
+            deviceTokenService: deviceTokenService
         )
 
         // Initialize HealthKitDataManager with UserMeasurementService
