@@ -9,7 +9,7 @@ final class MatchupService: ObservableObject {
     
     // MARK: - Matchups
     
-    func getMyMatchups(filter: MatchupFilter = .ALL, page: Int = 0, pageSize: Int = 100) async throws -> MatchupsResponse {
+    func getMyMatchups(filter: MatchupFilter = .ALL, page: Int = 1, pageSize: Int = 100) async throws -> MatchupsResponse {
         return try await networkClient.get(
             path: "/matchups",
             queryParams: [
@@ -20,7 +20,7 @@ final class MatchupService: ObservableObject {
         )
     }
     
-    func getUserMatchups(userId: String, filter: MatchupFilter = .ALL, page: Int = 0, pageSize: Int = 100) async throws -> MatchupsResponse {
+    func getUserMatchups(userId: String, filter: MatchupFilter = .ALL, page: Int = 1, pageSize: Int = 100) async throws -> MatchupsResponse {
         return try await networkClient.get(
             path: "/matchups",
             queryParams: [

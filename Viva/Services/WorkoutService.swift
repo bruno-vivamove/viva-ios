@@ -9,7 +9,7 @@ final class WorkoutService: ObservableObject {
     
     // MARK: - Workouts
     
-    func getWorkouts(page: Int = 0, pageSize: Int = 20) async throws -> WorkoutListResponse {
+    func getWorkouts(page: Int = 1, pageSize: Int = 20) async throws -> WorkoutListResponse {
         return try await networkClient.get(
             path: "/workouts",
             queryParams: [
