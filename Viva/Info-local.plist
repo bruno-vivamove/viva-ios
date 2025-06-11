@@ -5,9 +5,11 @@
 	<key>FIREBASE_CONFIG_FILE</key>
 	<string>GoogleService-Info-dev</string>
 	<key>AUTH_API_KEY</key>
-	<string>AIzaSyBt_443_Npn0Rtx-Rk_xBS5CdAt_FqWHh8</string>
+	<string>AIzaSyClaF7SyoPyE7T95AjgSw4ONQvfNkMslRM</string>
 	<key>BASE_URL</key>
 	<string>http://localhost:8080</string>
+	<key>REFERER</key>
+	<string>https://dev.vivamove.io</string>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>io.vivamove.healthupdate</string>
@@ -28,8 +30,6 @@
 	</array>
 	<key>GIDClientID</key>
 	<string>890110655718-2b2ltlm76i9gqdf8ddm6d1hr32q2pufm.apps.googleusercontent.com</string>
-	<key>REFERER</key>
-	<string>https://dev.vivamove.io</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
