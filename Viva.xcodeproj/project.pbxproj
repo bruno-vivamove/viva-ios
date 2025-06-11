@@ -584,7 +584,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		C02329292DEBA4DD00D4D49A /* Config - Dev */ = {
+		C02329292DEBA4DD00D4D49A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -638,9 +638,9 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
-			name = "Debug";
+			name = Debug;
 		};
-		C023292B2DEBA4DD00D4D49A /* Config - Dev */ = {
+		C023292B2DEBA4DD00D4D49A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -656,9 +656,9 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Viva.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Viva";
 			};
-			name = "Debug";
+			name = Debug;
 		};
-		C023292C2DEBA4DD00D4D49A /* Config - Dev */ = {
+		C023292C2DEBA4DD00D4D49A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -672,14 +672,14 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Viva;
 			};
-			name = "Debug";
+			name = Debug;
 		};
-		C023292D2DEBA4DD00D4D49A /* Config - Dev */ = {
+		C023292D2DEBA4DD00D4D49A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Viva/Viva-dev.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Viva/Viva-dev.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -691,8 +691,8 @@
 				INFOPLIST_FILE = "Viva/Info-dev.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Viva Dev";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Viva accesses your workout data, steps, and activity metrics to create personalized fitness challenges and track progress in competitions with friends. Health data is used solely for fitness tracking and social fitness features within the app.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Viva records completed workouts and fitness achievements to your Health app so your progress is reflected across all your health and fitness apps. This helps maintain accurate fitness records and integrates with your overall health data.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -715,14 +715,14 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = "Debug";
+			name = Debug;
 		};
-		C0232EEB2DEBAA9700D4D49A /* Config - Dev */ = {
+		C0232EEB2DEBAA9700D4D49A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Viva/Viva-prod.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Viva/Viva-prod.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -734,8 +734,8 @@
 				INFOPLIST_FILE = "Viva/Info-prod.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Viva;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Viva accesses your workout data, steps, and activity metrics to create personalized fitness challenges and track progress in competitions with friends. Health data is used solely for fitness tracking and social fitness features within the app.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Viva records completed workouts and fitness achievements to your Health app so your progress is reflected across all your health and fitness apps. This helps maintain accurate fitness records and integrates with your overall health data.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -758,14 +758,14 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = "Debug";
+			name = Debug;
 		};
-		C0232F722DEBAB5A00D4D49A /* Config - Dev */ = {
+		C0232F722DEBAB5A00D4D49A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Viva/Viva-local.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Viva/Viva-local.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -777,8 +777,8 @@
 				INFOPLIST_FILE = "Viva/Info-local.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Viva Local";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Viva accesses your workout data, steps, and activity metrics to create personalized fitness challenges and track progress in competitions with friends. Health data is used solely for fitness tracking and social fitness features within the app.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Viva records completed workouts and fitness achievements to your Health app so your progress is reflected across all your health and fitness apps. This helps maintain accurate fitness records and integrates with your overall health data.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -801,9 +801,9 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = "Debug";
+			name = Debug;
 		};
-		C023303F2DEBAC2C00D4D49A /* Config - Prod */ = {
+		C023303F2DEBAC2C00D4D49A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -857,9 +857,9 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
-			name = "Release";
+			name = Release;
 		};
-		C02330412DEBAC2C00D4D49A /* Config - Prod */ = {
+		C02330412DEBAC2C00D4D49A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -875,9 +875,9 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Viva.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Viva";
 			};
-			name = "Release";
+			name = Release;
 		};
-		C02330422DEBAC2C00D4D49A /* Config - Prod */ = {
+		C02330422DEBAC2C00D4D49A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -891,14 +891,14 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Viva;
 			};
-			name = "Release";
+			name = Release;
 		};
-		C02330432DEBAC2C00D4D49A /* Config - Prod */ = {
+		C02330432DEBAC2C00D4D49A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Viva/Viva-local.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Viva/Viva-local.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -910,8 +910,8 @@
 				INFOPLIST_FILE = "Viva/Info-local.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Viva Local";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Viva accesses your workout data, steps, and activity metrics to create personalized fitness challenges and track progress in competitions with friends. Health data is used solely for fitness tracking and social fitness features within the app.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Viva records completed workouts and fitness achievements to your Health app so your progress is reflected across all your health and fitness apps. This helps maintain accurate fitness records and integrates with your overall health data.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -934,14 +934,14 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = "Release";
+			name = Release;
 		};
-		C02330442DEBAC2C00D4D49A /* Config - Prod */ = {
+		C02330442DEBAC2C00D4D49A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Viva/Viva-dev.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Viva/Viva-dev.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -953,8 +953,8 @@
 				INFOPLIST_FILE = "Viva/Info-dev.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Viva Dev";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Viva accesses your workout data, steps, and activity metrics to create personalized fitness challenges and track progress in competitions with friends. Health data is used solely for fitness tracking and social fitness features within the app.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Viva records completed workouts and fitness achievements to your Health app so your progress is reflected across all your health and fitness apps. This helps maintain accurate fitness records and integrates with your overall health data.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -977,14 +977,14 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = "Release";
+			name = Release;
 		};
-		C02330452DEBAC2C00D4D49A /* Config - Prod */ = {
+		C02330452DEBAC2C00D4D49A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Viva/Viva-prod.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Viva/Viva-prod.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -996,8 +996,8 @@
 				INFOPLIST_FILE = "Viva/Info-prod.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Viva;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Viva accesses your workout data, steps, and activity metrics to create personalized fitness challenges and track progress in competitions with friends. Health data is used solely for fitness tracking and social fitness features within the app.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Viva records completed workouts and fitness achievements to your Health app so your progress is reflected across all your health and fitness apps. This helps maintain accurate fitness records and integrates with your overall health data.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1020,9 +1020,9 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = "Release";
+			name = Release;
 		};
-		C02330462DEBAC3B00D4D49A /* Config - Local */ = {
+		C02330462DEBAC3B00D4D49A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -1076,9 +1076,9 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
-			name = "Debug";
+			name = Debug;
 		};
-		C02330482DEBAC3B00D4D49A /* Config - Local */ = {
+		C02330482DEBAC3B00D4D49A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -1094,9 +1094,9 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Viva.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Viva";
 			};
-			name = "Debug";
+			name = Debug;
 		};
-		C02330492DEBAC3B00D4D49A /* Config - Local */ = {
+		C02330492DEBAC3B00D4D49A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -1110,14 +1110,14 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Viva;
 			};
-			name = "Debug";
+			name = Debug;
 		};
-		C023304A2DEBAC3B00D4D49A /* Config - Local */ = {
+		C023304A2DEBAC3B00D4D49A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Viva/Viva-local.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Viva/Viva-local.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1129,8 +1129,8 @@
 				INFOPLIST_FILE = "Viva/Info-local.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Viva Local";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Viva accesses your workout data, steps, and activity metrics to create personalized fitness challenges and track progress in competitions with friends. Health data is used solely for fitness tracking and social fitness features within the app.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Viva records completed workouts and fitness achievements to your Health app so your progress is reflected across all your health and fitness apps. This helps maintain accurate fitness records and integrates with your overall health data.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1153,14 +1153,14 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = "Debug";
+			name = Debug;
 		};
-		C023304B2DEBAC3B00D4D49A /* Config - Local */ = {
+		C023304B2DEBAC3B00D4D49A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Viva/Viva-dev.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Viva/Viva-dev.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1172,8 +1172,8 @@
 				INFOPLIST_FILE = "Viva/Info-dev.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Viva Dev";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Viva accesses your workout data, steps, and activity metrics to create personalized fitness challenges and track progress in competitions with friends. Health data is used solely for fitness tracking and social fitness features within the app.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Viva records completed workouts and fitness achievements to your Health app so your progress is reflected across all your health and fitness apps. This helps maintain accurate fitness records and integrates with your overall health data.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1196,14 +1196,14 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = "Debug";
+			name = Debug;
 		};
-		C023304C2DEBAC3B00D4D49A /* Config - Local */ = {
+		C023304C2DEBAC3B00D4D49A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Viva/Viva-prod.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Viva/Viva-prod.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1215,8 +1215,8 @@
 				INFOPLIST_FILE = "Viva/Info-prod.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Viva;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Viva accesses your workout data, steps, and activity metrics to create personalized fitness challenges and track progress in competitions with friends. Health data is used solely for fitness tracking and social fitness features within the app.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Viva records completed workouts and fitness achievements to your Health app so your progress is reflected across all your health and fitness apps. This helps maintain accurate fitness records and integrates with your overall health data.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1239,14 +1239,14 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = "Debug";
+			name = Debug;
 		};
-		C0F4DB852DF9427D0019D273 /* Config - Dev */ = {
+		C0F4DB852DF9427D0019D273 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Viva/Viva-prod.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Viva/Viva-prod.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1258,8 +1258,8 @@
 				INFOPLIST_FILE = "Viva/Info-prod.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Viva;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Viva accesses your workout data, steps, and activity metrics to create personalized fitness challenges and track progress in competitions with friends. Health data is used solely for fitness tracking and social fitness features within the app.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Viva records completed workouts and fitness achievements to your Health app so your progress is reflected across all your health and fitness apps. This helps maintain accurate fitness records and integrates with your overall health data.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1282,14 +1282,14 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = "Debug";
+			name = Debug;
 		};
-		C0F4DB862DF9427D0019D273 /* Config - Local */ = {
+		C0F4DB862DF9427D0019D273 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Viva/Viva-prod.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Viva/Viva-prod.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1301,8 +1301,8 @@
 				INFOPLIST_FILE = "Viva/Info-prod.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Viva;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Viva accesses your workout data, steps, and activity metrics to create personalized fitness challenges and track progress in competitions with friends. Health data is used solely for fitness tracking and social fitness features within the app.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Viva records completed workouts and fitness achievements to your Health app so your progress is reflected across all your health and fitness apps. This helps maintain accurate fitness records and integrates with your overall health data.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1325,14 +1325,14 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = "Debug";
+			name = Debug;
 		};
-		C0F4DB872DF9427D0019D273 /* Config - Prod */ = {
+		C0F4DB872DF9427D0019D273 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Viva/Viva-prod.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Viva/Viva-prod.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1344,8 +1344,8 @@
 				INFOPLIST_FILE = "Viva/Info-prod.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Viva;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to track your fitness progress";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need permission to update your health data";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Viva accesses your workout data, steps, and activity metrics to create personalized fitness challenges and track progress in competitions with friends. Health data is used solely for fitness tracking and social fitness features within the app.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Viva records completed workouts and fitness achievements to your Health app so your progress is reflected across all your health and fitness apps. This helps maintain accurate fitness records and integrates with your overall health data.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1368,7 +1368,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
-			name = "Release";
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -1376,72 +1376,72 @@
 		C02329222DEBA47200D4D49A /* Build configuration list for PBXNativeTarget "Viva - Dev Debug" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C023292D2DEBA4DD00D4D49A /* Config - Dev */,
-				C023304B2DEBAC3B00D4D49A /* Config - Local */,
-				C02330442DEBAC2C00D4D49A /* Config - Prod */,
+				C023292D2DEBA4DD00D4D49A /* Debug */,
+				C023304B2DEBAC3B00D4D49A /* Debug */,
+				C02330442DEBAC2C00D4D49A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Debug";
+			defaultConfigurationName = Debug;
 		};
 		C0232EE82DEBAA9700D4D49A /* Build configuration list for PBXNativeTarget "Viva - Prod Debug" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C0232EEB2DEBAA9700D4D49A /* Config - Dev */,
-				C023304C2DEBAC3B00D4D49A /* Config - Local */,
-				C02330452DEBAC2C00D4D49A /* Config - Prod */,
+				C0232EEB2DEBAA9700D4D49A /* Debug */,
+				C023304C2DEBAC3B00D4D49A /* Debug */,
+				C02330452DEBAC2C00D4D49A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Debug";
+			defaultConfigurationName = Debug;
 		};
 		C0232F6F2DEBAB5A00D4D49A /* Build configuration list for PBXNativeTarget "Viva - Local Debug" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C0232F722DEBAB5A00D4D49A /* Config - Dev */,
-				C023304A2DEBAC3B00D4D49A /* Config - Local */,
-				C02330432DEBAC2C00D4D49A /* Config - Prod */,
+				C0232F722DEBAB5A00D4D49A /* Debug */,
+				C023304A2DEBAC3B00D4D49A /* Debug */,
+				C02330432DEBAC2C00D4D49A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Debug";
+			defaultConfigurationName = Debug;
 		};
 		C03975A12D2F83CE00BCE78F /* Build configuration list for PBXProject "Viva" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C02329292DEBA4DD00D4D49A /* Config - Dev */,
-				C02330462DEBAC3B00D4D49A /* Config - Local */,
-				C023303F2DEBAC2C00D4D49A /* Config - Prod */,
+				C02329292DEBA4DD00D4D49A /* Debug */,
+				C02330462DEBAC3B00D4D49A /* Debug */,
+				C023303F2DEBAC2C00D4D49A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Debug";
+			defaultConfigurationName = Debug;
 		};
 		C03975CD2D2F83D000BCE78F /* Build configuration list for PBXNativeTarget "VivaTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C023292B2DEBA4DD00D4D49A /* Config - Dev */,
-				C02330482DEBAC3B00D4D49A /* Config - Local */,
-				C02330412DEBAC2C00D4D49A /* Config - Prod */,
+				C023292B2DEBA4DD00D4D49A /* Debug */,
+				C02330482DEBAC3B00D4D49A /* Debug */,
+				C02330412DEBAC2C00D4D49A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Debug";
+			defaultConfigurationName = Debug;
 		};
 		C03975D02D2F83D000BCE78F /* Build configuration list for PBXNativeTarget "VivaUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C023292C2DEBA4DD00D4D49A /* Config - Dev */,
-				C02330492DEBAC3B00D4D49A /* Config - Local */,
-				C02330422DEBAC2C00D4D49A /* Config - Prod */,
+				C023292C2DEBA4DD00D4D49A /* Debug */,
+				C02330492DEBAC3B00D4D49A /* Debug */,
+				C02330422DEBAC2C00D4D49A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Debug";
+			defaultConfigurationName = Debug;
 		};
 		C0F4DB842DF9427D0019D273 /* Build configuration list for PBXNativeTarget "Viva" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C0F4DB852DF9427D0019D273 /* Config - Dev */,
-				C0F4DB862DF9427D0019D273 /* Config - Local */,
-				C0F4DB872DF9427D0019D273 /* Config - Prod */,
+				C0F4DB852DF9427D0019D273 /* Debug */,
+				C0F4DB862DF9427D0019D273 /* Debug */,
+				C0F4DB872DF9427D0019D273 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Debug";
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 
