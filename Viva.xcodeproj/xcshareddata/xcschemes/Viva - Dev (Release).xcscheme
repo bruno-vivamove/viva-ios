@@ -15,23 +15,23 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C0232ECD2DEBAA9700D4D49A"
-               BuildableName = "Viva - Prod Debug.app"
-               BlueprintName = "Viva - Prod Debug"
+               BlueprintIdentifier = "C02329072DEBA47200D4D49A"
+               BuildableName = "Viva - Dev Debug.app"
+               BlueprintName = "Viva - Dev Debug"
                ReferencedContainer = "container:Viva.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -44,15 +44,15 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C0232ECD2DEBAA9700D4D49A"
-            BuildableName = "Viva - Prod Debug.app"
-            BlueprintName = "Viva - Prod Debug"
+            BlueprintIdentifier = "C02329072DEBA47200D4D49A"
+            BuildableName = "Viva - Dev Debug.app"
+            BlueprintName = "Viva - Dev Debug"
             ReferencedContainer = "container:Viva.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
@@ -61,18 +61,18 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C0232ECD2DEBAA9700D4D49A"
-            BuildableName = "Viva - Prod Debug.app"
-            BlueprintName = "Viva - Prod Debug"
+            BlueprintIdentifier = "C02329072DEBA47200D4D49A"
+            BuildableName = "Viva - Dev Debug.app"
+            BlueprintName = "Viva - Dev Debug"
             ReferencedContainer = "container:Viva.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
-      buildConfiguration = "Debug">
+      buildConfiguration = "Release">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
