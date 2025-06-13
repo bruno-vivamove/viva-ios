@@ -212,10 +212,12 @@ struct MatchupUserMeasurement: Codable, Equatable {
 struct MatchupUserMeasurements: Codable {
     let matchupUserMeasurements: [MatchupUserMeasurement]
     let isBackgroundUpdate: Bool?
-    
-    init(matchupUserMeasurements: [MatchupUserMeasurement], isBackgroundUpdate: Bool? = nil) {
+    let notifyUserId: String?
+
+    init(matchupUserMeasurements: [MatchupUserMeasurement], isBackgroundUpdate: Bool? = nil, notifyUserId: String? = nil) {
         self.matchupUserMeasurements = matchupUserMeasurements
         self.isBackgroundUpdate = isBackgroundUpdate
+        self.notifyUserId = notifyUserId
     }
 }
 

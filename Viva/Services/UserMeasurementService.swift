@@ -18,11 +18,13 @@ final class UserMeasurementService: ObservableObject {
     func saveUserMeasurements(
         matchupId: String, 
         measurements: [MatchupUserMeasurement],
-        isBackgroundUpdate: Bool = false
+        isBackgroundUpdate: Bool = false,
+        notifyUserId: String? = nil
     ) async throws -> MatchupDetails {
         let request = MatchupUserMeasurements(
             matchupUserMeasurements: measurements,
-            isBackgroundUpdate: isBackgroundUpdate
+            isBackgroundUpdate: isBackgroundUpdate,
+            notifyUserId: notifyUserId
         )
         
         let matchupDetails: MatchupDetails = try await networkClient.put(

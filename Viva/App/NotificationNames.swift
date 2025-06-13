@@ -24,4 +24,7 @@ extension Notification.Name {
     
     // Workout notifications
     static let workoutsRecorded = Notification.Name("workoutsRecorded")
+    
+    // Push notification indicator
+    static let pushNotificationReceived = Notification.Name("pushNotificationReceived")
 }

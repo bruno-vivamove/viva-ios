@@ -58,7 +58,7 @@ class VivaAppObjects: ObservableObject {
         appNetworkClient = NetworkClient(
             settings: AppNetworkClientSettings(
                 userSession,
-                shouldLogBodies: false
+                shouldLogBodies: true
             ),
             tokenRefreshHandler: TokenRefreshHandler(
                 sessionService: sessionService,
@@ -79,22 +79,20 @@ class VivaAppObjects: ObservableObject {
         )
 
         friendService = FriendService(
-            networkClient: appNetworkClient
+            networkClient: appNetworkClientNoBodies
         )
-        statsService = StatsService(networkClient: appNetworkClient)
-        matchupService = MatchupService(networkClient: appNetworkClient)
+        statsService = StatsService(networkClient: appNetworkClientNoBodies)
+        matchupService = MatchupService(networkClient: appNetworkClientNoBodies)
         userMeasurementService = UserMeasurementService(
             networkClient: appNetworkClientNoBodies
         )
-        workoutService = WorkoutService(networkClient: appNetworkClient)
+        workoutService = WorkoutService(networkClient: appNetworkClientNoBodies)
         userService = UserService(
-            networkClient: appNetworkClient,
+            networkClient: appNetworkClientNoBodies,
             userSession: userSession
         )
-
-        // Initialize DeviceTokenService
         deviceTokenService = DeviceTokenService(
-            networkClient: appNetworkClient,
+            networkClient: appNetworkClientNoBodies,
             userSession: userSession
         )
 

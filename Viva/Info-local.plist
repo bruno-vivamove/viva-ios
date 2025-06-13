@@ -39,5 +39,7 @@
 	</array>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Viva uses Face ID or Touch ID to securely protect your authentication data and provide quick access to the app.</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
 </dict>
 </plist>

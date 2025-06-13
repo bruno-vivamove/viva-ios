@@ -71,7 +71,7 @@ class BackgroundMatchupRefreshManager {
                 // Get all active matchups for the current user
                 let matchupsResponse = try await matchupService.getMyMatchups(
                     filter: .ACTIVE,
-                    page: 0,
+                    page: 1,
                     pageSize: 100
                 )
                 

@@ -67,7 +67,7 @@ class BackgroundHealthSyncManager {
             AppLogger.info("Found \(matchupDetails.count) active matchups for background sync", category: .data)
             
             // Sync health data for all relevant matchups
-            self.syncHealthDataForMatchups(matchupDetails) { success in
+            self.syncHealthDataForMatchups(matchupDetails, notifyUserId: userId) { success in
                 AppLogger.info("Background health sync completed with success: \(success)", category: .data)
                 UIApplication.shared.endBackgroundTask(backgroundTaskID)
                 completion(success)
@@ -81,19 +81,29 @@ class BackgroundHealthSyncManager {
         
         Task {
             do {
+                // TODO use locally stored matchups once thats implemented
                 // Get active matchups for the specified user
-                let matchupsResponse = try await matchupService.getUserMatchups(
-                    userId: userId,
+                let matchupsResponse = try await matchupService.getMyMatchups(
                     filter: .ACTIVE,
-                    page: 0,
+                    page: 1,
                     pageSize: 100
                 )
                 
-                // Convert Matchup objects to MatchupDetails by fetching each one
+                // Filter matchups to only include ones where the specified userId is in one of the teams
+                let relevantMatchups = matchupsResponse.matchups.filter { matchup in
+                    matchup.teams.contains { team in
+                        team.users.contains { user in
+                            user.id == userId
+                        }
+                    }
+                }
+                
+                // Convert filtered Matchup objects to MatchupDetails by fetching each one
                 var matchupDetails: [MatchupDetails] = []
                 
-                for matchup in matchupsResponse.matchups {
+                for matchup in relevantMatchups {
                     do {
+                        // TODO use locally stored version of matchup
                         let details = try await matchupService.getMatchup(matchupId: matchup.id)
                         matchupDetails.append(details)
                     } catch {
@@ -116,7 +126,7 @@ class BackgroundHealthSyncManager {
     }
     
     /// Syncs health data for the provided matchups
-    private func syncHealthDataForMatchups(_ matchupDetails: [MatchupDetails], completion: @escaping (Bool) -> Void) {
+    private func syncHealthDataForMatchups(_ matchupDetails: [MatchupDetails], notifyUserId: String? = nil, completion: @escaping (Bool) -> Void) {
         let group = DispatchGroup()
         var syncResults: [Bool] = []
         let queue = DispatchQueue(label: "background.health.sync", qos: .userInitiated)
@@ -133,7 +143,7 @@ class BackgroundHealthSyncManager {
                 }
                 
                 // Extract new measurements and upload them
-                self.uploadMeasurements(for: updatedMatchup) { success in
+                self.uploadMeasurements(for: updatedMatchup, notifyUser: notifyUserId) { success in
                     queue.async {
                         syncResults.append(success)
                         group.leave()
@@ -150,7 +160,7 @@ class BackgroundHealthSyncManager {
     }
     
     /// Uploads measurements using UserMeasurementService
-    private func uploadMeasurements(for matchupDetails: MatchupDetails, completion: @escaping (Bool) -> Void) {
+    private func uploadMeasurements(for matchupDetails: MatchupDetails, notifyUser notifyUserId: String? = nil, completion: @escaping (Bool) -> Void) {
         AppLogger.info("Uploading measurements for matchup: \(matchupDetails.id)", category: .data)
         
         // Get the current user's measurements from the updated matchup
@@ -178,7 +188,8 @@ class BackgroundHealthSyncManager {
                 _ = try await userMeasurementService.saveUserMeasurements(
                     matchupId: matchupDetails.id,
                     measurements: userMeasurements,
-                    isBackgroundUpdate: true
+                    isBackgroundUpdate: true,
+                    notifyUserId: notifyUserId
                 )
                 
                 AppLogger.info("Successfully uploaded measurements for matchup: \(matchupDetails.id)", category: .data)

@@ -99,7 +99,7 @@ extension DeviceTokenService {
         // Get previously stored token
         let existingToken = getStoredDeviceToken()
         
-        if existingToken != fcmToken {
+//        if existingToken != fcmToken {
             // Token has changed, need to update
             AppLogger.info("Device token changed, updating registration", category: .network)
             
@@ -118,9 +118,9 @@ extension DeviceTokenService {
             
             // Store the new token
             storeDeviceToken(fcmToken)
-        } else {
-            AppLogger.info("Device token unchanged, skipping registration", category: .network)
-        }
+//        } else {
+//            AppLogger.info("Device token unchanged, skipping registration", category: .network)
+//        }
     }
     
     /// Cleans up device token on logout
