@@ -225,7 +225,7 @@ class MatchupDetailViewModel: ObservableObject {
                 } else if matchup.status == .active {
                     // Trigger health data update - UI will be updated via notifications
                     AppLogger.info("MatchupDetail triggering health data update for matchup \(matchup.id)", category: .ui)
-                    healthKitDataManager.updateAndUploadHealthData(matchupDetail: matchup)
+                    healthKitDataManager.updateAndUploadHealthData(matchupDetail: matchup, requestType: .userInitiated)
                 }
             }
         } catch {

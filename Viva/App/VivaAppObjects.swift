@@ -21,6 +21,7 @@ class VivaAppObjects: ObservableObject {
     public let backgroundHealthSyncManager: BackgroundHealthSyncManager
     public let backgroundMatchupRefreshManager: BackgroundMatchupRefreshManager
     public let deviceTokenService: DeviceTokenService
+    public let notificationService: NotificationService
 
     init() {
         userSession = UserSession()
@@ -124,6 +125,14 @@ class VivaAppObjects: ObservableObject {
         backgroundMatchupRefreshManager = BackgroundMatchupRefreshManager(
             matchupService: matchupService,
             userSession: userSession
+        )
+
+        // Initialize NotificationService
+        notificationService = NotificationService(
+            userSession: userSession,
+            deviceTokenService: deviceTokenService,
+            backgroundHealthSyncManager: backgroundHealthSyncManager,
+            backgroundMatchupRefreshManager: backgroundMatchupRefreshManager
         )
 
         // Configure ErrorManager with HealthService for connectivity monitoring

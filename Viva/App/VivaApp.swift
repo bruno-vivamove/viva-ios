@@ -158,17 +158,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     // MARK: - Setup
     
     func setupNotifications() {
-        guard let vivaAppObjects = vivaAppObjects else {
-            AppLogger.error("VivaAppObjects not available for notification setup", category: .network)
-            return
-        }
-        
-        notificationService = NotificationService(
-            userSession: vivaAppObjects.userSession,
-            deviceTokenService: vivaAppObjects.deviceTokenService,
-            backgroundHealthSyncManager: vivaAppObjects.backgroundHealthSyncManager,
-            backgroundMatchupRefreshManager: vivaAppObjects.backgroundMatchupRefreshManager
-        )
+        notificationService = vivaAppObjects?.notificationService
         notificationService?.registerForPushNotifications()
     }
 }

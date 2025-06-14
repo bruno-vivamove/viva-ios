@@ -218,7 +218,7 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
             {
                 // Trigger health data update - UI will be updated via notifications
                 AppLogger.info("MatchupCard triggering health data update for matchup \(matchup.id)", category: .ui)
-                healthKitDataManager.updateAndUploadHealthData(matchupDetail: matchup)
+                healthKitDataManager.updateAndUploadHealthData(matchupDetail: matchup, requestType: .userInitiated)
             }
         } catch {
             AppLogger.error(

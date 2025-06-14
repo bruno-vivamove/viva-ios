@@ -77,6 +77,8 @@ final class HealthKitDataManager: ObservableObject {
 
     /// Sets up background observers for all health data types we're interested in
     func setupBackgroundObservers() {
+        return
+        
         guard isAuthorized else { return }
         
         // Stop any existing observers
@@ -388,7 +390,8 @@ final class HealthKitDataManager: ObservableObject {
     /// - Parameter matchupDetail: The matchup detail to update
     /// - Note: Posts .workoutsRecorded and .healthDataUpdated notifications on success
     func updateAndUploadHealthData(
-        matchupDetail: MatchupDetails
+        matchupDetail: MatchupDetails,
+        requestType: RequestType
     ) {
         // First query and upload workouts
         queryWorkouts(matchupDetail: matchupDetail) { workouts in
@@ -409,7 +412,7 @@ final class HealthKitDataManager: ObservableObject {
                         }
                         
                         // Continue with regular health data update after workouts are uploaded
-                        self.updateAndUploadHealthMeasurements(matchupDetail: matchupDetail)
+                        self.updateAndUploadHealthMeasurements(matchupDetail: matchupDetail, requestType: requestType)
                     } catch {
                         AppLogger.error(
                             "Failed to save workouts: \(error)",
@@ -423,7 +426,7 @@ final class HealthKitDataManager: ObservableObject {
                 }
             } else {
                 // No workouts to upload, proceed with regular health data update
-                self.updateAndUploadHealthMeasurements(matchupDetail: matchupDetail)
+                self.updateAndUploadHealthMeasurements(matchupDetail: matchupDetail, requestType: requestType)
             }
         }
     }
@@ -432,7 +435,8 @@ final class HealthKitDataManager: ObservableObject {
     /// - Parameter matchupDetail: The matchup detail to update
     /// - Note: Posts .healthDataUpdated notification on success
     private func updateAndUploadHealthMeasurements(
-        matchupDetail: MatchupDetails
+        matchupDetail: MatchupDetails,
+        requestType: RequestType
     ) {
         guard let userId = userSession.userId else {
             return
@@ -458,7 +462,7 @@ final class HealthKitDataManager: ObservableObject {
                         .saveUserMeasurements(
                             matchupId: matchupDetail.id,
                             measurements: userMeasurements,
-                            isBackgroundUpdate: true
+                            requestType: requestType
                         )
 
                     // Post notification that health data was updated
@@ -544,7 +548,7 @@ final class HealthKitDataManager: ObservableObject {
                         let matchupDetails = try await matchupService.getMatchup(matchupId: matchup.id)
                         
                         // Update and upload health data for this matchup
-                        updateAndUploadHealthData(matchupDetail: matchupDetails)
+                        updateAndUploadHealthData(matchupDetail: matchupDetails, requestType: .eventInitialized)
                         AppLogger.info("✅ Completed health data update for matchup \(matchupDetails.id) (\(index + 1)/\(activeMatchups.count))", category: .health)
                     } catch {
                         AppLogger.error("❌ Error getting details for matchup \(matchup.id): \(error)", category: .health)

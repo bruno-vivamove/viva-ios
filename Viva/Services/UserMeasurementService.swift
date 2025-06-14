@@ -18,12 +18,12 @@ final class UserMeasurementService: ObservableObject {
     func saveUserMeasurements(
         matchupId: String, 
         measurements: [MatchupUserMeasurement],
-        isBackgroundUpdate: Bool = false,
+        requestType: RequestType,
         notifyUserId: String? = nil
     ) async throws -> MatchupDetails {
         let request = MatchupUserMeasurements(
             matchupUserMeasurements: measurements,
-            isBackgroundUpdate: isBackgroundUpdate,
+            requestType: requestType,
             notifyUserId: notifyUserId
         )
         

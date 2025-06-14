@@ -209,14 +209,20 @@ struct MatchupUserMeasurement: Codable, Equatable {
     let points: Int
 }
 
+enum RequestType: String, Codable {
+    case userInitiated = "USER_INITIATED"
+    case notifInitiated = "NOTIF_INITIATED"
+    case eventInitialized = "EVENT_INITIALIZED"
+}
+
 struct MatchupUserMeasurements: Codable {
     let matchupUserMeasurements: [MatchupUserMeasurement]
-    let isBackgroundUpdate: Bool?
+    let requestType: RequestType?
     let notifyUserId: String?
 
-    init(matchupUserMeasurements: [MatchupUserMeasurement], isBackgroundUpdate: Bool? = nil, notifyUserId: String? = nil) {
+    init(matchupUserMeasurements: [MatchupUserMeasurement], requestType: RequestType, notifyUserId: String? = nil) {
         self.matchupUserMeasurements = matchupUserMeasurements
-        self.isBackgroundUpdate = isBackgroundUpdate
+        self.requestType = requestType
         self.notifyUserId = notifyUserId
     }
 }
