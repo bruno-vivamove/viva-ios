@@ -9,13 +9,14 @@ final class MatchupService: ObservableObject {
     
     // MARK: - Matchups
     
-    func getMyMatchups(filter: MatchupFilter = .ALL, page: Int = 1, pageSize: Int = 100) async throws -> MatchupsResponse {
+    func getMyMatchups(filter: MatchupFilter = .ALL, syncMatchupMembers: Bool = false, page: Int = 1, pageSize: Int = 100) async throws -> MatchupsResponse {
         return try await networkClient.get(
             path: "/matchups",
             queryParams: [
                 "filter": filter.rawValue,
                 "page": String(page),
-                "pageSize": String(pageSize)
+                "pageSize": String(pageSize),
+                "syncMatchupMembers": syncMatchupMembers ? "true" : "false"
             ]
         )
     }
@@ -32,9 +33,12 @@ final class MatchupService: ObservableObject {
         )
     }
     
-    func getMatchup(matchupId: String) async throws -> MatchupDetails {
+    func getMatchup(matchupId: String, syncMatchupMembers: Bool = false) async throws -> MatchupDetails {
         return try await networkClient.get(
-            path: "/matchups/\(matchupId)"
+            path: "/matchups/\(matchupId)",
+            queryParams: [
+                "syncMatchupMembers": syncMatchupMembers ? "true" : "false"
+            ]
         )
     }
     

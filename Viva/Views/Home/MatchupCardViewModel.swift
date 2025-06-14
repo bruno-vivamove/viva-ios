@@ -41,101 +41,6 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
         setupNotificationObservers()
     }
 
-    // Add this method to update the refresh time
-    func updateLastRefreshTime(_ newTime: Date?) {
-        // Only refresh if the new time is different (and later) than the current one
-        if let newTime = newTime,
-            lastRefreshTime == nil || newTime > lastRefreshTime!
-        {
-            lastRefreshTime = newTime
-            Task {
-                await loadInitialDataIfNeeded()
-            }
-        }
-    }
-
-    @MainActor
-    func loadInitialDataIfNeeded() async {
-        // Don't load if we've requested data in the last minute, regardless of result
-        if let requestedTime = dataRequestedTime,
-            Date().timeIntervalSince(requestedTime) < 60
-        {
-            return
-        }
-
-        // Only load data if it hasn't been loaded in the last 10 minutes or if matchupDetails is nil
-        if matchup == nil || dataLoadedTime == nil
-            || Date().timeIntervalSince(dataLoadedTime!) > 600
-        {
-            // Mark that we've requested data
-            dataRequestedTime = Date()
-            await loadData(uploadHealthData: true)
-        }
-    }
-
-    @MainActor
-    func loadData(uploadHealthData: Bool) async {
-        isLoading = true
-        error = nil
-
-        do {
-            // First, get the matchup details
-            let matchup = try await matchupService.getMatchup(
-                matchupId: matchupId
-            )
-
-            self.matchup = matchup
-            self.dataLoadedTime = Date()
-            self.isLoading = false
-
-            // If the matchup is active, update the health data in background
-            let isCurrentUserInMatchup = matchup.teams.flatMap { $0.users }
-                .contains { $0.id == userSession.userId }
-
-            if matchup.status == .active && isCurrentUserInMatchup
-                && uploadHealthData
-            {
-                // Trigger health data update - UI will be updated via notifications
-                AppLogger.info("MatchupCard triggering health data update for matchup \(matchup.id)", category: .ui)
-                healthKitDataManager.updateAndUploadHealthData(matchupDetail: matchup)
-            }
-        } catch {
-            AppLogger.error(
-                "Error loading matchup details: \(error)",
-                category: .network
-            )
-            self.error = error
-            self.isLoading = false
-        }
-    }
-
-    // Handle removing the current user from the matchup
-    @MainActor
-    func removeCurrentUser(userId: String) async -> Bool {
-        do {
-            _ = try await matchupService.removeMatchupUser(
-                matchupId: matchupId,
-                userId: userId
-            )
-            return true
-        } catch {
-            self.error = error
-            return false
-        }
-    }
-
-    // Handle canceling the matchup (for owner)
-    @MainActor
-    func cancelMatchup() async -> Bool {
-        do {
-            _ = try await matchupService.cancelMatchup(matchupId: matchupId)
-            return true
-        } catch {
-            self.error = error
-            return false
-        }
-    }
-
     private func setupNotificationObservers() {
         // Refresh when user profile is updated
         NotificationCenter.default.publisher(for: .userProfileUpdated)
@@ -255,5 +160,100 @@ class MatchupCardViewModel: ObservableObject, Identifiable {
                 }
             }
             .store(in: &cancellables)
+    }
+    
+    // Add this method to update the refresh time
+    func updateLastRefreshTime(_ newTime: Date?) {
+        // Only refresh if the new time is different (and later) than the current one
+        if let newTime = newTime,
+            lastRefreshTime == nil || newTime > lastRefreshTime!
+        {
+            lastRefreshTime = newTime
+            Task {
+                await loadInitialDataIfNeeded()
+            }
+        }
+    }
+
+    @MainActor
+    func loadInitialDataIfNeeded() async {
+        // Don't load if we've requested data in the last minute, regardless of result
+        if let requestedTime = dataRequestedTime,
+            Date().timeIntervalSince(requestedTime) < 60
+        {
+            return
+        }
+
+        // Only load data if it hasn't been loaded in the last 10 minutes or if matchupDetails is nil
+        if matchup == nil || dataLoadedTime == nil
+            || Date().timeIntervalSince(dataLoadedTime!) > 600
+        {
+            // Mark that we've requested data
+            dataRequestedTime = Date()
+            await loadData(uploadHealthData: true)
+        }
+    }
+
+    @MainActor
+    func loadData(uploadHealthData: Bool) async {
+        isLoading = true
+        error = nil
+
+        do {
+            // First, get the matchup details
+            let matchup = try await matchupService.getMatchup(
+                matchupId: matchupId,
+            )
+
+            self.matchup = matchup
+            self.dataLoadedTime = Date()
+            self.isLoading = false
+
+            // If the matchup is active, update the health data in background
+            let isCurrentUserInMatchup = matchup.teams.flatMap { $0.users }
+                .contains { $0.id == userSession.userId }
+
+            if matchup.status == .active && isCurrentUserInMatchup
+                && uploadHealthData
+            {
+                // Trigger health data update - UI will be updated via notifications
+                AppLogger.info("MatchupCard triggering health data update for matchup \(matchup.id)", category: .ui)
+                healthKitDataManager.updateAndUploadHealthData(matchupDetail: matchup)
+            }
+        } catch {
+            AppLogger.error(
+                "Error loading matchup details: \(error)",
+                category: .network
+            )
+            self.error = error
+            self.isLoading = false
+        }
+    }
+
+    // Handle removing the current user from the matchup
+    @MainActor
+    func removeCurrentUser(userId: String) async -> Bool {
+        do {
+            _ = try await matchupService.removeMatchupUser(
+                matchupId: matchupId,
+                userId: userId
+            )
+            return true
+        } catch {
+            self.error = error
+            return false
+        }
+    }
+
+    // Handle canceling the matchup (for owner)
+    @MainActor
+    func cancelMatchup() async -> Bool {
+        do {
+            _ = try await matchupService.cancelMatchup(matchupId: matchupId)
+            return true
+        } catch {
+            self.error = error
+            return false
+        }
     }
 }

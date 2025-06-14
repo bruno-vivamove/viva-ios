@@ -24,6 +24,7 @@ class BackgroundHealthSyncManager {
     /// Performs background health data sync for all matchups involving the specified user
     /// This method is called from silent push notifications
     func performBackgroundHealthSync(for userId: String, completion: @escaping (Bool) -> Void) {
+        // TODO many many optimizations
         AppLogger.info("Starting background health sync for user: \(userId)", category: .data)
         
         // Ensure we have a valid user session

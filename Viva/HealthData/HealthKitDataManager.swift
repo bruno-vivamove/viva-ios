@@ -75,6 +75,102 @@ final class HealthKitDataManager: ObservableObject {
         }
     }
 
+    /// Sets up background observers for all health data types we're interested in
+    func setupBackgroundObservers() {
+        guard isAuthorized else { return }
+        
+        // Stop any existing observers
+        stopBackgroundObservers()
+        
+        // Health data types to observe - explicitly defined as sample types
+        let observedTypes: [HKSampleType] = [
+            HKObjectType.workoutType(),
+            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
+            HKObjectType.quantityType(forIdentifier: .stepCount)!,
+            HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
+            HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
+            HKObjectType.quantityType(forIdentifier: .appleStandTime)!
+        ]
+        
+        // Setup observers for each type
+        for type in observedTypes {
+            setupObserver(for: type)
+        }
+        
+        // Start background delivery if not already enabled
+        if !backgroundDeliveryEnabled {
+            enableBackgroundDelivery()
+        }
+    }
+    
+    /// Sets up an observer for a specific health data type
+    private func setupObserver(for type: HKSampleType) {
+        // Create an observer query
+        let query = HKObserverQuery(sampleType: type, predicate: nil) { [weak self] query, completionHandler, error in
+            guard let self = self else {
+                completionHandler()
+                return
+            }
+            
+            // Check if user is still logged in
+            guard self.userSession.isLoggedIn else {
+                completionHandler()
+                return
+            }
+            
+            let typeName = self.getTypeDisplayName(type)
+            AppLogger.info("New HealthKit data detected for: \(typeName)", category: .health)
+            self.processHealthDataUpdate()
+            completionHandler()
+        }
+        
+        // Execute the query
+        healthStore.execute(query)
+        backgroundObservers.append(query)
+    }
+    
+    /// Enables background delivery for health data updates
+    private func enableBackgroundDelivery() {
+        // Define types for background delivery - explicitly defined as sample types
+        let types: [HKSampleType] = [
+            HKObjectType.workoutType(),
+            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
+            HKObjectType.quantityType(forIdentifier: .stepCount)!,
+            HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
+            HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
+            HKObjectType.quantityType(forIdentifier: .appleStandTime)!
+        ]
+        
+        // Enable background delivery for each type
+        let group = DispatchGroup()
+        
+        for type in types {
+            group.enter()
+            
+            healthStore.enableBackgroundDelivery(for: type, frequency: .immediate) { success, error in
+                if let error = error {
+                    AppLogger.error("Failed to enable background delivery for \(self.getTypeDisplayName(type)): \(error.localizedDescription)", category: .health)
+                } else if success {
+                    AppLogger.info("Background delivery enabled for \(self.getTypeDisplayName(type))", category: .health)
+                }
+                group.leave()
+            }
+        }
+        
+        group.notify(queue: .main) {
+            self.backgroundDeliveryEnabled = true
+            AppLogger.info("HealthKit background delivery setup complete", category: .health)
+        }
+    }
+    
+    /// Stops all background observers
+    func stopBackgroundObservers() {
+        for query in backgroundObservers {
+            healthStore.stop(query)
+        }
+        backgroundObservers.removeAll()
+    }
+    
     /// Updates matchup data with the user's health metrics
     /// - Parameters:
     ///   - matchupDetail: Current matchup details
@@ -415,102 +511,6 @@ final class HealthKitDataManager: ObservableObject {
 
         return merged
     }
-
-    /// Sets up background observers for all health data types we're interested in
-    func setupBackgroundObservers() {
-        guard isAuthorized else { return }
-        
-        // Stop any existing observers
-        stopBackgroundObservers()
-        
-        // Health data types to observe - explicitly defined as sample types
-        let observedTypes: [HKSampleType] = [
-            HKObjectType.workoutType(),
-            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
-            HKObjectType.quantityType(forIdentifier: .stepCount)!,
-            HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
-            HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
-            HKObjectType.quantityType(forIdentifier: .appleStandTime)!
-        ]
-        
-        // Setup observers for each type
-        for type in observedTypes {
-            setupObserver(for: type)
-        }
-        
-        // Start background delivery if not already enabled
-        if !backgroundDeliveryEnabled {
-            enableBackgroundDelivery()
-        }
-    }
-    
-    /// Sets up an observer for a specific health data type
-    private func setupObserver(for type: HKSampleType) {
-        // Create an observer query
-        let query = HKObserverQuery(sampleType: type, predicate: nil) { [weak self] query, completionHandler, error in
-            guard let self = self else {
-                completionHandler()
-                return
-            }
-            
-            // Check if user is still logged in
-            guard self.userSession.isLoggedIn else {
-                completionHandler()
-                return
-            }
-            
-            let typeName = self.getTypeDisplayName(type)
-            AppLogger.info("New HealthKit data detected for: \(typeName)", category: .health)
-            self.processHealthDataUpdate()
-            completionHandler()
-        }
-        
-        // Execute the query
-        healthStore.execute(query)
-        backgroundObservers.append(query)
-    }
-    
-    /// Enables background delivery for health data updates
-    private func enableBackgroundDelivery() {
-        // Define types for background delivery - explicitly defined as sample types
-        let types: [HKSampleType] = [
-            HKObjectType.workoutType(),
-            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
-            HKObjectType.quantityType(forIdentifier: .stepCount)!,
-            HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
-            HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
-            HKObjectType.quantityType(forIdentifier: .appleStandTime)!
-        ]
-        
-        // Enable background delivery for each type
-        let group = DispatchGroup()
-        
-        for type in types {
-            group.enter()
-            
-            healthStore.enableBackgroundDelivery(for: type, frequency: .immediate) { success, error in
-                if let error = error {
-                    AppLogger.error("Failed to enable background delivery for \(self.getTypeDisplayName(type)): \(error.localizedDescription)", category: .health)
-                } else if success {
-                    AppLogger.info("Background delivery enabled for \(self.getTypeDisplayName(type))", category: .health)
-                }
-                group.leave()
-            }
-        }
-        
-        group.notify(queue: .main) {
-            self.backgroundDeliveryEnabled = true
-            AppLogger.info("HealthKit background delivery setup complete", category: .health)
-        }
-    }
-    
-    /// Stops all background observers
-    func stopBackgroundObservers() {
-        for query in backgroundObservers {
-            healthStore.stop(query)
-        }
-        backgroundObservers.removeAll()
-    }
     
     /// Process new health data
     func processHealthDataUpdate() {
@@ -559,7 +559,6 @@ final class HealthKitDataManager: ObservableObject {
                 AppLogger.info("🎉 Background health data update completed for all active matchups", category: .health)
             } catch {
                 AppLogger.error("❌ Failed to fetch matchups for health data update: \(error)", category: .health)
-                // TODO: resolve "Publishing changes from background threads is not allowed; make sure to publish values from the main thread (via operators like receive(on:)) on model updates."
                 errorManager.registerError(
                     "Failed to fetch active matchups: \(error.localizedDescription)",
                     type: .network

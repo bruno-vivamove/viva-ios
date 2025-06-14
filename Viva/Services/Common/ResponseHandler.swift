@@ -308,29 +308,38 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         data: Data?,
         responseType: String?
     ) {
-        var logMessage = ""
-
-        // Add request information
-        if let request = request {
-            logMessage +=
-                "Request: \(request.httpMethod ?? "unknown") \(request.url?.absoluteString ?? "unknown")\n"
-            if let headers = request.allHTTPHeaderFields {
-                logMessage +=
-                    "Request Headers: \(headers.filter { $0.key != "Authorization" })\n"
-            }
-        }
-
-        if let responseType = responseType {
-            logMessage += "Response Type: \(responseType)\n"
-        }
-
         // Add icon based on status code
         let statusCode = httpResponse?.statusCode ?? 0
         let responseIcon = statusCode >= 400 ? "❌" : "✅"
-        logMessage +=
-            "\(responseIcon) Response Status: \(String(describing: httpResponse?.statusCode))\n"
-        logMessage +=
-            "Response Headers: \(String(describing: httpResponse?.headers))"
+        
+        var logMessage = "\(responseIcon) \(statusCode) Response"
+        
+        if let responseType = responseType {
+            logMessage += " (\(responseType))"
+        }
+        
+        logMessage += "\n"
+        
+        // Add request information
+        if let request = request {
+            logMessage += "Request: \(request.httpMethod ?? "unknown") \(request.url?.absoluteString ?? "unknown")\n"
+            if let headers = request.allHTTPHeaderFields {
+                let filteredHeaders = headers.filter { $0.key != "Authorization" }
+                logMessage += "Request Headers: \(filteredHeaders)\n"
+            }
+        }
+        
+        // Format response headers consistently
+        if let headers = httpResponse?.allHeaderFields {
+            // Convert headers to a more readable format
+            var headersDict: [String: String] = [:]
+            for (key, value) in headers {
+                if let keyString = key as? String {
+                    headersDict[keyString] = "\(value)"
+                }
+            }
+            logMessage += "Headers: \(headersDict)"
+        }
 
         if let data = data {
             logMessage += "\nSize: \(data.count) bytes"
@@ -344,9 +353,9 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
                     ),
                     let prettyString = String(data: prettyData, encoding: .utf8)
                 {
-                    logMessage += "\nRaw Response:\n\(prettyString)"
+                    logMessage += "\nBody:\n\(prettyString)"
                 } else if let rawString = String(data: data, encoding: .utf8) {
-                    logMessage += "\nRaw Response: \(rawString)"
+                    logMessage += "\nBody: \(rawString)"
                 }
             }
         }

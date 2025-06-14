@@ -2,95 +2,9 @@ import SwiftUI
 import GoogleSignIn
 import AuthenticationServices
 import Nuke
-import BackgroundTasks
 import UserNotifications
 import FirebaseMessaging
 import FirebaseCore
-
-class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
-    var vivaAppObjects: VivaAppObjects?
-    private var notificationService: NotificationService?
-    
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Initialize Firebase
-        FirebaseUtil.configureFirebase()
-        
-        // Set FCM messaging delegate
-        Messaging.messaging().delegate = self
-        
-        // Set UNUserNotificationCenter delegate
-        UNUserNotificationCenter.current().delegate = self
-        
-        return true
-    }
-    
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        notificationService?.handleAPNSTokenRegistration(deviceToken)
-    }
-    
-    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        notificationService?.handleAPNSTokenRegistrationFailure(error)
-    }
-    
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        notificationService?.processNotification(userInfo, completion: completionHandler)
-    }
-    
-    // MARK: - Setup
-    
-    func setupNotifications() {
-        guard let vivaAppObjects = vivaAppObjects else {
-            AppLogger.error("VivaAppObjects not available for notification setup", category: .network)
-            return
-        }
-        
-        notificationService = NotificationService(
-            userSession: vivaAppObjects.userSession,
-            deviceTokenService: vivaAppObjects.deviceTokenService,
-            backgroundHealthSyncManager: vivaAppObjects.backgroundHealthSyncManager,
-            backgroundMatchupRefreshManager: vivaAppObjects.backgroundMatchupRefreshManager
-        )
-        notificationService?.registerForPushNotifications()
-    }
-}
-
-
-
-// MARK: - MessagingDelegate
-
-extension AppDelegate: MessagingDelegate {
-    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        guard let fcmToken = fcmToken else {
-            AppLogger.warning("Received nil FCM token", category: .network)
-            return
-        }
-        
-        notificationService?.handleFCMTokenRefresh(fcmToken)
-    }
-}
-
-// MARK: - UNUserNotificationCenterDelegate
-
-extension AppDelegate {
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        let userInfo = notification.request.content.userInfo
-        AppLogger.info("Notification received in foreground", category: .network)
-        
-        notificationService?.processNotification(userInfo)
-        
-        // Don't show notification in foreground for silent notifications
-        completionHandler([])
-    }
-    
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        let userInfo = response.notification.request.content.userInfo
-        AppLogger.info("Notification tapped", category: .network)
-        
-        notificationService?.processNotification(userInfo)
-        
-        completionHandler()
-    }
-}
 
 @main
 struct VivaApp: App {
@@ -126,9 +40,6 @@ struct VivaApp: App {
                     // Setup notifications
                     appDelegate.setupNotifications()
                     
-                    // Register background tasks
-                    vivaAppObjects.backgroundTaskManager.registerBackgroundTasks()
-                    
                     // Check for existing Apple sign-in session
                     checkAppleSignInState()
                 }
@@ -150,33 +61,10 @@ struct VivaApp: App {
                     // Request HealthKit authorization if not already authorized
                     vivaAppObjects.healthKitDataManager.requestAuthorization()
                     AppLogger.info("Requested HealthKit authorization", category: .health)
-                }
-                
-                // FCM token registration is handled by MessagingDelegate
-                
+                }                
             case .background:
                 // App is entering background
                 AppLogger.info("App entered background", category: .general)
-                
-                // Schedule background health update task if user is logged in
-                if vivaAppObjects.userSession.isLoggedIn {
-                    let request = BGProcessingTaskRequest(identifier: BackgroundTaskManager.backgroundHealthUpdateTaskIdentifier)
-                    request.requiresNetworkConnectivity = true
-                    request.requiresExternalPower = false
-                    
-                    do {
-                        try BGTaskScheduler.shared.submit(request)
-                        AppLogger.info("✅ Successfully scheduled background health update task", category: .general)
-                    } catch let error as NSError {
-                        let errorDescription = switch error.code {
-                        case 1: "BGTaskSchedulerErrorCodeUnavailable - Background tasks not available (requires physical device, background app refresh enabled)"
-                        case 2: "BGTaskSchedulerErrorCodeTooManyPendingTaskRequests - Too many pending requests"
-                        case 3: "BGTaskSchedulerErrorCodeNotPermitted - App not permitted to use background tasks"
-                        default: "Unknown BGTaskScheduler error code \(error.code)"
-                        }
-                        AppLogger.error("❌ Failed to schedule background task: \(errorDescription)", category: .general)
-                    }
-                }
                 
             case .inactive:
                 // App is inactive but visible
@@ -235,6 +123,89 @@ struct AppContainerView: View {
                     .transition(.opacity)
             }
         }
+    }
+}
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+    var vivaAppObjects: VivaAppObjects?
+    private var notificationService: NotificationService?
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Initialize Firebase
+        FirebaseUtil.configureFirebase()
+        
+        // Set FCM messaging delegate
+        Messaging.messaging().delegate = self
+        
+        // Set UNUserNotificationCenter delegate
+        UNUserNotificationCenter.current().delegate = self
+        
+        return true
+    }
+    
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        notificationService?.handleAPNSTokenRegistration(deviceToken)
+    }
+    
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        notificationService?.handleAPNSTokenRegistrationFailure(error)
+    }
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        notificationService?.processNotification(userInfo, completion: completionHandler)
+    }
+    
+    // MARK: - Setup
+    
+    func setupNotifications() {
+        guard let vivaAppObjects = vivaAppObjects else {
+            AppLogger.error("VivaAppObjects not available for notification setup", category: .network)
+            return
+        }
+        
+        notificationService = NotificationService(
+            userSession: vivaAppObjects.userSession,
+            deviceTokenService: vivaAppObjects.deviceTokenService,
+            backgroundHealthSyncManager: vivaAppObjects.backgroundHealthSyncManager,
+            backgroundMatchupRefreshManager: vivaAppObjects.backgroundMatchupRefreshManager
+        )
+        notificationService?.registerForPushNotifications()
+    }
+}
+
+// MARK: - MessagingDelegate
+
+extension AppDelegate: MessagingDelegate {
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        guard let fcmToken = fcmToken else {
+            AppLogger.warning("Received nil FCM token", category: .network)
+            return
+        }
+        
+        notificationService?.handleFCMTokenRefresh(fcmToken)
+    }
+}
+
+// MARK: - UNUserNotificationCenterDelegate
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        let userInfo = notification.request.content.userInfo
+        AppLogger.info("Notification received in foreground", category: .network)
+        
+        notificationService?.processNotification(userInfo)
+        
+        // Don't show notification in foreground for silent notifications
+        completionHandler([])
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo = response.notification.request.content.userInfo
+        AppLogger.info("Notification tapped", category: .network)
+        
+        notificationService?.processNotification(userInfo)
+        
+        completionHandler()
     }
 }
 

@@ -141,6 +141,17 @@ class MatchupDetailViewModel: ObservableObject {
             }
             .store(in: &cancellables)
 
+        // Refresh when a matchup is updated
+        NotificationCenter.default.publisher(for: .matchupUpdated)
+            .compactMap { $0.object as? MatchupDetails }
+            .filter { $0.id == self.matchupId }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] updatedMatchup in
+                self?.matchup = updatedMatchup
+                self?.updateMeasurements(matchup: updatedMatchup)
+            }
+            .store(in: &cancellables)
+
         // Refresh when health data is updated
         NotificationCenter.default.publisher(for: .healthDataUpdated)
             .compactMap { $0.object as? MatchupDetails }
@@ -192,7 +203,8 @@ class MatchupDetailViewModel: ObservableObject {
         do {
             // First, get the matchup details
             let matchup = try await matchupService.getMatchup(
-                matchupId: matchupId
+                matchupId: matchupId,
+                syncMatchupMembers: true
             )
             self.matchup = matchup
             self.dataLoadedTime = Date()

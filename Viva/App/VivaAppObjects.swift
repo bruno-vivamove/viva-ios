@@ -4,7 +4,6 @@ class VivaAppObjects: ObservableObject {
     public let userSession: UserSession
     public let authManager: AuthenticationManager
     public let healthKitDataManager: HealthKitDataManager
-    public let backgroundTaskManager: BackgroundTaskManager
     public let errorManager: ErrorManager
 
     public let appNetworkClient: NetworkClient<VivaErrorResponse>
@@ -82,10 +81,10 @@ class VivaAppObjects: ObservableObject {
             networkClient: appNetworkClientNoBodies
         )
         statsService = StatsService(networkClient: appNetworkClientNoBodies)
-        matchupService = MatchupService(networkClient: appNetworkClientNoBodies)
         userMeasurementService = UserMeasurementService(
             networkClient: appNetworkClientNoBodies
         )
+        matchupService = MatchupService(networkClient: appNetworkClientNoBodies)
         workoutService = WorkoutService(networkClient: appNetworkClientNoBodies)
         userService = UserService(
             networkClient: appNetworkClientNoBodies,
@@ -111,11 +110,6 @@ class VivaAppObjects: ObservableObject {
             workoutService: workoutService,
             matchupService: matchupService,
             errorManager: errorManager
-        )
-
-        // Initialize BackgroundTaskManager with HealthKitDataManager dependency
-        backgroundTaskManager = BackgroundTaskManager(
-            healthKitDataManager: healthKitDataManager
         )
 
         // Initialize BackgroundHealthSyncManager

@@ -642,8 +642,13 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             requestTitle += " (retry \(currentAttempt - 1)/\(settings.maxRetries))"
         }
         
-        var logMessage = "\(requestTitle):\nURL: \(url.absoluteString)\n"
-        logMessage += "Headers: \(headers.filter { $0.name != "Authorization" })"
+        var logMessage = "\(requestTitle)\n"
+        logMessage += "URL: \(url.absoluteString)\n"
+        
+        // Format headers consistently
+        let headersDict = Dictionary(uniqueKeysWithValues: headers.map { ($0.name, $0.value) })
+        let filteredHeaders = headersDict.filter { $0.key != "Authorization" }
+        logMessage += "Headers: \(filteredHeaders)"
         
         // Add file count for uploads
         if let fileCount = fileCount {

@@ -23,24 +23,33 @@ class ErrorManager: ObservableObject {
     }
     
     func registerError(_ message: String, type: ErrorType) {
-        currentErrors[type] = message
-        
-        if type == .network {
-            startConnectivityMonitoring()
+        // Ensure UI updates happen on the main thread
+        DispatchQueue.main.async {
+            self.currentErrors[type] = message
+            
+            if type == .network {
+                self.startConnectivityMonitoring()
+            }
         }
     }
     
     func clearError(type: ErrorType) {
-        currentErrors.removeValue(forKey: type)
-        
-        if type == .network {
-            stopConnectivityMonitoring()
+        // Ensure UI updates happen on the main thread
+        DispatchQueue.main.async {
+            self.currentErrors.removeValue(forKey: type)
+            
+            if type == .network {
+                self.stopConnectivityMonitoring()
+            }
         }
     }
     
     func clearAllErrors() {
-        currentErrors.removeAll()
-        stopConnectivityMonitoring()
+        // Ensure UI updates happen on the main thread
+        DispatchQueue.main.async {
+            self.currentErrors.removeAll()
+            self.stopConnectivityMonitoring()
+        }
     }
     
     var hasErrors: Bool {
