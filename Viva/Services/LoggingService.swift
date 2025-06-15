@@ -9,7 +9,7 @@ final class LoggingService: ObservableObject {
     
     func sendLogEntry(_ logEntry: LogEntry) async {
         do {
-            let _: EmptyResponse = try await networkClient.post(
+            try await networkClient.post(
                 path: "/logs",
                 body: logEntry
             )
@@ -22,8 +22,4 @@ final class LoggingService: ObservableObject {
             #endif
         }
     }
-}
-
-// Empty response struct for POST requests that don't return data
-private struct EmptyResponse: Codable {
 }

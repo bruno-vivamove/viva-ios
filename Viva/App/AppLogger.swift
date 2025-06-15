@@ -51,6 +51,13 @@ struct AppLogger {
         sendLogRemotely(level: "DEBUG", message: message, category: category, file: file, function: function, line: line)
     }
     
+    /// Log a debug message locally only (no remote logging)
+    static func debugLocal(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
+        let context = extractContext(file: file, function: function, line: line)
+        category.logger.debug("[\(context, privacy: .public)]\n\(message, privacy: .public)")
+        sendLogRemotely(level: "DEBUG", message: message, category: category, file: file, function: function, line: line, skipRemote: true)
+    }
+    
     /// Log an info message (collected but may be dynamically disabled)
     /// - Parameters:
     ///   - message: The message to log
@@ -62,6 +69,13 @@ struct AppLogger {
         let context = extractContext(file: file, function: function, line: line)
         category.logger.info("[\(context, privacy: .public)]\n\(message, privacy: .public)")
         sendLogRemotely(level: "INFO", message: message, category: category, file: file, function: function, line: line)
+    }
+    
+    /// Log an info message locally only (no remote logging)
+    static func infoLocal(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
+        let context = extractContext(file: file, function: function, line: line)
+        category.logger.info("[\(context, privacy: .public)]\n\(message, privacy: .public)")
+        sendLogRemotely(level: "INFO", message: message, category: category, file: file, function: function, line: line, skipRemote: true)
     }
     
     /// Log a default message (standard level for most logging needs)
@@ -134,8 +148,10 @@ struct AppLogger {
         category: Category,
         file: String,
         function: String,
-        line: Int
+        line: Int,
+        skipRemote: Bool = false
     ) {
+        guard !skipRemote else { return }
         guard let loggingService = loggingService else { return }
         
         let fileName = URL(fileURLWithPath: file).lastPathComponent

@@ -154,7 +154,6 @@ private extension DeviceTokenService {
     func storeAPNSToken(_ token: String) {
         do {
             try userSession.storeInKeychain(key: Self.apnsTokenKey, value: token)
-            AppLogger.info("APNS token stored securely", category: .network)
         } catch {
             AppLogger.error("Failed to store APNS token: \(error)", category: .network)
         }
@@ -164,7 +163,6 @@ private extension DeviceTokenService {
     func storeFCMToken(_ token: String) {
         do {
             try userSession.storeInKeychain(key: Self.fcmTokenKey, value: token)
-            AppLogger.info("FCM token stored securely", category: .network)
         } catch {
             AppLogger.error("Failed to store FCM token: \(error)", category: .network)
         }

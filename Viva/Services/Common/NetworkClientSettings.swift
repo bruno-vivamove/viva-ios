@@ -7,6 +7,8 @@ protocol NetworkClientSettings {
     var maxRetries: Int { get }
 }
 
+private let defaultMaxRetries = 5
+
 final class AuthNetworkClientSettings: NetworkClientSettings {
     let baseUrl = "https://identitytoolkit.googleapis.com/v1/accounts"
     let headers = [
@@ -15,7 +17,7 @@ final class AuthNetworkClientSettings: NetworkClientSettings {
     let shouldLogBodies: Bool
     let maxRetries: Int
     
-    init(shouldLogBodies: Bool = false, maxRetries: Int = 3) {
+    init(shouldLogBodies: Bool = false, maxRetries: Int = defaultMaxRetries) {
         self.shouldLogBodies = shouldLogBodies
         self.maxRetries = maxRetries
     }
@@ -29,7 +31,7 @@ final class AppWithNoSessionNetworkClientSettings: NetworkClientSettings {
     let shouldLogBodies: Bool
     let maxRetries: Int
     
-    init(shouldLogBodies: Bool = false, maxRetries: Int = 3) {
+    init(shouldLogBodies: Bool = false, maxRetries: Int = defaultMaxRetries) {
         self.shouldLogBodies = shouldLogBodies
         self.maxRetries = maxRetries
     }
@@ -54,7 +56,7 @@ final class AppNetworkClientSettings: NetworkClientSettings {
         }
     }
     
-    init(_ userSession: UserSession, shouldLogBodies: Bool = false, maxRetries: Int = 3) {
+    init(_ userSession: UserSession, shouldLogBodies: Bool = false, maxRetries: Int = defaultMaxRetries) {
         self.userSession = userSession
         self.shouldLogBodies = shouldLogBodies
         self.maxRetries = maxRetries

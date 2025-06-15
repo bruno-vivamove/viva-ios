@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>FIREBASE_CONFIG_FILE</key>
-	<string>GoogleService-Info</string>
+	<string>GoogleService-Info-prod</string>
 	<key>AUTH_API_KEY</key>
 	<string>AIzaSyDFFQYxbY4RYsglPIceIgNCQO-3FU8IDt8</string>
 	<key>BASE_URL</key>

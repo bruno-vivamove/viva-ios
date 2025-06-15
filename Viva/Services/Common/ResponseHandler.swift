@@ -308,6 +308,11 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
         data: Data?,
         responseType: String?
     ) {
+        // Skip logging for log requests to avoid log recursion
+        if let url = request?.url?.path, url == "/logs" {
+            return
+        }
+        
         // Add icon based on status code
         let statusCode = httpResponse?.statusCode ?? 0
         let responseIcon = statusCode >= 400 ? "❌" : "✅"
@@ -360,6 +365,6 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
             }
         }
 
-        AppLogger.debug(logMessage, category: .network)
+        AppLogger.debugLocal(logMessage, category: .network)
     }
 }

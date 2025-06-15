@@ -15,6 +15,10 @@ class NotificationService: ObservableObject {
     private let deviceTokenService: DeviceTokenService
     private let backgroundHealthSyncManager: BackgroundHealthSyncManager
     private let backgroundMatchupRefreshManager: BackgroundMatchupRefreshManager
+    
+    // Current session tokens
+    private var currentAPNSToken: String?
+    private var currentFCMToken: String?
 
     // MARK: - Initialization
 
@@ -104,13 +108,16 @@ class NotificationService: ObservableObject {
             category: .network
         )
 
-        // Store APNS token locally
+        // Store current session token
+        currentAPNSToken = tokenString
+        
+        // Store APNS token locally for persistence
         UserDefaults.standard.set(tokenString, forKey: "apnsToken")
 
         // Set APNS token for Firebase Messaging
         Messaging.messaging().apnsToken = deviceToken
         
-        // Try to register with backend if we also have FCM token
+        // Try to register tokens (in case FCM token arrived first)
         tryRegisterTokensWithBackend()
     }
 
@@ -124,12 +131,15 @@ class NotificationService: ObservableObject {
 
     /// Handles FCM token refresh
     func handleFCMTokenRefresh(_ fcmToken: String) {
-        AppLogger.info("FCM token received/refreshed", category: .network)
+        AppLogger.info("FCM token received/refreshed: \(fcmToken)", category: .network)
 
-        // Store FCM token locally
+        // Store current session token
+        currentFCMToken = fcmToken
+        
+        // Store FCM token locally for persistence
         UserDefaults.standard.set(fcmToken, forKey: "fcmToken")
 
-        // Try to register with backend if we also have APNS token
+        // Register both tokens with backend now that we have FCM token
         tryRegisterTokensWithBackend()
     }
 
@@ -142,10 +152,10 @@ class NotificationService: ObservableObject {
             return
         }
         
-        guard let apnsToken = UserDefaults.standard.string(forKey: "apnsToken"),
-              let fcmToken = UserDefaults.standard.string(forKey: "fcmToken") else {
+        guard let apnsToken = currentAPNSToken,
+              let fcmToken = currentFCMToken else {
             AppLogger.info(
-                "Both APNS and FCM tokens not available yet, waiting...",
+                "Both APNS and FCM tokens not available yet in current session, waiting...",
                 category: .network
             )
             return

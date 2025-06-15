@@ -31,7 +31,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
         )
         self.tokenRefreshHandler = tokenRefreshHandler
 
-        AppLogger.info(
+        AppLogger.infoLocal(
             "NetworkClient initialized with baseURL: \(settings.baseUrl)",
             category: .network
         )
@@ -520,7 +520,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                 headers: requestHeaders
             )
             .uploadProgress { progress in
-                AppLogger.debug(
+                AppLogger.debugLocal(
                     "Upload progress: \(progress.fractionCompleted * 100)% (\(progress.completedUnitCount)/\(progress.totalUnitCount) bytes)",
                     category: .network
                 )
@@ -586,7 +586,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
                 headers: requestHeaders
             )
             .uploadProgress { progress in
-                AppLogger.debug(
+                AppLogger.debugLocal(
                     "Upload progress: \(progress.fractionCompleted * 100)% (\(progress.completedUnitCount)/\(progress.totalUnitCount) bytes)",
                     category: .network
                 )
@@ -634,6 +634,11 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
         body: (any Encodable)? = nil,
         fileCount: Int? = nil
     ) {
+        // Skip logging for log requests to avoid log recursion
+        if url.path == "/logs" {
+            return
+        }
+        
         let currentAttempt = settings.maxRetries - remainingRetries + 1
         
         // Build request title with retry info if applicable
@@ -668,7 +673,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
             }
         }
         
-        AppLogger.debug(logMessage, category: .network)
+        AppLogger.debugLocal(logMessage, category: .network)
     }
 
     private func configureMultipartFormData(
@@ -689,7 +694,7 @@ final class NetworkClient<ErrorType: Decodable & Error>: @unchecked Sendable {
 
         logMessage +=
             "\nTotal upload size: \(multipartFormData.contentLength) bytes"
-        AppLogger.debug(logMessage, category: .network)
+        AppLogger.debugLocal(logMessage, category: .network)
     }
 }
 

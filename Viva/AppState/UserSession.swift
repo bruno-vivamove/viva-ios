@@ -274,8 +274,6 @@ final class UserSession: ObservableObject {
             AppLogger.error("Failed to store \(key) in Keychain: OSStatus \(status)", category: .auth)
             throw KeychainError.storageError("Failed to store \(key) in Keychain")
         }
-        
-        AppLogger.info("Successfully stored \(key) in Keychain", category: .auth)
     }
     
     /// Retrieves a string value from Keychain

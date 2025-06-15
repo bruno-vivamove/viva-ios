@@ -418,10 +418,6 @@ final class HealthKitDataManager: ObservableObject {
                             "Failed to save workouts: \(error)",
                             category: .data
                         )
-                        self.errorManager.registerError(
-                            "Failed to upload workout data: \(error.localizedDescription)",
-                            type: .network
-                        )
                     }
                 }
             } else {
@@ -477,10 +473,6 @@ final class HealthKitDataManager: ObservableObject {
                     AppLogger.error(
                         "Failed to save measurements: \(error)",
                         category: .data
-                    )
-                    self.errorManager.registerError(
-                        "Failed to upload health measurements: \(error.localizedDescription)",
-                        type: .network
                     )
                 }
             }
@@ -552,10 +544,6 @@ final class HealthKitDataManager: ObservableObject {
                         AppLogger.info("✅ Completed health data update for matchup \(matchupDetails.id) (\(index + 1)/\(activeMatchups.count))", category: .health)
                     } catch {
                         AppLogger.error("❌ Error getting details for matchup \(matchup.id): \(error)", category: .health)
-                        errorManager.registerError(
-                            "Failed to fetch matchup details: \(error.localizedDescription)",
-                            type: .network
-                        )
                         continue
                     }
                 }
@@ -563,10 +551,6 @@ final class HealthKitDataManager: ObservableObject {
                 AppLogger.info("🎉 Background health data update completed for all active matchups", category: .health)
             } catch {
                 AppLogger.error("❌ Failed to fetch matchups for health data update: \(error)", category: .health)
-                errorManager.registerError(
-                    "Failed to fetch active matchups: \(error.localizedDescription)",
-                    type: .network
-                )
             }
         }
     }
