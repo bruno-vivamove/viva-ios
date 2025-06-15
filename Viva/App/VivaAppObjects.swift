@@ -22,6 +22,7 @@ class VivaAppObjects: ObservableObject {
     public let backgroundMatchupRefreshManager: BackgroundMatchupRefreshManager
     public let deviceTokenService: DeviceTokenService
     public let notificationService: NotificationService
+    public let loggingService: LoggingService
 
     init() {
         userSession = UserSession()
@@ -95,6 +96,9 @@ class VivaAppObjects: ObservableObject {
             networkClient: appNetworkClientNoBodies,
             userSession: userSession
         )
+        loggingService = LoggingService(
+            networkClient: appNetworkClientNoBodies
+        )
 
         // Other
         authManager = AuthenticationManager(
@@ -137,5 +141,8 @@ class VivaAppObjects: ObservableObject {
 
         // Configure ErrorManager with HealthService for connectivity monitoring
         errorManager.setHealthService(healthService)
+        
+        // Configure AppLogger with LoggingService for remote logging
+        AppLogger.configure(with: loggingService)
     }
 }

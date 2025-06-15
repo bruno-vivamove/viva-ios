@@ -4,6 +4,16 @@ import os.log
 /// A centralized logging system for the Viva app
 struct AppLogger {
     
+    // MARK: - Static Properties
+    
+    /// Static reference to the logging service for remote logging
+    private static var loggingService: LoggingService?
+    
+    /// Configure the AppLogger with a LoggingService instance
+    static func configure(with loggingService: LoggingService) {
+        AppLogger.loggingService = loggingService
+    }
+    
     // MARK: - Private Properties
     
     /// Date formatter for consistent timestamp formatting across all logs
@@ -38,6 +48,7 @@ struct AppLogger {
     static func debug(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
         category.logger.debug("[\(context, privacy: .public)]\n\(message, privacy: .public)")
+        sendLogRemotely(level: "DEBUG", message: message, category: category, file: file, function: function, line: line)
     }
     
     /// Log an info message (collected but may be dynamically disabled)
@@ -50,6 +61,7 @@ struct AppLogger {
     static func info(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
         category.logger.info("[\(context, privacy: .public)]\n\(message, privacy: .public)")
+        sendLogRemotely(level: "INFO", message: message, category: category, file: file, function: function, line: line)
     }
     
     /// Log a default message (standard level for most logging needs)
@@ -62,6 +74,7 @@ struct AppLogger {
     static func log(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
         category.logger.log("[\(context, privacy: .public)]\n\(message, privacy: .public)")
+        sendLogRemotely(level: "INFO", message: message, category: category, file: file, function: function, line: line)
     }
     
     /// Log a warning message (default visibility)
@@ -74,6 +87,7 @@ struct AppLogger {
     static func warning(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
         category.logger.warning("[\(context, privacy: .public)]\n\(message, privacy: .public)")
+        sendLogRemotely(level: "WARN", message: message, category: category, file: file, function: function, line: line)
     }
     
     /// Log an error message (persisted due to higher importance)
@@ -86,6 +100,7 @@ struct AppLogger {
     static func error(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
         category.logger.error("[\(context, privacy: .public)]\n\(message, privacy: .public)")
+        sendLogRemotely(level: "ERROR", message: message, category: category, file: file, function: function, line: line)
     }
     
     /// Log a critical fault (always collected, for severe issues)
@@ -98,6 +113,7 @@ struct AppLogger {
     static func fault(_ message: String, category: Category = .general, file: String = #file, function: String = #function, line: Int = #line) {
         let context = extractContext(file: file, function: function, line: line)
         category.logger.fault("[\(context, privacy: .public)]\n\(message, privacy: .public)")
+        sendLogRemotely(level: "ERROR", message: message, category: category, file: file, function: function, line: line)
     }
     
     
@@ -109,6 +125,36 @@ struct AppLogger {
         let fileName = URL(fileURLWithPath: file).lastPathComponent
         let timestamp = timestampFormatter.string(from: Date())
         return "\(timestamp) \(fileName):\(line) \(function)"
+    }
+    
+    /// Send log entry to remote server asynchronously
+    private static func sendLogRemotely(
+        level: String,
+        message: String,
+        category: Category,
+        file: String,
+        function: String,
+        line: Int
+    ) {
+        guard let loggingService = loggingService else { return }
+        
+        let fileName = URL(fileURLWithPath: file).lastPathComponent
+        let metadata: [String: String] = [
+            "category": category.rawValue,
+            "file": fileName,
+            "function": function,
+            "line": String(line)
+        ]
+        
+        let logEntry = LogEntry(
+            level: level,
+            message: message,
+            metadata: metadata
+        )
+        
+        Task {
+            await loggingService.sendLogEntry(logEntry)
+        }
     }
 }
 
