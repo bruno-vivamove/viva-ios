@@ -2,12 +2,14 @@ import Foundation
 import UIKit
 
 struct DeviceTokenRequest: Codable {
-    let deviceToken: String
+    let deviceToken: String      // APNS token
+    let notificationToken: String // FCM token
     let platform: String
     let deviceName: String?
     
-    init(deviceToken: String, platform: Platform, deviceName: String? = nil) {
+    init(deviceToken: String, notificationToken: String, platform: Platform, deviceName: String? = nil) {
         self.deviceToken = deviceToken
+        self.notificationToken = notificationToken
         self.platform = platform.rawValue
         self.deviceName = deviceName
     }
@@ -20,10 +22,11 @@ struct DeviceTokenRequest: Codable {
 
 extension DeviceTokenRequest {
     /// Creates a device token request for iOS with the current device name
-    static func ios(deviceToken: String, includeDeviceName: Bool = true) -> DeviceTokenRequest {
+    static func ios(deviceToken: String, notificationToken: String, includeDeviceName: Bool = true) -> DeviceTokenRequest {
         let deviceName = includeDeviceName ? UIDevice.current.name : nil
         return DeviceTokenRequest(
             deviceToken: deviceToken,
+            notificationToken: notificationToken,
             platform: .ios,
             deviceName: deviceName
         )
@@ -31,9 +34,15 @@ extension DeviceTokenRequest {
     
     /// Validates the device token format and requirements
     var isValid: Bool {
-        // Check token is not empty and within length limits
+        // Check APNS token is not empty and within length limits
         guard !deviceToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
               deviceToken.count <= 255 else {
+            return false
+        }
+        
+        // Check FCM token is not empty and within length limits
+        guard !notificationToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              notificationToken.count <= 255 else {
             return false
         }
         

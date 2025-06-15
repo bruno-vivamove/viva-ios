@@ -103,7 +103,7 @@ final class AuthenticationManager: ObservableObject {
         AppLogger.info("User signing out", category: .auth)
 
         // Clean up device token before clearing session
-        await deviceTokenService.cleanupDeviceToken()
+        await deviceTokenService.cleanupDeviceTokens()
 
         // Clear Apple Sign In state if it exists
         userSession.deleteAppleUserId()
@@ -359,17 +359,18 @@ final class AuthenticationManager: ObservableObject {
             return
         }
         
-        // Get FCM token and register
-        guard let fcmToken = await getFCMToken() else {
-            AppLogger.warning("Failed to get FCM token for registration", category: .auth)
+        // Get both APNS and FCM tokens and register
+        guard let apnsToken = UserDefaults.standard.string(forKey: "apnsToken"),
+              let fcmToken = await getFCMToken() else {
+            AppLogger.warning("Failed to get both APNS and FCM tokens for registration", category: .auth)
             return
         }
         
         do {
-            try await deviceTokenService.manageDeviceToken(fcmToken: fcmToken)
-            AppLogger.info("Successfully registered device token after authentication", category: .auth)
+            try await deviceTokenService.manageDeviceTokens(apnsToken: apnsToken, fcmToken: fcmToken)
+            AppLogger.info("Successfully registered device tokens after authentication", category: .auth)
         } catch {
-            AppLogger.error("Failed to register device token after authentication: \(error)", category: .auth)
+            AppLogger.error("Failed to register device tokens after authentication: \(error)", category: .auth)
         }
     }
     

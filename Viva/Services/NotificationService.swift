@@ -104,11 +104,14 @@ class NotificationService: ObservableObject {
             category: .network
         )
 
-        // Store device token locally
-        UserDefaults.standard.set(tokenString, forKey: "deviceToken")
+        // Store APNS token locally
+        UserDefaults.standard.set(tokenString, forKey: "apnsToken")
 
         // Set APNS token for Firebase Messaging
         Messaging.messaging().apnsToken = deviceToken
+        
+        // Try to register with backend if we also have FCM token
+        tryRegisterTokensWithBackend()
     }
 
     /// Handles APNS token registration failure
@@ -124,13 +127,13 @@ class NotificationService: ObservableObject {
         AppLogger.info("FCM token received/refreshed", category: .network)
 
         // Store FCM token locally
-        UserDefaults.standard.set(fcmToken, forKey: "currentFCMToken")
+        UserDefaults.standard.set(fcmToken, forKey: "fcmToken")
 
-        // Register with backend if user is logged in
-        registerTokenWithBackend(fcmToken)
+        // Try to register with backend if we also have APNS token
+        tryRegisterTokensWithBackend()
     }
 
-    private func registerTokenWithBackend(_ fcmToken: String) {
+    private func tryRegisterTokensWithBackend() {
         guard userSession.isLoggedIn else {
             AppLogger.info(
                 "User not logged in, skipping token registration",
@@ -138,19 +141,29 @@ class NotificationService: ObservableObject {
             )
             return
         }
+        
+        guard let apnsToken = UserDefaults.standard.string(forKey: "apnsToken"),
+              let fcmToken = UserDefaults.standard.string(forKey: "fcmToken") else {
+            AppLogger.info(
+                "Both APNS and FCM tokens not available yet, waiting...",
+                category: .network
+            )
+            return
+        }
 
         Task {
             do {
-                try await deviceTokenService.manageDeviceToken(
+                try await deviceTokenService.manageDeviceTokens(
+                    apnsToken: apnsToken,
                     fcmToken: fcmToken
                 )
                 AppLogger.info(
-                    "Successfully registered FCM token with backend",
+                    "Successfully registered both tokens with backend",
                     category: .network
                 )
             } catch {
                 AppLogger.error(
-                    "Failed to register FCM token: \(error)",
+                    "Failed to register tokens: \(error)",
                     category: .network
                 )
             }
