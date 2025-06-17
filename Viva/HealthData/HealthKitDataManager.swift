@@ -1,9 +1,19 @@
+import BackgroundTasks
 import HealthKit
 import SwiftUI
-import BackgroundTasks
 
 /// Manages HealthKit data access and processing for the app
 final class HealthKitDataManager: ObservableObject {
+    let observedTypes: [HKSampleType] = [
+        HKObjectType.workoutType(),
+        HKObjectType.quantityType(forIdentifier: .stepCount)!,
+        HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
+        HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
+        HKObjectType.categoryType(forIdentifier: .highHeartRateEvent)!,
+        HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
+        HKObjectType.quantityType(forIdentifier: .appleStandTime)!,
+    ]
+
     private let healthStore = HKHealthStore()
     private let userSession: UserSession
     private let userMeasurementService: UserMeasurementService
@@ -14,7 +24,9 @@ final class HealthKitDataManager: ObservableObject {
     private var backgroundObservers: [HKObserverQuery] = []
     private var backgroundDeliveryEnabled = false
     private var lastHealthDataUpdateTime: Date?
-    private let updateTimeQueue = DispatchQueue(label: "com.app.healthKitUpdateTimeQueue")
+    private let updateTimeQueue = DispatchQueue(
+        label: "com.app.healthKitUpdateTimeQueue"
+    )
 
     @Published var isAuthorized = false
 
@@ -42,9 +54,10 @@ final class HealthKitDataManager: ObservableObject {
         queryHandlers[.cycling] = WorkoutQuery(workoutType: .cycling)
         queryHandlers[.swimming] = WorkoutQuery(workoutType: .swimming)
         queryHandlers[.yoga] = WorkoutQuery(workoutType: .yoga)
-        queryHandlers[.strengthTraining] = WorkoutQuery(
-            workoutType: .strengthTraining
-        )
+        queryHandlers[.strengthTraining] =
+            WorkoutQuery(
+                workoutType: .strengthTraining
+            )
         queryHandlers[.elevatedHeartRate] = ElevatedHeartRateQuery()
         queryHandlers[.asleep] = SleepQuery()
         queryHandlers[.standing] = StandingQuery()
@@ -53,17 +66,7 @@ final class HealthKitDataManager: ObservableObject {
     /// Requests authorization from the user to access HealthKit data
     func requestAuthorization() {
         // Define health data types we want to access
-        let typesToRead: Set = [
-            HKObjectType.workoutType(),
-            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
-            HKObjectType.quantityType(forIdentifier: .stepCount)!,
-            HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
-            HKObjectType.categoryType(forIdentifier: .highHeartRateEvent)!,
-            HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
-            HKObjectType.quantityType(forIdentifier: .appleStandTime)!,
-        ]
-
-        healthStore.requestAuthorization(toShare: nil, read: typesToRead) {
+        healthStore.requestAuthorization(toShare: nil, read: Set(observedTypes)) {
             success,
             error in
             DispatchQueue.main.async {
@@ -77,94 +80,88 @@ final class HealthKitDataManager: ObservableObject {
 
     /// Sets up background observers for all health data types we're interested in
     func setupBackgroundObservers() {
-        return
-        
         guard isAuthorized else { return }
-        
+
         // Stop any existing observers
         stopBackgroundObservers()
-        
-        // Health data types to observe - explicitly defined as sample types
-        let observedTypes: [HKSampleType] = [
-            HKObjectType.workoutType(),
-            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
-            HKObjectType.quantityType(forIdentifier: .stepCount)!,
-            HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
-            HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
-            HKObjectType.quantityType(forIdentifier: .appleStandTime)!
-        ]
-        
+
         // Setup observers for each type
         for type in observedTypes {
             setupObserver(for: type)
         }
-        
+
         // Start background delivery if not already enabled
         if !backgroundDeliveryEnabled {
             enableBackgroundDelivery()
         }
     }
-    
+
     /// Sets up an observer for a specific health data type
     private func setupObserver(for type: HKSampleType) {
         // Create an observer query
-        let query = HKObserverQuery(sampleType: type, predicate: nil) { [weak self] query, completionHandler, error in
+        let query = HKObserverQuery(sampleType: type, predicate: nil) {
+            [weak self] query, completionHandler, error in
             guard let self = self else {
                 completionHandler()
                 return
             }
-            
+
             // Check if user is still logged in
             guard self.userSession.isLoggedIn else {
                 completionHandler()
                 return
             }
-            
+
             let typeName = self.getTypeDisplayName(type)
-            AppLogger.info("New HealthKit data detected for: \(typeName)", category: .health)
+            AppLogger.info(
+                "New HealthKit data detected for: \(typeName)",
+                category: .health
+            )
             self.processHealthDataUpdate()
             completionHandler()
         }
-        
+
         // Execute the query
         healthStore.execute(query)
         backgroundObservers.append(query)
     }
-    
+
     /// Enables background delivery for health data updates
     private func enableBackgroundDelivery() {
-        // Define types for background delivery - explicitly defined as sample types
-        let types: [HKSampleType] = [
-            HKObjectType.workoutType(),
-            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
-            HKObjectType.quantityType(forIdentifier: .stepCount)!,
-            HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
-            HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
-            HKObjectType.quantityType(forIdentifier: .appleStandTime)!
-        ]
-        
         // Enable background delivery for each type
         let group = DispatchGroup()
-        
-        for type in types {
+
+        for type in observedTypes {
             group.enter()
-            
-            healthStore.enableBackgroundDelivery(for: type, frequency: .immediate) { success, error in
+
+            healthStore.enableBackgroundDelivery(
+                for: type,
+                frequency: .immediate
+            ) { success, error in
                 if let error = error {
-                    AppLogger.error("Failed to enable background delivery for \(self.getTypeDisplayName(type)): \(error.localizedDescription)", category: .health)
+                    AppLogger.error(
+                        "Failed to enable background delivery for \(self.getTypeDisplayName(type)): \(error.localizedDescription)",
+                        category: .health
+                    )
                 } else if success {
-                    AppLogger.info("Background delivery enabled for \(self.getTypeDisplayName(type))", category: .health)
+                    AppLogger.info(
+                        "Background delivery enabled for \(self.getTypeDisplayName(type))",
+                        category: .health
+                    )
                 }
                 group.leave()
             }
         }
-        
+
         group.notify(queue: .main) {
             self.backgroundDeliveryEnabled = true
-            AppLogger.info("HealthKit background delivery setup complete", category: .health)
+            AppLogger.info(
+                "HealthKit background delivery setup complete",
+                category: .health
+            )
         }
     }
-    
+
     /// Stops all background observers
     func stopBackgroundObservers() {
         for query in backgroundObservers {
@@ -172,7 +169,7 @@ final class HealthKitDataManager: ObservableObject {
         }
         backgroundObservers.removeAll()
     }
-    
+
     /// Updates matchup data with the user's health metrics
     /// - Parameters:
     ///   - matchupDetail: Current matchup details
@@ -223,7 +220,7 @@ final class HealthKitDataManager: ObservableObject {
             completion(updatedMatchup)
         }
     }
-    
+
     /// Queries for workouts during the matchup time period
     /// - Parameters:
     ///   - matchupDetail: Current matchup details
@@ -233,31 +230,33 @@ final class HealthKitDataManager: ObservableObject {
         completion: @escaping ([Workout]) -> Void
     ) {
         guard let startTime = matchupDetail.startTime,
-              let userId = userSession.userId,
-              let user = matchupDetail.teams.flatMap({ $0.users }).first(where: { $0.id == userId })
+            let userId = userSession.userId,
+            let user = matchupDetail.teams.flatMap({ $0.users }).first(where: {
+                $0.id == userId
+            })
         else {
             completion([])
             return
         }
-        
+
         // Determine end time - either matchup end time or current time
         let endTime = matchupDetail.endTime ?? Date()
-        
+
         // Create predicate for time range
         let predicate = HKQuery.predicateForSamples(
             withStart: startTime,
             end: endTime,
             options: .strictStartDate
         )
-        
+
         // Sort by start date, most recent first
         let sortDescriptor = NSSortDescriptor(
             key: HKSampleSortIdentifierStartDate,
             ascending: false
         )
-        
+
         var workouts: [Workout] = []
-        
+
         // Query for all workout types
         let query = HKSampleQuery(
             sampleType: .workoutType(),
@@ -265,29 +264,40 @@ final class HealthKitDataManager: ObservableObject {
             limit: HKObjectQueryNoLimit,
             sortDescriptors: [sortDescriptor]
         ) { _, samples, error in
-            guard let workoutSamples = samples as? [HKWorkout], !workoutSamples.isEmpty else {
+            guard let workoutSamples = samples as? [HKWorkout],
+                !workoutSamples.isEmpty
+            else {
                 DispatchQueue.main.async {
                     completion([])
                 }
                 return
             }
-            
+
             // Process each workout
             for hkWorkout in workoutSamples {
                 // Map HKWorkoutActivityType to WorkoutType
-                let workoutType = self.mapHKWorkoutTypeToAppType(hkWorkout.workoutActivityType)
-                
+                let workoutType = self.mapHKWorkoutTypeToAppType(
+                    hkWorkout.workoutActivityType
+                )
+
                 // Create workout measurements
                 var measurements: [WorkoutMeasurement] = []
-                
+
                 // Get ID for the workout
                 let workoutId = hkWorkout.uuid.uuidString
-                
+
                 // Add energy burned measurement if available
-                if let energyBurnedType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned),
-                   let energyStats = hkWorkout.statistics(for: energyBurnedType),
-                   let energySum = energyStats.sumQuantity() {
-                    let energyBurned = energySum.doubleValue(for: HKUnit.kilocalorie())
+                if let energyBurnedType = HKQuantityType.quantityType(
+                    forIdentifier: .activeEnergyBurned
+                ),
+                    let energyStats = hkWorkout.statistics(
+                        for: energyBurnedType
+                    ),
+                    let energySum = energyStats.sumQuantity()
+                {
+                    let energyBurned = energySum.doubleValue(
+                        for: HKUnit.kilocalorie()
+                    )
                     let energyMeasurement = WorkoutMeasurement(
                         workoutId: workoutId,
                         measurementType: .energyBurned,
@@ -295,7 +305,7 @@ final class HealthKitDataManager: ObservableObject {
                     )
                     measurements.append(energyMeasurement)
                 }
-                
+
                 // Create workout object
                 let workout = Workout(
                     id: workoutId,
@@ -306,20 +316,22 @@ final class HealthKitDataManager: ObservableObject {
                     displayName: self.getWorkoutDisplayName(workoutType),
                     measurements: measurements
                 )
-                
+
                 workouts.append(workout)
             }
-            
+
             DispatchQueue.main.async {
                 completion(workouts)
             }
         }
-        
+
         healthStore.execute(query)
     }
-    
+
     /// Maps HealthKit workout types to app workout types
-    private func mapHKWorkoutTypeToAppType(_ hkType: HKWorkoutActivityType) -> WorkoutType {
+    private func mapHKWorkoutTypeToAppType(_ hkType: HKWorkoutActivityType)
+        -> WorkoutType
+    {
         switch hkType {
         case .walking: return .walking
         case .running: return .running
@@ -351,7 +363,7 @@ final class HealthKitDataManager: ObservableObject {
         default: return .other
         }
     }
-    
+
     /// Gets a display name for a workout type
     private func getWorkoutDisplayName(_ type: WorkoutType) -> String {
         switch type {
@@ -400,19 +412,27 @@ final class HealthKitDataManager: ObservableObject {
                 Task {
                     do {
                         // Upload the workouts
-                        try await self.workoutService.recordWorkouts(workouts: workouts)
-                        
+                        try await self.workoutService.recordWorkouts(
+                            workouts: workouts
+                        )
+
                         // Post notification that workouts were recorded
                         DispatchQueue.main.async {
-                            AppLogger.info("Posting workouts recorded notification for matchup \(matchupDetail.id)", category: .health)
+                            AppLogger.info(
+                                "Posting workouts recorded notification for matchup \(matchupDetail.id)",
+                                category: .health
+                            )
                             NotificationCenter.default.post(
                                 name: .workoutsRecorded,
                                 object: matchupDetail
                             )
                         }
-                        
+
                         // Continue with regular health data update after workouts are uploaded
-                        self.updateAndUploadHealthMeasurements(matchupDetail: matchupDetail, requestType: requestType)
+                        self.updateAndUploadHealthMeasurements(
+                            matchupDetail: matchupDetail,
+                            requestType: requestType
+                        )
                     } catch {
                         AppLogger.error(
                             "Failed to save workouts: \(error)",
@@ -422,11 +442,14 @@ final class HealthKitDataManager: ObservableObject {
                 }
             } else {
                 // No workouts to upload, proceed with regular health data update
-                self.updateAndUploadHealthMeasurements(matchupDetail: matchupDetail, requestType: requestType)
+                self.updateAndUploadHealthMeasurements(
+                    matchupDetail: matchupDetail,
+                    requestType: requestType
+                )
             }
         }
     }
-    
+
     /// Updates and uploads health measurements for a matchup
     /// - Parameter matchupDetail: The matchup detail to update
     /// - Note: Posts .healthDataUpdated notification on success
@@ -463,7 +486,10 @@ final class HealthKitDataManager: ObservableObject {
 
                     // Post notification that health data was updated
                     DispatchQueue.main.async {
-                        AppLogger.info("Posting health data updated notification for matchup \(savedMatchupDetails.id)", category: .health)
+                        AppLogger.info(
+                            "Posting health data updated notification for matchup \(savedMatchupDetails.id)",
+                            category: .health
+                        )
                         NotificationCenter.default.post(
                             name: .healthDataUpdated,
                             object: savedMatchupDetails
@@ -507,54 +533,89 @@ final class HealthKitDataManager: ObservableObject {
 
         return merged
     }
-    
+
     /// Process new health data
     func processHealthDataUpdate() {
         if let lastUpdate = lastHealthDataUpdateTime,
-           Date().timeIntervalSince(lastUpdate) < 60 {
-            AppLogger.info("Skipping health data update - last update was less than a minute ago", category: .health)
+            Date().timeIntervalSince(lastUpdate) < 60
+        {
+            AppLogger.info(
+                "Skipping health data update - last update was less than a minute ago",
+                category: .health
+            )
             return
         }
 
-        AppLogger.info("Processing health data update in background", category: .health)
+        AppLogger.info(
+            "Processing health data update in background",
+            category: .health
+        )
         lastHealthDataUpdateTime = Date()
 
         // Create a task to handle the asynchronous work
         Task {
             do {
                 // Get active matchups for the current user
-                let matchupsResponse = try await matchupService.getMyMatchups(filter: .UNFINALIZED)
-                let activeMatchups = matchupsResponse.matchups.filter { $0.status == .active }
-                
+                let matchupsResponse = try await matchupService.getMyMatchups(
+                    filter: .UNFINALIZED
+                )
+                let activeMatchups = matchupsResponse.matchups.filter {
+                    $0.status == .active
+                }
+
                 if activeMatchups.isEmpty {
-                    AppLogger.info("No active matchups found to update", category: .health)
+                    AppLogger.info(
+                        "No active matchups found to update",
+                        category: .health
+                    )
                     return
                 }
-                
-                AppLogger.info("Updating health data for \(activeMatchups.count) active matchups", category: .health)
-                
+
+                AppLogger.info(
+                    "Updating health data for \(activeMatchups.count) active matchups",
+                    category: .health
+                )
+
                 // Process each active matchup
                 for (index, matchup) in activeMatchups.enumerated() {
                     do {
                         // Get full matchup details
-                        let matchupDetails = try await matchupService.getMatchup(matchupId: matchup.id)
-                        
+                        let matchupDetails =
+                            try await matchupService.getMatchup(
+                                matchupId: matchup.id
+                            )
+
                         // Update and upload health data for this matchup
-                        updateAndUploadHealthData(matchupDetail: matchupDetails, requestType: .eventInitialized)
-                        AppLogger.info("✅ Completed health data update for matchup \(matchupDetails.id) (\(index + 1)/\(activeMatchups.count))", category: .health)
+                        updateAndUploadHealthData(
+                            matchupDetail: matchupDetails,
+                            requestType: .eventInitialized
+                        )
+                        AppLogger.info(
+                            "✅ Completed health data update for matchup \(matchupDetails.id) (\(index + 1)/\(activeMatchups.count))",
+                            category: .health
+                        )
                     } catch {
-                        AppLogger.error("❌ Error getting details for matchup \(matchup.id): \(error)", category: .health)
+                        AppLogger.error(
+                            "❌ Error getting details for matchup \(matchup.id): \(error)",
+                            category: .health
+                        )
                         continue
                     }
                 }
-                
-                AppLogger.info("🎉 Background health data update completed for all active matchups", category: .health)
+
+                AppLogger.info(
+                    "🎉 Background health data update completed for all active matchups",
+                    category: .health
+                )
             } catch {
-                AppLogger.error("❌ Failed to fetch matchups for health data update: \(error)", category: .health)
+                AppLogger.error(
+                    "❌ Failed to fetch matchups for health data update: \(error)",
+                    category: .health
+                )
             }
         }
     }
-    
+
     /// Get a display name for a health data type
     private func getTypeDisplayName(_ type: HKObjectType) -> String {
         if type is HKWorkoutType {
@@ -580,7 +641,7 @@ final class HealthKitDataManager: ObservableObject {
                 return categoryType.identifier
             }
         }
-        
+
         return type.identifier
     }
 }
