@@ -214,6 +214,7 @@ final class ResponseHandler<ErrorType: Decodable & Error> {
                 let result = try await retryHandler()
                 continuation.resume(returning: result)
             } catch {
+                // TODO ensure that this isnt trying to log remotely since we don't have a good session
                 // If refresh fails, handle the original error
                 AppLogger.error(
                     "Request retry after token refresh failed: \(error.localizedDescription)",

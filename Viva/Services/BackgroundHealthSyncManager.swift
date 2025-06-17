@@ -21,15 +21,14 @@ class BackgroundHealthSyncManager {
         self.userSession = userSession
     }
 
-    /// Performs background health data sync for all matchups involving the specified user
+    /// Performs background health data sync for all active matchups
     /// This method is called from silent push notifications
     func performBackgroundHealthSync(
-        for userId: String,
         completion: @escaping (Bool) -> Void
     ) {
         // TODO many many optimizations
         AppLogger.info(
-            "Starting background health sync for user: \(userId)",
+            "Starting background health sync for all active matchups",
             category: .data
         )
 
@@ -67,8 +66,8 @@ class BackgroundHealthSyncManager {
             completion(false)
         }
 
-        // Get user's active matchups involving the specified user
-        fetchRelevantMatchups(involving: userId) { [weak self] matchupDetails in
+        // Get all active matchups for the current user
+        fetchRelevantMatchups { [weak self] matchupDetails in
             guard let self = self else {
                 UIApplication.shared.endBackgroundTask(backgroundTaskID)
                 completion(false)
@@ -77,7 +76,7 @@ class BackgroundHealthSyncManager {
 
             if matchupDetails.isEmpty {
                 AppLogger.info(
-                    "No active matchups found for user: \(userId)",
+                    "No active matchups found for current user",
                     category: .data
                 )
                 UIApplication.shared.endBackgroundTask(backgroundTaskID)
@@ -90,8 +89,8 @@ class BackgroundHealthSyncManager {
                 category: .data
             )
 
-            // Sync health data for all relevant matchups
-            self.syncHealthDataForMatchups(matchupDetails, notifyUserId: userId)
+            // Sync health data for all active matchups
+            self.syncHealthDataForMatchups(matchupDetails, notifyUserId: nil)
             { success in
                 AppLogger.info(
                     "Background health sync completed with success: \(success)",
@@ -103,40 +102,29 @@ class BackgroundHealthSyncManager {
         }
     }
 
-    /// Fetches active matchups that involve the specified user
+    /// Fetches all active matchups for the current user
     private func fetchRelevantMatchups(
-        involving userId: String,
         completion: @escaping ([MatchupDetails]) -> Void
     ) {
         AppLogger.info(
-            "Fetching active matchups involving user: \(userId)",
+            "Fetching all active matchups for current user",
             category: .data
         )
 
         Task {
             do {
                 // TODO use locally stored matchups once thats implemented
-                // Get active matchups for the specified user
+                // Get all active matchups for the current user
                 let matchupsResponse = try await matchupService.getMyMatchups(
                     filter: .ACTIVE,
                     page: 1,
                     pageSize: 100
                 )
 
-                // Filter matchups to only include ones where the specified userId is in one of the teams
-                let relevantMatchups = matchupsResponse.matchups.filter {
-                    matchup in
-                    matchup.teams.contains { team in
-                        team.users.contains { user in
-                            user.id == userId
-                        }
-                    }
-                }
-
-                // Convert filtered Matchup objects to MatchupDetails by fetching each one
+                // Convert Matchup objects to MatchupDetails by fetching each one
                 var matchupDetails: [MatchupDetails] = []
 
-                for matchup in relevantMatchups {
+                for matchup in matchupsResponse.matchups {
                     do {
                         // TODO use locally stored version of matchup
                         let details = try await matchupService.getMatchup(
@@ -152,7 +140,7 @@ class BackgroundHealthSyncManager {
                 }
 
                 AppLogger.info(
-                    "Found \(matchupDetails.count) active matchups for user: \(userId)",
+                    "Found \(matchupDetails.count) active matchups for current user",
                     category: .data
                 )
 
@@ -161,7 +149,7 @@ class BackgroundHealthSyncManager {
                 }
             } catch {
                 AppLogger.error(
-                    "Failed to fetch matchups for user \(userId): \(error)",
+                    "Failed to fetch active matchups for current user: \(error)",
                     category: .data
                 )
                 DispatchQueue.main.async {

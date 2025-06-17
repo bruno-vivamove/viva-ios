@@ -254,8 +254,7 @@ class NotificationService: ObservableObject {
     ) {
         switch action {
         case "sync_health_data":
-            backgroundHealthSyncManager.performBackgroundHealthSync(for: userId)
-            {
+            backgroundHealthSyncManager.performBackgroundHealthSync {
                 success in
                 DispatchQueue.main.async {
                     completion?(success ? .newData : .failed)
