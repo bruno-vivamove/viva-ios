@@ -9,9 +9,13 @@ struct AppLogger {
     /// Static reference to the logging service for remote logging
     private static var loggingService: LoggingService?
     
-    /// Configure the AppLogger with a LoggingService instance
-    static func configure(with loggingService: LoggingService) {
+    /// Static reference to the user session for checking authentication status
+    private static var userSession: UserSession?
+    
+    /// Configure the AppLogger with a LoggingService and UserSession instance
+    static func configure(with loggingService: LoggingService, userSession: UserSession) {
         AppLogger.loggingService = loggingService
+        AppLogger.userSession = userSession
     }
     
     // MARK: - Private Properties
@@ -153,6 +157,11 @@ struct AppLogger {
     ) {
         guard !skipRemote else { return }
         guard let loggingService = loggingService else { return }
+        
+        // Only send logs remotely if the user has a valid session
+        guard let userSession = userSession, userSession.isLoggedIn else {
+            return
+        }
         
         let fileName = URL(fileURLWithPath: file).lastPathComponent
         let metadata: [String: String] = [

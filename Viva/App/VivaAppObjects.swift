@@ -142,7 +142,7 @@ class VivaAppObjects: ObservableObject {
         // Configure ErrorManager with HealthService for connectivity monitoring
         errorManager.setHealthService(healthService)
         
-        // Configure AppLogger with LoggingService for remote logging
-        AppLogger.configure(with: loggingService)
+        // Configure AppLogger with LoggingService and UserSession for remote logging
+        AppLogger.configure(with: loggingService, userSession: userSession)
     }
 }
