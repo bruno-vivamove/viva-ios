@@ -156,15 +156,16 @@ struct MatchupHistoryHeaderBar: View {
 
             Spacer()
 
-            Button(action: {
-                showTimeFilter = true
-            }) {
-                Text("All-Time ▼")
-                    .foregroundColor(VivaDesign.Colors.primaryText)
-                    .font(VivaDesign.Typography.caption.bold())
-                    .padding(.horizontal, VivaDesign.Spacing.small)
-                    .padding(.vertical, VivaDesign.Spacing.xsmall)
-            }
+            // TODO
+//            Button(action: {
+//                showTimeFilter = true
+//            }) {
+//                Text("All-Time ▼")
+//                    .foregroundColor(VivaDesign.Colors.primaryText)
+//                    .font(VivaDesign.Typography.caption.bold())
+//                    .padding(.horizontal, VivaDesign.Spacing.small)
+//                    .padding(.vertical, VivaDesign.Spacing.xsmall)
+//            }
         }
     }
 }

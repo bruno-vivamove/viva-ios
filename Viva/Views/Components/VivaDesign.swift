@@ -85,6 +85,7 @@ enum VivaDesign {
         static let radiusXLarge: CGFloat = 20
         
         // Border Width
+        static let borderVeryThin: CGFloat = 0.5
         static let borderThin: CGFloat = 1
         static let borderMedium: CGFloat = 2
         static let borderThick: CGFloat = 3

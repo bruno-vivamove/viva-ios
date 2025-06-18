@@ -64,7 +64,7 @@ struct VivaCard<Content: View>: View {
                     .fill(style.background)
                     .overlay(
                         RoundedRectangle(cornerRadius: VivaDesign.Sizing.radiusSmall)
-                            .stroke(style.border, lineWidth: style.border == .clear ? 0 : VivaDesign.Sizing.borderThin)
+                            .stroke(style.border, lineWidth: style.border == .clear ? 0 : VivaDesign.Sizing.borderVeryThin)
                     )
                     .shadow(
                         color: style.shadow ? .black.opacity(0.1) : .clear,

@@ -287,13 +287,14 @@ struct SentInvitesView: View {
                         friendStatus: .none
                     ),
                 actions: [
-                    UserActionCard.UserAction(
-                        title: "Remind",
-                        variant: .secondary
-                    ) { context in
-                        // Add remind functionality
-                        context.actionCompleted()
-                    },
+                    // TODO
+//                    UserActionCard.UserAction(
+//                        title: "Remind",
+//                        variant: .secondary
+//                    ) { context in
+//                        // Add remind functionality
+//                        context.actionCompleted()
+//                    },
                     UserActionCard.UserAction(
                         title: "Delete",
                         variant: .secondary

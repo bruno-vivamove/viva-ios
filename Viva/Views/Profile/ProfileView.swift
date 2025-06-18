@@ -7,6 +7,7 @@ struct ProfileView: View {
     @EnvironmentObject var healthKitDataManager: HealthKitDataManager
     @EnvironmentObject var friendService: FriendService
     @EnvironmentObject var userService: UserService
+    @EnvironmentObject var authManager: AuthenticationManager
 
     @StateObject private var viewModel: ProfileViewModel
     @State private var showSettings = false
@@ -47,7 +48,8 @@ struct ProfileView: View {
                 .edgesIgnoringSafeArea(.all)
 
             // Main content
-            VStack(spacing: 0) {
+            ScrollView {
+                VStack(spacing: 0) {
                     // Top section with profile image and aligned elements
                     // Using ZStack to position gray area behind content
                     ZStack(alignment: .top) {
@@ -113,16 +115,17 @@ struct ProfileView: View {
                                 Spacer()
 
                                 // Hamburger menu button - only for current user
-                                if viewModel.isCurrentUser == true {
-                                    Button(action: {
-                                        showSettings = true
-                                    }) {
-                                        Image(systemName: "line.3.horizontal")
-                                            .font(.system(size: 30))
-                                            .foregroundColor(.white)
-                                            .padding(.trailing, 16)
-                                    }
-                                }
+                                // TODO
+//                                if viewModel.isCurrentUser == true {
+//                                    Button(action: {
+//                                        showSettings = true
+//                                    }) {
+//                                        Image(systemName: "line.3.horizontal")
+//                                            .font(.system(size: 30))
+//                                            .foregroundColor(.white)
+//                                            .padding(.trailing, 16)
+//                                    }
+//                                }
                             }
                             .padding(.top, 16)
                             .padding(.horizontal, 16)
@@ -137,21 +140,22 @@ struct ProfileView: View {
                             .padding(.horizontal, 16)
 
                             // Location (left aligned)
-                            HStack(spacing: 6) {
-                                Image(systemName: "mappin.circle.fill")
-                                    .foregroundColor(
-                                        VivaDesign.Colors.vivaGreen
-                                    )
-                                    .font(.system(size: 14))
-
-                                Text("New York, NY")
-                                    .font(.system(size: 16))
-                                    .foregroundColor(
-                                        VivaDesign.Colors.vivaGreen
-                                    )
-                            }
-                            .padding(.top, 2)
-                            .padding(.horizontal, 16)
+                            // TODO
+//                            HStack(spacing: 6) {
+//                                Image(systemName: "mappin.circle.fill")
+//                                    .foregroundColor(
+//                                        VivaDesign.Colors.vivaGreen
+//                                    )
+//                                    .font(.system(size: 14))
+//
+//                                Text("New York, NY")
+//                                    .font(.system(size: 16))
+//                                    .foregroundColor(
+//                                        VivaDesign.Colors.vivaGreen
+//                                    )
+//                            }
+//                            .padding(.top, 2)
+//                            .padding(.horizontal, 16)
 
                             // Edit Profile Button (left aligned) - only for current user
                             if viewModel.isCurrentUser == true {
@@ -279,6 +283,23 @@ struct ProfileView: View {
                     // Add some padding at the bottom for scrolling
                     Spacer()
                         .frame(height: 40)
+
+                    // Log out button - only show for current user
+                    if viewModel.isCurrentUser == true {
+                        Button(action: {
+                            Task {
+                                await authManager.signOut()
+                            }
+                        }) {
+                            Text("LOG OUT")
+                                .font(.headline)
+                                .foregroundColor(VivaDesign.Colors.vivaGreen)
+                                .padding(.vertical)
+                        }
+                        .padding(.horizontal)
+                        .padding(.bottom, VivaDesign.Spacing.medium)
+                    }
+                }
             }
             .ignoresSafeArea(edges: .top)
             .refreshable {
