@@ -121,8 +121,10 @@ struct MatchupHistoryView: View {
                 if let error = viewModel.error {
                     if let vivaError = error as? VivaErrorResponse {
                         Text(vivaError.message)
+                            .vivaText()
                     } else {
                         Text(error.localizedDescription)
+                            .vivaText()
                     }
                 }
             }
@@ -148,10 +150,12 @@ struct MatchupHistoryHeaderBar: View {
                 Text("\(userStats.totalMatchups) Total Matchups")
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .font(VivaDesign.Typography.caption.bold())
+                    .vivaText()
             } else {
                 Text("0 Total Matchups")
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .font(VivaDesign.Typography.caption.bold())
+                    .vivaText()
             }
 
             Spacer()
@@ -180,6 +184,7 @@ struct MatchupStatsTableHeader: View {
                     .foregroundColor(
                         VivaDesign.Colors.primaryText
                     )
+                    .vivaText()
                     .frame(width: 60, alignment: .leading)
 
                 Spacer()
@@ -221,6 +226,7 @@ struct MatchupStatsSection: View {
                     Text("\(userStats.wins)-\(userStats.losses)")
                         .font(.system(size: 50, weight: .bold))
                         .foregroundColor(VivaDesign.Colors.primaryText)
+                        .vivaText()
 
                     VivaDivider()
                 }
@@ -307,6 +313,7 @@ struct MatchupStatsCard: View {
             Text("\(stats.userTeamWins)-\(stats.opponentTeamWins)")
                 .font(VivaDesign.Typography.body.bold())
                 .foregroundColor(VivaDesign.Colors.onBackground)
+                .vivaText()
                 .frame(width: 60, alignment: .leading)
 
             Spacer()
@@ -316,6 +323,7 @@ struct MatchupStatsCard: View {
             Text("vs.")
                 .font(VivaDesign.Typography.body)
                 .foregroundColor(VivaDesign.Colors.onBackground)
+                .vivaText()
                 .frame(width: 30, alignment: .center)
 
             Spacer()
@@ -339,7 +347,7 @@ struct MatchupStatsCard: View {
                 Text(opponent.displayName)
                     .font(VivaDesign.Typography.body)
                     .foregroundColor(VivaDesign.Colors.primaryText)
-                    .lineLimit(1)
+                    .vivaText()
                     .frame(alignment: .leading)
             } else {
                 Image(systemName: "person.circle.fill")
@@ -353,7 +361,7 @@ struct MatchupStatsCard: View {
                 Text(stats.displayName)
                     .font(VivaDesign.Typography.valueMedium)
                     .foregroundColor(VivaDesign.Colors.primaryText)
-                    .lineLimit(1)
+                    .vivaText()
                     .frame(alignment: .leading)
             }
 
@@ -375,6 +383,7 @@ struct MatchupHistoryEmptyStateView: View {
                 .font(VivaDesign.Typography.body)
                 .foregroundColor(VivaDesign.Colors.secondaryText)
                 .multilineTextAlignment(.center)
+                .vivaText()
         }
         .padding()
     }
@@ -392,6 +401,7 @@ struct MatchupHistoryTimeFilterView: View {
                 Text("Select Time Range")
                     .font(VivaDesign.Typography.header)
                     .foregroundColor(VivaDesign.Colors.primaryText)
+                    .vivaText()
 
                 Spacer()
 
@@ -417,6 +427,7 @@ struct MatchupHistoryTimeFilterView: View {
                             Text(option)
                                 .font(VivaDesign.Typography.body)
                                 .foregroundColor(VivaDesign.Colors.primaryText)
+                                .vivaText()
 
                             Spacer()
 

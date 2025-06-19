@@ -33,7 +33,7 @@ struct FriendRequestCard: View {
             UserActionCard.UserAction(
                 title: "Add Friend",
                 width: buttonWidth,
-                variant: .primary
+                variant: .secondary
             ) { context in
                 Task {
                     await viewModel.sendFriendRequest(
@@ -59,7 +59,7 @@ struct FriendRequestCard: View {
             UserActionCard.UserAction(
                 title: "Accept Request",
                 width: buttonWidth,
-                variant: .primary
+                variant: .secondary
             ) { context in
                 Task {
                     await viewModel

@@ -285,4 +285,19 @@ extension View {
             .frame(maxWidth: VivaDesign.Layout.screenMaxWidth)
             .screenPadding()
     }
+    
+    // Text Styling
+    func vivaText() -> some View {
+        self.modifier(VivaTextModifier())
+    }
+}
+
+// MARK: - Text Modifiers
+struct VivaTextModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .lineLimit(1)
+            .allowsTightening(true)
+            .minimumScaleFactor(0.8)
+    }
 }

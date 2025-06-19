@@ -81,7 +81,8 @@ struct MatchupInviteCard: View {
                     if canJoinLeftTeam, let teamId = coordinator.getTeamId(for: .left) {
                         actions.append(
                             UserActionCard.UserAction(
-                                title: "Invite Teammate"
+                                title: "Invite Teammate",
+                                variant: .secondary
                             ) { context in
                                 Task {
                                     await coordinator.inviteFriend(
@@ -98,7 +99,8 @@ struct MatchupInviteCard: View {
                     if canJoinRightTeam, let teamId = coordinator.getTeamId(for: .right) {
                         actions.append(
                             UserActionCard.UserAction(
-                                title: "Invite"
+                                title: "Invite",
+                                variant: .secondary
                             ) { context in
                                 Task {
                                     await coordinator.inviteFriend(

@@ -86,10 +86,12 @@ struct MatchupDetailView: View {
                     Text("Congratulations!")
                         .font(.title.bold())
                         .foregroundColor(VivaDesign.Colors.vivaGreen)
+                        .vivaText()
 
                     Text("Matchup Completed")
                         .font(.title3)
                         .foregroundColor(VivaDesign.Colors.primaryText)
+                        .vivaText()
 
                     Button {
                         // Dismiss the overlay by setting isCompletedButNotFinalized to false
@@ -100,6 +102,7 @@ struct MatchupDetailView: View {
                         Text("See Results")
                             .font(.headline)
                             .foregroundColor(.black)
+                            .vivaText()
                             .padding(.horizontal, 40)
                             .padding(.vertical, 12)
                             .background(VivaDesign.Colors.vivaGreen)
@@ -614,11 +617,11 @@ struct UserScoreView: View {
             Text(displayName)
                 .foregroundColor(VivaDesign.Colors.primaryText)
                 .font(VivaDesign.Typography.caption.bold())
-                .lineLimit(1)
+                .vivaText()
             Text("\(totalPoints)")
                 .foregroundColor(VivaDesign.Colors.primaryText)
                 .font(VivaDesign.Typography.points)
-                .lineLimit(1)
+                .vivaText()
         }
         .lineLimit(1)
         .truncationMode(.tail)
@@ -647,29 +650,28 @@ struct ViewToggle: View {
             // Toggle text with vertical separator
             HStack(spacing: VivaDesign.Spacing.xsmall) {
                 Text("Today")
-                    .lineLimit(1)
                     .font(VivaDesign.Typography.pointsTitle)
                     .fontWeight(.bold)
-                    .truncationMode(.tail)
                     .foregroundColor(
                         isShowingTotal
                             ? VivaDesign.Colors.secondaryText
                             : VivaDesign.Colors.vivaGreen
                     )
+                    .vivaText()
 
                 Text("|")
                     .foregroundColor(VivaDesign.Colors.vivaGreen)
+                    .vivaText()
 
                 Text("Total")
-                    .lineLimit(1)
                     .font(VivaDesign.Typography.pointsTitle)
                     .fontWeight(.bold)
-                    .truncationMode(.tail)
                     .foregroundColor(
                         isShowingTotal
                             ? VivaDesign.Colors.vivaGreen
                             : VivaDesign.Colors.secondaryText
                     )
+                    .vivaText()
             }
 
             // Right line
@@ -723,25 +725,22 @@ struct ComparisonRow: View {
             Text(leftValue)
                 .font(Font.system(size: 20, weight: .bold))
                 .fontWeight(.bold)
-                .lineLimit(1)
-                .truncationMode(.tail)
                 .foregroundColor(VivaDesign.Colors.primaryText)
+                .vivaText()
             Text(leftPoints)
                 .font(Font.system(size: 12, weight: .bold))
                 .fontWeight(.bold)
-                .lineLimit(1)
-                .truncationMode(.tail)
                 .foregroundColor(VivaDesign.Colors.vivaGreen)
+                .vivaText()
         }
         .frame(width: 80, alignment: .center)  // Fixed width with center alignment
     }
 
     private var centerTitle: some View {
         Text(title)
-            .lineLimit(1)
-            .truncationMode(.tail)
             .font(VivaDesign.Typography.pointsTitle)
             .foregroundColor(VivaDesign.Colors.primaryText)
+            .vivaText()
             .frame(width: 140, alignment: .center)  // Fixed width
     }
 
@@ -751,15 +750,13 @@ struct ComparisonRow: View {
             Text(rightValue)
                 .font(Font.system(size: 20, weight: .bold))
                 .fontWeight(.bold)
-                .lineLimit(1)
-                .truncationMode(.tail)
                 .foregroundColor(VivaDesign.Colors.primaryText)
+                .vivaText()
             Text(rightPoints)
                 .font(Font.system(size: 12, weight: .bold))
                 .fontWeight(.bold)
-                .lineLimit(1)
-                .truncationMode(.tail)
                 .foregroundColor(VivaDesign.Colors.vivaGreen)
+                .vivaText()
         }
         .frame(width: 80, alignment: .center)  // Fixed width with center alignment
     }
@@ -786,6 +783,7 @@ struct WorkoutListSection: View {
                 Text("No workouts recorded")
                     .foregroundColor(VivaDesign.Colors.secondaryText)
                     .font(VivaDesign.Typography.body)
+                    .vivaText()
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, VivaDesign.Spacing.medium)
                     .listRowBackground(Color.clear)
@@ -822,9 +820,8 @@ struct MatchupFooter: View {
                     // All-Time Wins label
                     Text("All-Time Wins")
                         .font(VivaDesign.Typography.caption.bold())
-                        .lineLimit(1)
-                        .truncationMode(.tail)
                         .foregroundColor(VivaDesign.Colors.primaryText)
+                        .vivaText()
 
                     // Record display
                     RecordDisplay(
@@ -841,6 +838,7 @@ struct MatchupFooter: View {
                 } label: {
                     Text("Rematch")
                         .font(.system(size: 24, weight: .semibold))
+                        .vivaText()
                         .padding(.horizontal, 60)
                         .padding(.vertical, VivaDesign.Spacing.small)
                         .foregroundColor(.white)
@@ -875,9 +873,8 @@ struct MatchupFooter: View {
                 VStack(spacing: VivaDesign.Spacing.small) {
                     Text("Matchup Ends")
                         .font(VivaDesign.Typography.caption.bold())
-                        .lineLimit(1)
-                        .truncationMode(.tail)
                         .foregroundColor(VivaDesign.Colors.primaryText)
+                        .vivaText()
                         .frame(maxWidth: .infinity, alignment: .center)
                         .opacity(endTime != nil && endTime! > Date() ? 1 : 0)  // Hide when waiting for data
                     TimeRemainingDisplay(
@@ -893,9 +890,8 @@ struct MatchupFooter: View {
                 VStack(spacing: VivaDesign.Spacing.small) {
                     Text("All-Time Wins")
                         .font(VivaDesign.Typography.caption.bold())
-                        .lineLimit(1)
-                        .truncationMode(.tail)
                         .foregroundColor(VivaDesign.Colors.primaryText)
+                        .vivaText()
                         .frame(maxWidth: .infinity, alignment: .center)
                     RecordDisplay(
                         leftUser: leftUser,
@@ -930,9 +926,8 @@ struct TimeRemainingDisplay: View {
         HStack(spacing: VivaDesign.Spacing.xsmall) {
             Text("Complete")
                 .font(.title)
-                .lineLimit(1)
-                .truncationMode(.tail)
                 .foregroundColor(VivaDesign.Colors.vivaGreen)
+                .vivaText()
         }
     }
 
@@ -940,8 +935,7 @@ struct TimeRemainingDisplay: View {
         HStack(spacing: VivaDesign.Spacing.xsmall) {
             Text("Not started")
                 .font(.title)
-                .lineLimit(1)
-                .truncationMode(.tail)
+                .vivaText()
         }
         .foregroundColor(VivaDesign.Colors.primaryText)
     }
@@ -949,11 +943,9 @@ struct TimeRemainingDisplay: View {
     private var waitingView: some View {
         Text("Waiting for final data")
             .font(.title3.bold())
-            .minimumScaleFactor(0.2)
-            .lineLimit(1)
-            .lineLimit(1)
             .foregroundColor(VivaDesign.Colors.primaryText)
             .padding(.horizontal, VivaDesign.Spacing.small)
+            .vivaText()
     }
 
     private var countdownView: some View {
@@ -962,26 +954,27 @@ struct TimeRemainingDisplay: View {
         return HStack(spacing: VivaDesign.Spacing.xsmall) {
             Text("\(remainingTime.days)")
                 .font(.title.bold())
-                .lineLimit(1)
+                .vivaText()
             Text("d")
                 .foregroundColor(VivaDesign.Colors.vivaGreen)
-                .lineLimit(1)
                 .font(VivaDesign.Typography.caption.bold())
+                .vivaText()
             Text("\(remainingTime.hours)")
                 .font(.title.bold())
-                .lineLimit(1)
+                .vivaText()
             Text("hr")
                 .foregroundColor(VivaDesign.Colors.vivaGreen)
-                .lineLimit(1)
                 .font(VivaDesign.Typography.caption.bold())
+                .vivaText()
             Text("\(remainingTime.minutes)")
                 .font(.title.bold())
-                .lineLimit(1)
+                .vivaText()
             Text("min")
                 .foregroundColor(VivaDesign.Colors.vivaGreen)
-                .lineLimit(1)
                 .font(VivaDesign.Typography.caption.bold())
+                .vivaText()
         }
+        .fixedSize(horizontal: true, vertical: false)
         .foregroundColor(VivaDesign.Colors.primaryText)
     }
 
@@ -1020,13 +1013,15 @@ struct RecordDisplay: View {
             
             Text("\(record.leftWins)")
                 .font(.system(size: 30, weight: .bold))
-                .lineLimit(1)
-                .padding(.horizontal, VivaDesign.Spacing.small)
-                        
+                .padding(.horizontal, VivaDesign.Spacing.xsmall)
+                .vivaText()
+                .minimumScaleFactor(0.8)
+
             Text("\(record.rightWins)")
                 .font(.system(size: 30, weight: .bold))
-                .lineLimit(1)
-                .padding(.horizontal, VivaDesign.Spacing.small)
+                .padding(.horizontal, VivaDesign.Spacing.xsmall)
+                .vivaText()
+                .minimumScaleFactor(0.8)
 
             VivaProfileImage(
                 userId: rightUser?.id,
@@ -1072,6 +1067,7 @@ struct InviteDialog: View {
                 Text(user.displayName)
                     .font(VivaDesign.Typography.title2)
                     .foregroundColor(VivaDesign.Colors.primaryText)
+                    .vivaText()
             }
             .padding(.top, VivaDesign.Spacing.medium)
 
@@ -1089,6 +1085,7 @@ struct InviteDialog: View {
                     HStack {
                         Image(systemName: "xmark.circle.fill")
                         Text("Cancel Invitation")
+                            .vivaText()
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -1104,6 +1101,7 @@ struct InviteDialog: View {
                     }
                 } label: {
                     Text("Dismiss")
+                        .vivaText()
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.gray.opacity(0.2))
@@ -1138,10 +1136,12 @@ struct MatchupResultMessage: View {
                 Text("You won this one! Nice work staying active.")
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .font(VivaDesign.Typography.body)
+                    .vivaText()
             } else {
                 Text("\(opponentName) took this one. Nice work staying active!")
                     .foregroundColor(VivaDesign.Colors.primaryText)
                     .font(VivaDesign.Typography.body)
+                    .vivaText()
             }
             Spacer()
         }
@@ -1427,6 +1427,7 @@ struct MatchupDetailErrorView: View {
             Text("Failed to load matchup")
                 .font(VivaDesign.Typography.title3)
                 .foregroundColor(VivaDesign.Colors.primaryText)
+                .vivaText()
 
             Button("Try Again") {
                 Task {
@@ -1459,6 +1460,7 @@ struct MatchupDetailLoadedView: View {
                     Text("MATCHUP RECAP")
                         .font(.title)
                         .fontWeight(.bold)
+                        .vivaText()
                         .foregroundColor(
                             VivaDesign.Colors.primaryText
                         )

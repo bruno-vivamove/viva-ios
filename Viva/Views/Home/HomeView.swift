@@ -243,7 +243,7 @@ struct ReceivedInvitesView: View {
                 actions: [
                     UserActionCard.UserAction(
                         title: "Accept",
-                        variant: .primary
+                        variant: .secondary
                     ) { context in
                         Task {
                             await viewModel.acceptInvite(invite)
