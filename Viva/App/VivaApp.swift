@@ -18,40 +18,29 @@ struct VivaApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ZStack {
-                VivaDesign.Colors.background
-                    .ignoresSafeArea()
-
-                if vivaAppObjects.userSession.isLoggedIn {
-                    MainView()
-                        .transition(.move(edge: .trailing))
-                } else {
-                    SignInView()
-                        .transition(.opacity)
+            AppContainerView()
+                .environmentObject(vivaAppObjects.userSession)
+                .environmentObject(vivaAppObjects.authManager)
+                .environmentObject(vivaAppObjects.friendService)
+                .environmentObject(vivaAppObjects.statsService)
+                .environmentObject(vivaAppObjects.matchupService)
+                .environmentObject(vivaAppObjects.userService)
+                .environmentObject(vivaAppObjects.healthKitDataManager)
+                .environmentObject(vivaAppObjects.userMeasurementService)
+                .environmentObject(vivaAppObjects.errorManager)
+                .onOpenURL { url in
+                    if url.absoluteString.contains("google") {
+                        GIDSignIn.sharedInstance.handle(url)
+                    }
                 }
-            }
-            .environmentObject(vivaAppObjects.userSession)
-            .environmentObject(vivaAppObjects.authManager)
-            .environmentObject(vivaAppObjects.friendService)
-            .environmentObject(vivaAppObjects.statsService)
-            .environmentObject(vivaAppObjects.matchupService)
-            .environmentObject(vivaAppObjects.userService)
-            .environmentObject(vivaAppObjects.healthKitDataManager)
-            .environmentObject(vivaAppObjects.userMeasurementService)
-            .environmentObject(vivaAppObjects.errorManager)
-            .onOpenURL { url in
-                if url.absoluteString.contains("google") {
-                    GIDSignIn.sharedInstance.handle(url)
-                }
-            }
-            .onAppear {
-                // Setup AppDelegate
-                appDelegate.vivaAppObjects = vivaAppObjects
-                appDelegate.setupNotifications()
+                .onAppear {
+                    // Setup AppDelegate
+                    appDelegate.vivaAppObjects = vivaAppObjects
+                    appDelegate.setupNotifications()
 
-                // Check for existing Apple sign-in session
-                checkAppleSignInState()
-            }
+                    // Check for existing Apple sign-in session
+                    checkAppleSignInState()
+                }
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             AppLogger.info(
@@ -92,6 +81,25 @@ struct VivaApp: App {
                     "Apple ID credential state: \(credentialState)",
                     category: .auth
                 )
+            }
+        }
+    }
+}
+
+struct AppContainerView: View {
+    @EnvironmentObject var userSession: UserSession
+    
+    var body: some View {
+        ZStack {
+            VivaDesign.Colors.background
+                .ignoresSafeArea()
+            
+            if userSession.isLoggedIn {
+                MainView()
+                    .transition(.move(edge: .trailing))
+            } else {
+                SignInView()
+                    .transition(.opacity)
             }
         }
     }

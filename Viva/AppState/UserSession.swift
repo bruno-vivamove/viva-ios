@@ -52,6 +52,7 @@ final class UserSession: ObservableObject {
         }
     }
     
+    @MainActor
     func setLoggedIn(userProfile: UserProfile, accessToken: String, refreshToken: String) {
         withAnimation(.easeInOut(duration: 0.5)) {
             self.userProfile = userProfile

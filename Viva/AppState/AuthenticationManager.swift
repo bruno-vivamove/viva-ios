@@ -59,13 +59,11 @@ final class AuthenticationManager: ObservableObject {
         AppLogger.debug("Creating session with idToken", category: .auth)
         let sessionResponse = try await sessionService.createSession(idToken)
 
-        await MainActor.run {
-            userSession.setLoggedIn(
-                userProfile: sessionResponse.userProfile,
-                accessToken: sessionResponse.accessToken,
-                refreshToken: sessionResponse.refreshToken
-            )
-        }
+        await userSession.setLoggedIn(
+            userProfile: sessionResponse.userProfile,
+            accessToken: sessionResponse.accessToken,
+            refreshToken: sessionResponse.refreshToken
+        )
         
         // Register device token after successful session creation
         await registerDeviceTokenIfNeeded()

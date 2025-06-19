@@ -47,12 +47,14 @@ struct MainView: View {
 
                 // Profile Tab
                 NavigationStack {
-                    ProfileView(
-                        userId: userSession.userId!,
-                        userSession: userSession,
-                        userService: userService,
-                        matchupService: matchupService
-                    )
+                    if let userId = userSession.userId {
+                        ProfileView(
+                            userId: userId,
+                            userSession: userSession,
+                            userService: userService,
+                            matchupService: matchupService
+                        )
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .tabItem {
