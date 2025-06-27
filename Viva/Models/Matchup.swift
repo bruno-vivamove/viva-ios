@@ -29,7 +29,6 @@ struct MatchupTeam: Codable, Identifiable, Equatable, Hashable {
     let teamHash: String?
     let side: Side
     let points: Int
-    let winCount: Int
     let users: [UserSummary]
     
     enum Side: String, Codable {
@@ -110,6 +109,8 @@ struct MatchupDetails: Codable, Equatable {
     var workouts: [Workout]
     var invites: [MatchupInvite]
     var finalized: Bool
+    let leftTeamWins: Int
+    let rightTeamWins: Int
     
     var leftTeam: MatchupTeam {
         teams.first { $0.side == .left }!

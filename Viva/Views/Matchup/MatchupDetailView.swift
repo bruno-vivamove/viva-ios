@@ -1584,8 +1584,8 @@ struct MatchupDetailLoadedView: View {
                 leftUser: matchup.leftTeam.users.first,
                 rightUser: matchup.rightTeam.users.first,
                 record: (
-                    leftWins: matchup.leftTeam.winCount,
-                    rightWins: matchup.rightTeam.winCount
+                    leftWins: matchup.leftTeamWins,
+                    rightWins: matchup.rightTeamWins
                 ),
                 isCompleted: matchup.status == .completed,
                 matchupService: viewModel.matchupService,
