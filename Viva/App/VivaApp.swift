@@ -13,6 +13,8 @@ struct VivaApp: App {
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
+        // Configure Firebase before anything else
+        FirebaseUtil.configureFirebase()
         configureVivaImageCache()
     }
 
@@ -116,9 +118,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication
             .LaunchOptionsKey: Any]?
     ) -> Bool {
-        // Initialize Firebase
-        FirebaseUtil.configureFirebase()
-
         // Set FCM messaging delegate
         Messaging.messaging().delegate = self
 
