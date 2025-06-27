@@ -211,7 +211,7 @@ struct MatchupStatsTableHeader: View {
 // MARK: - Stats Section
 struct MatchupStatsSection: View {
     let userStats: UserStats?
-    let matchupStats: [MatchupStats]
+    let matchupStats: [UserMatchupSeriesStats]
     @ObservedObject var viewModel: MatchupHistoryViewModel
 
     var body: some View {
@@ -304,13 +304,13 @@ struct MatchupHistoryCompletedMatchupsSection: View {
 }
 
 struct MatchupStatsCard: View {
-    let stats: MatchupStats
+    let stats: UserMatchupSeriesStats
     @ObservedObject var viewModel: MatchupHistoryViewModel
 
     var body: some View {
         HStack(spacing: 0) {
             // User Record (11-9)
-            Text("\(stats.userTeamWins)-\(stats.opponentTeamWins)")
+            Text("\(stats.wins)-\(stats.losses)")
                 .font(VivaDesign.Typography.body.bold())
                 .foregroundColor(VivaDesign.Colors.onBackground)
                 .vivaText()
@@ -330,7 +330,7 @@ struct MatchupStatsCard: View {
                 .frame(width: VivaDesign.Spacing.contentTiny)
 
             // Opponent Info with Profile Picture - fixed position
-            if let opponent = stats.opponentTeamUsers.first {
+            if let opponent = stats.opponents.first {
                 VivaProfileImage(
                     userId: opponent.id,
                     imageUrl: opponent.imageUrl,

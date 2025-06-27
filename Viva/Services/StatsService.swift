@@ -7,9 +7,9 @@ final class StatsService: ObservableObject {
         self.networkClient = networkClient
     }
     
-    func getUserMatchupStats() async throws -> UserMatchupStatsResponse {
+    func getUserMatchupStats() async throws -> UserSeriesStatsListResponse {
         return try await networkClient.get(
-            path: "/stats/matchups"
+            path: "/stats/v2/matchups"
         )
     }
 }

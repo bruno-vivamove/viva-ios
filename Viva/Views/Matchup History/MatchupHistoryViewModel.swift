@@ -4,7 +4,7 @@ import SwiftUI
 final class MatchupHistoryViewModel: ObservableObject {
     @Published var selectedMatchup: Matchup?
     @Published var userStats: UserStats?
-    @Published var matchupStats: [MatchupStats] = []
+    @Published var matchupStats: [UserMatchupSeriesStats] = []
     @Published var completedMatchups: [Matchup] = []
     @Published var isLoading: Bool = false
     @Published var error: Error?
@@ -102,8 +102,8 @@ final class MatchupHistoryViewModel: ObservableObject {
                 do {
                     let response =
                         try await statsService.getUserMatchupStats()
-                    self.userStats = response.userStats
-                    self.matchupStats = response.matchupStats
+                    self.userStats = response.overallStats
+                    self.matchupStats = response.seriesStats
                 } catch {
                     // Ignore errors when refreshing in background
                 }
@@ -156,8 +156,8 @@ final class MatchupHistoryViewModel: ObservableObject {
             )
 
             // Update the published properties
-            userStats = statsResponse.userStats
-            matchupStats = statsResponse.matchupStats
+            userStats = statsResponse.overallStats
+            matchupStats = statsResponse.seriesStats
 
             // Use the completed matchups from the response
             completedMatchups = matchupsResponse.matchups
