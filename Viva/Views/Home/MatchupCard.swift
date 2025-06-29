@@ -254,7 +254,7 @@ struct MatchupCard: View {
         }
     }
 
-    private func getUserDisplayName(user: UserSummary?, invite: MatchupInvite?)
+    private func getUserDisplayName(user: MatchupUser?, invite: MatchupInvite?)
         -> String
     {
         if let invite = invite, let invitedUser = invite.user {

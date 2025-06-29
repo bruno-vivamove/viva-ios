@@ -536,7 +536,7 @@ struct MatchupHeader: View {
 }
 
 struct UserScoreView: View {
-    let matchupUser: UserSummary?
+    let matchupUser: MatchupUser?
     let invite: MatchupInvite?
     let totalPoints: Int
     let imageOnLeft: Bool
@@ -547,7 +547,7 @@ struct UserScoreView: View {
     let isWinner: Bool
 
     init(
-        matchupUser: UserSummary?,
+        matchupUser: MatchupUser?,
         invite: MatchupInvite?,
         totalPoints: Int,
         imageOnLeft: Bool,
@@ -798,8 +798,8 @@ struct WorkoutListSection: View {
 
 struct MatchupFooter: View {
     let endTime: Date?
-    let leftUser: UserSummary?
-    let rightUser: UserSummary?
+    let leftUser: MatchupUser?
+    let rightUser: MatchupUser?
     let record: (leftWins: Int, rightWins: Int)
     let isCompleted: Bool
     let matchupService: MatchupService
@@ -993,8 +993,8 @@ struct TimeRemainingDisplay: View {
 }
 
 struct RecordDisplay: View {
-    let leftUser: UserSummary?
-    let rightUser: UserSummary?
+    let leftUser: MatchupUser?
+    let rightUser: MatchupUser?
     let record: (leftWins: Int, rightWins: Int)
     @Binding var selectedUserId: String?
 

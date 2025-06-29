@@ -309,7 +309,13 @@ final class HealthKitDataManager: ObservableObject {
                 // Create workout object
                 let workout = Workout(
                     id: workoutId,
-                    user: user,
+                    user: UserSummary(
+                        id: user.id,
+                        displayName: user.displayName,
+                        caption: nil,
+                        imageUrl: user.imageUrl,
+                        friendStatus: nil
+                    ),
                     workoutStartTime: hkWorkout.startDate,
                     workoutEndTime: hkWorkout.endDate,
                     type: workoutType,

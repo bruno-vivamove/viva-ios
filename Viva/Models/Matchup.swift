@@ -29,7 +29,7 @@ struct MatchupTeam: Codable, Identifiable, Equatable, Hashable {
     let teamHash: String?
     let side: Side
     let points: Int
-    let users: [UserSummary]
+    let users: [MatchupUser]
     
     enum Side: String, Codable {
         case left = "LEFT"
@@ -75,11 +75,11 @@ struct Matchup: Codable, Identifiable, Equatable, Hashable {
         teams.first { $0.side == .right }
     }
     
-    var leftUsers: [UserSummary] {
+    var leftUsers: [MatchupUser] {
         leftTeam?.users ?? []
     }
     
-    var rightUsers: [UserSummary] {
+    var rightUsers: [MatchupUser] {
         rightTeam?.users ?? []
     }
     
@@ -166,13 +166,28 @@ enum MatchupStatus: String, Codable {
     case cancelled = "CANCELLED"
 }
 
-struct MatchupUser: Codable {
-    let userId: String
-    let matchupId: String
-    let side: MatchupTeam.Side
-    let userOrder: Int
+struct MatchupUser: Codable, Identifiable, Equatable {
+    let id: String
+    let displayName: String
+    let imageUrl: String?
+    let matchupTeamId: String
+    let userOrder: Int?
+    let measurementsComplete: Bool?
+    let isFinalized: Bool?
+    let lastMeasurementUpdate: Date?
     let createTime: Date?
-    let userInfo: UserSummary?
+    
+    private enum CodingKeys: String, CodingKey {
+        case id = "userId"
+        case displayName
+        case imageUrl
+        case matchupTeamId
+        case userOrder
+        case measurementsComplete
+        case isFinalized
+        case lastMeasurementUpdate
+        case createTime
+    }
 }
 
 struct MatchupMeasurement: Codable, Equatable {
